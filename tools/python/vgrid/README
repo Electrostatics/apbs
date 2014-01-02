@@ -1,0 +1,39 @@
+This directory contains a Python interface for modifying dx files
+generated from APBS. 
+
+README updated 12/14/2004 by Todd Dolinsky (todd@ccb.wustl.edu)
+
+Scripts in this directory:
+
+    mergedx.py - merges multiple dx files generated from parallel
+        APBS runs into one merged dx file. Users may also resample the
+        grid size if desired.  Default output is written to mergedgrid.dx
+ 
+        Usage: mergedx.py [options] <input-file> <dx-stem>
+ 
+        Required Arguments:
+            <input-file>   : The path to an APBS input file used to
+                             generate the dx file.  If the APBS run was
+                             asynchronous, any of the input files may be used
+            <dx-stem>      : The stem of the dx filenames.  This script will
+                             add the digit and the .dx extension -  note that
+                             the dx files MUST be trailed by the form *.dx
+ 
+                             Example: given dx files 2PHKB-PE0.dx and 
+                                      2PHKB-PE1.dx, the stem would be 2PHKB-PE
+ 
+        Optional Arguments:
+            --help   (-h)  : Display the usage information
+            --out=<outpath>: Save merged dx file into filename <outpath>
+            --nx=<xsize>   : Resample to the <xsize> gridpoints in the x dir
+            --ny=<ysize>   : Resample to the <ysize> gridpoints in the z dir
+            --nz=<zsize>   : Resample to the <zsize> gridpoints in the z dir
+                             Note: If resampling, nx, ny, and nz all must be 
+                                   specified.
+ 
+
+
+    read.py    
+    average.py
+
+

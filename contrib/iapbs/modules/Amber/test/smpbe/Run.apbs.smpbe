@@ -1,0 +1,13 @@
+#!/bin/sh
+
+export MCSH_HOME=/dev/null
+
+output=smpbe.out
+
+$AMBERHOME/exe/sander.APBS -O -i smpbe.in \
+    -c 2ala.prmcrd -p 2ala.prmtop -o $output
+
+$AMBERHOME/test/dacdif $output.save $output
+
+
+/bin/rm -f mdinfo restrt

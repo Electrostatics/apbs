@@ -1,0 +1,17 @@
+ test of PB reaction field on protein g solvated in a sphere (iAPBS)
+&cntrl 
+   ntx=1, irest=0,
+   imin=1, ntmin=2, maxcyc=0,
+   ntpr=1, igb=6, ntb=0,
+   ntc=1, ntf=1, tol=0.000001,
+ /   
+&apbs
+    apbs_debug=0, apbs_print=1,
+    grid = 0.5, 0.5, 0.5,
+    calc_type=0,     cmeth=1,
+ bcfl=2, srfm=0,
+ chgm=0, srad =1.4, swin =0.3,
+ pdie=1.0,  sdie=80.0,
+ calcforce=0,
+LINE
+&end

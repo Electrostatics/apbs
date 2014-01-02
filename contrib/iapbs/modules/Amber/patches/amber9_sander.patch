@@ -1,0 +1,469 @@
+diff -ur sander.orig/depend sander/depend
+--- sander.orig/depend	2006-04-03 16:35:54.000000000 -0700
++++ sander/depend	2007-09-25 11:54:11.000000000 -0700
+@@ -187,6 +187,13 @@
+ amopen.o: \
+                     copyright.h
+ 
++apbs.o: \
++                    dprec.h\
++                    files.h
++
++apbs_vars.o: \
++                    dprec.h
++
+ assert.o: \
+                     copyright.h\
+                     assert.h
+@@ -1104,6 +1111,7 @@
+                     egb.o\
+                     pb_force.o\
+                     np_force.o\
++                    apbs.o\
+                     trace.o\
+                     stack.o\
+                     qmmm_module.o\
+@@ -1149,6 +1157,7 @@
+                     egb.LES.o\
+                     pb_force.o\
+                     np_force.o\
++                    apbs.o\
+                     trace.o\
+                     stack.o\
+                     qmmm_module.o\
+@@ -1193,6 +1202,7 @@
+                     egb.o\
+                     pb_force.o\
+                     np_force.o\
++                    apbs.o\
+                     trace.o\
+                     stack.o\
+                     qmmm_module.o\
+@@ -1238,6 +1248,7 @@
+                     egb.PIMD.o\
+                     pb_force.o\
+                     np_force.o\
++                    apbs.o\
+                     trace.o\
+                     stack.o\
+                     qmmm_module.PIMD.o\
+@@ -1393,6 +1404,7 @@
+                     pimd_vars.o\
+                     stack.o\
+                     nmr.o\
++                    apbs.o\
+                     box.h\
+                     def_time.h\
+                     ew_cntrl.h\
+@@ -1431,6 +1443,7 @@
+                     pimd_vars.o\
+                     stack.o\
+                     nmr.LES.o\
++                    apbs.o\
+                     box.h\
+                     def_time.h\
+                     ew_cntrl.h\
+@@ -1473,6 +1486,7 @@
+                     pimd_vars.o\
+                     stack.o\
+                     nmr.o\
++                    apbs.o\
+                     box.h\
+                     def_time.h\
+                     ew_cntrl.h\
+@@ -1515,6 +1529,7 @@
+                     pimd_vars.PIMD.o\
+                     stack.o\
+                     nmr.LES.o\
++                    apbs.o\
+                     box.h\
+                     def_time.h\
+                     ew_cntrl.h\
+@@ -2970,6 +2985,7 @@
+                     amoeba_runmd.o\
+                     amoeba_mdin.o\
+                     amoeba_interface.o\
++                    apbs.o\
+                     pimd_vars.o\
+                     files.h\
+                     memory.h\
+@@ -3009,6 +3025,7 @@
+                     amoeba_runmd.o\
+                     amoeba_mdin.o\
+                     amoeba_interface.o\
++                    apbs.o\
+                     pimd_vars.o\
+                     files.h\
+                     memory.h\
+@@ -3052,6 +3069,7 @@
+                     amoeba_runmd.o\
+                     amoeba_mdin.o\
+                     amoeba_interface.o\
++                    apbs.o\
+                     spatial_dcmp.o\
+                     pimd_vars.o\
+                     files.h\
+@@ -3096,6 +3114,7 @@
+                     amoeba_runmd.o\
+                     amoeba_mdin.o\
+                     amoeba_interface.o\
++                    apbs.o\
+                     pimd_vars.PIMD.o\
+                     files.h\
+                     memory.h\
+diff -ur sander.orig/dynlib.f sander/dynlib.f
+--- sander.orig/dynlib.f	2006-04-03 16:35:54.000000000 -0700
++++ sander/dynlib.f	2007-09-25 12:06:53.000000000 -0700
+@@ -340,6 +340,10 @@
+       write(6,9058) eel,ehbond,econst
+    else if ( igb == 10 ) then
+       write(6,9060) eel,ehbond,econst
++#ifdef APBS
++   else if (igb == 6 .and. mdin_apbs ) then
++      write(6,9060) eel,ehbond,econst
++#endif /* APBS */
+    else
+       write(6,9059) eel,ehbond,econst
+    end if
+@@ -374,6 +378,9 @@
+    end if
+    if (gbsa > 0) write(6,9077) esurf
+    if (igb == 10) write(6,9074) esurf,edisp
++#ifdef APBS
++   if (igb == 6 .and. mdin_apbs ) write(6,9087) esurf
++#endif /* APBS */
+    if (econst /= 0.0) write(6,9076) epot-econst
+    if ( dvdl /= 0.d0) write(6,9089) dvdl
+ #ifdef PIMD
+@@ -430,6 +437,10 @@
+       write(7,9058) eel,ehbond,econst
+    else if ( igb == 10 ) then
+       write(7,9060) eel,ehbond,econst
++#ifdef APBS
++   else if (igb == 6 .and. mdin_apbs ) then
++      write(7,9060) eel,ehbond,econst
++#endif /* APBS */
+    else
+       write(7,9059) eel,ehbond,econst
+    end if
+@@ -464,6 +475,9 @@
+    end if
+    if (gbsa > 0) write(7,9077) esurf
+    if (igb == 10) write(7,9074) esurf,edisp
++#ifdef APBS
++   if (igb == 6 .and. mdin_apbs ) write(7,9087) esurf
++#endif /* APBS */
+    if (econst /= 0.0) write(7,9076) epot-econst
+    if ( dvdl /= 0.d0) write(7,9089) dvdl
+ #ifndef LES
+@@ -523,7 +537,7 @@
+    9084 format (1x,'PDDGMNDO-ESCF= ',f11.4)
+    9085 format (1x,'PM3CARB1-ESCF= ',f11.4)
+    9086 format (1x,'DFTBESCF= ',f13.4)
+-   
++   9087 format (1x,'ENPOLAR= ',f14.4)
+ #ifdef LES
+    ! LES and non-LES temperatures (no solvent/solute)
+    9068 format (1x,'T_non-LES =',f10.4,2x, 'T_LES     = ',f10.4)
+diff -ur sander.orig/files.h sander/files.h
+--- sander.orig/files.h	2006-04-03 16:35:55.000000000 -0700
++++ sander/files.h	2007-09-12 12:50:23.000000000 -0700
+@@ -45,7 +45,12 @@
+ 
+ logical mdin_ewald,mdin_pb,mdin_amoeba
+ 
++#ifdef APBS
++logical mdin_apbs, sp_apbs
++common/mdin_flags/mdin_ewald,mdin_pb,mdin_amoeba,mdin_apbs,sp_apbs
++#else
+ common/mdin_flags/mdin_ewald,mdin_pb,mdin_amoeba
++#endif /* APBS */
+ 
+ integer BC_HULP  ! size in integers of common HULP
+ parameter ( BC_HULP = 9 )
+diff -ur sander.orig/force.f sander/force.f
+--- sander.orig/force.f	2006-04-03 16:35:55.000000000 -0700
++++ sander/force.f	2007-09-25 10:36:12.000000000 -0700
+@@ -11,6 +11,9 @@
+    use genborn
+    use poisson_boltzmann, only : pb_force
+    use dispersion_cavity, only : npopt, np_force
++#ifdef APBS
++   use apbs
++#endif /* APBS */
+    use trace
+    use stack
+    use qmmm_module, only : qmmm_nml,qmmm_struct, qm2_struct, &
+@@ -114,7 +117,7 @@
+    save ene
+ 
+    integer i,m,nttyp,i3
+-   _REAL_  virvsene,eelt,epol,esurf,edisp
++   _REAL_  virvsene,eelt,epol,esurf,edisp,enpol
+    _REAL_  epolar,aveper,aveind,avetot,emtot,dipiter,dipole_temp
+    integer l_r2x,l_rjx,l_tmp1,l_tmp2,l_tmp3,l_tmp4,l_tmp5
+    integer l_tmp6,l_tmp7,l_tmp8,l_jj,l_skipv, l_kvls,l_jvls,l_psi
+@@ -802,6 +805,33 @@
+ 
+       end if  ! ( igb == 10 )
+ 
++#ifdef APBS
++! APBS forces
++      if( mdin_apbs ) then
++         if (igb /= 6) then
++            write(6,*) '&apbs keyword requires igb=6.'
++            call mexit(6,1)
++         end if
++        
++         call timer_start(TIME_PBFORCE)
++
++! in: coords, radii, charges
++! out: updated forces (via apbs_params) and solvation energy (pol + apolar)
++
++         if (sp_apbs) then
++            call apbs_spenergy(natom, x, f, eelt, enpol)
++         else
++            call apbs_force(natom, x, f, ene(2), eelt, enpol)
++         end if
++!         ene(2) = 
++!         ene(3) = 
++         ene(4) = eelt
++         ene(23) = enpol
++         call timer_stop(TIME_PBFORCE)
++
++      end if  ! ( mdin_apbs )
++#endif /* APBS */
++
+ #ifdef MPI
+    end if
+ #endif
+diff -ur sander.orig/Makefile sander/Makefile
+--- sander.orig/Makefile	2006-04-03 16:35:54.000000000 -0700
++++ sander/Makefile	2007-09-12 12:50:23.000000000 -0700
+@@ -42,6 +42,9 @@
+     amoeba_direct.o amoeba_mdin.o amoeba_adjust.o amoeba_self.o\
+     amoeba_vdw.o amoeba_induced.o amoeba_runmd.o 
+ 
++APBSOBJ= \
++	apbs_vars.o apbs.o
++
+ QMOBJ= \
+     qm_mm.o qm_link_atoms.o qm_nb_list.o qm_extract_coords.o \
+     qm_ewald.o qm_gb.o qm_zero_charges.o qm_print_info.o \
+@@ -211,6 +214,19 @@
+ 		../lib/nxtsec.o ../lib/sys.a $(NETCDFLIB) $(LOADLIB)
+ 
+ #---------------------------------------------------------------------------
++sander.APBS$(SFX): $(NETCDF) $(APBSOBJ) $(MMOBJ) $(QMOBJ) $(QM2OBJ) \
++		$(QMMMOBJ_DFTB) \
++		qm_div.o force.o syslib \
++		nxtsec lapack blas lmod divcon checkserconf
++	$(LOAD) -o sander.APBS$(SFX)  $(APBSOBJ) $(MMOBJ) $(QMOBJ) $(QM2OBJ) \
++		$(QMMMOBJ_DFTB) \
++		qm_div.o force.o \
++		-L$(APBS_LIB) -liapbs -lapbsmainroutines -lapbs -lmaloc \
++		../lmod/lmod.a ../dcqtp/src/qmmm/libdivcon.a $(LOADLIB) \
++		../lapack/lapack.a ../blas/blas.a \
++		../lib/nxtsec.o ../lib/sys.a $(NETCDFLIB)
++
++#---------------------------------------------------------------------------
+ psander$(SFX): $(NETCDF) $(PSOBJ)  $(QMOBJ) $(QM2OBJ) $(QMMMOBJ_DFTB) \
+               qm_div.o force.PS.o syslib \
+                  syslib nxtsec lapack blas lmod
+diff -ur sander.orig/mdread.f sander/mdread.f
+--- sander.orig/mdread.f	2006-04-03 16:35:55.000000000 -0700
++++ sander/mdread.f	2007-09-25 12:11:49.000000000 -0700
+@@ -15,6 +15,9 @@
+ #endif
+    use stack, only: lastist,lastrst
+    use nmr, only: echoin
++#ifdef APBS
++   use apbs
++#endif /* APBS */
+    implicit none
+ #  include "box.h"
+ #  include "def_time.h"
+@@ -281,6 +284,9 @@
+    mdin_cntrl=.false.
+    mdin_ewald=.false.
+    mdin_pb=.false.
++#ifdef APBS
++   mdin_apbs = .false.
++#endif /* APBS */
+    mdin_lmod=.false.
+    mdin_amoeba=.false.
+    iamoeba = 0
+@@ -294,6 +300,11 @@
+    call nmlsrc('pb',5,ifind)
+    if (ifind /= 0) mdin_pb=.true.
+ 
++#ifdef APBS
++   call nmlsrc('apbs',5,ifind)
++   if (ifind /= 0) mdin_apbs=.true.
++#endif /* APBS */
++
+    call nmlsrc('lmod',5,ifind)
+    if (ifind /= 0) mdin_lmod=.true.
+ 
+@@ -425,6 +436,12 @@
+       call pb_read
+    end if
+ 
++#ifdef APBS
++   if ( mdin_apbs ) then
++      call apbs_read
++   end if
++#endif /* APBS */
++
+    if( iamoeba == 1 ) then
+       if( mdin_amoeba ) then
+          call AMOEBA_read_mdin(5)
+@@ -728,7 +745,7 @@
+          ', iesp    =',iesp
+    write(6,'(5x,3(a,f10.5))') 'dielc   =',dielc, &
+          ', cut     =',cut,', intdiel =',intdiel
+-   
++
+    if( igb /= 0 .and. igb /= 10) then
+       write(6,'(5x,3(a,f10.5))') 'saltcon =',saltcon, &
+             ', offset  =',offset,', gbalpha= ',gbalpha
+@@ -996,7 +1013,11 @@
+       write(0,*) 'GBSA=2 only works for single point energy calc'
+       call mexit( 6,1 )
+    end if
++#ifdef APBS
++   if( igb /= 0 .and. igb /= 10 .and. .not.mdin_apbs ) then
++#else
+    if( igb /= 0 .and. igb /= 10) then
++#endif /* APBS */
+ #ifdef LES
+       write(6,*) 'igb=1,5,7 are working with LES, no SA term included'
+ #endif
+@@ -1289,7 +1310,7 @@
+       call pb_init(ifcap,natom,nres,ntypes,nbonh,nbona,ix(i02),ix(i04),ix(i06),ix(i08),ix(i10),&
+                    ix(iibh),ix(ijbh),ix(iiba),ix(ijba),ih(m02),ih(m04),ih(m06),x(l15),x(l97))
+    end if  ! ( igb == 10 ) 
+- 
++
+    if (icnstph /= 0) then
+       !     Read charge data and alter current charges accordingly
+       call cnstphread(ix(icpstinf),ix(icpresst),ix(icpptcnt), &
+@@ -1639,7 +1660,12 @@
+       write(6,'(/,a)') ' igb>0 is only compatible with ntb=0'
+       inerr = 1
+    end if
++#ifdef APBS
++      if ( ntb == 0 .and. sqrt(cut) < 8.05 .and. igb /= 10 .and. &
++           .not.mdin_apbs ) then
++#else
+    if ( ntb == 0 .and. sqrt(cut) < 8.05 .and. igb /= 10 ) then
++#endif /* APBS */
+       write(6,'(/,a,f8.2)') ' unreasonably small cut for non-periodic run: ', &
+          sqrt(cut)
+       inerr = 1
+@@ -2083,7 +2109,7 @@
+          ih(m06),ix,x,ix(i08),ix(i10),fmn, &
+          nspm,ix(i70),x(l75),tmass,tmassinv,x(lmass),x(lwinv),req)
+    endif
+-   
++
+    !  DEBUG input; force checking
+    call load_debug(5)
+ 
+diff -ur sander.orig/printe.f sander/printe.f
+--- sander.orig/printe.f	2006-04-03 16:35:55.000000000 -0700
++++ sander/printe.f	2007-09-23 21:53:02.000000000 -0700
+@@ -172,6 +172,9 @@
+ #  include "ew_mpole.h"
+ #  include "ew_cntrl.h"
+ #  include "tgtmd.h"
++#ifdef APBS
++#  include "files.h"
++#endif /* APBS */
+ 
+    _REAL_  epot,enonb,enele,ehbond,ebond,eangle,edihed,enb14,eel14
+    _REAL_  econst,epolar,aveper,aveind,avetot,esurf,edisp,diprms,dipiter
+@@ -209,6 +212,10 @@
+       write(6,9048) enonb,enele,ehbond
+    else if ( igb == 10 ) then
+       write(6,9050) enonb,enele,ehbond
++#ifdef APBS
++   else if ( igb == 6 .and. mdin_apbs ) then
++      write(6,9050) enonb,enele,ehbond
++#endif /* APBS */
+    else
+       write(6,9049) enonb,enele,ehbond
+    end if
+@@ -235,6 +242,9 @@
+    end if
+    if( gbsa > 0 ) write(6,9077) esurf
+    if (igb == 10) write(6,9074) esurf,edisp
++#ifdef APBS
++   if (igb == 6 .and. mdin_apbs ) write(6,9069) esurf
++#endif /* APBS */
+    if (epolar /= 0.0) write(6,9068) epolar
+    if (econst /= 0.0) write(6,9078) epot-econst
+    if ( dvdl /= 0.d0) write(6,9089) dvdl
+@@ -259,6 +269,10 @@
+          write(7,9048) enonb,enele,ehbond
+       else if ( igb == 10 ) then
+          write(7,9050) enonb,enele,ehbond
++#ifdef APBS
++      else if ( igb == 6 .and. mdin_apbs ) then
++         write(7,9050) enonb,enele,ehbond
++#endif /* APBS */
+       else
+          write(7,9049) enonb,enele,ehbond
+       end if
+@@ -285,6 +299,9 @@
+       end if
+       if( gbsa > 0 ) write(7,9077) esurf
+       if ( igb == 10 ) write(7,9074) esurf,edisp
++#ifdef APBS
++      if (igb == 6 .and. mdin_apbs ) write(7,9069) esurf
++#endif /* APBS */
+       if (epolar /= 0.0) write(7,9068) epolar
+       if (econst /= 0.0) write(7,9078) epot-econst
+       if ( dvdl /= 0.d0) write(7,9089) dvdl
+@@ -307,6 +324,9 @@
+    9058 format (1x,'1-4 VDW = ',f13.4,2x,'1-4 EEL = ',f13.4,2x, &
+          'RESTRAINT  = ',f13.4)
+    9068 format (1x,'EPOLAR  = ',f13.4)
++#ifdef APBS
++   9069 format (1x,'ENPOLAR = ',f13.4)
++#endif /* APBS */
+    9074 format (1x,'ECAVITY = ',f13.4,2x,'EDISPER = ',f13.4)
+    9077 format (1x,'ESURF   = ',f13.4)
+    9078 format (1x,'EAMBER  = ',f13.4)
+diff -ur sander.orig/sander.f sander/sander.f
+--- sander.orig/sander.f	2006-04-03 16:35:55.000000000 -0700
++++ sander/sander.f	2007-09-25 11:01:07.000000000 -0700
+@@ -34,6 +34,11 @@
+   use amoeba_mdin, only : beeman_integrator
+   use amoeba_interface, only:  &
+                              AMOEBA_deallocate,AMOEBA_readparm
++
++#ifdef APBS
++   use apbs
++#endif /* APBS */
++
+ #ifdef PSANDER
+    use spatial, only:deallocate_psander
+ #endif
+@@ -335,6 +340,16 @@
+ 
+       if( igb == 0 .and. induced == 1 ) call get_dips(x,nr)
+ 
++#ifdef APBS
++!     APBS initialization
++      if ( mdin_apbs ) then
++!     in: natom, coords, charge and radii (from prmtop)
++!     out: pb charges and pb radii (via apbs_vars module)
++         call apbs_init(natom, x(lcrd), x(l15), x(l97))
++      end if
++#endif /* APBS */
++
++
+       !        ----- SET THE INITIAL VELOCITIES -----
+ 
+       if (ntx <= 3) then

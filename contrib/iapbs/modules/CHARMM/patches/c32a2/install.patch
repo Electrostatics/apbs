@@ -1,0 +1,56 @@
+--- install.com.orig	2005-06-09 15:59:21.000000000 -0700
++++ install.com	2005-06-09 21:00:03.000000000 -0700
+@@ -116,6 +116,7 @@
+ set qcadpac = 0
+ set qqchem = 0
+ set qsccdftb = 0
++set apbs = 0
+ set scali = 0
+ set socket = 0
+ set f77 = 0
+@@ -178,6 +179,7 @@
+   echo "           C  replace QUANTUM with CADPAC."
+   echo "           T  replace QUANTUM with SCCDFTB."
+   echo "          QC  replace QUANTUM with Q-CHEM."
++  echo "        APBS  compile with APBS support."
+   echo "           S  Uses TCP/IP SOCKET library for parallel."
+   echo "        FULL  For FULL featured version (default)."
+   echo "        LITE  For a version with reduced functional features."
+@@ -225,6 +227,7 @@
+     if ( $opt == 'Q'  ) set qgamess = 1
+     if ( $opt == 'U'  ) set qgamessuk = 1
+     if ( $opt == 'C'  ) set qcadpac = 1
++    if ( $opt == 'APBS'  ) set apbs = 1
+     if ( $opt == 'S'  ) set socket = 1
+     if ( $opt == 'T'  ) set qsccdftb = 1
+     if ( $opt == 'QC'  ) set qqchem = 1
+@@ -450,7 +453,18 @@
+                     $chmbuild/Makefile_$chmhost > $chmbuild/Makefile_$$
+    /bin/mv $chmbuild/Makefile_$$ $chmbuild/Makefile_$chmhost
+   endif
+-
++# setup for APBS
++  if ( $apbs == 1 && $chm_host == gnu ) then
++      setenv APBS Y
++      if ( ! $?APBS_LIB || ! $?IAPBS_LIB || ! $?APBS_BLAS ) then
++        echo "APBS_LIB, IAPBS_LIB and APBS_BLAS variables must be set!"
++	exit
++      endif           
++  endif
++  if ( $apbs == 1 && $chm_host != gnu ) then
++    echo "APBS build is supported on gnu platform only"
++    exit
++  endif
+ # Modify Makefile_template for long integer compilation
+   if ( $longint == 1 ) then
+       if ( $chm_host == sgi64 || \
+@@ -1040,6 +1054,9 @@
+   if ( $full == 1 ) then
+     echo "ACE"        >> $chmbuild/pref$$.dat
+     echo "ADUMB"      >> $chmbuild/pref$$.dat
++    if ( $apbs == 1 ) then
++      echo "APBS"     >> $chmbuild/pref$$.dat
++    endif
+     echo "ASPENER"    >> $chmbuild/pref$$.dat
+     echo "ASPMEMB"    >> $chmbuild/pref$$.dat
+     echo "BANBA"      >> $chmbuild/pref$$.dat

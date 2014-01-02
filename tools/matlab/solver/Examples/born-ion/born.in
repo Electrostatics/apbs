@@ -1,0 +1,76 @@
+#############################################################################
+### BORN ION SOLVATION ENERGY
+### $Id: apbs-mol-auto.in 1119 2007-07-23 13:52:03Z sobolevnrm $
+###
+### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for 
+### input file sytax.
+#############################################################################
+
+# READ IN MOLECULES
+read                                                
+    mol pqr born-ion.pqr
+end
+
+# COMPUTE POTENTIAL FOR SOLVATED STATE
+elec name solvated
+    mg-auto      
+    dime 65 65 65
+    cglen 50 50 50
+    fglen 12 12 12
+    fgcent mol 1
+    cgcent mol 1
+    mol 1
+    lpbe
+    bcfl mdh
+    pdie 1.0
+    sdie 78.54
+    chgm spl0
+    srfm spl2
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+    write pot dx solvated-born-pot
+    write charge dx born-charge
+    write dielx dx solvated-born-dielx
+    write diely dx solvated-born-diely
+    write dielz dx solvated-born-dielz
+    write kappa dx solvated-born-kappa
+end
+
+# COMPUTE POTENTIAL FOR REFERENCE STATE
+elec name reference
+    mg-auto
+    dime 65 65 65
+    cglen 50 50 50
+    fglen 12 12 12
+    fgcent mol 1
+    cgcent mol 1
+    mol 1
+    lpbe
+    bcfl mdh
+    pdie 1.0
+    sdie 1.0
+    chgm spl0
+    srfm spl2
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+    write pot dx ref-born-pot
+    write dielx dx ref-born-dielx
+    write diely dx ref-born-diely
+    write dielz dx ref-born-dielz
+    write kappa dx ref-born-kappa
+end
+
+# COMBINE TO GIVE SOLVATION ENERGY
+print elecEnergy solvated - reference end
+print elecEnergy solvated end
+print elecEnergy reference end
+
+quit

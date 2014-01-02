@@ -1,0 +1,18 @@
+APBS visualization example
+&cntrl
+   maxcyc=0, imin=1,
+   cut=12.0,
+   igb=6, ntb=0
+   ntpr=1,
+ /
+&apbs
+    apbs_debug = 100,
+    apbs_print=100,
+    calc_type = 0,
+    grid = 0.5, 0.5, 0.5,
+    srad = 0.7,
+    wpot = 1, wchg = 1, wsmol =1,
+    sp_apbs=.true.,
+    calcnpenergy=0, calcnpforce=0,
+&end
+    

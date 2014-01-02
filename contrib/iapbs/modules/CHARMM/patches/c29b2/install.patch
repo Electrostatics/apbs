@@ -1,0 +1,55 @@
+--- install.com.orig	2003-02-10 14:06:55.000000000 -0800
++++ install.com	2005-06-11 12:20:45.000000000 -0700
+@@ -90,6 +90,7 @@
+ set qgamess = 0
+ set qgamessuk = 0
+ set qcadpac = 0
++set apbs = 0
+ set scali = 0
+ set socket = 0
+ set f77 = 0
+@@ -152,6 +153,7 @@
+   echo "           Q  replace QUANTUM with GAMESS."
+   echo "           U  replace QUANTUM with GAMESS-UK."
+   echo "           C  replace QUANTUM with CADPAC."
++  echo "        APBS  compile with APBS support."
+   echo "           S  Uses TCP/IP SOCKET library for parallel."
+   echo "        FULL  For FULL featured version (default)."
+   echo "        LITE  For a version with reduced functional features."
+@@ -196,6 +198,7 @@
+     if ( $opt == 'Q'  ) set qgamess = 1
+     if ( $opt == 'U'  ) set qgamessuk = 1
+     if ( $opt == 'C'  ) set qcadpac = 1
++    if ( $opt == 'APBS'  ) set apbs = 1
+     if ( $opt == 'S'  ) set socket = 1
+     if ( $opt == 'FULL' || $opt == 'full' ) set full = 1
+     if ( $opt == 'LITE' || $opt == 'lite' ) set full = 0
+@@ -373,6 +376,18 @@
+                     $chmbuild/Makefile_$chmhost > $chmbuild/Makefile_$$
+    /bin/mv $chmbuild/Makefile_$$ $chmbuild/Makefile_$chmhost
+   endif
++# setup for APBS
++  if ( $apbs == 1 && $chm_host == gnu ) then
++      setenv APBS Y
++      if ( ! $?APBS_LIB || ! $?IAPBS_LIB || ! $?APBS_BLAS ) then
++        echo "APBS_LIB, IAPBS_LIB and APBS_BLAS variables must be set!"
++        exit
++      endif
++  endif
++  if ( $apbs == 1 && $chm_host != gnu ) then
++    echo "APBS build is supported on gnu platform only"
++    exit
++  endif
+ # Modify Makefile_template for GAMESSUK
+   if ( $qgamessuk == 1 ) then
+ 
+@@ -1010,6 +1025,9 @@
+   if ( $full == 1 ) then
+     echo "ACE"        >> $chmbuild/pref$$.dat
+     echo "ADUMB"      >> $chmbuild/pref$$.dat
++    if ( $apbs == 1 ) then
++      echo "APBS"     >> $chmbuild/pref$$.dat
++    endif
+     echo "ASPENER"    >> $chmbuild/pref$$.dat
+     echo "BANBA"      >> $chmbuild/pref$$.dat
+     echo "BLOCK"      >> $chmbuild/pref$$.dat

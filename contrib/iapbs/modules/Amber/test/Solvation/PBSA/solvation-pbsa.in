@@ -1,0 +1,14 @@
+APBS solvation energy example
+&cntrl
+   maxcyc=0, imin=1,
+   cut=12.0,
+   igb=10, ntb=0,
+   ntpr=1,
+ /
+&pb
+npbverb=1, istrng=0, epsout=78.54, epsin=1.0,
+sprob=1.4, radiopt=1, npopt=2,
+space=0.5, nbuffer=0, accept=0.001,
+cutnb=0, dbfopt=1, fillratio=3.0,
+&end
+

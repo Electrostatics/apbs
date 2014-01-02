@@ -1,0 +1,164 @@
+read 
+    mol xml acetic-acid.xml
+    mol xml acetate.xml
+    mol xml proton.xml
+end
+
+# Solvated acetic acid
+elec name acetic-solv
+    mg-auto
+    dime 65 65 65
+    cglen 12 12 12
+    fglen 6 6 6 
+    fgcent mol 1
+    cgcent mol 1
+    mol 1
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.150 radius 2.0
+    ion charge -1 conc 0.150 radius 2.0
+    pdie 2.0
+    sdie 78.0
+    chgm spl0
+    srfm smol
+    srad 0
+    swin 0.3
+    sdens 10.0
+    temp 293.0
+    calcenergy total
+    calcforce no
+end
+# Reference acetic acid
+elec name acetic-ref
+    mg-auto
+    dime 65 65 65
+    cglen 12 12 12
+    fglen 6 6 6
+    cgcent mol 1
+    fgcent mol 1
+    mol 1
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.000 radius 2.0
+    ion charge -1 conc 0.000 radius 2.0
+    pdie 2.0
+    sdie 2.0
+    chgm spl0                             # Charge disc method (linear)
+    srfm smol
+    srad 0
+    swin 0.3
+    sdens 10.0
+    temp 293.0
+    calcenergy total
+    calcforce no
+end
+# Solvated acetate
+elec name acetate-solv
+    mg-auto
+    dime 65 65 65
+    cglen 12 12 12
+    fglen 6 6 6 
+    fgcent mol 1
+    cgcent mol 1
+    mol 2
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.150 radius 2.0
+    ion charge -1 conc 0.150 radius 2.0
+    pdie 2.0
+    sdie 78.0
+    chgm spl0                             # Charge disc method (linear)
+    srfm smol
+    srad 0
+    swin 0.3
+    sdens 10.0
+    temp 293.0
+    calcenergy total
+    calcforce no
+end
+
+# Acetate ref
+elec name acetate-ref
+    mg-auto
+    dime 65 65 65
+    cglen 12 12 12
+    fglen  6  6  6
+    cgcent mol 1
+    fgcent mol 1
+    mol 2
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.000 radius 2.0
+    ion charge -1 conc 0.000 radius 2.0
+    pdie 2.0
+    sdie 2.0
+    chgm spl0                             # Charge disc method (linear)
+    srfm smol
+    srad 0
+    swin 0.3
+    sdens 10.0
+    temp 293.0
+    calcenergy total
+    calcforce no
+end
+
+# Solvated proton
+elec name proton-solv
+    mg-auto
+    dime 65 65 65
+    cglen 12 12 12
+    fglen 6 6 6 
+    cgcent mol 1
+    fgcent mol 1
+    mol 3
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.150 radius 2.0
+    ion charge -1 conc 0.150 radius 2.0
+    pdie 2.0
+    sdie 78.0
+    chgm spl0                             # Charge disc method (linear)
+    srfm smol
+    srad 0
+    swin 0.3
+    sdens 10.0
+    temp 293.0
+    calcenergy total
+    calcforce no
+end
+
+# Reference proton
+elec name proton-ref
+    mg-auto
+    dime 65 65 65
+    cglen 12 12 12
+    fglen  6  6  6
+    cgcent mol 1
+    fgcent mol 1
+    mol 3
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.000 radius 2.0
+    ion charge -1 conc 0.000 radius 2.0
+    pdie 2.0
+    sdie 2.0
+    chgm spl0                             # Charge disc method (linear)
+    srfm smol
+    srad 0
+    swin 0.3
+    sdens 10.0
+    temp 293.0
+    calcenergy total
+    calcforce no
+end
+
+# SOLVATION OF ACETIC ACID
+print elecEnergy acetic-solv - acetic-ref end
+# SOLVATION OF ACETATE
+print elecEnergy acetate-solv - acetate-ref end
+# SOLVATION OF PROTON
+print elecEnergy proton-solv - proton-ref end
+# TOTAL ENERGY
+print elecEnergy acetate-solv - acetate-ref + proton-solv - proton-ref - acetic-solv + acetic-ref end
+
+quit

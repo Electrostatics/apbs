@@ -1,0 +1,440 @@
+apbslib.c
+
+[ Python Module : apbslib ]
+
+
+APBS_SWIG = 1
+        [ Constant: int  ]
+
+1.  class MGparm
+================
+[ created from struct MGparm ]
+
+
+MGparm()
+        [ Constructor: returns MGparm * ]
+
+del this
+        [ Destructor: returns void  ]
+
+self.type
+        [ Member data: returns MGparm_CalcType * ]
+
+2.  class PBEparm
+=================
+[ created from struct PBEparm ]
+
+
+PBEparm()
+        [ Constructor: returns PBEparm * ]
+
+del this
+        [ Destructor: returns void  ]
+
+self.temp
+        [ Member data: returns double  ]
+
+3.  class Vcom
+==============
+[ created from struct Vcom ]
+
+
+Vcom()
+        [ Constructor: returns Vcom * ]
+
+del this
+        [ Destructor: returns void  ]
+
+----------
+
+Vcom_ctor(commtype)
+        [ returns Vcom * ]
+
+Vcom_dtor(thee)
+        [ returns void  ]
+
+Vcom_size(thee)
+        [ returns int  ]
+
+Vcom_rank(thee)
+        [ returns int  ]
+
+4.  class Vmem
+==============
+[ created from struct Vmem ]
+
+
+Vmem()
+        [ Constructor: returns Vmem * ]
+
+del this
+        [ Destructor: returns void  ]
+
+----------
+
+Vmem_ctor(name)
+        [ returns Vmem * ]
+
+Vmem_dtor(thee)
+        [ returns void  ]
+
+5.  class Vpmg
+==============
+[ created from struct Vpmg ]
+
+
+Vpmg()
+        [ Constructor: returns Vpmg * ]
+
+del this
+        [ Destructor: returns void  ]
+
+6.  class Vpbe
+==============
+[ created from struct Vpbe ]
+
+
+Vpbe()
+        [ Constructor: returns Vpbe * ]
+
+del this
+        [ Destructor: returns void  ]
+
+self.acc
+        [ Member data: returns Vacc * ]
+
+7.  class NOsh_calc
+===================
+[ created from struct NOsh_calc ]
+
+
+self.mgparm
+        [ Member data: returns MGparm * ]
+
+self.femparm
+        [ Member data: returns FEMparm * ]
+
+self.pbeparm
+        [ Member data: returns PBEparm * ]
+
+self.calctype
+        [ Member data: returns int  ]
+
+8.  class NOsh
+==============
+[ created from struct NOsh ]
+
+
+NOsh()
+        [ Constructor: returns NOsh * ]
+
+del this
+        [ Destructor: returns void  ]
+
+self.ncalc
+        [ Member data: returns int  ]
+
+self.nprint
+        [ Member data: returns int  ]
+
+self.nelec
+        [ Member data: returns int  ]
+
+self.printwhat
+        [ Member data: returns NOsh_PrintType * ]
+
+----------
+
+NPT_ENERGY = NPT_ENERGY
+        [ Constant: int  ]
+
+NPT_FORCE = NPT_FORCE
+        [ Constant: int  ]
+
+NOsh_getCalc(thee,icalc)
+        [ returns NOsh_calc * ]
+
+NOsh_elecname(thee,ielec)
+        [ returns char * ]
+
+NOsh_elec2calc(thee,icalc)
+        [ returns int  ]
+
+NOsh_printWhat(thee,iprint)
+        [ returns NOsh_PrintType  ]
+
+NOsh_ctor2(thee,rank,size)
+        [ returns int  ]
+
+NOsh_dtor(thee)
+        [ returns void  ]
+
+NOsh_parseFile(thee,filename)
+        [ returns int  ]
+
+9.  class AtomForce
+===================
+[ created from struct AtomForce ]
+
+
+AtomForce()
+        [ Constructor: returns AtomForce * ]
+
+del this
+        [ Destructor: returns void  ]
+
+10.  Pointer Handling Library
+=============================
+
+%include pointer.i
+
+The pointer.i library provides run-time support for managing and 
+manipulating a variety of C/C++ pointer values.  In particular,
+you can create various kinds of objects and dereference common
+pointer types.  This is done through a common set of functions:
+
+    ptrcast      - Casts a pointer to a new type
+    ptrvalue     - Dereferences a pointer 
+    ptrset       - Set the value of an object referenced by 
+                   a pointer.
+    ptrcreate    - Create a new object and return a pointer.
+    ptrfree      - Free the memory allocated by ptrcreate.
+    ptradd       - Increment/decrement a pointer value.
+    ptrmap       - Make two datatypes equivalent to each other.
+                   (Is a runtime equivalent of typedef).
+
+When creating, dereferencing, or setting the value of pointer
+variable, only the common C datatypes of int, short, long, float,
+double, char, and char * are currently supported.   Other
+datatypes may generate an error.
+
+One of the more interesting aspects of this library is that
+it operates with a wide range of datatypes.  For example,
+the "ptrvalue" function can dereference "double *", "int *",
+"long *", "char *", and other datatypes. Since SWIG encodes
+pointers with type information, this can be done transparently
+and in most cases, you can dereference a pointer without
+ever knowing what type it actually is.
+
+This library is primarily designed for utility, not high 
+performance (the dynamic determination of pointer types takes
+more work than most normal wrapper functions).  As a result,
+you may achieve better performance by writing customized
+"helper" functions if you're making lots of calls to these
+functions in inner loops or other intensive operations.
+
+ptrcast(ptr,type)
+        Casts a pointer ptr to a new datatype given by the string type.
+        type may be either the SWIG generated representation of a datatype
+        or the C representation.  For example :
+        
+           ptrcast(ptr,"double_p");   # Python representation
+           ptrcast(ptr,"double *");    # C representation
+        
+        A new pointer value is returned.   ptr may also be an integer
+        value in which case the value will be used to set the pointer
+        value.  For example :
+        
+           a = ptrcast(0,"Vector_p");
+        
+        Will create a NULL pointer of type "Vector_p"
+        
+        The casting operation is sensitive to formatting.  As a result,
+        "double *" is different than "double*".  As a result of thumb,
+        there should always be exactly one space between the C datatype
+        and any pointer specifiers (*).
+        
+ptrvalue(ptr,index,type)
+        Returns the value that a pointer is pointing to (ie. dereferencing).
+        The type is automatically inferred by the pointer type--thus, an
+        integer pointer will return an integer, a double will return a double,
+        and so on.   The index and type fields are optional parameters.  When
+        an index is specified, this function returns the value of ptr[index].
+        This allows array access.   When a type is specified, it overrides
+        the given pointer type.   Examples :
+        
+           ptrvalue(a)             #  Returns the value *a
+           ptrvalue(a,10)          #  Returns the value a[10]
+           ptrvalue(a,10,"double") #  Returns a[10] assuming a is a double *
+        
+ptrset(ptr,value,index,type)
+        Sets the value pointed to by a pointer.  The type is automatically
+        inferred from the pointer type so this function will work for
+        integers, floats, doubles, etc...  The index and type fields are
+        optional.  When an index is given, it provides array access.  When
+        type is specified, it overrides the given pointer type.  Examples :
+        
+          ptrset(a,3)            # Sets the value *a = 3
+          ptrset(a,3,10)         # Sets a[10] = 3
+          ptrset(a,3,10,"int")   # Sets a[10] = 3 assuming a is a int *
+        
+ptrcreate(type,value,nitems)
+        Creates a new object and returns a pointer to it.  This function 
+        can be used to create various kinds of objects for use in C functions.
+        type specifies the basic C datatype to create and value is an
+        optional parameter that can be used to set the initial value of the
+        object.  nitems is an optional parameter that can be used to create
+        an array.  This function results in a memory allocation using
+        malloc().  Examples :
+        
+          a = ptrcreate("double")     # Create a new double, return pointer
+          a = ptrcreate("int",7)      # Create an integer, set value to 7
+          a = ptrcreate("int",0,1000) # Create an integer array with initial
+                                      # values all set to zero
+        
+        This function only recognizes a few common C datatypes as listed below :
+        
+               int, short, long, float, double, char, char *, void
+        
+        All other datatypes will result in an error.  However, other
+        datatypes can be created by using the ptrcast function.  For
+        example:
+        
+         a = ptrcast(ptrcreate("int",0,100),"unsigned int *")
+        
+ptrfree(ptr)
+        Destroys the memory pointed to by ptr.  This function calls free()
+        and should only be used with objects created by ptrcreate().  Since
+        this function calls free, it may work with other objects, but this
+        is generally discouraged unless you absolutely know what you're
+        doing.
+        
+ptradd(ptr,offset)
+        Adds a value to the current pointer value.  For the C datatypes of
+        int, short, long, float, double, and char, the offset value is the
+        number of objects and works in exactly the same manner as in C.  For
+        example, the following code steps through the elements of an array
+        
+         a = ptrcreate("double",0,100);    # Create an array double a[100]
+         b = a;
+         for i in range(0,100):
+             ptrset(b,0.0025*i);           # set *b = 0.0025*i
+             b = ptradd(b,1);              # b++ (go to next double)
+        
+        In this case, adding one to b goes to the next double.
+        
+        For all other datatypes (including all complex datatypes), the
+        offset corresponds to bytes.  This function does not perform any
+        bounds checking and negative offsets are perfectly legal.  
+        
+ptrmap(type1,type2)
+        This is a rarely used function that performs essentially the same
+        operation as a C typedef.  To manage datatypes at run-time, SWIG
+        modules manage an internal symbol table of type mappings.  This
+        table keeps track of which types are equivalent to each other.  The
+        ptrmap() function provides a mechanism for scripts to add symbols
+        to this table.  For example :
+        
+           ptrmap("double_p","Real_p");
+        
+        would make the types "doublePtr" and "RealPtr" equivalent to each
+        other.  Pointers of either type could now be used interchangably.
+        
+        Normally this function is not needed, but it can be used to
+        circumvent SWIG's normal type-checking behavior or to work around
+        weird type-handling problems.
+        
+new_valist(maxargs)
+
+new_gridlist(maxargs)
+
+new_pmglist(maxargs)
+
+get_Vpmg(args,n)
+
+new_pmgplist(maxargs)
+
+new_pbelist(maxargs)
+
+get_Vpbe(args,n)
+
+new_atomforcelist(maxargs)
+
+delete_atomforcelist(a)
+
+delete_valist(a)
+
+delete_gridlist(a)
+
+delete_pmglist(a)
+
+delete_pmgplist(a)
+
+delete_pbelist(a)
+
+get_AtomForce(aforce,n)
+
+make_Valist(args,n)
+
+double_array(size)
+
+int_array(size)
+
+delete_double_array(d)
+
+delete_int_array(i)
+
+get_entry(array,i)
+
+set_entry(array,i,val)
+
+NOsh_parse(thee,sock)
+
+Vio_setup(key,iodev,iofmt,iohost,iofile,string)
+
+loadMolecules(nosh,alist)
+
+killMolecules(nosh,alist)
+
+loadDielMaps(nosh,dielXMap,dielYMap,dielZMap)
+
+killDielMaps(nosh,dielXMap,dielYMap,dielZMap)
+
+loadKappaMaps(nosh,kappa)
+
+killKappaMaps(nosh,kappa)
+
+loadChargeMaps(nosh,charge)
+
+killChargeMaps(nosh,charge)
+
+printPBEPARM(pbeparm)
+
+printMGPARM(mgparm,realCenter)
+
+initMG(i,nosh,mgparm,pbeparm,realCenter,pbe,alist,dielXMap,dielYMap,dielZMap,kappaMap,chargeMap,pmgp,pmg)
+
+killMG(nosh,pbe,pmgp,pmg)
+
+solveMG(nosh,pmg,type)
+
+setPartMG(nosh,mgparm,pmg)
+
+killEnergy()
+
+forceMG(mem,nosh,pbeparm,mgparm,pmg,nforce,atomForce,alist)
+
+killForce(mem,nosh,nforce,atomForce)
+
+writedataMG(rank,nosh,pbeparm,pmg)
+
+writematMG(rank,nosh,pbeparm,pmg)
+
+printForce(com,nosh,nforce,atomForce,i)
+
+startVio()
+
+Vacc_molAcc(thee,center,radius)
+
+Vacc_vdwAcc(thee,center)
+
+energyMG(nosh,icalc,pmg,INPUT,BOTH,INPUT,INPUT,INPUT)
+
+printEnergy(com,nosh,totEnergy,i)
+
+Valist_load(thee,size,x,y,z,chg,rad)
+
+getPotentials(nosh,pbeparm,pmg,alist)
+
+getForces(atomForce,alist)
+

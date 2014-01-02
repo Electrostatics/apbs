@@ -1,0 +1,261 @@
+!
+! Simple ionization energy example for acetic acid. Focusing is used 
+! to get more accurate energies.
+!  AcOH(aq) ---> AcO(-)(aq) + H(+)(aq)
+! Note that this is only the hydration part of the reaction. The "gas-
+! phase" part would need to be included (i.e. to account for the energy 
+! of the electronic rearrangements) in order to compute an absolute pKa. 
+! A non-polar cavitation term would also be necessary.
+!
+read                                   ! read   
+     mol 1                             ! mol 1 (acetic acid)
+     file "elec.pdb"                   ! from the file "elec.pdb"
+     pdb                               ! in free-format PDB format 
+end                                    
+
+set                                    ! set
+     charge                            ! the charges
+     radii                             ! and the radii of all atoms
+     file "elec.dat"                   ! from the file "elec.dat"
+     para mine                         ! using the parameter set "mine"
+end                        
+
+print apar mol1 end
+                                        
+!
+! Solvation energy calculation for acetic acid (coarse grid)
+!
+
+elec calc mol 1                        ! do electrostatic calculations
+ bcflag 2 solver 0                     ! boundary condition (each atom is
+                                       !  a Debye-Huckel sphere). Use the
+                                       !  diagonal scaling preconditioned
+                                       !  conjugate gradient.
+ spacing 1.00 dime 60 60 60            ! definition of the grid spacing and
+                                       !  dimensions
+ center                                ! center the grid at center 
+                                       !  of mol 1
+ temp 293.0                            ! temperature in K
+ sdie 78.0                             ! solvent dielectric
+ pdie 2.0                              ! internal dielectric
+ maxits 400                            ! increase the number of iterations
+                                       !  that can be used to solve the FDPBE
+ ionstr 150.0                          ! ionic strength
+ rion 2.0                              ! ion exclusion radius
+end
+
+!
+! Now focus to get a better result (fine grid)
+!
+
+elec calc mol 1                        ! do electrostatic calculations
+ bcflag 4 solver 0                     ! focus using the coarse grid to
+                                       !  set the boundary conditions
+ spacing 0.20 dime 60 60 60            ! definition of the grid spacing and
+                                       !  dimensions
+ center                                ! center the grid at center 
+                                       !  of mol 1
+ temp 293.0                            ! temperature in K
+ sdie 78.0                             ! solvent dielectric
+ pdie 2.0                              ! internal dielectric
+ maxits 400                            ! increase the number of iterations
+                                       !  that can be used to solve the FDPBE
+ ionstr 150.0                          ! ionic strength
+ rion 2.0                              ! ion exclusion radius
+end
+
+print elec zenergy mol 1 end           ! zero out the energy accumulator
+print elec energy  mol 1 end           ! compute the electrostatic energy
+print elec fdcoul  mol 1 end           ! compute the coulombic (q-q/r) energy
+                                       !   via a Green's function method and
+                                       !   subtract it from the total
+print elec self    mol 1 end           ! compute the self energy and subtract
+                                       !   it from the total
+print elec tenergy mol 1 end           ! write out the total energy in kcal/mol
+assign eacid = $tenergy end            ! save the total energy for acetic acid
+
+print elec phizero mol 1 end
+print elec phisave mol 1 end           ! compute the reaction potentials 
+                                       !  at positions of all charges
+                                       !  due to unit positive charge 
+                                       !  at position of atom 1
+
+print elec phiwrite mol 1 end          ! print reaction potentials 
+
+print elec energy                      ! print electrostatic energy
+      mol1                             !  of mol 1
+end
+
+!
+! Now compute the solvation energy for the acetate ion
+!
+
+edit charge -0.91 atnum 6 end          ! set charge -0.91 on atom 6 
+edit charge -0.91 atnum 7 end          ! set charge -0.91 on atom 7 
+edit charge  0.0  atnum 8 end          ! set charge  0.   on atom 8 
+                                           
+print apar mol1 end
+
+elec calc mol 1                        ! do electrostatic calculations
+ bcflag 2 solver 0                     ! boundary condition (each atom is
+                                       !  a Debye-Huckel sphere). Use the
+                                       !  diagonal scaling preconditioned
+                                       !  conjugate gradient.
+ spacing 1.00 dime 60 60 60            ! definition of the grid spacing and
+                                       !  dimensions
+ center                                ! center the grid at center 
+                                       !  of mol 1
+ temp 293.0                            ! temperature in K
+ sdie 78.0                             ! solvent dielectric
+ pdie 2.0                              ! internal dielectric
+ maxits 400                            ! increase the number of iterations
+                                       !  that can be used to solve the FDPBE
+ ionstr 150.0                          ! ionic strength
+ rion 2.0                              ! ion exclusion radius
+end
+
+!
+! Now focus to get a better result (fine grid)
+!
+
+elec calc mol 1                        ! do electrostatic calculations
+ bcflag 4 solver 0                     ! boundary condition (each atom is
+                                       !  a Debye-Huckel sphere). Use the
+                                       !  diagonal scaling preconditioned
+                                       !  conjugate gradient.
+ spacing 0.20 dime 60 60 60            ! definition of the grid spacing and
+                                       !  dimensions
+ center                                ! center the grid at center 
+                                       !  of mol 1
+ temp 293.0                            ! temperature in K
+ sdie 78.0                             ! solvent dielectric
+ pdie 2.0                              ! internal dielectric
+ maxits 400                            ! increase the number of iterations
+                                       !  that can be used to solve the FDPBE
+ ionstr 150.0                          ! ionic strength
+ rion 2.0                              ! ion exclusion radius
+end
+
+print elec zenergy mol 1 end           ! zero out the energy accumulator
+print elec energy  mol 1 end           ! compute the electrostatic energy
+print elec fdcoul  mol 1 end           ! compute the coulombic (q-q/r) energy
+                                       !   via a Green's function method and
+                                       !   subtract it from the total
+print elec self    mol 1 end           ! compute the self energy and subtract
+                                       !   it from the total
+print elec tenergy mol 1 end           ! write out the total energy in kcal/mol
+assign eacet = $tenergy end            ! save the total energy for acetate ion
+
+print elec phizero mol 1 end
+print elec phisave mol 1 end           ! compute the reaction potentials 
+                                       !  at positions of all charges
+                                       !  due to unit positive charge 
+                                       !  at position of atom 1
+
+print elec phiwrite mol 1 end          ! print reaction potentials 
+
+print mol 1 elec energy end            ! print electrostatic energy
+                                       !  of all atoms but 1 in the
+                                       !  reaction field created by
+                                       !  unit charge on atom 1  
+      
+!
+! Calculate the solvation energy of a proton
+!
+
+read                                   ! read   
+     mol 1                             ! mol 1 (proton}
+     inter                             ! interactively
+     pdb                               ! in free-format PDB format 
+end                                    
+ATOM      1  H   PROT    1       0.178  -1.286   2.937  1.00  0.00
+END
+
+set                                    ! set
+     charge                            ! the charges
+     radii                             ! and the radii of all atoms
+     file "elec.dat"                   ! from the file "elec.dat"
+     para mine                         ! using the parameter set "mine"
+end                        
+
+print apar mol1 end
+                                        
+!
+! Solvation energy calculation for acetic acid
+!
+
+elec calc mol 1                        ! do electrostatic calculations
+ bcflag 2 solver 0                     ! boundary condition (each atom is
+                                       !  a Debye-Huckel sphere). Use the
+                                       !  diagonal scaling preconditioned
+                                       !  conjugate gradient.
+ spacing 1.00 dime 60 60 60            ! definition of the grid spacing and
+                                       !  dimensions
+ center                                ! center the grid at center 
+                                       !  of mol 1
+ temp 293.0                            ! temperature in K
+ sdie 78.0                             ! solvent dielectric
+ pdie 2.0                              ! internal dielectric
+ maxits 400                            ! increase the number of iterations
+                                       !  that can be used to solve the FDPBE
+ ionstr 150.0                          ! ionic strength
+ rion 2.0                              ! ion exclusion radius
+end
+
+!
+! Now focus to get a better result (fine grid)
+!
+
+elec calc mol 1                        ! do electrostatic calculations
+ bcflag 4 solver 0                     ! boundary condition (each atom is
+                                       !  a Debye-Huckel sphere). Use the
+                                       !  diagonal scaling preconditioned
+                                       !  conjugate gradient.
+ spacing 0.20 dime 60 60 60            ! definition of the grid spacing and
+                                       !  dimensions
+ center                                ! center the grid at center 
+                                       !  of mol 1
+ temp 293.0                            ! temperature in K
+ sdie 78.0                             ! solvent dielectric
+ pdie 2.0                              ! internal dielectric
+ maxits 400                            ! increase the number of iterations
+                                       !  that can be used to solve the FDPBE
+ ionstr 150.0                          ! ionic strength
+ rion 2.0                              ! ion exclusion radius
+end
+
+print elec zenergy mol 1 end           ! zero out the energy accumulator
+print elec energy  mol 1 end           ! compute the electrostatic energy
+print elec fdcoul  mol 1 end           ! compute the coulombic (q-q/r) energy
+                                       !   via a Green's function method and
+                                       !   subtract it from the total
+print elec self    mol 1 end           ! compute the self energy and subtract
+                                       !   it from the total
+print elec tenergy mol 1 end           ! write out the total energy in kcal/mol
+assign eprot = $tenergy end            ! save the total energy for a proton
+
+print elec phizero mol 1 end
+print elec phisave mol 1 end           ! compute the reaction potentials
+                                       !  at positions of all charges
+                                       !  due to unit positive charge
+                                       !  at position of atom 1
+
+print elec phiwrite mol 1 end          ! print reaction potentials
+
+print mol 1 elec energy end            ! print electrostatic energy
+                                       !  of all atoms but 1 in the
+                                       !  reaction field created by
+                                       !  unit charge on atom 1
+
+assign etot = $eacet                   ! compute the solvation energy 
+              $eprot +                 !  difference for the deprotonation
+              $eacid -                 !  reaction of acetic acid
+end
+
+!
+! This calculation took 650 seconds on our Indigo2 Extreme R4400 200 MHz
+! and resulted in an etot of -112.6 kcal/mol
+!
+
+stop
+

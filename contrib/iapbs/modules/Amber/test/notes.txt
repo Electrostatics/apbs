@@ -1,0 +1,33 @@
+# iAPBS/Amber validation/test directory
+
+echo "AMBERHOME: $AMBERHOME"
+
+cd Solvation
+./Run.apbs.solv
+
+export TESTsander=$AMBERHOME/exe/sander.APBS
+cd apbs_radi
+./Run.ion.min
+
+cd pbsa_pgb/iAPBS
+./Run.test.sh
+
+cd Minimization
+./Run.apbs.min
+
+cd Visualization
+./Run.apbs.vis
+
+cd apbs_min/
+./Run.apbs.min
+
+cd apbs_radi/
+./Run.ion.min
+
+cd apbs_solv/
+./Run.apbs.solv
+
+# SM-PBE
+cd smpbe
+./Run.apbs.smpbe
+

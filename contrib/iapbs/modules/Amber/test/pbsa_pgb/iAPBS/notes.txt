@@ -1,0 +1,14 @@
+
+
+$AMBERHOME/exe/ambpdb -p prmtop -noter < pgb.rst  > pgb.pdb
+/opt/apbs-0.5.0/pdb2pqr/pdb2pqr.py --assign-only --ff=parse pgb.pdb pgb-parse.pqr
+/opt/apbs-0.5.0/pdb2pqr/pdb2pqr.py --assign-only --ff=amber pgb.pdb pgb-amber.pqr
+
+$AMBERHOME/exe/sander.APBS -O -i iapbs.in -c pgb.rst -p prmtop -o iapbs.out
+
+
+
+# run tests:
+
+./Run.test.sh
+

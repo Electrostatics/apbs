@@ -1,0 +1,78 @@
+##########################################################################
+### ION-ION PMF
+### $Id$
+###
+### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for
+### syntax help.
+##########################################################################
+
+read 
+	mol pdb complex.pdb 
+	parm flat parm.dat
+end
+
+elec name solv
+	mg-manual
+	dime 65 65 65
+	grid 0.21 0.21 0.21
+	gcent 0.0 0.0 0.0
+	mol 1
+	lpbe
+	bcfl mdh
+	pdie 1.0
+	sdie 78.54
+	chgm spl2
+	srfm spl2
+	srad 1.4
+	swin 0.3
+	sdens 10.0
+	temp 298.15
+	calcenergy total
+	calcforce comps
+end
+elec name ref
+	mg-manual
+	dime 65 65 65
+	grid 0.21 0.21 0.21
+	gcent 0.0 0.0 0.0
+	mol 1
+	lpbe
+	bcfl mdh
+	pdie 1.0
+	sdie 1.0
+	chgm spl2
+	srfm spl2
+	srad 1.4
+	swin 0.3
+	sdens 10.0
+	temp 298.15
+	calcenergy total
+	calcforce comps
+end
+
+apolar name asolv
+	grid 0.1 0.1 0.1
+	mol 1
+	srfm sacc
+	swin 0.3
+	srad 1.4
+	press 0.00
+	gamma 0.00072
+	bconc 0.033
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce comps
+end
+
+# THIS GIVES THE POLAR SOLVATION ENERGY OF THE COMPLEX
+print elecEnergy solv - ref end
+# THIS GIVES THE POLAR SOLVATION FORCES ON THE COMPLEX
+print elecForce solv - ref end
+# THIS GIVES THE APOLAR SOLVATION ENERGY OF THE COMPLEX
+print apolEnergy asolv end
+# THIS GIVES THE APOLAR SOLVATION FORCES ON THE COMPLEX
+print apolForce asolv end
+
+quit

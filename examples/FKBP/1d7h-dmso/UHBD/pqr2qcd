@@ -1,0 +1,2 @@
+#! /bin/sh
+cat $1 | sed -f amber2charmm_sed.scr | awk '{if ($1=="ATOM" ) {printf ("%-6s%4d %-4s %-4s %8.3f%8.3f%8.3f%8.3f%8.3f\n",$1,$5,$4,$3,$6,$7,$8,$9,$10)} else {print}}' > $2 

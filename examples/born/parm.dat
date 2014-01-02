@@ -1,0 +1,12 @@
+##########################################################################
+# Parameters for the APBS Vparam class
+# -- Nathan Baker
+#
+# Format:
+#  <RESIDUE> <ATOM> <CHARGE> <RADIUS> <EPSILON>
+# where <RESIDUE> is the residue name, <ATOM> is the atom name, <CHARGE>
+# is the atomic charge in e, <RADIUS> is the van der Waals radius in 
+# A, and <EPSILON> is the van der Waals well depth in kJ/mol.
+##########################################################################
+ION	I	1.00	2.00	0.500
+WAT	OW	0.000000	1.7683	0.6364

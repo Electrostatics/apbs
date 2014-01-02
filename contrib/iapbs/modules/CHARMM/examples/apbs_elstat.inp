@@ -1,0 +1,77 @@
+* apbs_elstat.inp
+* external files: top_all22_prot.inp, par_all22_prot.inp and radius.str
+* $Id: apbs_elstat.inp,v 1.2 2005/06/20 21:40:02 rok Exp $
+
+!if ?apbs .ne. 1 then stop
+
+stream datadir.def
+
+open read card unit 11 name @0top_all22_prot.inp
+read rtf card unit 11
+close unit 11
+
+open read card unit 11 name @0par_all22_prot.inp
+read para card unit 11
+close unit 11
+
+read sequence ALA 1
+generate ALAD first ACE last CT3 setup warning
+
+read coor card
+* ALAD
+*
+   22
+    1    1 ALA  CAY    4.07676   3.03415  -3.82644 ALAD 1      0.00000
+    2    1 ALA  HY1    3.38014   2.34546  -3.30049 ALAD 1      0.00000
+    3    1 ALA  HY2    5.00882   3.05721  -3.22489 ALAD 1      0.00000
+    4    1 ALA  HY3    4.15907   2.82692  -4.91542 ALAD 1      0.00000
+    5    1 ALA  CY     3.38897   4.27061  -3.53138 ALAD 1      0.00000
+    6    1 ALA  OY     3.49052   4.78172  -2.38252 ALAD 1      0.00000
+    7    1 ALA  N      2.53822   4.73538  -4.36448 ALAD 1      0.00000
+    8    1 ALA  HN     2.01149   4.10166  -4.91496 ALAD 1      0.00000
+    9    1 ALA  CA     1.67556   5.89668  -4.06707 ALAD 1      0.00000
+   10    1 ALA  HA     1.59111   6.09020  -3.00284 ALAD 1      0.00000
+   11    1 ALA  CB     2.53016   7.09556  -4.41434 ALAD 1      0.00000
+   12    1 ALA  HB1    2.52615   7.11846  -5.52371 ALAD 1      0.00000
+   13    1 ALA  HB2    2.15839   8.07814  -4.05285 ALAD 1      0.00000
+   14    1 ALA  HB3    3.51494   7.05372  -3.90013 ALAD 1      0.00000
+   15    1 ALA  C      0.34175   5.90615  -4.74842 ALAD 1      0.00000
+   16    1 ALA  O      0.17979   5.47884  -5.92042 ALAD 1      0.00000
+   17    1 ALA  NT    -0.70645   6.40667  -4.13872 ALAD 1      0.00000
+   18    1 ALA  HNT   -0.54290   6.65017  -3.19244 ALAD 1      0.00000
+   19    1 ALA  CAT   -1.88322   6.64491  -4.83560 ALAD 1      0.00000
+   20    1 ALA  HT1   -2.72804   6.10066  -4.35910 ALAD 1      0.00000
+   21    1 ALA  HT2   -2.08533   6.27265  -5.86664 ALAD 1      0.00000
+   22    1 ALA  HT3   -1.93591   7.75719  -4.86951 ALAD 1      0.00000
+
+coor orient
+
+scalar charge show
+
+PBEQ
+! read in radii
+  stream @0radius.str
+
+! first APBS calculation is done at solvent, sdie = 80.0
+  APBS mgmanual lpbe grdx 0.5 grdy 0.5 grdz 0.5 -
+  srfm 2 debug 0 sdie 80.0 gamma 0.2 -
+  calcene 1 -
+  sele all END
+
+  set elsten80 = ?enpb
+  set apolarEN = ?ennp
+
+! second calculation is done in sdie = 1.0
+  APBS mgmanual lpbe grdx 0.5 grdy 0.5 grdz 0.5 -
+  srfm 2 debug 0 sdie 1.0 gamma 0.2 -
+  calcene 1 -
+  sele all END
+
+  set elsten1 = ?enpb
+
+END
+
+!  Electrostatic free energy of solvation, should be -11.544 kcal/mol
+calc total @elsten80 - @elsten1
+
+stop

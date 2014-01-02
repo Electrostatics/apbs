@@ -1,0 +1,15 @@
+--- ../Orig/c35b2/build/UNX/Makefile_gnu	2008-02-14 08:37:27.000000000 -0800
++++ build/UNX/Makefile_gnu	2013-01-11 09:07:07.450539270 -0800
+@@ -31,10 +31,8 @@
+ 
+ # options for compilation with APBS
+ ifdef APBS
+-# these must be defined: APBS_LIB, IAPBS_LIB and APBS_BLAS
+-ADDLIB := $(ADDLIB) $(IAPBS_LIB)/iapbs.a \
+-        -L$(APBS_LIB) -lapbsmainroutines -lapbs -lmaloc $(APBS_BLAS)
+-
++# APBS_LIB must be defined
++ADDLIB := $(ADDLIB) $(APBS_LIB) 
+ endif
+ 
+ RANLIB = ranlib

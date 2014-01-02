@@ -1,0 +1,32 @@
+Energy table
+
+molecule 1 at -3 0 0  and molecule 2 at -2.75 0 0
+
+Energy molecule 1 (KJ/mol)
+APBS        MATLAB
+97.76         97.77
+
+Energy molecule 2 (KJ/mol)
+APBS        MATLAB 
+118.56        118.57
+
+Energy complex (KJ/mol)
+APBS        MATLAB
+307.61        307.65
+
+
+      
+molecule 1 at -3 0 0  and molecule 2 at -0.25 0 0
+
+Energy molecule 1 (KJ/mol)
+APBS        MATLAB
+97.76         97.77
+
+Energy molecule 2 (KJ/mol)
+APBS        MATLAB 
+106.56        106.57
+
+Energy complex (KJ/mol)
+APBS        MATLAB
+210.77        210.81
+

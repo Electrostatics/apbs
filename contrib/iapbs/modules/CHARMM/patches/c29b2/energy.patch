@@ -1,0 +1,33 @@
+--- source/energy/energy.src.orig	2003-02-10 14:06:56.000000000 -0800
++++ source/energy/energy.src	2005-06-11 12:12:08.000000000 -0700
+@@ -32,6 +32,9 @@
+       LOGICAL QSECD
+       REAL*8 EIMSLV                             !##ASPENER
+ C
++##IF APBS
++##INCLUDE '~/charmm_fcm/apbs.fcm'
++##ENDIF
+ ##INCLUDE '~/charmm_fcm/block.fcm'
+ ##INCLUDE '~/charmm_fcm/lambda.fcm'
+ ##INCLUDE '~/charmm_fcm/cnst.fcm'
+@@ -1884,6 +1887,20 @@
+ C
+ C-----------------------------------------------------------------------
+ ##ENDIF
++##IF APBS
++C    APBS calculated forces
++      IF(ENE3) THEN                                          !##MTS
++        IF(MYNOD.EQ.INODE(20)) THEN  !##PARALLEL
++          IF (QETERM(PBELEC) .AND. QETERM(PBNP) .AND. QFAPBS ) THEN
++            CALL apbsfrc(NATOM,X,Y,Z,CG,ETERM(PBELEC),ETERM(PBNP),
++     $                   DX,DY,DZ,ecalls, .false.)
++            IF (TIMER.GT.1)
++     $         CALL WRTTIM(' APBS Solvation energy times:')
++          ENDIF
++        ENDIF                        !##PARALLEL
++      ENDIF                                                  !##MTS
++
++##ENDIF
+ C
+ C . Free stack space for the second derivatives.
+       IF(QSECD) CALL FRESTK(INTEG4(NDD1))

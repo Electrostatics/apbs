@@ -1,0 +1,50 @@
+README for tools/Python directory
+---------------------------------
+
+Author: Todd Dolinsky (todd@ccb.wustl.edu)
+Date: 9/12/2005
+
+This directory contains Python wrappers for APBS.
+
+Files:
+    apbslib.i   - SWIG interface file
+    apbslib.c   - SWIG generated C file
+    apbslib.py  - SWIG generated Python file containing wrappers
+                  for the APBS functions defined in routines.c
+    _apbslib.so - Generated shared object file
+                  NOTE:  This file used to be called apbslibc.so in APBS
+                         0.3.2 and below.
+    main.py     - Driver file for APBS code; mimics main.c
+    noinput.py  - Example driver file for APBS code that does not need
+                  PQR/.in input files - all input is handled at the Python
+                  level
+    apbs.in     - Example APBS input file for Born Ion example
+
+To run the Python-wrapper version of APBS, make sure you have a working
+version of Python installed.  By default, the wrappers are compiled during the 
+initial configure process if Python is detected on the system.*  Type
+
+python main.py <input file>       or
+python noinput.py
+
+to run APBS on an input file in Python.  The input file must be the same
+format as the standard APBS input files - see documentation for formatting.
+
+* The main configure script needs additional libraries to compile correctly,
+and thus may not work on all systems.  Current status:
+
+Linux       - Working
+Mac G5      - Working
+Irix/SGI    - Untested
+Sun/Solaris - Untested
+Mingw       - Working, but users will need to copy the resulting 
+             _apbslib.so.exe to _apbslib.dll:
+
+              cd /path/to/apbs/tools/python
+              cp _apbslib.so.exe _apbslib.dll
+              cp vgrid/_vgrid.so.exe vgrid/_vgrid.dll
+
+Cygwin      - No support (by default, the directory is not compiled)
+
+
+    

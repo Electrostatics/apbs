@@ -1,0 +1,149 @@
+Charm++: standalone mode (not using charmrun)
+Charm++> cpu topology info is being gathered. 
+Charm++> 1 unique compute nodes detected. 
+Info: NAMD 2.7b1 for Linux-x86_64
+Info: 
+Info: Please visit http://www.ks.uiuc.edu/Research/namd/
+Info: and send feedback or bug reports to namd@ks.uiuc.edu
+Info: 
+Info: Please cite Phillips et al., J. Comp. Chem. 26:1781-1802 (2005)
+Info: in all publications reporting results obtained with NAMD.
+Info: 
+Info: Based on Charm++/Converse 60100 for net-linux-x86_64-iccstatic
+Info: Built Mon May 4 16:23:25 PDT 2009 by rok on morgan.ucsd.edu
+Info: 1 NAMD  2.7b1  Linux-x86_64  1    morgan.ucsd.edu  rok
+Info: Running on 1 processors.
+Info: Charm++/Converse parallel runtime startup completed at 0.00306511 s
+Info: 1.51997 MB of memory in use based on CmiMemoryUsage
+Info: Configuration file is apbs-solvation.conf
+TCL: Suspending until startup complete.
+Info: SIMULATION PARAMETERS:
+Info: TIMESTEP               1
+Info: NUMBER OF STEPS        0
+Info: STEPS PER CYCLE        20
+Info: LOAD BALANCE STRATEGY  New Load Balancers -- ASB
+Info: LDB PERIOD             4000 steps
+Info: FIRST LDB TIMESTEP     100
+Info: LAST LDB TIMESTEP     -1
+Info: LDB BACKGROUND SCALING 1
+Info: HOM BACKGROUND SCALING 1
+Info: MAX SELF PARTITIONS    20
+Info: MAX PAIR PARTITIONS    8
+Info: SELF PARTITION ATOMS   154
+Info: SELF2 PARTITION ATOMS   154
+Info: PAIR PARTITION ATOMS   318
+Info: PAIR2 PARTITION ATOMS  637
+Info: MIN ATOMS PER PATCH    100
+Info: INITIAL TEMPERATURE    300
+Info: CENTER OF MASS MOVING INITIALLY? NO
+Info: DIELECTRIC             1
+Info: EXCLUDE                SCALED ONE-FOUR
+Info: 1-4 SCALE FACTOR       0.833333
+Info: DCD FILENAME           output.dcd
+Info: DCD FREQUENCY          500
+Info: DCD FIRST STEP         500
+Info: NO EXTENDED SYSTEM TRAJECTORY OUTPUT
+Info: NO VELOCITY DCD OUTPUT
+Info: OUTPUT FILENAME        output
+Info: BINARY OUTPUT FILES WILL BE USED
+Info: RESTART FILENAME       output.restart
+Info: RESTART FREQUENCY      500
+Info: BINARY RESTART FILES WILL BE USED
+Info: SWITCHING ACTIVE
+Info: SWITCHING ON           9
+Info: SWITCHING OFF          10
+Info: PAIRLIST DISTANCE      11
+Info: PAIRLIST SHRINK RATE   0.01
+Info: PAIRLIST GROW RATE     0.01
+Info: PAIRLIST TRIGGER       0.3
+Info: PAIRLISTS PER CYCLE    2
+Info: PAIRLISTS ENABLED
+Info: MARGIN                 0
+Info: HYDROGEN GROUP CUTOFF  2.5
+Info: PATCH DIMENSION        13.5
+Info: CROSSTERM ENERGY INCLUDED IN DIHEDRAL
+Info: TIMING OUTPUT STEPS    100
+Info: APBS SOLVATION FORCES ACTIVE
+Info:     APBS PQR FILE: dipeptide.pqr
+Info: LANGEVIN DYNAMICS ACTIVE
+Info: LANGEVIN TEMPERATURE   300
+Info: LANGEVIN DAMPING COEFFICIENT IS 2 INVERSE PS
+Info: LANGEVIN DYNAMICS NOT APPLIED TO HYDROGENS
+Info: USING VERLET I (r-RESPA) MTS SCHEME.
+Info: C1 SPLITTING OF LONG RANGE ELECTROSTATICS
+Info: PLACING ATOMS IN PATCHES BY HYDROGEN GROUPS
+Info: RANDOM NUMBER SEED     1241479450
+Info: USE HYDROGEN BONDS?    NO
+Info: Using AMBER format force field!
+Info: AMBER PARM FILE        dipeptide.top
+Info: AMBER COORDINATE FILE  dipeptide.crd
+Info: Exclusions will be read from PARM file!
+Info: SCNB (VDW SCALING)     2
+Info: USING ARITHMETIC MEAN TO COMBINE L-J SIGMA PARAMETERS
+Reading parm file (dipeptide.top) ...
+PARM file in AMBER 7 format
+Info: SUMMARY OF PARAMETERS:
+Info: 8 BONDS
+Info: 14 ANGLES
+Info: 20 DIHEDRAL
+Info: 0 IMPROPER
+Info: 0 CROSSTERM
+Info: 0 VDW
+Info: 28 VDW_PAIRS
+Info: TIME FOR READING PDB FILE: 9.53674e-07
+Info: 
+Info: ****************************
+Info: STRUCTURE SUMMARY:
+Info: 20 ATOMS
+Info: 19 BONDS
+Info: 32 ANGLES
+Info: 53 DIHEDRALS
+Info: 0 IMPROPERS
+Info: 0 CROSSTERMS
+Info: 91 EXCLUSIONS
+Info: 60 DEGREES OF FREEDOM
+Info: 10 HYDROGEN GROUPS
+Info: TOTAL MASS = 142.16 amu
+Info: TOTAL CHARGE = 1.11759e-08 e
+Info: *****************************
+Info: 
+Info: Entering startup at 0.00763321 s, 1.75603 MB of memory in use
+Info: Startup phase 0 took 2.7895e-05 s, 1.75612 MB of memory in use
+Info: Startup phase 1 took 0.000102997 s, 1.76848 MB of memory in use
+Info: Startup phase 2 took 2.5034e-05 s, 1.77174 MB of memory in use
+Info: PATCH GRID IS 1 BY 1 BY 1
+Info: PATCH GRID IS 1-AWAY BY 1-AWAY BY 1-AWAY
+Info: REMOVING COM VELOCITY -2.16119 3.76538 0.300987
+Info: LARGEST PATCH (0) HAS 20 ATOMS
+Info: CREATING 12 COMPUTE OBJECTS
+Info: Startup phase 3 took 0.000146866 s, 1.80525 MB of memory in use
+Info: Startup phase 4 took 1.50204e-05 s, 1.80513 MB of memory in use
+Info: Startup phase 5 took 1.71661e-05 s, 1.80501 MB of memory in use
+LDB: Measuring processor speeds ... Done.
+Info: Startup phase 6 took 4.69685e-05 s, 1.80641 MB of memory in use
+Info: CREATING 12 COMPUTE OBJECTS
+Info: useSync: 1 useProxySync: 0
+Info: NONBONDED TABLE R-SQUARED SPACING: 0.0625
+Info: NONBONDED TABLE SIZE: 705 POINTS
+Info: ABSOLUTE IMPRECISION IN VDWA TABLE ENERGY: 7.88861e-31 AT 9.99687
+Info: RELATIVE IMPRECISION IN VDWA TABLE ENERGY: 1.10587e-16 AT 9.99687
+APBS: reading PQR file dipeptide.pqr
+APBS: total charge: 0.4061
+Info: Startup phase 7 took 0.00159788 s, 2.1953 MB of memory in use
+Info: Startup phase 8 took 4.31538e-05 s, 2.44762 MB of memory in use
+Info: Finished startup at 0.00965619 s, 2.44762 MB of memory in use
+
+TCL: Minimizing for 0 steps
+APBS ENERGIES: ELEC: -34.9938 NONPOLAR: 9.09946
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:       0         0.0006         0.6006         3.6494         0.0000             18.5634         7.3412         0.0000       -25.8943         0.0000              4.2609         0.0000         4.2609         4.2609         0.0000
+
+WRITING EXTENDED SYSTEM TO OUTPUT FILE AT STEP 0
+WRITING COORDINATES TO OUTPUT FILE AT STEP 0
+COORDINATE DCD FILE WAS NOT CREATED
+WRITING VELOCITIES TO OUTPUT FILE AT STEP 0
+====================================================
+
+WallClock: 0.344394  CPUTime: 0.344021  Memory: 2.346481 MB
+Program finished.

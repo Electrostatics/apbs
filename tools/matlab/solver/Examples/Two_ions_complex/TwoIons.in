@@ -1,0 +1,60 @@
+read 
+    mol pqr twoions.pqr    # Two-ion complex
+end
+elec name comp_solv        # Solvated complex
+    mg-manual
+    dime 65 65 65          # Grid dimensions
+    nlev 4                 # Multigrid levels
+    glen 12 12 12          # Grid lengths
+    gcent mol 1            # Grid center 
+    mol 1 
+    lpbe                   # Linearized PB
+    bcfl mdh               # Full multipole boundary condition
+    ion 1 0.000 2.0        # Zero ionic strength
+    ion -1 0.000 2.0       # Zero ionic strength
+    pdie 2.0               # Solute dielectric
+    sdie 78.54             # Solvent dielectric
+    chgm spl0              # linear spline charge discretization
+    srfm mol               # Molecular surface
+    srad 1.4               # Solvent probe radius
+    swin 0.3               # Surface spline window
+    sdens 10.0             # Sphere density
+    temp 298.15            # Temperature
+    calcenergy total       # Total energy
+    calcforce no           # No forces
+    write pot dx solvated-two-ions-pot
+    write charge dx two-ions-charge
+    write dielx dx solvated-two-ions-dielx
+    write diely dx solvated-two-ions-diely
+    write dielz dx solvated-two-ions-dielz
+    write kappa dx solvated-two-ions-kappa
+end
+elec name comp_ref        # reference complex
+    mg-manual
+    dime 65 65 65          # Grid dimensions
+    nlev 4                 # Multigrid levels
+    glen 12 12 12          # Grid lengths
+    gcent mol 1            # Grid center 
+    mol 1 
+    lpbe                   # Linearized PB
+    bcfl mdh               # Full multipole boundary condition
+    ion 1 0.000 2.0        # Zero ionic strength
+    ion -1 0.000 2.0       # Zero ionic strength
+    pdie 2.0               # Solute dielectric
+    sdie 2.0               # Solvent dielectric
+    chgm spl0              # linear spline charge discretization
+    srfm mol               # Molecular surface
+    srad 1.4               # Solvent probe radius
+    swin 0.3               # Surface spline window
+    sdens 10.0             # Sphere density
+    temp 298.15            # Temperature
+    calcenergy total       # Total energy
+    calcforce no           # No forces
+    write pot dx ref-two-ions-pot
+    write dielx dx ref-two-ions-dielx
+    write diely dx ref-two-ions-diely
+    write dielz dx ref-two-ions-dielz
+    write kappa dx ref-two-ions-kappa
+end
+
+quit

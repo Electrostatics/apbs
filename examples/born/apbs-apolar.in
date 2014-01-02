@@ -1,0 +1,52 @@
+#############################################################################
+### BORN ION SOLVATION ENERGY
+### $Id: apbs.in 996 2006-11-27 19:21:40Z sdg0919 $
+###
+### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for 
+### input file syntax.
+#############################################################################
+
+# READ IN MOLECULES
+read 
+    mol pqr ion.pqr       # Read molecule 1
+    parm flat parm.dat
+end
+
+APOLAR name area
+	grid 0.1 0.1 0.1
+	mol 1
+	srfm sacc
+	swin 0.3
+	srad 0.0
+	press 0.0
+	gamma 1.0
+	bconc 0.0
+	sdens 10.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce comps
+END
+
+APOLAR name volume
+	grid 0.1 0.1 0.1
+	mol 1
+	srfm sacc
+	swin 0.3
+	srad 0.0
+	press 1.0
+	gamma 0.0
+	bconc 0.0
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce comps
+END
+
+print apolEnergy area end
+print apolEnergy volume end
+
+
+# SO LONG
+quit

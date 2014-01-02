@@ -1,0 +1,93 @@
+read                   ! read
+    mol 1              ! molecule 1
+    file 'small491.pdb'      ! from pdb file
+    pdb                ! in free-format PDB format
+end
+read                   ! read
+    mol 2              ! molecule 1
+    file '491.pdb'      ! from pdb file
+    pdb                ! in free-format PDB format
+end
+set
+    charge             ! the charges
+    radii              ! and the radii
+    param CHARMM23        ! using parameter set "amber"
+    file 'aheall-atom.charmm.dat'     ! from the file "ahe.dat"
+end
+
+elec                   ! calculate the electrostatic potential
+    calc
+    dime 200 200 200 
+    grid 0.50           ! using a grid spacing of 1.0 Angstroms
+    all 
+    ions 50.0 
+    full
+    maxits 500
+    pdie 12.0
+    nsph 200
+    sdie 78.4
+    rion 2.0
+    nmap 1.4           ! use probe-accessible surface
+    bcfl 2             ! using boundary condition 2
+    gcent   289.756 167.946 81.925 
+end
+print elec zenerg all end
+print elec energy all end
+print elec self   all end
+print elec fdcoul all end
+print elec tenerg all end
+
+assign e1 = $energy end
+
+elec                   ! calculate the electrostatic potential
+    calc
+    dime 200 200 200
+    grid 0.50           ! using a grid spacing of 1.0 Angstroms
+    mol 1  
+    full
+    ions 50.0
+    maxits 500
+    pdie 12.0
+    nsph 200
+    sdie 78.4
+    rion 2.0
+    nmap 1.4           ! use probe-accessible surface
+    bcfl 2             ! using boundary condition 2
+    gcent   289.756 167.946 81.925
+end
+print elec zenerg mol 1 end
+print elec energy mol 1 end
+print elec self   mol 1 end
+print elec fdcoul mol 1 end
+print elec tenerg mol 1 end
+
+assign e2 = $energy end
+
+elec                   ! calculate the electrostatic potential
+    calc
+    dime 200 200 200
+    grid 0.50           ! using a grid spacing of 1.0 Angstroms
+    mol 2  
+    full
+    ions 50.0
+    maxits 500
+    pdie 12.0
+    nsph 200
+    sdie 78.4
+    rion 2.0
+    nmap 1.4           ! use probe-accessible surface
+    bcfl 2             ! using boundary condition 2
+    gcent   289.756 167.946 81.925
+end
+print elec zenerg mol 2 end
+print elec energy mol 2 end
+print elec self   mol 2 end
+print elec fdcoul mol 2 end
+print elec tenerg mol 2 end
+
+assign e3 = $energy end
+
+assign ebind = $e1 $e2 - $e3 - end
+
+stop
+

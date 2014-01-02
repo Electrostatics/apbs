@@ -1,0 +1,28 @@
+EQUIVALENCES
+
+OPLS
+resi atom   chrg   epsi   sigm   radi end
+MEOH O     -.70   0.170  3.070  1.535
+MEOH CH3   0.27   0.207  3.775  1.8875
+MEOH H     0.43   0.466  0.400  0.2
+MEO  O     -.98   0.170  3.070  1.535
+MEO  CH3   -.02   0.207  3.775  1.8875
+H2O  O     -.834  0.170  3.070  3.070
+H2O  H     0.417  0.466  0.400  0.2
+
+BASHFORD
+resi atom   chrg   epsi   sigm   radi end
+MEOH CH3   0.22   0.207  3.775  2.165
+MEOH O     -.58   0.170  3.070  1.600
+MEOH H     0.36   0.466  0.400  0.800
+MEO  CH3   0.10   0.207  3.775  2.165
+MEO  O    -1.10   0.170  3.070  1.500
+
+CHARMM
+resi atom   chrg   epsi   sigm   radi end
+MEOH CH3   0.25   0.207  2.165  2.165
+MEOH O     -.65   0.170  1.600  1.600
+MEOH H     0.40   0.466  0.800  0.800
+MEO  CH3   -.15   0.207  2.165  2.165
+MEO  O     -.85   0.170  1.600  1.600
+

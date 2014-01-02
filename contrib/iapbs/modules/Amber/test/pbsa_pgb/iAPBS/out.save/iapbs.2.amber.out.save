@@ -1,0 +1,194 @@
+
+          -------------------------------------------------------
+          Amber 9  SANDER                              2006
+          -------------------------------------------------------
+
+| Run on 09/24/2007 at 15:23:10
+  [-O]verwriting output
+
+File Assignments:
+|  MDIN: iapbs.in                                                              
+| MDOUT: iapbs.2.amber.out                                                     
+|INPCRD: pgb.rst                                                               
+|  PARM: prmtop                                                                
+|RESTRT: restrt                                                                
+|  REFC: refc                                                                  
+| MDVEL: mdvel                                                                 
+|  MDEN: mden                                                                  
+| MDCRD: mdcrd                                                                 
+|MDINFO: mdinfo                                                                
+|INPDIP: inpdip                                                                
+|RSTDIP: rstdip                                                                
+
+ 
+ Here is the input file:
+ 
+ test of PB reaction field on protein g solvated in a sphere (iAPBS)           
+&cntrl                                                                         
+   ntx=1, irest=0,                                                             
+   imin=1, ntmin=2, maxcyc=0,                                                  
+   ntpr=1, igb=6, ntb=0,                                                       
+   ntc=1, ntf=1, tol=0.000001,                                                 
+ /                                                                             
+&apbs                                                                          
+    apbs_debug=0, apbs_print=1,                                                
+    grid = 0.5, 0.5, 0.5,                                                      
+    calc_type=0,     cmeth=1,                                                  
+ bcfl=2, srfm=0,                                                               
+ chgm=0, srad =1.4, swin =0.3,                                                 
+ pdie=1.0,  sdie=80.0,                                                         
+ calcforce=0,                                                                  
+ radiopt=2, pqr='pgb-amber.pqr',                                               
+&end                                                                           
+
+--------------------------------------------------------------------------------
+   1.  RESOURCE   USE: 
+--------------------------------------------------------------------------------
+
+| Flags:                                                                        
+| New format PARM file being parsed.
+| Version =    1.000 Date = 03/08/04 Time = 15:34:25
+ NATOM  =     855 NTYPES =      13 NBONH =     419 MBONA  =     442
+ NTHETH =     951 MTHETA =     600 NPHIH =    1716 MPHIA  =    1040
+ NHPARM =       0 NPARM  =       0 NNB   =    4698 NRES   =      56
+ NBONA  =     442 NTHETA =     600 NPHIA =    1040 NUMBND =      30
+ NUMANG =      65 NPTRA  =      26 NATYP =      21 NPHB   =       0
+ IFBOX  =       0 NMXRS  =      24 IFCAP =       0 NEXTRA =       0
+ NCOPY  =       0
+
+
+|     Memory Use     Allocated
+|     Real               55051
+|     Hollerith           5188
+|     Integer            61665
+|     Max Pairs              1
+|     nblistReal             0
+|     nblist Int             0
+|       Total              691 kbytes
+| Duplicated    0 dihedrals
+| Duplicated    0 dihedrals
+
+--------------------------------------------------------------------------------
+   2.  CONTROL  DATA  FOR  THE  RUN
+--------------------------------------------------------------------------------
+
+                                                                                
+
+General flags:
+     imin    =       1, nmropt  =       0
+
+Nature and format of input:
+     ntx     =       1, irest   =       0, ntrx    =       1
+
+Nature and format of output:
+     ntxo    =       1, ntpr    =       1, ntrx    =       1, ntwr    =     500
+     iwrap   =       0, ntwx    =       0, ntwv    =       0, ntwe    =       0
+     ioutfm  =       0, ntwprt  =       0, idecomp =       0, rbornstat=      0
+
+Potential function:
+     ntf     =       1, ntb     =       0, igb     =       6, nsnb    =      25
+     ipol    =       0, gbsa    =       0, iesp    =       0
+     dielc   =   1.00000, cut     =   8.00000, intdiel =   1.00000
+     saltcon =   0.00000, offset  =   0.09000, gbalpha=    1.00000
+     gbbeta  =   0.00000, gbgamma =   0.00000, surften =   0.00500
+     rdt     =   0.00000, rgbmax  =  25.00000
+     alpb  =        0
+     scnb    =   2.00000, scee    =   1.20000
+
+Frozen or restrained atoms:
+     ibelly  =       0, ntr     =       0
+
+Energy minimization:
+     maxcyc  =       0, ncyc    =      10, ntmin   =       2
+     dx0     =   0.01000, drms    =   0.00010
+|  INFO: Old style inpcrd file read
+
+
+--------------------------------------------------------------------------------
+   3.  ATOMIC COORDINATES AND VELOCITIES
+--------------------------------------------------------------------------------
+
+                                                                                
+ begin time read from input coords =     0.000 ps
+
+iAPBS: Initializing APBS interface
+iAPBS: Reading radii definition from pqr filename: pgb-amber.pqr                                                                                                                                                                                                                                                   
+iAPBS: Grid dime not specified, calculating ...
+iAPBS: Requesting recalculating dime during caclulations.
+iAPBS: Grid values: 
+fglen:   40.582  53.930  51.807
+cglen:   40.582  57.681  54.072
+dime:   65  97  97
+grid:    0.500   0.500   0.500
+Required memory (in MB):    116.651
+
+ APBS calculation parameters:
+
+Nonlinear traditional PBE
+Multiple Debye-Huckel boundary conditions
+Molecular surface definition
+Using trilinear interpolation (linear splines)
+Grid dimension:  65  97  97
+Coarse grid lengths:  40.582  57.681  54.072
+Fine grid lengths:  40.582  53.930  51.807
+Grid spacings:   0.500   0.500   0.500
+Solute dielectric (pdie):   1.000
+Solvent dielectric (sdie):  80.000
+Temperature: 298.150
+sdens:  10.000
+Surface tension:   0.105
+radiopt is set to 2
+
+ Number of triangulated 3-point waters found:        0
+
+--------------------------------------------------------------------------------
+   4.  RESULTS
+--------------------------------------------------------------------------------
+
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+      1      -2.1135E+03     2.8943E+00     2.2881E+01     CG        606
+
+ BOND    =       15.9232  ANGLE   =       72.0306  DIHED      =      259.6946
+ VDWAALS =     -400.2516  EEL     =    -4454.9764  EPB        =     -942.1228
+ 1-4 VDW =      182.2148  1-4 EEL =     3058.2617  RESTRAINT  =        0.0000
+ ENPOLAR =       95.6782
+
+
+  Maximum number of minimization cycles reached.
+
+
+                    FINAL RESULTS
+
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+      1      -2.1135E+03     2.8943E+00     2.2881E+01     CG        606
+
+ BOND    =       15.9232  ANGLE   =       72.0306  DIHED      =      259.6946
+ VDWAALS =     -400.2516  EEL     =    -4454.9764  EPB        =     -942.1228
+ 1-4 VDW =      182.2148  1-4 EEL =     3058.2617  RESTRAINT  =        0.0000
+ ENPOLAR =       95.6782
+
+--------------------------------------------------------------------------------
+   5.  TIMINGS
+--------------------------------------------------------------------------------
+
+|    Read coords time           0.00 ( 0.02% of Total)
+|                Calc gb off-diag           0.01 (99.85% of Gen B)
+|                Other                      0.00 ( 0.15% of Gen B)
+|             Gen Born time              0.01 ( 0.02% of Nonbo)
+|             PB Nonbond                25.02 (100.0% of Nonbo)
+|          Nonbond force             25.02 (100.0% of Force)
+|       Force time                25.02 (100.0% of Runmd)
+|    Runmd Time                25.02 (100.0% of Total)
+|    Other                      0.01 ( 0.05% of Total)
+| Total time                25.04 (100.0% of ALL  )
+
+| Highest rstack allocated:          0
+| Highest istack allocated:          0
+|           Job began  at 15:23:10.515  on 09/24/2007
+|           Setup done at 15:23:10.531  on 09/24/2007
+|           Run   done at 15:23:35.557  on 09/24/2007
+|     wallclock() was called      22 times

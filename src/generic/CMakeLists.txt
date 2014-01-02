@@ -1,0 +1,44 @@
+add_items(
+    SOURCES
+    nosh.c
+    mgparm.c
+    femparm.c
+    pbeparm.c
+    bemparm.c
+    geoflowparm.c
+    apolparm.c
+    vacc.c
+    valist.c
+    vatom.c
+    vpbe.c
+    vcap.c
+    vclist.c
+    vstring.c
+    vparam.c
+    vgreen.c
+)
+
+add_items(
+    EXTERNAL_HEADERS
+    nosh.h
+    mgparm.h
+    femparm.h
+    pbeparm.h
+    bemparm.h
+    geoflowparm.h
+    apolparm.h
+    vacc.h
+    valist.h
+    vatom.h
+    vpbe.h
+    vcap.h
+    vclist.h
+    vstring.h
+    vparam.h
+    vgreen.h
+    vmatrix.h
+    vhal.h
+    vunit.h
+)
+
+add_sublibrary(generic)

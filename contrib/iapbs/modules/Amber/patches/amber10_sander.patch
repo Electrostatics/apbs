@@ -1,0 +1,1648 @@
+diff -ur --new-file sander.orig/apbs.f sander/apbs.f
+--- sander.orig/apbs.f	1969-12-31 16:00:00.000000000 -0800
++++ sander/apbs.f	2006-11-29 15:49:46.000000000 -0800
+@@ -0,0 +1,825 @@
++! $Id: amber10_sander.patch,v 1.2 2006/11/30 04:16:55 rok Exp $
++!
++#include "dprec.h"
++
++MODULE apbs
++#ifdef APBS
++
++! add timer calls rokFIXME
++
++CONTAINS
++!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++  SUBROUTINE apbs_read()
++!
++! read in APBS user input parameters and set defaults
++!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++
++    USE apbs_vars
++    IMPLICIT NONE
++
++! files.h contains mdin_apbs, sp_apbs
++#include "files.h" 
++
++    INTEGER :: i
++    INTEGER :: nonlin, bcfl, nion, srfm, calcenergy, calcforce
++    INTEGER :: calc_type, nlev, cmeth, ccmeth, fcmeth, chgm
++    INTEGER :: wpot, wchg, wsmol
++    INTEGER :: usedielmap, dielmapid, usekappamap, kappamapid
++    INTEGER :: usechargemap, chargemapid
++    _REAL_ :: pdie, sdie, srad, swin, temp, gamma, sdens
++
++    NAMELIST /apbs/ dime, pdime, cglen, fglen, grid, &
++         nonlin, bcfl, nion, pdie, sdie, srfm, chgm, srad, swin, &
++         temp, gamma, sdens, &
++         cmeth, ccmeth, fcmeth, ionq, ionc, ionrr, &
++         calcenergy, calcforce, apbs_debug, sp_apbs, apbs_print, &
++         wpot, wchg, wsmol, ispara, radiopt, geom_upd_limit, &
++         evdw_upd_limit
++
++    ! Default values
++    ! PBEparm
++    ispara = 0
++    i_pbeparm(1) = 1 ! molid
++    nonlin = 0
++    bcfl = 1
++    nion = 0
++    srfm = 2
++    pdie = 2.0
++    sdie = 78.4
++    srad = 1.4
++    swin = 0.3
++    temp = 298.15
++    gamma = 0.105
++    sdens = 10.0
++    calcenergy = 1
++    calcforce = 0
++    wpot = 0
++    wchg = 0
++    wsmol = 0
++
++    ! MGparm
++    calc_type = 1 ! 0 - manual MG, 1- autoMG, 2- parallel MG 
++    nlev = 4
++    cmeth = 1
++    ccmeth = 1
++    fcmeth = 1
++    chgm = 1
++
++    pdime = (/ 0, 0, 0 /)
++    ofrac = 0.1
++
++    !    ionq  = (/ 1.0, -1.0 /)
++    !    ionc  = (/ 0.15, 0.15 /)
++    !    ionrr = (/ 2.0, 2.0 /)
++
++    dime    = (/ 0, 0, 0 /)
++    grid    = (/ 0.0, 0.0, 0.0 /)
++    glen    = (/ 0.0, 0.0, 0.0 /)
++    center  = (/ 0.0, 0.0, 0.0 /)
++    cglen   = (/ 0.0, 0.0, 0.0 /)
++    fglen   = (/ 0.0, 0.0, 0.0 /)
++    ccenter = (/ 0.0, 0.0, 0.0 /)
++    fcenter = (/ 0.0, 0.0, 0.0 /)
++
++    usedielmap = 0
++    dielmapid = 0
++    usekappamap = 0
++    kappamapid = 0
++    usechargemap = 0
++    chargemapid = 0
++
++    ! is this a single point energy calculation?
++    ! default is no
++    sp_apbs = .FALSE.
++    ! printing verbosity
++    apbs_print = 1
++    ! debuging flag
++    apbs_debug = 0
++    ! radii optimization option
++    radiopt = 0
++
++    ! number of PB steps
++    napbs = 0
++    ! APBS update forces schema geom limit
++    ! 0.0 means: do updates every apbs_force call
++    geom_upd_limit = 0.0
++    evdw_upd_limit = 0.0
++
++    ! read in APBS input parameters
++    IF (mdin_apbs) THEN
++       REWIND 5
++       READ(5, nml=apbs)
++    ELSE
++       WRITE(6,*) 'iAPBS: WARNING: Did NOT read in any APBS parameters!'
++       WRITE(6,*) 'iAPBS: Exiting ...'
++       CALL mexit(6,1)
++    END IF
++
++    i_pbeparm(2) = nonlin
++    i_pbeparm(3) = bcfl
++    i_pbeparm(4) = nion
++    i_pbeparm(5) = srfm
++    i_pbeparm(6) = calcenergy
++    i_pbeparm(7) = calcforce
++    i_pbeparm(8) = usedielmap
++    i_pbeparm(9) = dielmapid
++    i_pbeparm(10) = usekappamap
++    i_pbeparm(11) = kappamapid
++    i_pbeparm(12) = usechargemap
++    i_pbeparm(13) = chargemapid
++    i_pbeparm(14) = wpot
++    i_pbeparm(15) = wchg
++    i_pbeparm(16) = wsmol
++
++    r_pbeparm(1) = pdie
++    r_pbeparm(2) = sdie
++    r_pbeparm(3) = srad
++    r_pbeparm(4) = swin
++    r_pbeparm(5) = temp
++    r_pbeparm(6) = gamma
++    r_pbeparm(7) = sdens
++
++    set_pbeparm = (/ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 /)
++
++    i_mgparm(1) = calc_type
++    i_mgparm(2) = nlev
++    i_mgparm(3) = cmeth
++    i_mgparm(4) = ccmeth
++    i_mgparm(5) = fcmeth
++    i_mgparm(6) = chgm
++
++    set_mgparm = (/ 1, 1, 1, 1, 1, 1, 1, 1, 1 /)
++    IF (cmeth == 0) THEN
++       set_mgparm(2) = 1 ! setgcent
++    ELSE
++       set_mgparm(2) = 0
++    END IF
++    ! setcgcent and setfgcent is always set (it is either molid or a point)
++    set_mgparm(3) = 1 ! setcgcent
++    set_mgparm(4) = 1 ! setfgcent
++
++    ! using dime, cglen and fglen only right now rokFIXME
++    set_mgparm(8) = 0 ! setgrid
++
++    ! Amber/APBS commands parsing section
++    !    INCLUDE "apbs_input.f90" ! initialize all data (development purposes)
++
++    ! add print info initialization section rokFIXME
++
++    CALL apbs_print_info()
++
++  END SUBROUTINE apbs_read
++
++!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++  SUBROUTINE apbs_init(natom, cg, radii)
++!
++! initialize APBS charges and radii
++! in: natom
++!     cg (atomic charges)
++!     radii (atomi radii)
++!
++! on exit pbcg and pbradii are modified (via 'use apbs_vars')
++!
++! these values are then constant during simulation
++!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++
++    USE apbs_vars
++
++    IMPLICIT NONE
++    ! passed in variables
++    INTEGER, INTENT(in) :: natom
++    _REAL_, INTENT(in) :: cg(natom), radii(natom)
++
++    ! local variables
++    INTEGER :: i, dummyi
++    CHARACTER :: dummyc
++    _REAL_ :: dummyr
++
++    WRITE(6,*) ''
++    WRITE(6, *) 'iAPBS: Initializing APBS interface'
++
++! possible additions:
++! - call pb_aaradi() (from sa_driver.f)
++! - call phi_aaradi() (from sa_driver.f)
++!    CALL pb_aaradi( natom, nbonh, ibh, jbh, pbradii, acrg, ucrgh, ucrga, &
++!         resid, igraph, isymbl, radii )
++!
++    IF (radiopt == 0) THEN
++       WRITE(6,*) 'iAPBS: Using radii definition from prmtop file'
++       pbradii = radii
++       pbcg = cg / 18.2223d0 ! 18.2223d0 is used to convert amber charge 
++                             ! to units of the electron charge
++    ELSE IF (radiopt == 1) THEN
++       ! read from a file
++       ! file format: atom chrg radius
++       WRITE(6,*) 'iAPBS: Reading chg/radii definition from pbparamsin file'
++       OPEN(21, file="pbparamsin", status="old")
++       DO i = 1, natom
++          READ(21,*) dummyc, pbcg(i), pbradii(i)
++       END DO
++       CLOSE(21)
++    ELSE IF (radiopt == 2) THEN
++       ! read a pqr file
++       ! no REMARK and END lines!
++       WRITE(6,*) 'iAPBS: Reading chg/radii definition from pqr file'
++       OPEN(21, file="pqr", status="old")
++       DO i = 1, natom
++          READ(21,*) dummyc, dummyi, dummyc, dummyc, dummyi, &
++               dummyr, dummyr, dummyr, pbcg(i), pbradii(i)
++       END DO
++       CLOSE(21)
++    ELSE IF (radiopt == 3) THEN
++       ! read from a file
++       ! file format: atom radius
++       WRITE(6,*) 'iAPBS: Reading radii definition from pbparamsin file'
++       OPEN(21, file="pbparamsin", status="old")
++       DO i = 1, natom
++          READ(21,*) dummyc, pbradii(i)
++       END DO
++       CLOSE(21)
++       pbcg = cg / 18.2223d0 ! 18.2223d0 is used to convert amber charge 
++                             ! to units of the electron charge
++    ELSE
++       WRITE(6,*) 'iAPBS: Unknown radiopt option'
++       CALL mexit(6,1)
++    END IF
++
++    IF (apbs_debug > 2) THEN
++       WRITE(6, *) 'iAPBS: natom, PB charge, PB radius'
++       DO i = 1, natom
++          WRITE(6, '(i4, 2f8.3)') i, pbcg(i), pbradii(i)
++       END DO
++    END IF
++
++    WRITE(6,*) ''
++
++  END SUBROUTINE apbs_init
++
++!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++  SUBROUTINE apbs_print_info()
++!
++! Print out APBS calculation parameters
++!
++!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++
++    USE apbs_vars
++    IMPLICIT NONE
++
++    WRITE(6,*) ''
++    WRITE(6,*) ' APBS calculation parameters:'
++    WRITE(6,*) ''
++
++! nonlin
++    IF (i_pbeparm(2) == 0) THEN
++       WRITE(6,*)'Nonlinear traditional PBE'
++    ELSE IF (i_pbeparm(2) == 1) THEN
++       WRITE(6,*)'Linearized traditional PBE'
++    ELSE
++       WRITE(6,*)'Unknown PBE option'
++       CALL mexit(6,1)
++    END IF
++
++! boundary conditions, bcfl
++    IF (i_pbeparm(3) == 0) THEN
++       WRITE(6,*) 'Zero boundary conditions'
++    ELSE IF (i_pbeparm(3) == 1) THEN
++       WRITE(6,*) 'Single Debye-Hückel boundary conditions'
++    ELSE IF (i_pbeparm(3) == 2) THEN
++       WRITE(6,*) 'Multiple Debye-Hückel boundary conditions'
++    ELSE
++       WRITE(6,*) 'Unknown boundary conditions option'
++       CALL mexit(6,1)
++    END IF
++
++! surface definition, srfm
++    IF (i_pbeparm(5) == 0) THEN
++       WRITE (6,*) 'Molecular surface definition'
++    ELSE IF (i_pbeparm(5) == 1) THEN
++       WRITE (6,*) 'Smoothed molecular surface definition'
++    ELSE IF (i_pbeparm(5) == 2) THEN
++       WRITE (6,*) 'Cubic-spline surface'
++    ELSE
++       WRITE(6,*) 'Unknown surface definition'
++       CALL mexit(6,1)
++    END IF
++
++! charge discretization, chgm
++    IF (i_mgparm(6) == 0) THEN
++       WRITE(6,*) 'Using trilinear interpolation (linear splines)'
++    ELSE IF(i_mgparm(6) == 1) THEN
++       WRITE(6,*) 'Using cubic B-spline discretization'
++    ELSE
++       WRITE(6,*) 'Unknown charge discretization'
++       CALL mexit(6,1)
++    END IF
++
++
++!   WRITE(6,*) 'Number of grid points for grid-based discretization:', dime
++   WRITE(6,'(a, 3i4)') ' Grid dimension:', dime(1), dime(2), dime(3)
++   WRITE(6,'(a, 3f8.3)') ' Coarse grid lengths:', cglen(1), cglen(2), cglen(3)
++   WRITE(6,'(a, 3f8.3)') ' Fine grid lengths:', fglen(1), fglen(2), fglen(3)
++   WRITE(6,'(a, 3f8.3)') ' Grid spacings:', fglen(1)/dime(1), &
++        fglen(2)/dime(2), fglen(3)/dime(3)
++   WRITE(6,'(a, f8.3)') ' sdens:', r_pbeparm(7)
++   WRITE(6,'(a, f8.3)') ' Solute dielectric (pdie):', r_pbeparm(1)
++   WRITE(6,'(a, f8.3)') ' Solvent dielectric (sdie):', r_pbeparm(2)
++   WRITE(6,'(a, f8.3)') ' Temperature:', r_pbeparm(5)
++   WRITE(6,'(a, f8.3)') ' Surface tension:', r_pbeparm(6)
++
++   IF (radiopt == 0) THEN
++      WRITE(6,*) 'radiopt is set to 0'
++   ELSE IF (radiopt == 1) THEN
++      WRITE(6,*) 'radiopt is set to 1'
++   ELSE IF (radiopt == 2) THEN
++      WRITE(6,*) 'radiopt is set to 2'
++   ELSE IF (radiopt == 3) THEN
++      WRITE(6,*) 'radiopt is set to 3'
++   ELSE
++      WRITE(6,*) 'Unknown radiopt selection'
++      CALL mexit(6,1)
++   END IF
++
++
++   WRITE(6,*) ''
++
++  END SUBROUTINE apbs_print_info
++
++!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++  SUBROUTINE apbs_spenergy(natom, x, f, eelt, enpol)
++!
++! single point PB energy calculation
++!
++! in:
++!  natom
++!  x: coords
++!  f: forces
++! out:
++!  eelt: electrostatic energy (polar)
++!  enpol: apolar energy
++!
++!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++
++    USE apbs_vars
++
++    IMPLICIT NONE
++
++    ! passed in variables
++    INTEGER, INTENT(in) :: natom
++    _REAL_ :: x(3*natom), f(3*natom)
++    _REAL_, INTENT(out) :: eelt, enpol
++
++    ! local variables
++    INTEGER :: i, j, rc, apbsdrv, ncalc(1)
++    LOGICAL :: skip
++    _REAL_ :: cx(natom), cy(natom), cz(natom)
++    _REAL_ :: esenerg(15)
++    _REAL_ :: npenerg(15)
++    _REAL_ :: apbsdx(natom), apbsdy(natom), apbsdz(natom)
++    _REAL_ :: apbsqfx(natom), apbsqfy(natom), apbsqfz(natom)
++    _REAL_ :: apbsibx(natom), apbsiby(natom), apbsibz(natom)
++    _REAL_ :: apbsnpx(natom), apbsnpy(natom), apbsnpz(natom)
++    _REAL_ :: apbsdbx(natom), apbsdby(natom), apbsdbz(natom)
++
++    !    eelt = 0.d0; enpol = 0.d0 rokFIXME ?
++
++    ! unpack coordinates
++    DO i = 1, natom
++       j = 3*(i-1)
++       cx(i) = x(j+1)
++       cy(i) = x(j+2)
++       cz(i) = x(j+3)
++    END DO
++
++    IF (apbs_debug > 3) THEN
++       WRITE(6, *) 'iAPBS: unpacked coordinates, charge and radius:'
++       DO i = 1, natom
++          WRITE(6, '(i4, 5f8.3)') i, cx(i), cy(i), cz(i), &
++               pbcg(i), pbradii(i)
++       END DO
++    END IF
++
++    IF (apbs_debug > 1) WRITE(6, *) 'iAPBS: Calling apbsdrv'
++
++    ! call APBS as a function
++
++    rc = apbsdrv(natom, ispara, i_pbeparm, set_pbeparm, r_pbeparm, &
++         ionq, ionc, ionrr, &
++         i_mgparm, set_mgparm, dime, pdime, grid, glen, center, &
++         cglen, fglen, ccenter, fcenter, ofrac, &
++         cx, cy, cz, &
++         pbradii, pbcg, apbs_debug, &
++         ncalc, esenerg, npenerg, apbsdx, apbsdy, apbsdz, &
++         apbsqfx, apbsqfy, apbsqfz, apbsibx, apbsiby, apbsibz, &
++         apbsnpx, apbsnpy, apbsnpz, apbsdbx, apbsdby, apbsdbz)
++
++    WRITE(6,*) '  iAPBS> apbs return code: ', rc
++    IF (rc == 0) THEN
++       WRITE(6,*) 'iAPBS Bomb: apbs failed'
++       CALL mexit(6,1)
++    END IF
++
++    ! update total returned energy (in kcal/mol)
++    eelt = esenerg(ncalc(1)) / 4.2D0
++    enpol = npenerg(ncalc(1)) / 4.2D0
++    !         write(*,*)'APBSFRC>after energy...'
++    IF (apbs_print > 0) THEN
++       WRITE (6, '(a, f8.3, a)') &
++            "APBSSP> Electrostatic energy: ", &
++            eelt, " kcal/mol"
++       WRITE (6, '(a, f8.3, a)') &
++            "APBSSP> Nonpolar energy:      ", &
++            enpol, " kcal/mol"
++    END IF
++
++  END SUBROUTINE apbs_spenergy
++
++!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++  SUBROUTINE apbs_force(natom, x, f, evdw, eelt, enpol)
++!
++! PB solvation force calculation
++!
++! in:
++!  natom
++!  x: coords
++!  f: forces
++!  evdw: van der Waals energy
++! out:
++!  eelt: electrostatic solvation energy (polar)
++!  enpol: apolar solvation energy
++!
++! on exit f gets updated with solvation forces
++!
++!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++
++    USE apbs_vars
++
++    IMPLICIT NONE
++
++    ! passed in variables
++    INTEGER, INTENT(in) :: natom
++    _REAL_, INTENT(in) :: evdw
++    _REAL_ :: x(3*natom), f(3*natom)
++    _REAL_, INTENT(out) :: eelt, enpol
++
++    ! local variables
++    INTEGER :: i, j, rc, apbsdrv, ncalc(1)
++    LOGICAL :: skip, do_apbs_update
++    _REAL_ :: cx(natom), cy(natom), cz(natom)
++    _REAL_ :: dx(natom), dy(natom), dz(natom)
++    _REAL_ :: esenerg(15)
++    _REAL_ :: npenerg(15)
++    _REAL_ :: sdie, gamma, ionc1, ionc2
++
++    _REAL_ :: enelec, ennp
++    _REAL_ :: esenvac, esensolv, npenvac, npensolv
++    _REAL_ :: apbsdx(natom), apbsdy(natom), apbsdz(natom)
++    _REAL_ :: solvdx(natom), solvdy(natom), solvdz(natom)
++    _REAL_ :: vacdx(natom), vacdy(natom), vacdz(natom)
++
++
++    _REAL_ :: apbsqfx(natom), apbsqfy(natom), apbsqfz(natom)
++    _REAL_ :: apbsibx(natom), apbsiby(natom), apbsibz(natom)
++    _REAL_ :: apbsnpx(natom), apbsnpy(natom), apbsnpz(natom)
++    _REAL_ :: apbsdbx(natom), apbsdby(natom), apbsdbz(natom)
++    _REAL_ :: solvqfx(natom), solvqfy(natom), solvqfz(natom)
++    _REAL_ :: solvibx(natom), solviby(natom), solvibz(natom)
++    _REAL_ :: solvnpx(natom), solvnpy(natom), solvnpz(natom)
++    _REAL_ :: solvdbx(natom), solvdby(natom), solvdbz(natom)
++    _REAL_ :: vacqfx(natom), vacqfy(natom), vacqfz(natom)
++    _REAL_ :: vacibx(natom), vaciby(natom), vacibz(natom)
++    _REAL_ :: vacnpx(natom), vacnpy(natom), vacnpz(natom)
++    _REAL_ :: vacdbx(natom), vacdby(natom), vacdbz(natom)
++
++    !    eelt = 0.d0; enpol = 0.d0 rokFIXME??
++
++    do_apbs_update = .TRUE.
++
++    ! unpack coordinates
++    DO i = 1, natom
++       j = 3*(i-1)
++       cx(i) = x(j+1)
++       cy(i) = x(j+2)
++       cz(i) = x(j+3)
++    END DO
++
++    IF (apbs_debug > 3) THEN
++       WRITE(6, *) 'iAPBS: unpacked coordinates, charge and radius:'
++       DO i = 1, natom
++          WRITE(6, '(i4, 5f8.3)') i, cx(i), cy(i), cz(i), &
++               pbcg(i), pbradii(i)
++       END DO
++    END IF
++
++    ! must turn on calcforce parameter in apbs!
++    IF (i_pbeparm(7) == 0 ) THEN
++       WRITE(6, *) 'iAPBS: Turning forces on (calcforce=2)'
++       i_pbeparm(7) = 2
++    END IF
++
++    napbs = napbs + 1
++
++    ! check if the geometry or energy
++    ! changed enough for PB forces recalculation
++    IF (geom_upd_limit > 0.0d0 .OR. evdw_upd_limit > 0.0d0) THEN
++       CALL check_apbs_update(cx, cy, cz, natom, evdw, do_apbs_update)
++    END IF
++
++    ! if yes, recalculate PB forces and energies
++    IF (do_apbs_update) THEN
++       IF (apbs_debug > 1) WRITE(6, *) 'iAPBS: Calling apbsdrv'
++       IF (geom_upd_limit > 0.0d0 .OR. evdw_upd_limit > 0.0d0) THEN
++          IF (apbs_debug > 0) WRITE(6,*) 'Doing PB forces update'
++       END IF
++
++       ! first calculation - in solvent
++       rc = apbsdrv(natom, ispara, i_pbeparm, set_pbeparm, r_pbeparm, &
++            ionq, ionc, ionrr, &
++            i_mgparm, set_mgparm, dime, pdime, grid, glen, center, &
++            cglen, fglen, ccenter, fcenter, ofrac, &
++            cx, cy, cz, &
++            pbradii, pbcg, apbs_debug, &
++            ncalc, esenerg, npenerg, apbsdx, apbsdy, apbsdz, &
++            apbsqfx, apbsqfy, apbsqfz, apbsibx, apbsiby, apbsibz, &
++            apbsnpx, apbsnpy, apbsnpz, apbsdbx, apbsdby, apbsdbz)
++
++       ! total energy in solvent (in kcal/mol)
++       esensolv = esenerg(ncalc(1)) / 4.2D0
++       npensolv = npenerg(ncalc(1)) / 4.2D0
++
++       IF (apbs_print > 1) THEN
++          WRITE (6, '(a, f8.3, a)') &
++               "iAPBS: Electrostatic energy in solvent: ", &
++               esensolv, " kcal/mol"
++          WRITE (6, '(a, f8.3, a)') &
++               "iAPBS: Nonpolar energy in solvent:      ", &
++               npensolv, " kcal/mol"
++       END IF
++
++       ! get the total forces from the solvent calculation
++       DO i = 1, natom
++          solvdx(i) = apbsdx(i) / 4.2D0
++          solvdy(i) = apbsdy(i) / 4.2D0
++          solvdz(i) = apbsdz(i) / 4.2D0
++
++          solvqfx(i) = apbsqfx(i) / 4.2D0
++          solvqfy(i) = apbsqfy(i) / 4.2D0
++          solvqfz(i) = apbsqfz(i) / 4.2D0
++
++          solvibx(i) = apbsibx(i) / 4.2D0
++          solviby(i) = apbsiby(i) / 4.2D0
++          solvibz(i) = apbsibz(i) / 4.2D0
++
++          solvnpx(i) = apbsnpx(i) / 4.2D0
++          solvnpy(i) = apbsnpy(i) / 4.2D0
++          solvnpz(i) = apbsnpz(i) / 4.2D0
++
++          solvdbx(i) = apbsdbx(i) / 4.2D0
++          solvdby(i) = apbsdby(i) / 4.2D0
++          solvdbz(i) = apbsdbz(i) / 4.2D0
++       END DO
++
++!-----------------------------------------------------------------
++
++       ! save sdie and ion concentration
++       sdie = r_pbeparm(2)
++       ionc1 = ionc(1)
++       ionc2 = ionc(2)
++       ! set sdie = 1.0
++       ! salt concentration should be 0.0
++       r_pbeparm(2) = 1.0D0 ! sdie
++       ionc(1) = 0.0D0
++       ionc(2) = 0.0D0
++
++       ! redo the calculation in vacuum
++       rc = apbsdrv(natom, ispara, i_pbeparm, set_pbeparm, r_pbeparm, &
++            ionq, ionc, ionrr, &
++            i_mgparm, set_mgparm, dime, pdime, grid, glen, center, &
++            cglen, fglen, ccenter, fcenter, ofrac, &
++            cx, cy, cz, &
++            pbradii, pbcg, apbs_debug, &
++            ncalc, esenerg, npenerg, apbsdx, apbsdy, apbsdz, &
++            apbsqfx, apbsqfy, apbsqfz, apbsibx, apbsiby, apbsibz,&
++            apbsnpx, apbsnpy, apbsnpz, apbsdbx, apbsdby, apbsdbz)
++
++       ! return back the original sdie and ionc concentration values
++       r_pbeparm(2) = sdie
++       ionc(1) = ionc1
++       ionc(2) = ionc2
++
++       ! total energy in vacuum (in kcal/mol)
++       esenvac = esenerg(ncalc(1)) / 4.2D0
++       ! npenvac = npenerg(ncalc(1)) / 4.2D0
++       ! no NP energy in vacuum
++       npenvac = 0.0D0
++       IF (apbs_print > 1) THEN
++          WRITE(6, '(a, f8.3, a)') &
++               "iAPBS: Electrostatic energy in vacuum: ", &
++               esenvac, " kcal/mol"
++          WRITE(6, '(a, f8.3, a)') &
++               "iAPBS: Nonpolar energy in vacuum:      ", &
++               npenvac, " kcal/mol"
++       END IF
++
++       ! get the total forces from the vacuum calculation
++       DO i = 1, natom
++          vacdx(i) = apbsdx(i) / 4.2D0
++          vacdy(i) = apbsdy(i) / 4.2D0
++          vacdz(i) = apbsdz(i) / 4.2D0
++
++          vacqfx(i) = apbsqfx(i) / 4.2D0
++          vacqfy(i) = apbsqfy(i) / 4.2D0
++          vacqfz(i) = apbsqfz(i) / 4.2D0
++
++          vacibx(i) = apbsibx(i) / 4.2D0
++          vaciby(i) = apbsiby(i) / 4.2D0
++          vacibz(i) = apbsibz(i) / 4.2D0
++
++          ! the following are zero in vacuum
++          vacnpx(i) = 0.0D0
++          vacnpy(i) = 0.0D0
++          vacnpz(i) = 0.0D0
++
++          vacdbx(i) = 0.0D0
++          vacdby(i) = 0.0D0
++          vacdbz(i) = 0.0D0
++
++       END DO
++!-----------------------------------------------------------------
++
++       ! add calulated total forces to f in common block
++       DO i = 1, natom
++          j = 3*(i-1)
++          f(j+1) = f(j+1) + (solvdx(i) - vacdx(i))
++          f(j+2) = f(j+2) + (solvdy(i) - vacdy(i))
++          f(j+3) = f(j+3) + (solvdz(i) - vacdz(i))
++       END DO
++
++       IF (apbs_debug > 3) THEN
++          DO i = 1, natom
++             j = 3*(i-1)
++             WRITE(6, '(a, 4x, i4, 3f8.3)') "APBSFRC> TotalForces:", &
++                  i, f(j+1), f(j+2), f(j+3)
++          END DO
++          DO i = 1, natom
++             WRITE(6,'(a, 2x, i4, 3f8.3)') "APBSFRC> SolventForces:", &
++                  i, solvdx(i), solvdy(i) , solvdz(i)
++          END DO
++          DO i = 1, natom
++             WRITE(6,'(a, 3x, i4, 3f8.3)') "APBSFRC> VacuumForces:", &
++                  i, vacdx(i), vacdy(i), vacdz(i)
++          END DO
++          DO i = 1, natom
++             WRITE(6,'(a, 5x, i4, 3f8.3)') "APBSFRC> SolvForces:", &
++                  i, solvdx(i) - vacdx(i), solvdy(i) - vacdy(i), &
++                  solvdz(i) - vacdz(i)
++          END DO
++          DO i = 1, natom
++             WRITE(6,'(a, 7x, i4, 3f8.3)') "APBSFRC> qfForces:", &
++                  i, solvqfx(i) - vacqfx(i), &
++                  solvqfy(i) - vacqfy(i), solvqfz(i) - vacqfz(i)
++          END DO
++          DO i = 1, natom
++             WRITE(6,'(a, 7x, i4, 3f8.3)') "APBSFRC> ibForces:", &
++                  i, solvibx(i) - vacibx(i), &
++                  solviby(i) - vaciby(i), solvibz(i) - vacibz(i)
++          END DO
++          DO i = 1, natom
++             WRITE(6,'(a, 7x, i4, 3f8.3)') "APBSFRC> npForces:", &
++                  i, solvnpx(i) - vacnpx(i), &
++                  solvnpy(i) - vacnpy(i), solvnpz(i) - vacnpz(i)
++          END DO
++          DO i = 1, natom
++             WRITE(6,'(a, 7x, i4, 3f8.3)') "APBSFRC> dbForces:", &
++                  i, solvdbx(i) - vacdbx(i), &
++                  solvdby(i) - vacdby(i), solvdbz(i) - vacdbz(i)
++          END DO
++
++       END IF ! if apbs_debug >
++
++       ! total, solvatation energy (in kcal/mol)
++       enelec = esensolv - esenvac
++       IF (apbs_print > 1) THEN
++          WRITE(6, '(a, f8.3, a)') &
++               "iAPBS: Total solvation energy: ", enelec, " kcal/mol"
++       END IF
++
++       ! total, non-polar energy (in kcal/mol)
++       !         ennp = npensolv - npenvac
++       ennp = npensolv
++       IF (apbs_print > 1) THEN
++          WRITE(6, '(a, f8.3, a)') &
++               "iAPBS: Total non-polar energy: ", ennp, " kcal/mol"
++          WRITE(6, '(a, f8.3, a)') &
++               "iAPBS: Total non-polar energy (vacuum): ", npenvac, " kcal/mol"
++       END IF
++
++       ! assign calculated  energies for export
++       eelt = enelec
++       enpol = ennp
++
++
++       ! printing options rokFIXME
++       IF (apbs_print > 1) THEN
++          WRITE(6, '(a, f8.3, a)') &
++               'The Free Energy of Charging in Solvent  = ', &
++               esensolv,' kcal/mol'
++          WRITE(6, '(a, f8.3, a)') &
++               'The Free Energy of Charging in Vacuum   = ', &
++               esenvac,' kcal/mol'
++          WRITE(6, '(a, f8.3, a)') &
++               'The Electrostatic Solvation Free Energy = ', &
++               enelec,' kcal/mol'
++          WRITE(6, '(a, f8.3, a)') &
++               'The Nonpolar Solvation Free Energy      = ', &
++               ennp,' kcal/mol'
++       END IF
++
++       ! save solvation forces for different update schemes
++       DO i = 1, natom
++          solvfrcx(i) = solvdx(i) - vacdx(i)
++          solvfrcy(i) = solvdy(i) - vacdy(i)
++          solvfrcz(i) = solvdz(i) - vacdz(i)
++       END DO
++
++       ! save ennp and enelec
++       senelec = enelec
++       sennp = ennp
++
++    ELSE
++       IF (apbs_debug > 0) WRITE(6,*) 'Skipping PB forces update'
++       ! we are not updating solv forces in this cycle, so just
++       ! return energies and forces calculated during the
++       ! previous update
++       eelt = senelec
++       enpol = sennp
++       DO i = 1, natom
++          j = 3*(i-1)
++          f(j+1) = f(j+1) + solvfrcx(i)
++          f(j+2) = f(j+2) + solvfrcy(i)
++          f(j+3) = f(j+3) + solvfrcz(i)
++       END DO
++    END IF ! if (do_apbs_update)
++
++    RETURN
++  END SUBROUTINE apbs_force
++
++!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++  SUBROUTINE check_apbs_update(cx, cy, cz, natom, evdw, do_apbs_update)
++!
++! check if change in geometry warrants new PB energy and forces update
++!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++
++    USE apbs_vars
++
++    IMPLICIT NONE
++
++    INTEGER :: i, natom
++    LOGICAL :: do_apbs_update
++    _REAL_ :: dx, dy, dz, dis, maxdis, evdw, evdwDelta
++    _REAL_ :: cx(natom), cy(natom), cz(natom)
++
++    do_apbs_update = .TRUE.
++
++    IF (napbs > 1) THEN ! do this starting with second apbs call
++       maxdis = 0.d0
++       DO i = 1, natom
++          dx = cx(i) - savedx(i)
++          dy = cy(i) - savedy(i)
++          dz = cz(i) - savedz(i)
++          dis = dx*dx + dy*dy + dz*dz
++          maxdis = MAX(dis, maxdis)
++       END DO
++
++       maxdis = SQRT(1.d0/3.d0 * maxdis)
++       ! consider vdW energy change
++       evdwDelta = evdw - saveevdw
++
++       do_apbs_update = (maxdis > geom_upd_limit) .or. &
++            (ABS(evdwDelta) > evdw_upd_limit)
++
++       IF (apbs_debug > 0) THEN
++          WRITE(6,*) ''
++          WRITE(6,*) ''
++          WRITE(6, '(a, 2f8.4)') &
++               'Max. change in geometry, maxdis, geom_upd_limit:', &
++               maxdis, geom_upd_limit
++          WRITE(6,'(a, 4f10.4)') &
++               'evdw, saveevdw, evdwDelta, evdw_upd_limit:', &
++               evdw, saveevdw, evdwDelta, evdw_upd_limit
++       END IF
++    END IF
++
++    ! save coords for the next call
++    DO i = 1, natom
++       savedx(i) = cx(i)
++       savedy(i) = cy(i)
++       savedz(i) = cz(i)
++    END DO
++    ! save vdW energy for the next call
++    saveevdw = evdw
++
++   RETURN
++  END SUBROUTINE check_apbs_update
++
++#endif /* APBS */
++END MODULE apbs
+diff -ur --new-file sander.orig/apbs_vars.f sander/apbs_vars.f
+--- sander.orig/apbs_vars.f	1969-12-31 16:00:00.000000000 -0800
++++ sander/apbs_vars.f	2006-11-29 15:50:00.000000000 -0800
+@@ -0,0 +1,246 @@
++! $Id: amber10_sander.patch,v 1.2 2006/11/30 04:16:55 rok Exp $
++!
++#include "dprec.h"
++
++MODULE apbs_vars
++#ifdef APBS
++!-----------------------------------------------------------------------
++!
++!                 iAPBS variables definition
++!
++! Similar type of varibles are packed together (integer/integer and
++! real/real) to mimize fortran/C passing incompatabilities.
++!
++! For detailed description of individual variables please see
++! the iAPBS Programmer's Guide.
++!
++!-----------------------------------------------------------------------
++! max number of counterions
++  INTEGER, PARAMETER :: MAXION = 2
++! static dimensions (for now) rokFIXME
++  INTEGER, PARAMETER :: APBSNATOMS = 10000
++
++!-----------------------------------------------------------------------
++!     int ispara;            : 1 => is a parallel calculation,
++!                              0 => is not
++  INTEGER :: ispara
++
++!-----------------------------------------------------------------------
++!      i_pbeparm members
++!
++! 1 int molid;            : Molecule ID to perform calculation on
++! 2 int nonlin;           : 0 => LPBE, 1 => NPBE
++! 3 int bcfl;             : Boundary condition: 0 => zero, 1 => single
++!                           Debye-Huckel sphere, 2 => multiple Debye-
++!                           Huckel spheres, 4 => focusing
++! 4 int nion;             : Number of counterion species
++! 5 int srfm;             : Surface calculation method
++!                              0: Mol surface for epsilon; inflated VdW
++!                                 for kappa; no smoothing
++!                              1: As 0 with harmoic average
++!                                 smoothing
++!                              2: Cubic spline
++! 6 int calcenergy;       : Energy calculation
++!                              0: don't calculate out energy
++!                              1: calculate total energy
++!                              2: calculate total energy and all energy
++!                                 components
++! 7 int calcforce;        : Atomic forces I/O
++!                              0: don't calculate forces
++!                              1: calculate net forces on molecule
++!                              2: calculate atom-level forces
++! 8 int useDielMap;       : Indicates whether we use an external
++!                           dielectric maps (note plural)
++! 9 int dielMapID;        : Dielectric map ID (if used)
++! 10 int useKappaMap;     : Indicates whether we use an external
++!                           kappa map
++! 11 int kappaMapID;      : Kappa map ID (if used)
++! 12 int useChargeMap;    : Indicates whether we use an external
++!                           charge distribution map
++! 13 int chargeMapID;     : Charge distribution map ID (if used)
++! 14 int write out elstat potential (0/1)
++! 15 int write out charge (0/1)
++! 16 int write out smol (0/1)
++!
++  INTEGER :: i_pbeparm(16)
++
++!-----------------------------------------------------------------------
++!     r_pbeparm members
++!
++! 1 double pdie;          : Solute dielectric
++! 2 double sdie;          : Solvent dielectric
++! 3 double srad;          : Solvent radius
++! 4 double swin;          : Cubic spline window
++! 5 double temp;          : Temperature (in K)
++! 6 double gamma;         : Surface tension for apolar energies/forces
++!                           (in kJ/mol/A^2)
++! 7 double sdens;         : Vacc sphere density
++!
++  _REAL_ :: r_pbeparm(7)
++
++!-----------------------------------------------------------------------
++!   set_pbeparm members
++!
++! 1   cpbeparm->setnonlin = 1;
++! 2   cpbeparm->setbcfl = 1;
++! 3   cpbeparm->setnion = 1;
++! 4   cpbeparm->setpdie = 1;
++! 5   cpbeparm->setsdie = 1;
++! 6   cpbeparm->setsrfm = 1;
++! 7   cpbeparm->setsrad = 1;
++! 8   cpbeparm->setswin = 1;
++! 9   cpbeparm->settemp = 1;
++! 10  cpbeparm->setgamma = 1;
++! 11  cpbeparm->setcalcenergy = 1;
++! 12  cpbeparm->setcalcforce = 0;
++! 13  cpbeparm->setsdens = 1;
++!
++  INTEGER :: set_pbeparm(13)
++
++!-----------------------------------------------------------------------
++!   i_mgparm members
++!
++! 1 int type;         : What type of MG calculation?
++!                            0: sequential manual
++!                            1: sequential auto-focus
++!                            2: parallel auto-focus
++! 2 int nlev;         : Levels in multigrid hierarchy
++! 3 int cmeth;        : Centering method:
++!                            0: center on point,
++!                            1: center on molecule
++! 4 int ccmeth;       : Coarse grid centering method:  0 => center
++!                       on point, 1 => center on molecule
++! 5 int fcmeth;       : Fine grid centering method:  0 => center on
++!                       point, 1 => center on molecule
++! 6 int chgm            Types of charge discretization methods
++!                            0: Trilinear interpolation of charge to 
++!                       8 nearest grid points. The traditional method;
++!                       not particularly good to use with PBE forces. 
++!                            1: Cubic B-spline across nearest- and
++!                       next-nearest-neighbors.  Mainly for use in 
++!                       grid-sensitive applications 
++!                       (such as force calculations).
++!
++  INTEGER :: i_mgparm(6)
++
++!-----------------------------------------------------------------------
++!  set_mgparm members
++!
++! 1    cmgparm->setdime = 1;
++! 2    cmgparm->setgcent = 1;
++! 3    cmgparm->setcgcent = 1;
++! 4    cmgparm->setfgcent = 1;
++!
++!       not using grid
++! 5    cmgparm->setcglen = 1;
++! 6    cmgparm->setfglen = 1;
++! 7    cmgparm->setglen = 1;
++! 8    cmgparm->setgrid = 0;
++! 9    cmgparm->setchgm = ;
++!
++  INTEGER :: set_mgparm(9)
++
++!-----------------------------------------------------------------------
++!   int dime[3];                 : Grid dimensions
++!   int pdime[3];                : Grid of processors to be used in
++!                                  calculation
++!
++  INTEGER :: dime(3), pdime(3)
++
++!-----------------------------------------------------------------------
++!   double grid[3];             : Grid spacings
++!   double glen[3];             : Grid side lengths.
++!   double center[3];           : Grid center. If ispart = 0, then this is
++!                                 only meaningful if cmeth = 0.  However, if
++!                                 ispart = 1 and cmeth = 0, then this is the
++!                                 center of the non-disjoint (overlapping)
++!                                 partition.  If ispart = 1 and cmeth = 1, then
++!                                 this is the vector that must be added to the
++!                                 center of the molecule to give the center of
++!                                 the non-disjoint partition. 
++!   double cglen[3];            : Coarse grid side lengths
++!   double fglen[3];            : Fine grid side lengths
++!   double ccenter[3];          : Coarse grid center. 
++!   double fcenter[3];          : Fine grid center. 
++!   double ofrac;               : Overlap fraction between procs
++!
++  _REAL_ :: grid(3), glen(3), center(3), cglen(3), fglen(3)
++  _REAL_ :: ccenter(3), fcenter(3), ofrac
++
++!-----------------------------------------------------------------------
++! mobile ion definition
++!
++!   double ionq[MAXION];   : Counterion charges (in e)
++!   double ionc[MAXION];   : Counterion concentrations (in M)
++!   double ionr[MAXION];   : Counterion radii (in A)
++!
++  _REAL_ :: ionq(MAXION), ionc(MAXION), ionrr(MAXION)
++
++!-----------------------------------------------------------------------
++! internal PB radii and charges
++  _REAL_ :: pbradii(APBSNATOMS)    ! PB radii
++  _REAL_ :: pbcg(APBSNATOMS)       ! PB charges
++
++!-----------------------------------------------------------------------
++! solvation energy and forces saved for use later
++  _REAL_ :: senelec, sennp
++  _REAL_ :: solvfrcx(APBSNATOMS)
++  _REAL_ :: solvfrcy(APBSNATOMS)
++  _REAL_ :: solvfrcz(APBSNATOMS)
++
++  _REAL_ :: geom_upd_limit, evdw_upd_limit, saveevdw
++  _REAL_ :: savedx(APBSNATOMS)
++  _REAL_ :: savedy(APBSNATOMS)
++  _REAL_ :: savedz(APBSNATOMS)
++
++!-----------------------------------------------------------------------
++! some integer variables
++!
++! napbs - how often we calculate APBS forces during MD/minimization
++! umeth - forces update method
++! apbs_debug - debug/verbosity value [0-5]
++! apbs_print - debug/verbosity value [0-5]
++! radiopt - optimization of radii method (see the source for details)
++!                             
++  INTEGER :: napbs, umeth, apbs_debug, apbs_print, radiopt
++
++!-----------------------------------------------------------------------
++! logical variables
++!
++! qapbs: were all parameters parsed?
++! qfapbs: do we want to calculate solvation forces?
++! qaparsed: did we parse all user options?
++!
++  LOGICAL :: qapbs, qfapbs, qaparsed
++
++!-----------------------------------------------------------------------
++!
++!  commons
++!
++!-----------------------------------------------------------------------
++!
++! disable COMMONs, we are using modules
++!
++!-----------------------------------------------------------------------
++! integer common
++!  COMMON / apbs_int / ispara, i_pbeparm, set_pbeparm, i_mgparm, &
++!       dime, pdime, set_mgparm, napbs, umeth, apbs_debug
++
++!-----------------------------------------------------------------------
++! double precision common
++!  COMMON / apbs_real / r_pbeparm, ionq, ionc, ionrr, &
++!       grid, glen, center, cglen, fglen, &
++!       ccenter, fcenter, ofrac, pbcg, pbradii, &
++!       senelec, sennp, solvfrcx, solvfrcy, solvfrcz
++
++!-----------------------------------------------------------------------
++! logical common
++!  COMMON / apbs_logical/ qapbs, qfapbs, qaparsed
++!
++!
++!  SAVE / apbs_int /
++!  SAVE / apbs_real /
++!  SAVE / apbs_logical /
++
++#endif /* APBS */
++END MODULE apbs_vars
+diff -ur --new-file sander.orig/depend sander/depend
+--- sander.orig/depend	2006-11-11 10:54:47.000000000 -0800
++++ sander/depend	2006-11-29 15:26:11.000000000 -0800
+@@ -208,6 +208,13 @@
+                     assert.h\
+                     dprec.h
+ 
++apbs.o: \
++                    dprec.h\
++                    files.h
++
++apbs_vars.o: \
++                    dprec.h
++
+ assert.o: \
+                     copyright.h\
+                     assert.h
+@@ -1115,6 +1122,7 @@
+                     egb.o\
+                     pb_force.o\
+                     np_force.o\
++                    apbs.o\
+                     trace.o\
+                     stack.o\
+                     pimd_vars.o\
+@@ -1161,6 +1169,7 @@
+                     egb.LES.o\
+                     pb_force.o\
+                     np_force.o\
++                    apbs.o\
+                     trace.o\
+                     stack.o\
+                     pimd_vars.o\
+@@ -1206,6 +1215,7 @@
+                     egb.o\
+                     pb_force.o\
+                     np_force.o\
++                    apbs.o\
+                     trace.o\
+                     stack.o\
+                     pimd_vars.o\
+@@ -1252,6 +1262,7 @@
+                     egb.o\
+                     pb_force.o\
+                     np_force.o\
++                    apbs.o\
+                     trace.o\
+                     stack.o\
+                     pimd_vars.o\
+@@ -1433,6 +1444,7 @@
+                     cmd_vars.o\
+                     stack.o\
+                     nmr.o\
++                    apbs.o\
+                     box.h\
+                     def_time.h\
+                     ew_cntrl.h\
+@@ -1473,6 +1485,7 @@
+                     cmd_vars.o\
+                     stack.o\
+                     nmr.LES.o\
++                    apbs.o\
+                     box.h\
+                     def_time.h\
+                     ew_cntrl.h\
+@@ -1517,6 +1530,7 @@
+                     cmd_vars.o\
+                     stack.o\
+                     nmr.o\
++                    apbs.o\
+                     box.h\
+                     def_time.h\
+                     ew_cntrl.h\
+@@ -2178,6 +2192,7 @@
+ 
+ qm2_dftb_eglcao.o: \
+                     dprec.h\
++                    def_time.h\
+                     qm2_dftb_module.o\
+                     qmmm_module.o\
+                     constants.o
+@@ -2260,6 +2275,17 @@
+ 	$(FPP) qm2_dftb_gammamat.f > _qm2_dftb_gammamat.f
+ 	$(FC) -c $(FOPTFLAGS) -o $@ _qm2_dftb_gammamat.f
+ 
++qm2_dftb_gb.o: \
++                    dprec.h\
++                    qmmm_module.o\
++                    qm2_dftb_module.o\
++                    constants.o
++
++
++qm2_dftb_gb.o:   qm2_dftb_gb.f
++	$(FPP) qm2_dftb_gb.f > _qm2_dftb_gb.f
++	$(FC) -c $(FOPTFLAGS) -o $@ _qm2_dftb_gb.f
++
+ qm2_dftb_geometries.o: \
+                     dprec.h\
+                     qm2_dftb_module.o\
+@@ -2272,8 +2298,8 @@
+ 
+ qm2_dftb_get_qm_forces.o: \
+                     copyright.h\
+-                    def_time.h\
+                     dprec.h\
++                    def_time.h\
+                     qm2_dftb_module.o\
+                     qmmm_module.o\
+                     constants.o
+@@ -2431,10 +2457,9 @@
+ qm2_energy.o: \
+                     copyright.h\
+                     dprec.h\
++                    def_time.h\
+                     qmmm_module.o\
+-                    constants.o\
+-                    new_time.h\
+-                    def_time.h
++                    constants.o
+ 
+ 
+ qm2_energy.o:   qm2_energy.f
+@@ -2555,10 +2580,9 @@
+ qm2_scf.o: \
+                     copyright.h\
+                     dprec.h\
+-                    qmmm_module.o\
+-                    constants.o\
+                     def_time.h\
+-                    new_time.h
++                    qmmm_module.o\
++                    constants.o
+ 
+ 
+ qm2_scf.o:   qm2_scf.f
+@@ -2663,7 +2687,6 @@
+                     qmmm_module.o\
+                     constants.o\
+                     qm2_dftb_module.o\
+-                    new_time.h\
+                     assert.h\
+                     memory.h
+ 
+diff -ur --new-file sander.orig/dynlib.f sander/dynlib.f
+--- sander.orig/dynlib.f	2006-10-30 10:11:34.000000000 -0800
++++ sander/dynlib.f	2006-11-29 15:19:27.000000000 -0800
+@@ -334,6 +334,10 @@
+       write(6,9058) eel,ehbond,econst
+    else if ( igb == 10 ) then
+       write(6,9060) eel,ehbond,econst
++#ifdef APBS
++   else if (igb == 6 .and. mdin_apbs ) then
++      write(6,9060) eel,ehbond,econst
++#endif /* APBS */
+    else
+       write(6,9059) eel,ehbond,econst
+    end if
+@@ -374,6 +378,9 @@
+ #endif /*  !PUPIL_SUPPORT */
+    if (gbsa > 0) write(6,9077) esurf
+    if (igb == 10) write(6,9074) esurf,edisp
++#ifdef APBS
++   if (igb == 6 .and. mdin_apbs ) write(6,9087) esurf
++#endif /* APBS */
+    if (econst /= 0.0) write(6,9076) epot-econst
+    if ( dvdl /= 0.d0) write(6,9089) dvdl
+    if ( ineb>0 ) call pimd_neb_energy_report(6)
+@@ -428,6 +435,10 @@
+       write(7,9058) eel,ehbond,econst
+    else if ( igb == 10 ) then
+       write(7,9060) eel,ehbond,econst
++#ifdef APBS
++   else if (igb == 6 .and. mdin_apbs ) then
++      write(7,9060) eel,ehbond,econst
++#endif /* APBS */
+    else
+       write(7,9059) eel,ehbond,econst
+    end if
+@@ -467,6 +478,9 @@
+ #endif /*  !PUPIL_SUPPORT */
+    if (gbsa > 0) write(7,9077) esurf
+    if (igb == 10) write(7,9074) esurf,edisp
++#ifdef APBS
++   if (igb == 6 .and. mdin_apbs ) write(7,9087) esurf
++#endif /* APBS */
+    if (econst /= 0.0) write(7,9076) epot-econst
+    if ( dvdl /= 0.d0) write(7,9089) dvdl
+ #ifndef LES
+@@ -526,6 +540,7 @@
+    9084 format (1x,'PDDGMNDO-ESCF= ',f11.4)
+    9085 format (1x,'PM3CARB1-ESCF= ',f11.4)
+    9086 format (1x,'DFTBESCF= ',f13.4)
++   9087 format (1x,'ENPOLAR= ',f14.4)
+    
+ #ifdef LES
+    ! LES and non-LES temperatures (no solvent/solute)
+diff -ur --new-file sander.orig/files.h sander/files.h
+--- sander.orig/files.h	2006-10-17 08:58:01.000000000 -0700
++++ sander/files.h	2006-11-29 15:19:50.000000000 -0800
+@@ -48,7 +48,12 @@
+ 
+ logical mdin_ewald,mdin_pb,mdin_amoeba
+ 
++#ifdef APBS
++logical mdin_apbs, sp_apbs
++common/mdin_flags/mdin_ewald,mdin_pb,mdin_amoeba,mdin_apbs,sp_apbs
++#else
+ common/mdin_flags/mdin_ewald,mdin_pb,mdin_amoeba
++#endif /* APBS */
+ 
+ integer BC_HULP  ! size in integers of common HULP
+ parameter ( BC_HULP = 9 )
+diff -ur --new-file sander.orig/force.f sander/force.f
+--- sander.orig/force.f	2006-10-30 10:11:34.000000000 -0800
++++ sander/force.f	2006-11-29 15:21:10.000000000 -0800
+@@ -11,6 +11,9 @@
+    use genborn
+    use poisson_boltzmann, only : pb_force
+    use dispersion_cavity, only : npopt, np_force
++#ifdef APBS
++   use apbs
++#endif /* APBS */
+    use trace
+    use stack
+    use pimd_vars, only: ipimd,ineb,nbead,bnd_vir,Epot_spring,Epot_deriv,real_mass,nrg_all
+@@ -132,7 +135,7 @@
+            am_Espring,am_Ederiv
+ 
+    integer i,m,nttyp,i3
+-   _REAL_  virvsene,eelt,epol,esurf,edisp
++   _REAL_  virvsene,eelt,epol,esurf,edisp,enpol
+    _REAL_  epolar,aveper,aveind,avetot,emtot,dipiter,dipole_temp
+    integer l_r2x,l_rjx,l_tmp1,l_tmp2,l_tmp3,l_tmp4,l_tmp5
+    integer l_tmp6,l_tmp7,l_tmp8,l_jj,l_skipv, l_kvls,l_jvls,l_psi
+@@ -282,7 +285,11 @@
+    ! If we are doing qm_gb=2 then we need to calculate the GB radii 
+    ! before calling qm_mm
+ 
++!#ifdef APBS
++!   if( igb > 0 .and. igb /= 6 .and. igb /=10 .and. igb /= 11 .and. &
++!#else
+    if( igb > 0 .and. igb /= 6 .and. igb /=10 .and. &
++!#endif /* APBS */
+       ( irespa < 2 .or. mod(irespa,nrespai) == 0) ) then
+ #ifdef MPI
+       gb_rad_mpistart = mytaskid+1
+@@ -585,6 +592,7 @@
+    ! ----------------------------------------------------------------
+    call timer_start(TIME_NONBON)
+ 
++
+    call timer_start(TIME_EEXIPS)
+    if( ips > 0 ) then
+       call eexips(evdwex,eelex,istart,iend, ntb, &
+@@ -901,7 +909,11 @@
+    !     -- when igb!=0 and igb!=10, all nonbonds are done in routine egb:
+ 
+    esurf = 0.d0
+-   if( igb /= 0 .and. igb /= 10) then
++!#ifdef APBS
++!   if( igb /= 0 .and. igb /= 10 .and. igb /= 11 ) then
++!#else
++   if( igb /= 0 .and. igb /= 10 ) then
++!#endif /* APBS */
+ 
+       call timer_start(TIME_EGB)
+       call egb( x,f,rborn,fs,reff,onereff,xx(l15),ix(i04),ix(i06), &
+@@ -922,7 +934,35 @@
+       endif
+ #endif
+ 
+-   end if  ! ( igb /= 0 .and. igb /= 10)
++   end if  ! ( igb /= 0 .and. (igb /= 10 .or. igb /= 11))
++
++#ifdef APBS
++! APBS forces
++!      if( igb == 11 ) then
++      if( mdin_apbs ) then
++         if (igb /= 6) then
++            write(6,*) '&apbs keyword requires igb=6.'
++            call mexit(6,1)
++         end if
++        
++         call timer_start(TIME_PBFORCE)
++
++! in: coords, radii, charges
++! out: updated forces (via apbs_params) and solvation energy (pol + apolar)
++
++         if (sp_apbs) then
++            call apbs_spenergy(natom, x, f, eelt, enpol)
++         else
++            call apbs_force(natom, x, f, ene(2), eelt, enpol)
++         end if
++!         ene(2) = 
++!         ene(3) = 
++         ene(4) = eelt
++         ene(23) = enpol
++         call timer_stop(TIME_PBFORCE)
++
++      end if  ! ( igb == 11 )
++#endif /* APBS */
+ 
+ #ifdef MPI
+   
+diff -ur --new-file sander.orig/Makefile sander/Makefile
+--- sander.orig/Makefile	2006-11-11 16:56:44.000000000 -0800
++++ sander/Makefile	2006-11-29 15:39:38.000000000 -0800
+@@ -53,6 +53,9 @@
+     amoeba_direct.o amoeba_mdin.o amoeba_adjust.o amoeba_self.o\
+     amoeba_vdw.o amoeba_induced.o amoeba_runmd.o 
+ 
++APBSOBJ= \
++	apbs_vars.o apbs.o
++
+ QMOBJ= \
+     qm_mm.o qm_link_atoms.o qm_nb_list.o qm_extract_coords.o \
+     qm_ewald.o qm_gb.o qm_zero_charges.o qm_print_info.o \
+@@ -232,6 +235,19 @@
+ 		../lib/nxtsec.o ../lib/sys.a $(NETCDFLIB) $(LOADLIB)
+ 
+ #---------------------------------------------------------------------------
++sander.APBS$(SFX): $(NETCDF) $(APBSOBJ) $(MMOBJ) $(QMOBJ) $(QM2OBJ) \
++              $(QMMMOBJ_DFTB) $(FULLPIMDOBJ) \
++              qm_div.o force.o syslib \
++              nxtsec lapack blas lmod $(INCDIVCON) checkserconf
++	$(LOAD) -o sander.APBS$(SFX)  $(APBSOBJ) $(MMOBJ) $(QMOBJ) $(QM2OBJ) \
++              $(QMMMOBJ_DFTB) $(FULLPIMDOBJ) \
++              qm_div.o force.o \
++              -L$(APBS_LIB) -liapbs -lapbsmainroutines -lapbs -lmaloc \
++              ../lmod/lmod.a $(LIBDIVCON) \
++              ../lapack/lapack.a ../blas/blas.a \
++              ../lib/nxtsec.o ../lib/sys.a $(NETCDFLIB) $(LOADLIB)
++
++#---------------------------------------------------------------------------
+ psander$(SFX): $(NETCDF) $(PSOBJ)  $(QMOBJ) $(QM2OBJ) $(QMMMOBJ_DFTB) $(PIMDOBJ) \
+               qm_div.o force.PS.o syslib \
+                  syslib nxtsec lapack blas lmod
+diff -ur --new-file sander.orig/mdread.f sander/mdread.f
+--- sander.orig/mdread.f	2006-10-25 18:41:03.000000000 -0700
++++ sander/mdread.f	2006-11-29 15:23:28.000000000 -0800
+@@ -17,6 +17,9 @@
+    use cmd_vars, only: restart_cmd, neq_cmd, adiab_param
+    use stack, only: lastist,lastrst
+    use nmr, only: echoin
++#ifdef APBS
++   use apbs
++#endif /* APBS */
+    implicit none
+ #  include "box.h"
+ #  include "def_time.h"
+@@ -303,6 +306,9 @@
+    mdin_cntrl=.false.
+    mdin_ewald=.false.
+    mdin_pb=.false.
++#ifdef APBS
++   mdin_apbs = .false.
++#endif /* APBS */
+    mdin_lmod=.false.
+    mdin_amoeba=.false.
+    iamoeba = 0
+@@ -316,6 +322,11 @@
+    call nmlsrc('pb',5,ifind)
+    if (ifind /= 0) mdin_pb=.true.
+ 
++#ifdef APBS
++   call nmlsrc('apbs',5,ifind)
++   if (ifind /= 0) mdin_apbs=.true.
++#endif /* APBS */
++
+    call nmlsrc('lmod',5,ifind)
+    if (ifind /= 0) mdin_lmod=.true.
+ 
+@@ -447,6 +458,13 @@
+       call pb_read
+    end if
+ 
++#ifdef APBS
++!   if ( igb == 11 ) then
++   if ( mdin_apbs ) then
++      call apbs_read
++   end if
++#endif /* APBS */
++
+    if( iamoeba == 1 ) then
+       if( mdin_amoeba ) then
+          call AMOEBA_read_mdin(5)
+@@ -593,6 +611,9 @@
+                      cutoffnb
+    use amoeba_mdin, only : iamoeba,beeman_integrator
+    use amoeba_runmd, only : AM_RUNMD_get_coords
++#ifdef APBS
++   use apbs
++#endif /* APBS */
+ 
+ !Francesco: added number of thermostats for Nose'-Hoover chains
+    use nose_hoover_vars, only: nchain
+@@ -772,8 +793,12 @@
+          ', iesp    =',iesp
+    write(6,'(5x,3(a,f10.5))') 'dielc   =',dielc, &
+          ', cut     =',cut,', intdiel =',intdiel
+-   
++
++#ifdef APBS
++   if( igb /= 0 .and. igb /= 10 .and. igb /= 11) then
++#else
+    if( igb /= 0 .and. igb /= 10) then
++#endif /* APBS */
+       write(6,'(5x,3(a,f10.5))') 'saltcon =',saltcon, &
+             ', offset  =',offset,', gbalpha= ',gbalpha
+       write(6,'(5x,3(a,f10.5))') 'gbbeta  =',gbbeta, &
+@@ -1061,7 +1086,11 @@
+       write(0,*) 'GBSA=2 only works for single point energy calc'
+       call mexit( 6,1 )
+    end if
++#ifdef APBS
++   if( igb /= 0 .and. igb /= 10 .and. igb /= 11) then
++#else
+    if( igb /= 0 .and. igb /= 10) then
++#endif /* APBS */
+ #ifdef LES
+       write(6,*) 'igb=1,5,7 are working with LES, no SA term included'
+ #endif
+@@ -1406,7 +1435,17 @@
+       call pb_init(ifcap,natom,nres,ntypes,nbonh,nbona,ix(i02),ix(i04),ix(i06),ix(i08),ix(i10),&
+                    ix(iibh),ix(ijbh),ix(iiba),ix(ijba),ix(ibellygp),ih(m02),ih(m04),ih(m06),x(l15),x(l97))
+    end if  ! ( igb == 10 ) 
+- 
++
++#ifdef APBS
++! APBS initialization
++!   if ( igb == 11 ) then
++   if ( mdin_apbs ) then
++! in: natom, charge and radii (from prmtop)
++! out: pb charges and pb radii (via apbs_vars module)
++      call apbs_init(natom, x(l15), x(l97))
++   end if  ! ( igb == 11 ) 
++#endif /* APBS */
++
+    if (icnstph /= 0) then
+       !     Read charge data and alter current charges accordingly
+       call cnstphread(ix(icpstinf),ix(icpresst),ix(icpptcnt), &
+@@ -1494,11 +1533,19 @@
+           ') cannot both be turned on'
+       inerr = 1
+    end if
++#ifdef APBS
++   if (igb /= 0 .and. igb /= 1 .and. igb /= 2 .and. igb /= 5 &
++         .and. igb /=6 .and. igb /=7 .and. igb /=10 .and. igb /= 11) then
++      write(6,'(/2x,a,i3,a)') 'IGB (',igb,') must be 0,1,2,5,6,7,10 or 11.'
++      inerr = 1
++   end if
++#else
+    if (igb /= 0 .and. igb /= 1 .and. igb /= 2 .and. igb /= 5 &
+          .and. igb /=6 .and. igb /=7 .and. igb /=10) then
+       write(6,'(/2x,a,i3,a)') 'IGB (',igb,') must be 0,1,2,5,6,7 or 10.'
+       inerr = 1
+    end if
++#endif /* APBS */
+    if (alpb /= 0 .and. alpb /= 1 )  then
+       write(6,'(/2x,a,i3,a)') 'ALPB (',alpb,') must be 0 or 1.'
+       inerr = 1
+@@ -1795,7 +1842,11 @@
+       write(6,'(/,a)') ' igb>0 is only compatible with ntb=0'
+       inerr = 1
+    end if
++#ifdef APBS
++   if ( ntb == 0 .and. sqrt(cut) < 8.05 .and. igb /= 10 .and. igb /= 11) then
++#else
+    if ( ntb == 0 .and. sqrt(cut) < 8.05 .and. igb /= 10 ) then
++#endif /* APBS */
+       write(6,'(/,a,f8.2)') ' unreasonably small cut for non-periodic run: ', &
+          sqrt(cut)
+       inerr = 1
+diff -ur --new-file sander.orig/printe.f sander/printe.f
+--- sander.orig/printe.f	2006-10-04 18:20:06.000000000 -0700
++++ sander/printe.f	2006-11-29 15:24:22.000000000 -0800
+@@ -172,6 +172,9 @@
+ #  include "ew_mpole.h"
+ #  include "ew_cntrl.h"
+ #  include "tgtmd.h"
++#ifdef APBS
++#  include "files.h"
++#endif /* APBS */
+ 
+    _REAL_  epot,enonb,enele,ehbond,ebond,eangle,edihed,enb14,eel14
+    _REAL_  econst,epolar,aveper,aveind,avetot,esurf,edisp,diprms,dipiter
+@@ -209,6 +212,10 @@
+       write(6,9048) enonb,enele,ehbond
+    else if ( igb == 10 ) then
+       write(6,9050) enonb,enele,ehbond
++#ifdef APBS
++   else if ( igb == 6 .and. mdin_apbs ) then
++      write(6,9050) enonb,enele,ehbond
++#endif /* APBS */
+    else
+       write(6,9049) enonb,enele,ehbond
+    end if
+@@ -238,6 +245,9 @@
+ #endif
+    if( gbsa > 0 ) write(6,9077) esurf
+    if (igb == 10) write(6,9074) esurf,edisp
++#ifdef APBS
++   if (igb == 6 .and. mdin_apbs ) write(6,9069) esurf
++#endif /* APBS */
+    if (epolar /= 0.0) write(6,9068) epolar
+    if (econst /= 0.0) write(6,9078) epot-econst
+    if ( dvdl /= 0.d0) write(6,9089) dvdl
+@@ -262,6 +272,10 @@
+          write(7,9048) enonb,enele,ehbond
+       else if ( igb == 10 ) then
+          write(7,9050) enonb,enele,ehbond
++#ifdef APBS
++!      else if ( igb == 11 ) then
++!         write(7,9050) enonb,enele,ehbond
++#endif /* APBS */
+       else
+          write(7,9049) enonb,enele,ehbond
+       end if
+@@ -313,6 +327,9 @@
+    9058 format (1x,'1-4 VDW = ',f13.4,2x,'1-4 EEL = ',f13.4,2x, &
+          'RESTRAINT  = ',f13.4)
+    9068 format (1x,'EPOLAR  = ',f13.4)
++#ifdef APBS
++   9069 format (1x,'ENPOLAR = ',f13.4)
++#endif /* APBS */
+    9074 format (1x,'ECAVITY = ',f13.4,2x,'EDISPER = ',f13.4)
+    9077 format (1x,'ESURF   = ',f13.4)
+    9078 format (1x,'EAMBER  = ',f13.4)
+diff -ur --new-file sander.orig/sander.f sander/sander.f
+--- sander.orig/sander.f	2006-11-06 23:20:42.000000000 -0800
++++ sander/sander.f	2006-11-29 15:24:59.000000000 -0800
+@@ -253,7 +253,12 @@
+       allocate( x(lastr), ix(lasti), ipairs(lastpr), ih(lasth), stat = ier )
+       REQUIRE( ier == 0 )
+ 
++#ifdef APBS
++      if(igb /= 0 .and. igb /= 10 .and. igb /= 11) &
++         call allocate_gb( natom, ncopy )
++#else
+       if(igb /= 0 .and. igb /= 10)call allocate_gb( natom, ncopy )
++#endif /* APBS */
+ 
+       if( idecomp > 0 ) then
+          call allocate_int_decomp(natom, nres)
+@@ -653,7 +658,12 @@
+    !  ---allocate memory for GB on the non-master nodes:
+ 
+    if( .not.master ) then
++#ifdef APBS
++      if(igb /= 0 .and. igb /= 10 .and. igb /= 11) &
++         call allocate_gb( natom, ncopy )
++#else
+       if(igb /= 0 .and. igb /= 10) call allocate_gb( natom, ncopy )
++#endif /* APBS */
+    end if  ! ( .not.master )
+ 
+    nr = nrp
+@@ -1083,7 +1093,11 @@
+    call deallocate_psander
+ #endif
+    call deallocate_stacks()
++#ifdef APBS
++   if( igb /= 0 .and. igb /= 10 .and. igb /= 11 ) then
++#else
+    if( igb /= 0 .and. igb /= 10 ) then
++#endif /* APBS */
+       call deallocate_gb( )
+    end if
+    if (master) then  

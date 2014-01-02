@@ -1,0 +1,136 @@
+!
+!  Solvation Example
+!
+!  The difference in solvation energy is computed between 
+!  methanol and methoxide.
+!
+!     Methanol
+!
+read                   ! read
+    mol 1              ! methanol
+    inter              ! from the input stream
+    pdb                ! in free-format PDB format
+end
+ATOM      1  CH3 MEOH    1      0.0190  0.0000   0.6556  0.0000  0.00
+ATOM      2  O   MEOH    1      -.1197  0.0000   -.7372  0.0000  0.00
+ATOM      3  H   MEOH    1      0.7370  0.0000  -1.1390  0.0000  0.00
+END
+
+set                    ! read
+    charge             ! set the charges
+    radius             ! and the radii of all of the atoms
+    param opls         ! using the parameter set "opls"
+    file "solv.dat"    ! from the file "solv.dat"
+end
+
+print apar mol1 end
+
+elec                   ! calculate the electrostatic potential
+    mol 1              ! for methanol
+    bcfl 2             ! using boundary condition 2
+    spacing 0.25       ! grid spacing
+    dime 60 60 60      ! grid dimensions
+    sdie 78            ! solvent dielectric
+    center             ! centering the grid on the molecule
+end
+
+print                  ! print
+    elec energy        ! the electrostatic energy
+    mol1               ! of the solvated system
+end
+assign                 ! save
+    e1 = $energy       ! the energy in the user variable e1
+end
+
+elec                   ! calculate the electrostatic potential
+    mol 1              ! for molecule 1
+    bcfl 2             ! using boundary condition 2
+    spacing 0.25       ! grid spacing
+    dime 60 60 60      ! grid dimensions
+    sdie 1             ! vacuo dielectric
+    center             ! centering the grid on the molecule
+end
+print                  ! print
+    elec energy        ! the electrostatic energy
+    mol1               ! of the in vacuo system
+end
+assign                 ! save
+    e2 = $energy       ! the energy in the user variable e2
+end
+
+assign                 ! calculate the solvation energy
+    emeoh = $e1        ! as the solvated energy
+            $e2 -      ! minus the vacuo energy
+end
+
+!
+!  Methoxide
+!
+read                   ! read
+    mol 1              ! methoxide
+    inter              ! from the input stream
+    pdb                ! in free-format PDB format
+end
+ATOM      1  CH3 MEO     1      0.0000  0.0000   0.5274  0.0000  0.00
+ATOM      2  O   MEO     1      0.0000  0.0000   -.7831  0.0000  0.00
+END
+
+set                    ! read
+    charge             !
+    radius             ! and the radii of all of the atoms
+    param opls         ! using the parameter set "opls"
+    file "solv.dat"    ! from the file "solv.dat"
+end
+
+print apar mol1 end
+
+elec                   ! calculate the electrostatic potential
+    mol 1              ! for methoxide
+    bcfl 2             ! using boundary condition 2
+    spacing 0.25       ! grid spacing
+    dime 60 60 60      ! grid dimensions
+    sdie 78            ! solvent dielectric
+    center             ! centering the grid on the molecule
+end
+print                  ! print
+    elec energy        ! the electrostatic energy
+    mol 1              ! of solvated system
+end
+
+assign                 ! save
+    e1 = $energy       ! the energy in the user variable e1
+end
+
+elec                   ! calculate the electrostatic potential
+    mol 1              ! for methoxide
+    bcfl 2             ! using boundary condition 2
+    spacing 0.25       ! grid spacing
+    dime 60 60 60      ! grid dimensions
+    sdie 1             ! in vacuo dielectric
+    center             ! centering the grid on the molecule
+end
+print                  ! print
+    elec energy        ! the electrostatic energy
+    mol 1              ! of solvated system
+end
+
+assign                 ! save
+    e2 = $energy       ! the energy in the user variable e2
+end
+
+assign                 ! calculate the solvation energy
+    emeo = $e1         ! of methoxide as the solvated energy
+           $e2 -       ! minus the in vacuo energy
+end
+
+assign                 ! calculate the difference in solvation
+    ediff = $emeo      ! energy between methanol and methoxide
+            $emeoh -
+end
+
+!
+! This example took 212 seconds on our Indigo2 Extreme R4400 200 MHz
+! and resulted in an ediff of -84.7 kcal/mol.
+!
+
+stop

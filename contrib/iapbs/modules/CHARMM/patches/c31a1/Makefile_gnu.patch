@@ -1,0 +1,26 @@
+--- build/UNX/Makefile_gnu.orig	2005-04-13 17:09:59.000000000 -0700
++++ build/UNX/Makefile_gnu	2005-05-02 12:28:45.000000000 -0700
+@@ -27,6 +27,14 @@
+ INCLUDE = -I../../source/moldyn
+ endif
+ 
++# options for compilation with APBS
++ifdef APBS
++# these must be defined: APBS_LIB, IAPBS_LIB and APBS_BLAS
++ADDLIB := $(ADDLIB) $(IAPBS_LIB)/iapbs.a \
++        -L$(APBS_LIB) -lapbsmainroutines -lapbs -lmaloc $(APBS_BLAS)
++
++endif
++
+ RANLIB = ranlib
+ .SUFFIXES: .fcm .src .o
+ VPATH = fcm
+@@ -87,7 +95,7 @@
+ ifdef INTEL32_IFC
+ FC = ifc -O3 -tpp7 -axW -w95 -cm
+ LD = ifc -O3 -tpp7 -axW
+-ADDLIB := $(ADDLIB) -lPEPCF90
++#ADDLIB := $(ADDLIB) -lPEPCF90
+ endif
+ 
+ FC := $(FC) $(INCLUDE)

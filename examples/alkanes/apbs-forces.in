@@ -1,0 +1,24 @@
+read 
+	mol pdb pentane.pdb
+	parm flat parm.dat
+end
+
+APOLAR name solvated
+	grid 0.3 0.3 0.3
+	mol 1
+	srfm sacc
+	swin 0.3
+	srad 0.65
+	press 0.2394
+	gamma 0.0085
+	bconc 0.033428
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce comps
+END
+
+print apolForce solvated end
+
+quit

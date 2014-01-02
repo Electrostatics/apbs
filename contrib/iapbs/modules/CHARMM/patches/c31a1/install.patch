@@ -1,0 +1,56 @@
+--- install.com.orig	2005-04-13 17:30:20.000000000 -0700
++++ install.com	2005-05-02 12:27:53.000000000 -0700
+@@ -102,6 +102,7 @@
+ set qgamessuk = 0
+ set qcadpac = 0
+ set qsccdftb = 0
++set apbs = 0
+ set scali = 0
+ set socket = 0
+ set f77 = 0
+@@ -168,6 +169,7 @@
+   echo "           U  replace QUANTUM with GAMESS-UK."
+   echo "           C  replace QUANTUM with CADPAC."
+   echo "           T  replace QUANTUM with SCCDFTB."
++  echo "        APBS  compile with APBS support."
+   echo "           S  Uses TCP/IP SOCKET library for parallel."
+   echo "        FULL  For FULL featured version (default)."
+   echo "        LITE  For a version with reduced functional features."
+@@ -215,6 +217,7 @@
+     if ( $opt == 'Q'  ) set qgamess = 1
+     if ( $opt == 'U'  ) set qgamessuk = 1
+     if ( $opt == 'C'  ) set qcadpac = 1
++    if ( $opt == 'APBS'  ) set apbs = 1
+     if ( $opt == 'S'  ) set socket = 1
+     if ( $opt == 'T'  ) set qsccdftb = 1
+     if ( $opt == 'FULL' || $opt == 'full' ) set full = 1
+@@ -396,7 +399,18 @@
+                     $chmbuild/Makefile_$chmhost > $chmbuild/Makefile_$$
+    /bin/mv $chmbuild/Makefile_$$ $chmbuild/Makefile_$chmhost
+   endif
+-
++# setup for APBS
++  if ( $apbs == 1 && $chm_host == gnu ) then
++      setenv APBS Y
++      if ( ! $?APBS_LIB || ! $?IAPBS_LIB || ! $?APBS_BLAS ) then
++        echo "APBS_LIB, IAPBS_LIB and APBS_BLAS variables must be set!"
++	exit
++      endif           
++  endif
++  if ( $apbs == 1 && $chm_host != gnu ) then
++    echo "APBS build is supported on gnu platform only"
++    exit
++  endif
+ # Modify Makefile_template for long integer compilation
+   if ( $longint == 1 ) then
+       if ( $chm_host == sgi64 || \
+@@ -1077,6 +1091,9 @@
+   if ( $full == 1 ) then
+     echo "ACE"        >> $chmbuild/pref$$.dat
+     echo "ADUMB"      >> $chmbuild/pref$$.dat
++    if ( $apbs == 1 ) then
++      echo "APBS"     >> $chmbuild/pref$$.dat
++    endif
+     echo "ASPENER"    >> $chmbuild/pref$$.dat
+     echo "BANBA"      >> $chmbuild/pref$$.dat
+     echo "BLOCK"      >> $chmbuild/pref$$.dat

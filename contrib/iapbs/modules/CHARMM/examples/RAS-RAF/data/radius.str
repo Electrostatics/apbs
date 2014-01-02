@@ -1,0 +1,127 @@
+* Atomic radius derived from solvent electrostatic charge distribution
+* Tested with free energy perturbation with explicit solvent
+* Authors:  Mafalda Nina, Dmitrii Belogv, and Benoit Roux
+* University of Montreal, June 1996.
+* M. Nina and B. Roux. Atomic Radii for Continuum Electrostatics Calculations based on 
+* Molecular Dynamics Free Energy Simulations. J. Phys. Chem. B 101: 5239-5248 (1997).
+*
+
+! UPDATES:
+! --------
+!
+! GLU and ASP modified December 1st, 1998 by Mafalda Nina
+!
+! Protonated histidine HSP has been included, January 1999 by Mafalda Nina
+! dG_elec = -68.15 kcal/mol (MD/FES) or -68.10 kcal/mol (PBEQ)
+!
+! TEA and ions added by Benoit Roux, January 1999.
+!
+! sodium added by Benoit Roux, November 2000
+     
+! Set to zero all H radii
+scalar wmain set 0.0 sele chem H* end
+
+! Set heavy atoms to average default values 
+scalar wmain set 2.3 sele chem C* end 
+scalar wmain set 1.8 sele chem O* end
+scalar wmain set 2.3 sele chem N* end
+scalar wmain set 2.3 sele chem S* end
+
+!Patches CT3 N-Methylamide C-terminus
+!        ACE acetylated N-terminus (ACP for PRO)
+scalar wmain set 2.06 sele (type CAY .or. type CAT) end
+scalar wmain set 2.04 sele type CY end
+scalar wmain set 1.52 sele type OY end
+scalar wmain set 2.23 sele type NT end
+scalar wmain set 1.40 sele type OT* end ! for COO- terminus
+
+!Backbone
+scalar wmain set 2.04 sele type C  end
+       ! for peptide bond
+scalar wmain set 1.52 sele type O  end
+       ! for peptide bond
+scalar wmain set 2.23 sele type N  end
+       ! for peptide bond
+scalar wmain set 2.86 sele type CA  end
+       ! for all CA except GLY
+scalar wmain set 2.38 sele (resnam GLY .and. type CA) end
+       ! for GLY only
+
+!Hydrogens
+scalar wmain set 0.00 sele type H* end
+       ! for all hydrogens
+
+!Carbons 
+scalar wmain set 2.67 sele type CB end
+       ! for all residues
+scalar wmain set 2.46 sele type CG* end 
+       ! for ARG, GLN, ILE, LYS, MET, PHE, THR, TRP, VAL, HSP, HSD  
+scalar wmain set 2.77 sele resnam GLU .and. type CG end 
+       ! for GLU only
+scalar wmain set 2.44 sele type CD* end 
+       ! for ARG, ILE, LEU, LYS
+scalar wmain set 1.98 sele (resnam GLN .and. type CD) .or. (resnam ASN .and. type CG) .or. - 
+                           (resnam GLU .and. type CD) .or. (resnam ASP .and. type CG) end  
+       ! for ASP, GLU, ASN, GLN 
+scalar wmain set 1.98 sele (resnam PRO .and. (type CB .or. type CG .or. type CD)) end
+       ! for PRO only
+scalar wmain set 2.00 sele (resnam TYR .and. (type CE* .or. type CD* .or. -
+                          type CZ)) .or. (resnam PHE .and. (type CE* .or. -
+                          type CD* .or. type CZ))  end
+       ! for TYR, PHE rings 
+scalar wmain set 1.78 sele (resnam TRP .and. (type CE* .or. type CD* .or. - 
+                          type CZ* .or. type CH2)) end
+       ! for TRP ring only
+scalar wmain set 2.10 sele type CE end
+       ! for MET only
+scalar wmain set 2.80 sele (resnam ARG .and. type CZ) .or. (resnam LYS .and. type CE) end
+       ! for ARG, LYS
+scalar wmain set 1.98 select (( resnam HSD  .or. resnam HSP) .and. type CE1) -
+       .or. (( resnam HSD .or. resnam HSP)  .and. type CD2) end
+       ! for neutral HSD and protonated HSP 
+
+!Oxygens
+scalar wmain set 1.40 sele (resnam GLU .or. resnam ASP) .and. (type OE* .or. type OD*) end
+       ! for GLU, ASP
+scalar wmain set 1.42 sele (resnam ASN .or. resnam GLN) .and. (type OE* .or. type OD*) end
+       ! for ASN, GLN
+scalar wmain set 1.64 sele type OG* end
+       ! for SER, THR
+scalar wmain set 1.85 sele (resnam TYR .and. type OH) end
+       ! for TYR only
+scalar wmain set 2.2 select resname TIP3 .and. type OH2 end
+       ! for explicit water molecules                                                                                
+
+!Nitrogens
+scalar wmain set 1.80 sele resnam HSD  .and. (type NE2 .or. type ND1) end
+       ! for neutral HSD 
+scalar wmain set 2.30 sele resnam HSP  .and. (type NE2 .or. type ND1) end
+       ! for protonated HSP 
+scalar wmain set 2.13 sele resnam ARG .and. (type NH* .or. type NE) .or. -
+                      (resnam LYS .and. type NZ) end
+       ! for ARG, LYS
+scalar wmain set 2.15 sele (resnam GLN .and. type NE2) .or. (resnam ASN .and. type ND2) end 
+       ! for GLN, ASN
+scalar wmain set 2.40 sele resnam TRP .and. type NE1 end
+       ! for TRP
+
+!Sulphur
+scalar wmain set 2.00 sele type S* end
+       ! for MET, CYS
+
+
+!Ions
+scalar wmain set 2.035 select resname POT end
+       !potassium ion K+
+
+scalar wmain set 2.035 select resname CLA end
+       !chloride ion Cl-
+
+scalar wmain set 1.66 select resname SOD end
+       !sodium ion Na+
+              
+scalar wmain set 2.15 sele resnam TEA .and. type N end
+scalar wmain set 2.30 sele ( type C1 .or. type C2 .or. type C3 .or. type C4 ) .and. resnam TEA end
+scalar wmain set 2.30 sele ( type C5 .or. type C6 .or. type C7 .or. type C8 ) .and. resnam TEA end
+       ! Tetramethylamonium (TEA)
+

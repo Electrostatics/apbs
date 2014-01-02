@@ -1,0 +1,193 @@
+
+          -------------------------------------------------------
+          Amber 10 SANDER                              2008
+          -------------------------------------------------------
+
+| Run on 05/28/2008 at 14:03:08
+  [-O]verwriting output
+
+File Assignments:
+|  MDIN: mdin                                                                  
+| MDOUT: ranp.out                                                              
+|INPCRD: ./prmtop-inpcrd/ranp.inpcrd                                           
+|  PARM: ./prmtop-inpcrd/ranp.prmtop                                           
+|RESTRT: restrt                                                                
+|  REFC: refc                                                                  
+| MDVEL: mdvel                                                                 
+|  MDEN: mden                                                                  
+| MDCRD: mdcrd                                                                 
+|MDINFO: mdinfo                                                                
+|INPDIP: inpdip                                                                
+|RSTDIP: rstdip                                                                
+
+ 
+ Here is the input file:
+ 
+ test of iAPBS/sander solvation energies (based on pbsa_radi)                  
+ &cntrl                                                                        
+   ntx=1, irest=0,                                                             
+   imin=1, maxcyc=0,                                                           
+   ntpr=1, ntwr=100000,                                                        
+   igb=6, ntb=0,                                                               
+   ntc=1, ntf=1, tol=0.000001,                                                 
+   ntt=0, temp0=300                                                            
+ &end                                                                          
+ &apbs                                                                         
+    apbs_debug=0,                                                              
+    apbs_print=0,                                                              
+    grid=0.5, 0.5, 0.5,                                                        
+    calc_type=0,                                                               
+    cmeth=1,                                                                   
+    bcfl=2,                                                                    
+    srfm=1,                                                                    
+    chgm=1,                                                                    
+    pdie=1.0,                                                                  
+    sdie=80.0,                                                                 
+    srad = 1.4,                                                                
+    radiopt=0,                                                                 
+    calcforce=0, calcnpenergy=1,                                               
+&end                                                                           
+
+--------------------------------------------------------------------------------
+   1.  RESOURCE   USE: 
+--------------------------------------------------------------------------------
+
+| Flags:                                                                        
+| New format PARM file being parsed.
+| Version =    1.000 Date = 09/05/04 Time = 12:56:17
+ NATOM  =      19 NTYPES =       5 NBONH =      10 MBONA  =       9
+ NTHETH =      22 MTHETA =      12 NPHIH =      45 MPHIA  =      26
+ NHPARM =       0 NPARM  =       0 NNB   =     102 NRES   =       1
+ NBONA  =       9 NTHETA =      12 NPHIA =      26 NUMBND =       5
+ NUMANG =       9 NPTRA  =      12 NATYP =       5 NPHB   =       0
+ IFBOX  =       0 NMXRS  =      19 IFCAP =       0 NEXTRA =       0
+ NCOPY  =       0
+
+
+|     Memory Use     Allocated
+|     Real                1377
+|     Hollerith            117
+|     Integer            20992
+|     Max Pairs              1
+|     nblistReal             0
+|     nblist Int             0
+|       Total               93 kbytes
+| Duplicated    0 dihedrals
+| Duplicated    0 dihedrals
+
+--------------------------------------------------------------------------------
+   2.  CONTROL  DATA  FOR  THE  RUN
+--------------------------------------------------------------------------------
+
+RAN                                                                             
+
+General flags:
+     imin    =       1, nmropt  =       0
+
+Nature and format of input:
+     ntx     =       1, irest   =       0, ntrx    =       1
+
+Nature and format of output:
+     ntxo    =       1, ntpr    =       1, ntrx    =       1, ntwr    =  100000
+     iwrap   =       0, ntwx    =       0, ntwv    =       0, ntwe    =       0
+     ioutfm  =       0, ntwprt  =       0, idecomp =       0, rbornstat=      0
+
+Potential function:
+     ntf     =       1, ntb     =       0, igb     =       6, nsnb    =      25
+     ipol    =       0, gbsa    =       0, iesp    =       0
+     dielc   =   1.00000, cut     =   8.00000, intdiel =   1.00000
+     saltcon =   0.00000, offset  =   0.09000, gbalpha=    1.00000
+     gbbeta  =   0.00000, gbgamma =   0.00000, surften =   0.00500
+     rdt     =   0.00000, rgbmax  =  25.00000  extdiel =  78.50000
+     alpb  =        0
+     scnb    =   2.00000, scee    =   1.20000
+
+Frozen or restrained atoms:
+     ibelly  =       0, ntr     =       0
+
+Energy minimization:
+     maxcyc  =       0, ncyc    =      10, ntmin   =       1
+     dx0     =   0.01000, drms    =   0.00010
+|  INFO: Old style inpcrd file read
+
+
+--------------------------------------------------------------------------------
+   3.  ATOMIC COORDINATES AND VELOCITIES
+--------------------------------------------------------------------------------
+
+RAN                                                                             
+ begin time read from input coords =     0.000 ps
+
+iAPBS: Initializing APBS interface
+iAPBS: Using charge/radii definition from prmtop file
+iAPBS: Grid dime not specified, calculating ...
+iAPBS: Requesting dime re-calculation on the fly
+
+ APBS calculation parameters:
+
+Nonlinear traditional PBE
+Multiple Debye-Huckel boundary conditions
+Smoothed molecular surface definition
+Using cubic B-spline discretization
+Grid dimension:  33  33  33
+Coarse grid lengths:  11.963  11.217  11.037 A
+Fine grid lengths:  11.963  11.217  11.037 A
+Grid spacings:   0.500   0.500   0.500 A
+Solute dielectric (pdie):   1.000
+Solvent dielectric (sdie):  80.000
+Temperature: 298.150 K
+Surface sphere density (sdens):  10.000 grid points/A^2
+Surface tension:   0.105 kJ/mol/A
+Using charge/radii information from prmtop file
+
+ Number of triangulated 3-point waters found:        0
+
+--------------------------------------------------------------------------------
+   4.  RESULTS
+--------------------------------------------------------------------------------
+
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+      1       4.7241E+01     1.5621E+01     9.1181E+01     O5'         2
+
+ BOND    =        0.0125  ANGLE   =        2.4661  DIHED      =       12.5170
+ VDWAALS =       16.6286  EEL     =      -56.1863  EPB        =      -33.5765
+ 1-4 VDW =        6.7100  1-4 EEL =       91.6803  RESTRAINT  =        0.0000
+ ENPOLAR =        6.9894
+
+
+  Maximum number of minimization cycles reached.
+
+
+                    FINAL RESULTS
+
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+      1       4.7241E+01     1.5621E+01     9.1181E+01     O5'         2
+
+ BOND    =        0.0125  ANGLE   =        2.4661  DIHED      =       12.5170
+ VDWAALS =       16.6286  EEL     =      -56.1863  EPB        =      -33.5765
+ 1-4 VDW =        6.7100  1-4 EEL =       91.6803  RESTRAINT  =        0.0000
+ ENPOLAR =        6.9894
+
+--------------------------------------------------------------------------------
+   5.  TIMINGS
+--------------------------------------------------------------------------------
+
+|    Read coords time           0.00 ( 0.08% of Total)
+|             PB Nonbond                 0.79 (100.0% of Nonbo)
+|          Nonbond force              0.79 (100.0% of Force)
+|          Bond/Angle/Dihedral        0.00 ( 0.01% of Force)
+|       Force time                 0.79 (100.0% of Runmd)
+|    Runmd Time                 0.79 (99.63% of Total)
+|    Other                      0.00 ( 0.29% of Total)
+| Total time                 0.79 (100.0% of ALL  )
+
+| Highest rstack allocated:          0
+| Highest istack allocated:          0
+|           Job began  at 14:03:08.145  on 05/28/2008
+|           Setup done at 14:03:08.148  on 05/28/2008
+|           Run   done at 14:03:08.934  on 05/28/2008
+|     wallclock() was called      22 times

@@ -1,0 +1,14 @@
+--- source/misc/pbeq.src.orig	2004-03-19 22:44:49.000000000 -0800
++++ source/misc/pbeq.src	2005-05-23 17:38:06.000000000 -0700
+@@ -182,6 +182,11 @@
+          QMMIJ     = .FALSE.
+       ENDIF
+ 
++      ELSEIF(WRD.EQ.'APBS')THEN
++       WRITE(OUTU,100)
++       WRITE(OUTU,100) 'PBEQ> Entering APBS module'
++       call apbs
++
+ C.......................................................................
+       ELSEIF(WRD.EQ.'SOLV')THEN
+ C            -------------

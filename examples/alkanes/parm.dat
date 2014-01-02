@@ -1,0 +1,13 @@
+##########################################################################
+# Parameters for the APBS Vparam class from the AMBER PARM94 force field
+# Adapted by Todd Dolinsky and Nathan Baker
+#
+# Format:
+#  <RESIDUE> <ATOM> <CHARGE> <RADIUS> <EPSILON>
+# where <RESIDUE> is the residue name, <ATOM> is the atom name, <CHARGE>
+# is the atomic charge in e, <RADIUS> is the van der Waals radius in 
+# A, and <EPSILON> is the van der Waals well depth in kJ/mol.
+##########################################################################
+ALK	C	0.597200	1.9080	0.4577
+ALK	H	0.112300	1.4870	0.0657
+WAT	OW	0.000000	1.7683	0.6364

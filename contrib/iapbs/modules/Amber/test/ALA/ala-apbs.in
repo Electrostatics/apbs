@@ -1,0 +1,49 @@
+read
+    mol pqr ala.pqr
+end
+elec 
+    mg-auto
+    dime 33 33 33
+    cglen 5.9704 6.6283 5.1357
+    fglen 5.9704 6.6283 5.1357
+    cgcent mol 1
+    fgcent mol 1
+    mol 1
+    lpbe
+    bcfl sdh
+    pdie 2.0000
+    sdie 78.5400
+    srfm smol
+    chgm spl2
+    sdens 10.00
+    srad 1.40
+    swin 0.30
+    temp 298.15
+    gamma 0.105
+    calcenergy total
+    calcforce no
+end
+elec 
+    mg-auto
+    dime 33 33 33
+    cglen 5.9704 6.6283 5.1357
+    fglen 5.9704 6.6283 5.1357
+    cgcent mol 1
+    fgcent mol 1
+    mol 1
+    lpbe
+    bcfl sdh
+    pdie 2.0000
+    sdie 2.0000
+    srfm smol
+    chgm spl2
+    sdens 10.00
+    srad 1.40
+    swin 0.30
+    temp 298.15
+    gamma 0.105
+    calcenergy total
+    calcforce no
+end
+print energy 2 - 1 end
+quit

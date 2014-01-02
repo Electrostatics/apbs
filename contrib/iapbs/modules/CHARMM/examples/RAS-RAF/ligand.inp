@@ -1,0 +1,309 @@
+* mmpbsa.inp : run MM-PBSA analysis on trajectories
+* (Entropy is calculated from quasiharmonic analysis of heavy atoms.)
+*
+
+bomlev -2
+
+!== variables to be set by user ==
+! modify the DEFINEs below too!
+
+set mol LIGAND ! COMPLEX, RECEPTOR or LIGAND
+
+set data "ligand.dat" ! output file
+
+set T      300.0      ! temperature
+set entropy  0        ! flag for entropy calculation, 0 = not calculated
+
+set gammaP   0.00542  ! for Gasa (non-polar dGsolv)
+set betaP    0.92     ! for Gasa
+
+set dcel     1.0      ! grid spacing for PBEQ
+set saltcon  0.0      ! salt concentration for PBEQ
+set rion     0.0      ! ion exclusion radius
+set epssol  80.0      ! dielectric constant of the bulk solvent
+set epsvac   1.0      ! dielectric constant of the vacuum
+set epsprot  1.0      ! dielectric constant of the protein
+set rsol     1.4      ! solvent probe radius
+
+set traj   "short.dcd" ! input trajectory
+set fframe  1
+set skip    1
+
+set psf  "complex.psf"
+set crd  "complex.crd"
+
+
+!== read in the topology and parameter files ==
+!read rtf   card name $CHM_HOME/toppar/top_all27_prot_na.rtf
+!read param card name $CHM_HOME/toppar/par_all27_prot_na.prm
+read rtf   card name ./data/top_all27_prot_na.rtf
+read param card name ./data/par_all27_prot_na.prm
+
+!== load the structure file ==
+open read unit 2 form name @psf
+read psf card unit 2
+close unit 2
+
+! define the parts of the system
+define COMPLEX  select segid A .or. segid B end
+define RECEPTOR select segid A end
+define LIGAND   select segid B end
+
+!== read in initial coordinate set ==
+open read unit 2 form name @crd
+read coor card unit 2
+close unit 2
+
+! copy coordinates to comparison set
+coor copy comp
+
+
+!== setup trajectory for reading: we assume single trajectory for the moment ==
+set trajU 20
+
+! determine last frame
+open read unit @trajU unform name @traj
+traj query unit @trajU
+calc last = ?nfile - 1   ! why one frame "missing" in NAMD trajectory?
+calc trlen = @last - @fframe
+calc lframe = @fframe + @skip * int( @trlen / @skip )
+close unit @trajU
+
+open read unit @trajU unform name @traj
+traj first @trajU nunits 1 begin @fframe stop @lframe skip @skip
+
+
+!== initialise variables ==
+set datU 15
+
+set n 0  ! frame counter
+calc nmax = int( ( @lframe - @fframe ) / @skip )
+
+! MM-PBSA equation: G = Egas + Gsolv - TSmm
+set avgEgas 0 ! solute internal energy
+set varEgas 0
+set avgEele 0
+set varEele 0
+set avgEvdW 0
+set varEvdW 0
+set avgEint 0
+set varEint 0
+set avgGasa 0 ! nonpolar contribution to solvation free energy
+set varGasa 0
+set avgGPB 0 ! solvation free energy from finite difference PBEQ
+set varGPB 0
+
+! data file
+open write card unit @datU name @data
+write title unit @datU
+*#frame      Egas       Eele       EvdW       Eint       Gasa       GPB
+*
+
+
+!== BEGIN reading the trajectory ==
+label trajloop
+  incr n by 1
+
+  traj read
+
+  delete atoms select .not. @mol end
+
+  coor orient norot ! center coordinates
+
+  ! Egas
+  energy cutnb 999.0 ctofnb 997.0 ctonnb 995.0 ctexnb 999.0
+
+  set Egas = ?ener
+  calc delta = @Egas - @avgEgas
+  calc avgEgas = @avgEgas + @delta / @n
+  calc varEgas = @varEgas + @delta * ( @Egas - @avgEgas )
+
+  set Eele = ?elec
+  calc delta = @Eele - @avgEele
+  calc avgEele = @avgEele + @delta / @n
+  calc varEele = @varEele + @delta * ( @Eele - @avgEele )
+
+  set Evdw = ?vdw
+  calc delta = @Evdw - @avgEvdw
+  calc avgEvdw = @avgEvdw + @delta / @n
+  calc varEvdw = @varEvdw + @delta * ( @Evdw - @avgEvdw )
+
+  calc Eint = ?ener - ?elec - ?vdw
+  calc delta = @Eint - @avgEint
+  calc avgEint = @avgEint + @delta / @n
+  calc varEint = @varEint + @delta * ( @Eint - @avgEint )
+
+  ! Gasa
+  coor surface rprobe @rsol
+  calc Gasa = @gammaP * ?area + @betaP
+  calc delta = @Gasa - @avgGasa
+  calc avgGasa = @avgGasa + @delta / @n
+  calc varGasa = @varGasa + @delta * ( @Gasa - @avgGasa )
+
+  != GPB finite difference PBEQ =
+  ! establish grid dimensions
+  coor stat
+
+  != BEGIN Poisson-Bolztmann equation =
+  pbeq
+    !scalar wmain = radius  ! set wmain to vdW radii
+    stream ./data/radius.str       ! Benoit Roux's parameter
+
+    apbs mgauto lpbe grdx @dcel grdy @dcel grdz @dcel -
+      sdie @epssol pdie @epsprot srad @rsol temp @T -
+      srfm 2 bcfl 1 chgm 1 cmeth 1 calcene 1 debug 1
+    set pbext = ?enpb
+
+    apbs mgauto lpbe grdx @dcel grdy @dcel grdz @dcel -
+      sdie @epsvac pdie @epsprot srad @rsol temp @T -
+      srfm 2 bcfl 1 chgm 1 cmeth 1 calcene 1 debug 1
+    set pbvac = ?enpb
+
+    calc GPB = @pbext - @pbvac
+    calc delta = @GPB - @avgGPB
+    calc avgGPB = @avgGPB + @delta / @n
+    calc varGPB = @varGPB + @delta * ( @GPB - @avgGPB )
+
+    reset
+  end
+  != END Poisson-Bolztmann equation =
+
+  ! write data
+  trim n from 1 to 10
+  trim Egas from 0 to 10
+  trim Eele from 1 to 10
+  trim EvdW from 1 to 10
+  trim Eint from 1 to 10
+  trim Gasa from 1 to 10
+  trim GPB from 1 to 10
+
+  write title unit @datU
+*@n @Egas @Eele @EvdW @Eint @Gasa @GPB
+*
+
+  ! reload the structure file
+  open read unit 2 form name @psf
+  read psf card unit 2
+  close unit 2
+if @n le @nmax goto trajloop
+!== END reading the trajectory ==
+
+!== calculate average values ==
+trim avgEgas from 1 to 12
+trim avgEele from 1 to 12
+trim avgEvdW from 1 to 12
+trim avgEint from 1 to 12
+trim avgGPB from 1 to 12
+trim avgGasa from 1 to 12
+
+calc n = @n - 1
+calc varEgas = sqrt( @varEgas / @n )
+calc varEele = sqrt( @varEele / @n )
+calc varEvdW = sqrt( @varEvdW / @n )
+calc varEint = sqrt( @varEint / @n )
+calc varGPB = sqrt( @varGPB / @n )
+calc varGasa = sqrt( @varGasa / @n )
+
+trim varEgas from 1 to 12
+trim varEele from 1 to 12
+trim varEvdW from 1 to 12
+trim varEint from 1 to 12
+trim varGPB from 1 to 12
+trim varGasa from 1 to 12
+
+calc G = @avgEgas + @avgGPB + @avgGasa
+
+write title unit @datU
+*#
+*# MM-PBSA results for @mol (@n frames)
+*#
+*#               MEAN         STD
+*#           ============ ============
+*#  Eele     @avgEele @varEele
+*#  EvdW     @avgEvdW @varEvdW
+*#  Eint     @avgEint @varEint
+*#  Egas     @avgEgas @varEgas
+*#  Gasa     @avgGasa @varGasa
+*#  GPB      @avgGPB @varGPB
+*#
+*#  G(no_entropy) = Egas + Gasa + GPB = @G
+*#
+*
+
+
+!== entropy calculation via QHA ==
+if @entropy ne 0 then
+  set trajQHA @mol_QHA.dcd
+  set trajUQHA 1
+
+  incr nmax by 1
+
+  ! write mass RMS oriented trajectory
+  open write unit @trajUQHA unform name @trajQHA
+
+  merge coor firstu @trajU nunit 1 outputu @trajUQHA -
+    begin @fframe stop @lframe skip @skip nfile @nmax -
+    select @mol .and. .not. hydrogen end -
+    orient mass sele @mol .and. .not. hydrogen end
+
+  close unit @trajU
+
+  ! read in mass RMS oriented trajectory and compute average structure
+  open read unit @trajUQHA unform name @trajQHA
+  delete atom select .not. @mol .or. hydrogen end
+
+  coor dynamics firstu @trajUQHA nunit 1 -
+    begin @fframe stop @lframe skip @skip -
+    select all end -
+    orient mass select all end
+
+  coor copy comp
+
+  ! calculate number of vectors to use for vibrational analysis
+  calc nmod = ?natom * 3
+
+  vibran nmod @nmod
+    quasi temp @T firstu @trajUQHA nunit 1 thermo -
+      begin @fframe stop @lframe skip @skip
+    set Stot ?stot
+  end
+
+  close unit @trajUQHA
+
+  calc TdS = @T * @Stot
+
+  trim Stot from 1 to 12
+  trim TdS  from 1 to 12
+
+
+  !== MM-PBSA equation: G = Egas + Gsolv - TSmm ==
+  !                     Gsolv = GPB + Gasa
+  calc G = @G - @TdS
+
+  !== write results ==
+  write title unit @datU
+*#  Stot = @Stot, TdS = @TdS
+*#
+*#  G = G(no_entropy) - TdS = @G
+*#
+
+endif
+
+write title unit @datU
+*# input files
+*#   trajectory: @traj (first frame #@fframe, skip @skip)
+*#   PSF: @psf
+*#   CRD: @crd
+*#
+*# key parameters
+*#   T = @T K
+*#   Gasa: gammaP = @gammaP, betaP = @betaP
+*#   PBEQ: dcel = @dcel, conc = @saltcon, ionr = @rion
+*#         epssol = @epssol, epsvac = @epsvac, epsprot = @epsprot
+*#         rsol = @rsol
+*#
+
+close unit @datU
+
+stop
+
