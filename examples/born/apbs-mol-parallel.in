@@ -1,0 +1,69 @@
+#############################################################################
+### BORN ION SOLVATION ENERGY
+### $Id$
+###
+### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for 
+### input file sytax.
+#############################################################################
+
+# READ IN MOLECULES
+read
+    mol xml ion.xml
+end
+
+# COMPUTE POTENTIAL FOR SOLVATED STATE
+elec name solvated
+    mg-para
+    ofrac 0.1
+    pdime 2 2 1
+    dime 65 65 65
+    cglen 50 50 50
+    fglen 12 12 12
+    fgcent mol 1
+    cgcent mol 1
+    mol 1
+    lpbe
+    bcfl mdh
+    pdie 1.0
+    sdie 78.54
+    chgm spl2
+    srfm mol
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+    # write pot dx potential
+    # write charge dx charge
+end
+
+# COMPUTE POTENTIAL FOR REFERENCE STATE
+elec name reference
+    mg-para
+    ofrac 0.1
+    pdime 2 2 1
+    dime 65 65 65
+    cglen 50 50 50
+    fglen 12 12 12
+    fgcent mol 1
+    cgcent mol 1
+    mol 1
+    lpbe
+    bcfl mdh
+    pdie 1.0
+    sdie 1.0
+    chgm spl2
+    srfm mol
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+
+# COMBINE TO GIVE SOLVATION ENERGY
+print elecEnergy solvated - reference end
+
+quit

@@ -1,0 +1,93 @@
+##########################################################################
+### HCA/ACETAZOLAMIDE BINDING
+### $Id$
+###
+###  Please see APBS documentation (http://apbs.sourceforge.net/doc/) for
+### syntax help.
+##########################################################################
+
+read 
+    mol pqr acet.pqr                    # Read molecule 1
+    mol pqr hca.pqr                    # Read molecule 1
+    mol pqr complex.pqr                   # Read molecule 1
+end
+
+# ACETAZOLAMIDE POTENTIAL
+elec name acet
+    mg-auto
+    dime 65 65 65
+    cglen 96.0 96.0 96.0
+    fglen 14.4 14.4 14.4
+    fgcent mol 1
+    cgcent mol 1
+    mol 1
+    lpbe
+    bcfl sdh
+    ion charge 1 conc 0.000 radius 2.0                    
+    ion charge -1 conc 0.000 radius 2.0                
+    pdie 2.0
+    sdie 78.54
+    chgm spl0
+    srfm smol
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+
+# HCA POTENTIAL
+elec name hca
+    mg-auto
+    dime 65 65 65
+    cglen 96.0 96.0 96.0
+    fglen 14.4 14.4 14.4
+    fgcent mol 1
+    cgcent mol 1
+    mol 2
+    lpbe
+    bcfl sdh
+    ion charge 1 conc 0.000 radius 2.0               
+    ion charge -1 conc 0.000 radius 2.0               
+    pdie 2.0
+    sdie 78.54
+    chgm spl0
+    srfm smol
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+
+# COMPLEX POTENTIAL
+elec name complex
+    mg-auto
+    dime 65 65 65
+    fglen 14.4 14.4 14.4
+    cglen 96.0 96.0 96.0
+    fgcent mol 1
+    cgcent mol 1
+    mol 3
+    lpbe
+    bcfl sdh
+    ion charge 1 conc 0.000 radius 2.0               
+    ion charge -1 conc 0.000 radius 2.0      
+    pdie 2.0
+    sdie 78.54
+    chgm spl0
+    srfm smol
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+
+# CALCULATE BINDING ENERGY
+print elecEnergy complex - acet - hca end
+
+quit

@@ -1,0 +1,270 @@
+
+
+ UNIVERSITY OF HOUSTON BROWNIAN DYNAMICS  (Release experimental)
+
+   AUTHORS                 : Jeffry Madura
+                           : Malcolm Davis
+                           : Rebecca Wade
+                           : Brock Luty
+                           : Michael Gilson
+                           : Jan Antosiewicz
+
+   date/time               : 26-Jan-   2  21:17:02 CST
+
+
+ CURRENT MAXIMUM PROGRAM DIMENSIONS     
+   Maximum Number of Atoms                           :     20000
+   Maximum Grid Size                                 :       250^3 
+   Maximum Number of Subunits                        :        40
+   Maximum Entries in Atomic Database                :      1500
+   Maximum Equivalences in Atomic Database           :      1000
+   Maximum Number of Runs                            :      1000
+   Maximum Number of Reaction Sites                  :        40
+   Maximum Number of Criteria per Reaction Site      :        10
+   Maximum Number of Columns in an Atomic Database   :        16
+   Maximum Number of Diffusing Units                 :         5
+   Maximum Number of Diffusing Subunits              :        15
+   Maximum Number of Distance Constraints            :        30
+   Maximum Number of Molecules                       :        50
+   Maximum Number of Time Step Regions               :         5
+   Maximum Number of Time Steps for Correlation Func.:        11
+   Maximum Number of Bins for Dihedral Distributions :       360
+   Maximum Number of Trajectories for Analysis       :         1
+   Maximum Number of Traj. Files to be Concatenated  :        10
+   Maximum Number of User Variables                  :      1500
+   Maximum Number of Atom Neighbors                  :       300
+   Maximum Number of Surface Points per Atom         :      5000
+   Maximum Number of S+R Surface Points              :    100000
+   Maximum Number of Elements in the C{eval} Stack  :        20
+   Maximum Number of Blocks for Gaussian Random #s   :      1000
+   Maximum Vector length for Vector Processor        :      1024
+   Maximum Number of 1-2 and 1-3 Atom Exclusions     :        20
+   Maximum Number of 1-4 Interactions per Atom       :        40
+   Maximum Number of Bond+Nonbond Interact. per Atom :        20
+   Maximum Number of Bonds                           :      6000
+   Maximum Number of Angles                          :      6000
+   Maximum Number of Dihedrals                       :      8000
+   Maximum Size of the Nonbonded List                :   7000000
+
+
+Main >  
+Main >  read mol 1 file "./bx6_7_lig.pdb" pdb end
+
+ READ MODULE
+ READ COORDINATES
+   Molecule number                                   :         1
+   Coordinate file                                   :./bx6_7_lig.pdb     
+   File format                                       :free format PDB     
+   Atoms read                                        :        47
+
+
+Main >  rdtop new file "./bx6_lig.top" mol 1 end
+./bx6_lig.top                                                                   
+ WARNING:
+Radii have been assigned from topology  file.
+ To change this, read radii after topology file
+
+Main >  set radii file "/net/home/cwong/PKA/charmm.uhb" para "charmm_rmin" end
+ SET MODULE
+   Setting                                           :               radii
+   Parameter set                                     :charmm_rmin         
+   Database file                                     :/net/home/cwong/PKA/
+   Reading of database completed                     :
+   Number of entries                                 :      1459
+   Number of equivalences                            :         0
+   Assignments made                                  :        47
+Main >  
+Main >  print apar mol 1 end
+
+ PRINT MODULE     
+ PRINTING ATOMIC PARAMETER INFORMATION   
+     Atom    Residue       Coordinates(x,y,z)      Charge   Radii   Net Charge
+     1 c1   bx6    351   22.758  -32.646   24.883    0.550    1.870
+     2 c8   bx6    351   21.510  -33.006   25.576    0.000    2.040
+     3 c9   bx6    351   21.396  -34.314   26.095    0.000    1.990
+     4 c10  bx6    351   20.219  -34.702   26.754    0.000    1.990
+     5 c11  bx6    351   19.169  -33.770   26.877    0.250    2.040
+     6 o1   bx6    351   17.998  -34.158   27.496   -0.650    1.550
+     7 c12  bx6    351   19.279  -32.456   26.383    0.000    1.990
+     8 c13  bx6    351   20.457  -32.073   25.721    0.000    1.990
+     9 o2   bx6    351   23.656  -33.453   24.670   -0.550    1.550
+    10 n2   bx6    351   22.872  -31.357   24.491   -0.350    1.830
+    11 n1   bx6    351   26.155  -29.614   24.198   -0.300    1.650
+    12 c2   bx6    351   24.835  -29.952   24.746    0.300    2.235
+    13 c3   bx6    351   24.113  -30.950   23.837    0.100    2.265
+    14 c4   bx6    351   23.795  -30.459   22.416    0.250    2.265
+    15 c5   bx6    351   23.954  -28.951   22.169    0.000    2.235
+    16 c6   bx6    351   25.401  -28.443   22.138    0.000    2.235
+    17 c7   bx6    351   26.083  -28.320   23.505    0.300    2.235
+    18 o3   bx6    351   24.606  -31.211   21.456   -0.550    1.600
+    19 c14  bx6    351   24.157  -31.482   20.238    0.700    1.870
+    20 o4   bx6    351   23.102  -31.107   19.824   -0.400    1.520
+    21 c15  bx6    351   25.053  -32.334   19.447    0.000    2.040
+    22 c16  bx6    351   24.584  -32.927   18.272    0.000    1.990
+    23 c17  bx6    351   25.397  -33.802   17.546    0.250    2.040
+    24 o5   bx6    351   24.862  -34.331   16.386   -0.650    1.550
+    25 c18  bx6    351   26.691  -34.119   18.005    0.000    2.040
+    26 c19  bx6    351   27.171  -33.490   19.175    0.250    2.040
+    27 o6   bx6    351   28.416  -33.747   19.715   -0.650    1.550
+    28 c20  bx6    351   26.362  -32.582   19.867    0.000    1.990
+    29 c21  bx6    351   27.475  -35.140   17.267    0.400    1.870
+    30 o7   bx6    351   26.946  -35.882   16.448   -0.400    1.550
+    31 c22  bx6    351   28.916  -35.270   17.535    0.000    2.040
+    32 c23  bx6    351   29.344  -36.371   18.289    0.250    2.040
+    33 o8   bx6    351   28.427  -37.285   18.770   -0.650    1.550
+    34 c24  bx6    351   30.703  -36.559   18.569    0.000    1.990
+    35 c25  bx6    351   31.646  -35.633   18.114    0.000    1.990
+    36 c26  bx6    351   31.224  -34.528   17.366    0.000    1.990
+    37 c27  bx6    351   29.864  -34.340   17.054    0.000    2.040
+    38 c28  bx6    351   29.480  -33.190   16.214    0.140    1.870
+    39 o9   bx6    351   30.052  -32.107   16.355   -0.570    1.660
+    40 o10  bx6    351   28.595  -33.344   15.376   -0.570    1.660
+    41 h1   bx6    351   18.044  -35.081   27.714    0.400    0.760
+    42 h2   bx6    351   22.142  -30.695   24.663    0.250    0.800
+    43 h3   bx6    351   26.483  -30.339   23.572    0.350    0.800
+    44 h4   bx6    351   25.537  -34.741   15.864    0.400    0.760
+    45 h5   bx6    351   28.438  -33.485   20.628    0.400    0.760
+    46 h6   bx6    351   28.878  -37.986   19.224    0.400    0.760
+    47 h7   bx6    351   26.819  -29.545   24.959    0.350    0.800    0.000
+ Center of Geometry of this list of Atoms(x,y,z)
+                         25.384  -33.006   21.189
+ Total Charge of this list of Atoms
+                          0.000
+
+
+Main >  print upar mol 1 end
+
+ PRINT MODULE     
+ PRINTING UNIT PARAMETER INFORMATION  
+ Unit  First/Last       Number of            subunit   atoms at
+        subunits    subs  bonds angls dihed  at cog    cent of subs
+
+
+Main >  print geom all  end
+
+ PRINT MODULE     
+ PRINTING GEOMETRICAL QUANTITIES FOR ATOMS
+ GEOMETRY ANALYSIS OF ATOM LIST                    
+   Center of geometry of atoms at (x,y,z)            :  25.384, -33.006,  21.189
+ Max distance of any atom coord from center of geom:  10.03826
+   Xmin, Xmax, Xmax-Xmin                             :  16.448,  33.636,  17.188
+   Ymin, Ymax, Ymax-Ymin                             : -38.835, -26.085,  12.750
+   Zmin, Zmax, Zmax-Zmin                             :  13.716,  29.046,  15.330
+   Maximum number of grid points available (per edge):     250
+   Grid unit spacing, Grid unit volume(x1000)        :   0.070,   0.341
+   Grid origin (of Octant)                           :  16.651, -41.740,  12.455
+   Substrate exclusion radius              (srad #.#):   0.000
+   Volume of molecule based on excluded volume       :   539.1
+   Effective Radius based on excluded volume         :   5.049
+ DOING RADIAL ANALYSIS OF ATOM LIST                
+   Distance between radial steps           (rdel #.#):   1.000
+   Number of cosine theta intervals        (ncos #.#):      50
+   Number of phi intervals                 (nphi #.#):     100
+   Minimum radius found                              :   1.000
+   Maximum radius found                              :  11.000
+   Average radius                                    :   3.993      +/-    2.390
+   number of holes encounter stepping in r coord     :    662.
+
+
+Main >  
+Main >  ! FINAL on NCSA computers
+Main >  elec calc mol 1 bcfl 2 grid 0.3 dime 240 240 240 maxits 500
+Elec >       pdie 2 sdie 78 gcenter 28.99    -29.75     29.57 end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) :240,240,240
+   Grid located by   (gcen,gcor,cent,same orig,gori) :   center specified.
+   Grid origin (range (min,max))                     :    -7.160  A        64.840  A
+                                                         -65.900  A         6.100  A
+                                                          -6.580  A        65.420  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.300  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap, & nnewmap):F F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.000  mM
+   Concentration  of monovalent cations (ions1p #.#) :     0.000  mM
+   Concentration  of   divalent cations (ions2p #.#) :     0.000  mM
+   Concentration  of  trivalent cations (ions3p #.#) :     0.000  mM
+   Concentration  of monovalent anions  (ions1n #.#) :     0.000  mM
+   Concentration  of   divalent anions  (ions2n #.#) :     0.000  mM
+   Concentration  of  trivalent anions  (ions3n #.#) :     0.000  mM
+   Debye-Huckel parameter                            :     0.000  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :        47
+   X-coordinate of the center of geometry            :    25.384    A
+   Y-coordinate of the center of geometry            :   -33.006    A
+   Z-coordinate of the center of geometry            :    21.189    A
+   Net charge of the selected atoms                  :     0.000    e
+   Effective radius of the selected atoms            :     1.870    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       500
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :         1
+   Norm of the constant vector                       :0.1125E+03
+   Norm of the residual vector                       :0.1119E-03
+   Convergence achieved                              :0.9944E-06
+Main >  print elec zenerg mol 1 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec energy mol 1 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic energy for selected atoms           :0.202980E+04 kcal/mol
+ ASSIGNMENT
+   Set the variable:               energy             = 0.20298041091354E+04
+
+
+Main >  print elec self mol 1 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic self energy for selected atoms      :0.251476E+04 kcal/mol
+ ASSIGNMENT
+   Set the variable:                 self             = 0.25147570607692E+04
+
+
+Main >  print elec fdcoul mol 1 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic finite-difference Coulombic energy  :-.407057E+03 kcal/mol
+ ASSIGNMENT
+   Set the variable:               fdcoul             = -.40705748848414E+03
+
+
+Main >  print elec tenerg mol 1 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Summed energy terms for selected atoms            :-.778955E+02 kcal/mol
+ ASSIGNMENT
+   Set the variable:              tenergy             = -.77895463149641E+02
+
+
+Main >  
+Main >  
+Main >  stop
+ UHBD termination
+   date/time               : 26-Jan-   2  22:43:41 CST
+
+

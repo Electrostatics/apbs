@@ -1,0 +1,2043 @@
+1
+                 Chemistry at HARvard Macromolecular Mechanics
+                   (CHARMM) - Developmental Version 35b2   February 15, 2008   
+       Copyright(c) 1984-2001  President and Fellows of Harvard College
+                              All Rights Reserved
+      Current operating system: Linux-2.6.28-18-generic(x86_64)@morgan.ucsd.
+                 Created on  3/17/10 at 13:13:58 by user: rok         
+
+            Maximum number of ATOMS:     25140, and RESidues:       14000
+            Current HEAP size:         2048000, and STACK size:    500000
+
+ RDTITL> * MMPBSA.INP : RUN MM-PBSA ANALYSIS ON TRAJECTORIES
+ RDTITL> * (ENTROPY IS CALCULATED FROM QUASIHARMONIC ANALYSIS OF HEAVY ATOMS.)
+ RDTITL> *
+  
+ CHARMM>     
+  
+ CHARMM>    bomlev -2
+  
+ CHARMM>     
+  
+ CHARMM>    !== variables to be set by user ==
+ CHARMM>    ! modify the DEFINEs below too!
+ CHARMM>     
+  
+ CHARMM>    set mol LIGAND ! COMPLEX, RECEPTOR or LIGAND
+ Parameter: MOL <- "LIGAND"
+  
+ CHARMM>     
+  
+ CHARMM>    set data "ligand.dat" ! output file
+ Parameter: DATA <- ""ligand.dat""
+  
+ CHARMM>     
+  
+ CHARMM>    set T      300.0      ! temperature
+ Parameter: T <- "300.0"
+  
+ CHARMM>    set entropy  0        ! flag for entropy calculation, 0 = not calculated
+ Parameter: ENTROPY <- "0"
+  
+ CHARMM>     
+  
+ CHARMM>    set gammaP   0.00542  ! for Gasa (non-polar dGsolv)
+ Parameter: GAMMAP <- "0.00542"
+  
+ CHARMM>    set betaP    0.92     ! for Gasa
+ Parameter: BETAP <- "0.92"
+  
+ CHARMM>     
+  
+ CHARMM>    set dcel     1.0      ! grid spacing for PBEQ
+ Parameter: DCEL <- "1.0"
+  
+ CHARMM>    set saltcon  0.0      ! salt concentration for PBEQ
+ Parameter: SALTCON <- "0.0"
+  
+ CHARMM>    set rion     0.0      ! ion exclusion radius
+ Parameter: RION <- "0.0"
+  
+ CHARMM>    set epssol  80.0      ! dielectric constant of the bulk solvent
+ Parameter: EPSSOL <- "80.0"
+  
+ CHARMM>    set epsvac   1.0      ! dielectric constant of the vacuum
+ Parameter: EPSVAC <- "1.0"
+  
+ CHARMM>    set epsprot  1.0      ! dielectric constant of the protein
+ Parameter: EPSPROT <- "1.0"
+  
+ CHARMM>    set rsol     1.4      ! solvent probe radius
+ Parameter: RSOL <- "1.4"
+  
+ CHARMM>     
+  
+ CHARMM>    set traj   "short.dcd" ! input trajectory
+ Parameter: TRAJ <- ""short.dcd""
+  
+ CHARMM>    set fframe  1
+ Parameter: FFRAME <- "1"
+  
+ CHARMM>    set skip    1
+ Parameter: SKIP <- "1"
+  
+ CHARMM>     
+  
+ CHARMM>    set psf  "complex.psf"
+ Parameter: PSF <- ""complex.psf""
+  
+ CHARMM>    set crd  "complex.crd"
+ Parameter: CRD <- ""complex.crd""
+  
+ CHARMM>     
+  
+ CHARMM>     
+  
+ CHARMM>    !== read in the topology and parameter files ==
+ CHARMM>    !read rtf   card name $CHM_HOME/toppar/top_all27_prot_na.rtf
+ CHARMM>    !read param card name $CHM_HOME/toppar/par_all27_prot_na.prm
+ CHARMM>    read rtf   card name ./data/top_all27_prot_na.rtf
+ VOPEN> Attempting to open::./data/top_all27_prot_na.rtf::
+ MAINIO> Residue topology file being read from unit  90.
+ TITLE> *>>>>>>>>CHARMM22 ALL-HYDROGEN TOPOLOGY FILE FOR PROTEINS <<<<<<<
+ TITLE> *>>>>>>>>>>>>>>>>>>>> AND NUCLEIC ACIDS <<<<<<<<<<<<<<<<<<<<<<<<<
+ TITLE> *>>>>> INCLUDES PHI, PSI CROSS TERM MAP (CMAP) CORRECTION <<<<<<<
+ TITLE> *>>>>>>>>>>>>>>>>>>>>>>   JULY, 2004    <<<<<<<<<<<<<<<<<<<<<<<<<<
+ TITLE> * ALL COMMENTS TO ADM JR. VIA THE CHARMM WEB SITE: WWW.CHARMM.ORG
+ TITLE> *               PARAMETER SET DISCUSSION FORUM
+ TITLE> *
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>    read param card name ./data/par_all27_prot_na.prm
+ VOPEN> Attempting to open::./data/par_all27_prot_na.prm::
+
+          PARAMETER FILE BEING READ FROM UNIT 90
+ TITLE> *>>>>> CHARMM22 ALL-HYDROGEN PARAMETER FILE FOR PROTEINS <<<<<<<<
+ TITLE> *>>>>>>>>>>>>>>>>>>>> AND NUCLEIC ACIDS <<<<<<<<<<<<<<<<<<<<<<<<<
+ TITLE> *>>>>> INCLUDES PHI, PSI CROSS TERM MAP (CMAP) CORRECTION <<<<<<<
+ TITLE> *>>>>>>>>>>>>>>>>>>>>>> DECEMBER, 2003 <<<<<<<<<<<<<<<<<<<<<<<<<<
+ TITLE> * ALL COMMENTS TO ADM JR. VIA THE CHARMM WEB SITE: WWW.CHARMM.ORG
+ TITLE> *               PARAMETER SET DISCUSSION FORUM
+ TITLE> *
+ PARMIO> NONBOND, HBOND lists and IMAGE atoms cleared.
+ VCLOSE: Closing unit   90 with status "KEEP"
+  
+ CHARMM>     
+  
+ CHARMM>    !== load the structure file ==
+ CHARMM>    open read unit 2 form name @psf
+ Parameter: PSF -> ""complex.psf""
+ VOPEN> Attempting to open::complex.psf::
+ OPNLGU> Unit  2 opened for READONLY access to /home/rok/Sandbox-100309/iapbs/modules/CHARMM/examples/RAS-RAF/complex.psf
+  
+ CHARMM>    read psf card unit 2
+ MAINIO> Protein structure file being read from unit   2.
+ TITLE>  * RAS-RAF
+ TITLE>  *  DATE:     3/ 5/10     16:40:36      CREATED BY USER: hhl
+ TITLE>  *
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        3   Number of residues   =      243
+         Number of atoms         =     3906   Number of groups     =     1156
+         Number of bonds         =     3936   Number of angles     =     7099
+         Number of dihedrals     =    10345   Number of impropers  =      657
+         Number of cross-terms   =      238
+         Number of HB acceptors  =      388   Number of HB donors  =      468
+         Number of NB exclusions =        0   Total charge =   -4.00000
+  
+ CHARMM>    close unit 2
+ VCLOSE: Closing unit    2 with status "KEEP"
+  
+ CHARMM>     
+  
+ CHARMM>    ! define the parts of the system
+ CHARMM>    define COMPLEX  select segid A .or. segid B end
+ SELRPN>   3862 atoms have been selected out of   3906
+  
+ CHARMM>    define RECEPTOR select segid A end
+ SELRPN>   2621 atoms have been selected out of   3906
+  
+ CHARMM>    define LIGAND   select segid B end
+ SELRPN>   1241 atoms have been selected out of   3906
+  
+ CHARMM>     
+  
+ CHARMM>    !== read in initial coordinate set ==
+ CHARMM>    open read unit 2 form name @crd
+ Parameter: CRD -> ""complex.crd""
+ VOPEN> Attempting to open::complex.crd::
+ OPNLGU> Unit  2 opened for READONLY access to /home/rok/Sandbox-100309/iapbs/modules/CHARMM/examples/RAS-RAF/complex.crd
+  
+ CHARMM>    read coor card unit 2
+          SPATIAL COORDINATES BEING READ FROM UNIT  2
+ TITLE> * RAS-RAF
+ TITLE> *  DATE:     3/ 5/10     16:40:36      CREATED BY USER: HHL
+ TITLE> *
+  
+ CHARMM>    close unit 2
+ VCLOSE: Closing unit    2 with status "KEEP"
+  
+ CHARMM>     
+  
+ CHARMM>    ! copy coordinates to comparison set
+ CHARMM>    coor copy comp
+ SELECTED COORDINATES COPIED TO THE COMPARISON SET.
+
+  
+ CHARMM>     
+  
+ CHARMM>     
+  
+ CHARMM>    !== setup trajectory for reading: we assume single trajectory for the moment ==
+ CHARMM>    set trajU 20
+ Parameter: TRAJU <- "20"
+  
+ CHARMM>     
+  
+ CHARMM>    ! determine last frame
+ CHARMM>    open read unit @trajU unform name @traj
+ Parameter: TRAJU -> "20"
+ Parameter: TRAJ -> ""short.dcd""
+ VOPEN> Attempting to open::short.dcd::
+ OPNLGU> Unit 20 opened for READONLY access to /home/rok/Sandbox-100309/iapbs/modules/CHARMM/examples/RAS-RAF/short.dcd
+  
+ CHARMM>    traj query unit @trajU
+ Parameter: TRAJU -> "20"
+
+ READING TRAJECTORY FROM UNIT  20
+   NUMBER OF COORDINATE SETS IN FILE:       3
+   NUMBER OF PREVIOUS DYNAMICS STEPS:       0
+   FREQUENCY FOR SAVING COORDINATES:        1
+   NUMBER OF STEPS FOR CREATION RUN:        3
+
+   NUMBER OF DEGREES OF FREEDOM:            0
+   NUMBER OF FIXED ATOMS:                   0
+   THE INTEGRATION TIME STEP (PS):     0.0489
+   THE FILE CONTAINS CRYSTAL UNIT CELL DATA
+   THE FILE DOES NOT CONTAIN 4-D DATA
+  
+ CHARMM>    calc last = ?nfile - 1   ! why one frame "missing" in NAMD trajectory?
+ RDCMND substituted energy or value "?NFILE" to "3"
+Evaluating: 3-1
+ Parameter: LAST <- "2"
+  
+ CHARMM>    calc trlen = @last - @fframe
+ Parameter: LAST -> "2"
+ Parameter: FFRAME -> "1"
+Evaluating: 2-1
+ Parameter: TRLEN <- "1"
+  
+ CHARMM>    calc lframe = @fframe + @skip * int( @trlen / @skip )
+ Parameter: FFRAME -> "1"
+ Parameter: SKIP -> "1"
+ Parameter: TRLEN -> "1"
+ Parameter: SKIP -> "1"
+Evaluating: 1+1*INT(1/1)
+ Parameter: LFRAME <- "2"
+  
+ CHARMM>    close unit @trajU
+ Parameter: TRAJU -> "20"
+ VCLOSE: Closing unit   20 with status "KEEP"
+  
+ CHARMM>     
+  
+ CHARMM>    open read unit @trajU unform name @traj
+ Parameter: TRAJU -> "20"
+ Parameter: TRAJ -> ""short.dcd""
+ VOPEN> Attempting to open::short.dcd::
+ OPNLGU> Unit 20 opened for READONLY access to /home/rok/Sandbox-100309/iapbs/modules/CHARMM/examples/RAS-RAF/short.dcd
+  
+ CHARMM>    traj first @trajU nunits 1 begin @fframe stop @lframe skip @skip
+ Parameter: TRAJU -> "20"
+ Parameter: FFRAME -> "1"
+ Parameter: LFRAME -> "2"
+ Parameter: SKIP -> "1"
+ TRAJ: INITIATING READ OF A TRAJECTORY, OPTIONS;
+    FIRSTU =  20 NUNIT =   1 SKIP =     1
+  
+ CHARMM>     
+  
+ CHARMM>     
+  
+ CHARMM>    !== initialise variables ==
+ CHARMM>    set datU 15
+ Parameter: DATU <- "15"
+  
+ CHARMM>     
+  
+ CHARMM>    set n 0  ! frame counter
+ Parameter: N <- "0"
+  
+ CHARMM>    calc nmax = int( ( @lframe - @fframe ) / @skip )
+ Parameter: LFRAME -> "2"
+ Parameter: FFRAME -> "1"
+ Parameter: SKIP -> "1"
+Evaluating: INT((2-1)/1)
+ Parameter: NMAX <- "1"
+  
+ CHARMM>     
+  
+ CHARMM>    ! MM-PBSA equation: G = Egas + Gsolv - TSmm
+ CHARMM>    set avgEgas 0 ! solute internal energy
+ Parameter: AVGEGAS <- "0"
+  
+ CHARMM>    set varEgas 0
+ Parameter: VAREGAS <- "0"
+  
+ CHARMM>    set avgEele 0
+ Parameter: AVGEELE <- "0"
+  
+ CHARMM>    set varEele 0
+ Parameter: VAREELE <- "0"
+  
+ CHARMM>    set avgEvdW 0
+ Parameter: AVGEVDW <- "0"
+  
+ CHARMM>    set varEvdW 0
+ Parameter: VAREVDW <- "0"
+  
+ CHARMM>    set avgEint 0
+ Parameter: AVGEINT <- "0"
+  
+ CHARMM>    set varEint 0
+ Parameter: VAREINT <- "0"
+  
+ CHARMM>    set avgGasa 0 ! nonpolar contribution to solvation free energy
+ Parameter: AVGGASA <- "0"
+  
+ CHARMM>    set varGasa 0
+ Parameter: VARGASA <- "0"
+  
+ CHARMM>    set avgGPB 0 ! solvation free energy from finite difference PBEQ
+ Parameter: AVGGPB <- "0"
+  
+ CHARMM>    set varGPB 0
+ Parameter: VARGPB <- "0"
+  
+ CHARMM>     
+  
+ CHARMM>    ! data file
+ CHARMM>    open write card unit @datU name @data
+ Parameter: DATU -> "15"
+ Parameter: DATA -> ""ligand.dat""
+ VOPEN> Attempting to open::ligand.dat::
+ OPNLGU> Unit 15 opened for WRITE access to /home/rok/Sandbox-100309/iapbs/modules/CHARMM/examples/RAS-RAF/ligand.dat
+  
+ CHARMM>    write title unit @datU
+ Parameter: DATU -> "15"
+ RDTITL> *#FRAME      EGAS       EELE       EVDW       EINT       GASA       GPB
+ RDTITL> *
+  
+ CHARMM>     
+  
+ CHARMM>     
+  
+ CHARMM>    !== BEGIN reading the trajectory ==
+ CHARMM>    label trajloop
+  
+ CHARMM>      incr n by 1
+ Parameter: N <- "1"
+  
+ CHARMM>     
+  
+ CHARMM>      traj read
+
+ READING TRAJECTORY FROM UNIT  20
+   NUMBER OF COORDINATE SETS IN FILE:       3
+   NUMBER OF PREVIOUS DYNAMICS STEPS:       0
+   FREQUENCY FOR SAVING COORDINATES:        1
+   NUMBER OF STEPS FOR CREATION RUN:        3
+
+ TITLE>  Created by DCD plugin                                                           
+ TITLE>  REMARKS Created 17 March, 2010 at 16:38 Ï•ÿ·€£Ã¿ÜŒt£Ã¿Ä· ¸    È¨ð·          
+ TITLE>  *
+  
+ CHARMM>     
+  
+ CHARMM>      delete atoms select .not. @mol end
+ Parameter: MOL -> "LIGAND"
+ SELRPN>   2665 atoms have been selected out of   3906
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:        167 residues deleted.
+
+ Message from MAPIC:          2 segments deleted.
+ DELTIC:      2686 bonds deleted
+ DELTIC:      4832 angles deleted
+ DELTIC:      7043 dihedrals deleted
+ DELTIC:       446 improper dihedrals deleted
+ DELTIC:       164 crossterm maps deleted
+ DELTIC:       314 donors deleted
+ DELTIC:       281 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        1   Number of residues   =       76
+         Number of atoms         =     1241   Number of groups     =      363
+         Number of bonds         =     1250   Number of angles     =     2267
+         Number of dihedrals     =     3302   Number of impropers  =      211
+         Number of cross-terms   =       74
+         Number of HB acceptors  =      107   Number of HB donors  =      154
+         Number of NB exclusions =        0   Total charge =    6.00000
+  
+ CHARMM>     
+  
+ CHARMM>      coor orient norot ! center coordinates
+
+ ORIENT THE COORDINATES TO ALIGN WITH AXIS
+
+ CENTER OF ATOMS BEFORE TRANSLATION    -8.30533    -5.72157    14.35486
+ SELECTED COORDINATES TRANSLATED IN THE MAIN SET.
+
+  
+ CHARMM>     
+  
+ CHARMM>      ! Egas
+  
+ CHARMM>      energy cutnb 999.0 ctofnb 997.0 ctonnb 995.0 ctexnb 999.0
+
+ NONBOND OPTION FLAGS: 
+     ELEC     VDW      ATOMs    CDIElec  SHIFt    VATOm    VSWItch 
+     BYGRoup  NOEXtnd  NOEWald 
+ CUTNB  =999.000 CTEXNB =999.000 CTONNB =995.000 CTOFNB =997.000
+ WMIN   =  1.500 WRNMXD =  0.500 E14FAC =  1.000 EPS    =  1.000
+ NBXMOD =      5
+ There are        0 atom  pairs and        0 atom  exclusions.
+ There are        0 group pairs and        0 group exclusions.
+ <MAKINB> with mode   5 found   3517 exclusions and   3260 interactions(1-4)
+ <MAKGRP> found   1042 group exclusions.
+ Generating nonbond list with Exclusion mode = 5
+ == PRIMARY == SPACE FOR   769421 ATOM PAIRS AND        0 GROUP PAIRS
+
+ General atom nonbond list generation found:
+   765903 ATOM PAIRS WERE FOUND FOR ATOM LIST
+        0 GROUP PAIRS REQUIRED ATOM SEARCHES
+
+ENER ENR:  Eval#     ENERgy      Delta-E         GRMS
+ENER INTERN:          BONDs       ANGLes       UREY-b    DIHEdrals    IMPRopers
+ENER CROSS:           CMAPs     
+ENER EXTERN:        VDWaals         ELEC       HBONds          ASP         USER
+ ----------       ---------    ---------    ---------    ---------    ---------
+ENER>        0   -533.20973      0.00000     16.80954
+ENER INTERN>      208.20967    609.62272     88.25839    404.36336     34.93238
+ENER CROSS>       -95.62058
+ENER EXTERN>     -307.65323  -1475.32244      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+  
+ CHARMM>     
+  
+ CHARMM>      set Egas = ?ener
+ RDCMND substituted energy or value "?ENER" to "-533.21"
+ Parameter: EGAS <- "-533.21"
+  
+ CHARMM>      calc delta = @Egas - @avgEgas
+ Parameter: EGAS -> "-533.21"
+ Parameter: AVGEGAS -> "0"
+Evaluating: -533.21-0
+ Parameter: DELTA <- "-533.21"
+  
+ CHARMM>      calc avgEgas = @avgEgas + @delta / @n
+ Parameter: AVGEGAS -> "0"
+ Parameter: DELTA -> "-533.21"
+ Parameter: N -> "1"
+Evaluating: 0+-533.21/1
+ Parameter: AVGEGAS <- "-533.21"
+  
+ CHARMM>      calc varEgas = @varEgas + @delta * ( @Egas - @avgEgas )
+ Parameter: VAREGAS -> "0"
+ Parameter: DELTA -> "-533.21"
+ Parameter: EGAS -> "-533.21"
+ Parameter: AVGEGAS -> "-533.21"
+Evaluating: 0+-533.21*(-533.21--533.21)
+ Parameter: VAREGAS <- "0"
+  
+ CHARMM>     
+  
+ CHARMM>      set Eele = ?elec
+ RDCMND substituted energy or value "?ELEC" to "-1475.32"
+ Parameter: EELE <- "-1475.32"
+  
+ CHARMM>      calc delta = @Eele - @avgEele
+ Parameter: EELE -> "-1475.32"
+ Parameter: AVGEELE -> "0"
+Evaluating: -1475.32-0
+ Parameter: DELTA <- "-1475.32"
+  
+ CHARMM>      calc avgEele = @avgEele + @delta / @n
+ Parameter: AVGEELE -> "0"
+ Parameter: DELTA -> "-1475.32"
+ Parameter: N -> "1"
+Evaluating: 0+-1475.32/1
+ Parameter: AVGEELE <- "-1475.32"
+  
+ CHARMM>      calc varEele = @varEele + @delta * ( @Eele - @avgEele )
+ Parameter: VAREELE -> "0"
+ Parameter: DELTA -> "-1475.32"
+ Parameter: EELE -> "-1475.32"
+ Parameter: AVGEELE -> "-1475.32"
+Evaluating: 0+-1475.32*(-1475.32--1475.32)
+ Parameter: VAREELE <- "0"
+  
+ CHARMM>     
+  
+ CHARMM>      set Evdw = ?vdw
+ RDCMND substituted energy or value "?VDW" to "-307.653"
+ Parameter: EVDW <- "-307.653"
+  
+ CHARMM>      calc delta = @Evdw - @avgEvdw
+ Parameter: EVDW -> "-307.653"
+ Parameter: AVGEVDW -> "0"
+Evaluating: -307.653-0
+ Parameter: DELTA <- "-307.653"
+  
+ CHARMM>      calc avgEvdw = @avgEvdw + @delta / @n
+ Parameter: AVGEVDW -> "0"
+ Parameter: DELTA -> "-307.653"
+ Parameter: N -> "1"
+Evaluating: 0+-307.653/1
+ Parameter: AVGEVDW <- "-307.653"
+  
+ CHARMM>      calc varEvdw = @varEvdw + @delta * ( @Evdw - @avgEvdw )
+ Parameter: VAREVDW -> "0"
+ Parameter: DELTA -> "-307.653"
+ Parameter: EVDW -> "-307.653"
+ Parameter: AVGEVDW -> "-307.653"
+Evaluating: 0+-307.653*(-307.653--307.653)
+ Parameter: VAREVDW <- "0"
+  
+ CHARMM>     
+  
+ CHARMM>      calc Eint = ?ener - ?elec - ?vdw
+ RDCMND substituted energy or value "?ENER" to "-533.21"
+ RDCMND substituted energy or value "?ELEC" to "-1475.32"
+ RDCMND substituted energy or value "?VDW" to "-307.653"
+Evaluating: -533.21--1475.32--307.653
+ Parameter: EINT <- "1249.76"
+  
+ CHARMM>      calc delta = @Eint - @avgEint
+ Parameter: EINT -> "1249.76"
+ Parameter: AVGEINT -> "0"
+Evaluating: 1249.76-0
+ Parameter: DELTA <- "1249.76"
+  
+ CHARMM>      calc avgEint = @avgEint + @delta / @n
+ Parameter: AVGEINT -> "0"
+ Parameter: DELTA -> "1249.76"
+ Parameter: N -> "1"
+Evaluating: 0+1249.76/1
+ Parameter: AVGEINT <- "1249.76"
+  
+ CHARMM>      calc varEint = @varEint + @delta * ( @Eint - @avgEint )
+ Parameter: VAREINT -> "0"
+ Parameter: DELTA -> "1249.76"
+ Parameter: EINT -> "1249.76"
+ Parameter: AVGEINT -> "1249.76"
+Evaluating: 0+1249.76*(1249.76-1249.76)
+ Parameter: VAREINT <- "0"
+  
+ CHARMM>     
+  
+ CHARMM>      ! Gasa
+  
+ CHARMM>      coor surface rprobe @rsol
+ Parameter: RSOL -> "1.4"
+ SURFAC: Lennard-Jones radii values being used
+ SURFAC: RPRObe=   1.40000
+ SURFAC: Analytic surface area method used
+  
+ CHARMM>      calc Gasa = @gammaP * ?area + @betaP
+ Parameter: GAMMAP -> "0.00542"
+ Parameter: BETAP -> "0.92"
+ RDCMND substituted energy or value "?AREA" to "5174.35"
+Evaluating: 0.00542*5174.35+0.92
+ Parameter: GASA <- "28.965"
+  
+ CHARMM>      calc delta = @Gasa - @avgGasa
+ Parameter: GASA -> "28.965"
+ Parameter: AVGGASA -> "0"
+Evaluating: 28.965-0
+ Parameter: DELTA <- "28.965"
+  
+ CHARMM>      calc avgGasa = @avgGasa + @delta / @n
+ Parameter: AVGGASA -> "0"
+ Parameter: DELTA -> "28.965"
+ Parameter: N -> "1"
+Evaluating: 0+28.965/1
+ Parameter: AVGGASA <- "28.965"
+  
+ CHARMM>      calc varGasa = @varGasa + @delta * ( @Gasa - @avgGasa )
+ Parameter: VARGASA -> "0"
+ Parameter: DELTA -> "28.965"
+ Parameter: GASA -> "28.965"
+ Parameter: AVGGASA -> "28.965"
+Evaluating: 0+28.965*(28.965-28.965)
+ Parameter: VARGASA <- "0"
+  
+ CHARMM>     
+  
+ CHARMM>      != GPB finite difference PBEQ =
+  
+ CHARMM>      ! establish grid dimensions
+  
+ CHARMM>      coor stat
+ STATISTICS FOR      1241 SELECTED ATOMS:
+    XMIN =  -14.375365 XMAX =   15.490930 XAVE =    0.000000
+    YMIN =  -15.439118 YMAX =   19.197196 YAVE =    0.000000
+    ZMIN =  -15.984354 ZMAX =   20.460595 ZAVE =    0.000000
+    WMIN =    0.000000 WMAX =   60.105983 WAVE =    4.169498
+  
+ CHARMM>     
+  
+ CHARMM>      != BEGIN Poisson-Bolztmann equation =
+  
+ CHARMM>      pbeq
+ 
+   Calculations with the Poisson-Boltzmann Equation 
+ 
+  
+   PBEQ>        !scalar wmain = radius  ! set wmain to vdW radii
+  
+   PBEQ>        stream ./data/radius.str       ! Benoit Roux's parameter
+ VOPEN> Attempting to open::./data/radius.str::
+ OPNLGU> Unit 99 opened for READONLY access to /home/rok/Sandbox-100309/iapbs/modules/CHARMM/examples/RAS-RAF/./data/radius.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * ATOMIC RADIUS DERIVED FROM SOLVENT ELECTROSTATIC CHARGE DISTRIBUTION
+ RDTITL> * TESTED WITH FREE ENERGY PERTURBATION WITH EXPLICIT SOLVENT
+ RDTITL> * AUTHORS:  MAFALDA NINA, DMITRII BELOGV, AND BENOIT ROUX
+ RDTITL> * UNIVERSITY OF MONTREAL, JUNE 1996.
+ RDTITL> * M. NINA AND B. ROUX. ATOMIC RADII FOR CONTINUUM ELECTROSTATICS CALCULATIONS BASED ON
+ RDTITL> * MOLECULAR DYNAMICS FREE ENERGY SIMULATIONS. J. PHYS. CHEM. B 101: 5239-5248 (1997).
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+   PBEQ>     
+  
+   PBEQ>    ! UPDATES:
+   PBEQ>    ! --------
+   PBEQ>    !
+   PBEQ>    ! GLU and ASP modified December 1st, 1998 by Mafalda Nina
+   PBEQ>    !
+   PBEQ>    ! Protonated histidine HSP has been included, January 1999 by Mafalda Nina
+   PBEQ>    ! dG_elec = -68.15 kcal/mol (MD/FES) or -68.10 kcal/mol (PBEQ)
+   PBEQ>    !
+   PBEQ>    ! TEA and ions added by Benoit Roux, January 1999.
+   PBEQ>    !
+   PBEQ>    ! sodium added by Benoit Roux, November 2000
+   PBEQ>     
+  
+   PBEQ>    ! Set to zero all H radii
+   PBEQ>    scalar wmain set 0.0 sele chem H* end
+ SELRPN>    633 atoms have been selected out of   1241
+  
+   PBEQ>     
+  
+   PBEQ>    ! Set heavy atoms to average default values
+   PBEQ>    scalar wmain set 2.3 sele chem C* end
+ SELRPN>    382 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 1.8 sele chem O* end
+ SELRPN>    106 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 2.3 sele chem N* end
+ SELRPN>    115 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 2.3 sele chem S* end
+ SELRPN>      5 atoms have been selected out of   1241
+  
+   PBEQ>     
+  
+   PBEQ>    !Patches CT3 N-Methylamide C-terminus
+   PBEQ>    !        ACE acetylated N-terminus (ACP for PRO)
+   PBEQ>    scalar wmain set 2.06 sele (type CAY .or. type CAT) end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 2.04 sele type CY end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 1.52 sele type OY end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 2.23 sele type NT end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 1.40 sele type OT* end ! for COO- terminus
+ SELRPN>      2 atoms have been selected out of   1241
+  
+   PBEQ>     
+  
+   PBEQ>    !Backbone
+   PBEQ>    scalar wmain set 2.04 sele type C  end
+ SELRPN>     76 atoms have been selected out of   1241
+  
+   PBEQ>           ! for peptide bond
+  
+   PBEQ>    scalar wmain set 1.52 sele type O  end
+ SELRPN>     75 atoms have been selected out of   1241
+  
+   PBEQ>           ! for peptide bond
+  
+   PBEQ>    scalar wmain set 2.23 sele type N  end
+ SELRPN>     76 atoms have been selected out of   1241
+  
+   PBEQ>           ! for peptide bond
+  
+   PBEQ>    scalar wmain set 2.86 sele type CA  end
+ SELRPN>     76 atoms have been selected out of   1241
+  
+   PBEQ>           ! for all CA except GLY
+  
+   PBEQ>    scalar wmain set 2.38 sele (resnam GLY .and. type CA) end
+ SELRPN>      4 atoms have been selected out of   1241
+  
+   PBEQ>           ! for GLY only
+  
+   PBEQ>     
+  
+   PBEQ>    !Hydrogens
+   PBEQ>    scalar wmain set 0.00 sele type H* end
+ SELRPN>    633 atoms have been selected out of   1241
+  
+   PBEQ>           ! for all hydrogens
+  
+   PBEQ>     
+  
+   PBEQ>    !Carbons
+   PBEQ>    scalar wmain set 2.67 sele type CB end
+ SELRPN>     72 atoms have been selected out of   1241
+  
+   PBEQ>           ! for all residues
+  
+   PBEQ>    scalar wmain set 2.46 sele type CG* end
+ SELRPN>     71 atoms have been selected out of   1241
+  
+   PBEQ>           ! for ARG, GLN, ILE, LYS, MET, PHE, THR, TRP, VAL, HSP, HSD
+  
+   PBEQ>    scalar wmain set 2.77 sele resnam GLU .and. type CG end
+ SELRPN>      4 atoms have been selected out of   1241
+  
+   PBEQ>           ! for GLU only
+  
+   PBEQ>    scalar wmain set 2.44 sele type CD* end
+ SELRPN>     56 atoms have been selected out of   1241
+  
+   PBEQ>           ! for ARG, ILE, LEU, LYS
+  
+   PBEQ>    scalar wmain set 1.98 sele (resnam GLN .and. type CD) .or. (resnam ASN .and. type CG) .or. -
+   PBEQ>                               (resnam GLU .and. type CD) .or. (resnam ASP .and. type CG) end
+ SELRPN>     16 atoms have been selected out of   1241
+  
+   PBEQ>           ! for ASP, GLU, ASN, GLN
+  
+   PBEQ>    scalar wmain set 1.98 sele (resnam PRO .and. (type CB .or. type CG .or. type CD)) end
+ SELRPN>      6 atoms have been selected out of   1241
+  
+   PBEQ>           ! for PRO only
+  
+   PBEQ>    scalar wmain set 2.00 sele (resnam TYR .and. (type CE* .or. type CD* .or. -
+   PBEQ>                              type CZ)) .or. (resnam PHE .and. (type CE* .or. -
+   PBEQ>                              type CD* .or. type CZ))  end
+ SELRPN>     15 atoms have been selected out of   1241
+  
+   PBEQ>           ! for TYR, PHE rings
+  
+   PBEQ>    scalar wmain set 1.78 sele (resnam TRP .and. (type CE* .or. type CD* .or. -
+   PBEQ>                              type CZ* .or. type CH2)) end
+ SELRPN>      7 atoms have been selected out of   1241
+  
+   PBEQ>           ! for TRP ring only
+  
+   PBEQ>    scalar wmain set 2.10 sele type CE end
+ SELRPN>      8 atoms have been selected out of   1241
+  
+   PBEQ>           ! for MET only
+  
+   PBEQ>    scalar wmain set 2.80 sele (resnam ARG .and. type CZ) .or. (resnam LYS .and. type CE) end
+ SELRPN>     12 atoms have been selected out of   1241
+  
+   PBEQ>           ! for ARG, LYS
+  
+   PBEQ>    scalar wmain set 1.98 select (( resnam HSD  .or. resnam HSP) .and. type CE1) -
+   PBEQ>           .or. (( resnam HSD .or. resnam HSP)  .and. type CD2) end
+ SELRPN>      6 atoms have been selected out of   1241
+  
+   PBEQ>           ! for neutral HSD and protonated HSP
+  
+   PBEQ>     
+  
+   PBEQ>    !Oxygens
+   PBEQ>    scalar wmain set 1.40 sele (resnam GLU .or. resnam ASP) .and. (type OE* .or. type OD*) end
+ SELRPN>     16 atoms have been selected out of   1241
+  
+   PBEQ>           ! for GLU, ASP
+  
+   PBEQ>    scalar wmain set 1.42 sele (resnam ASN .or. resnam GLN) .and. (type OE* .or. type OD*) end
+ SELRPN>      8 atoms have been selected out of   1241
+  
+   PBEQ>           ! for ASN, GLN
+  
+   PBEQ>    scalar wmain set 1.64 sele type OG* end
+ SELRPN>      5 atoms have been selected out of   1241
+  
+   PBEQ>           ! for SER, THR
+  
+   PBEQ>    scalar wmain set 1.85 sele (resnam TYR .and. type OH) end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>           ! for TYR only
+  
+   PBEQ>    scalar wmain set 2.2 select resname TIP3 .and. type OH2 end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>           ! for explicit water molecules
+  
+   PBEQ>     
+  
+   PBEQ>    !Nitrogens
+   PBEQ>    scalar wmain set 1.80 sele resnam HSD  .and. (type NE2 .or. type ND1) end
+ SELRPN>      2 atoms have been selected out of   1241
+  
+   PBEQ>           ! for neutral HSD
+  
+   PBEQ>    scalar wmain set 2.30 sele resnam HSP  .and. (type NE2 .or. type ND1) end
+ SELRPN>      4 atoms have been selected out of   1241
+  
+   PBEQ>           ! for protonated HSP
+  
+   PBEQ>    scalar wmain set 2.13 sele resnam ARG .and. (type NH* .or. type NE) .or. -
+   PBEQ>                          (resnam LYS .and. type NZ) end
+ SELRPN>     24 atoms have been selected out of   1241
+  
+   PBEQ>           ! for ARG, LYS
+  
+   PBEQ>    scalar wmain set 2.15 sele (resnam GLN .and. type NE2) .or. (resnam ASN .and. type ND2) end
+ SELRPN>      8 atoms have been selected out of   1241
+  
+   PBEQ>           ! for GLN, ASN
+  
+   PBEQ>    scalar wmain set 2.40 sele resnam TRP .and. type NE1 end
+ SELRPN>      1 atoms have been selected out of   1241
+  
+   PBEQ>           ! for TRP
+  
+   PBEQ>     
+  
+   PBEQ>    !Sulphur
+   PBEQ>    scalar wmain set 2.00 sele type S* end
+ SELRPN>      5 atoms have been selected out of   1241
+  
+   PBEQ>           ! for MET, CYS
+  
+   PBEQ>     
+  
+   PBEQ>     
+  
+   PBEQ>    !Ions
+   PBEQ>    scalar wmain set 2.035 select resname POT end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>           !potassium ion K+
+  
+   PBEQ>     
+  
+   PBEQ>    scalar wmain set 2.035 select resname CLA end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>           !chloride ion Cl-
+  
+   PBEQ>     
+  
+   PBEQ>    scalar wmain set 1.66 select resname SOD end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>           !sodium ion Na+
+  
+   PBEQ>     
+  
+   PBEQ>    scalar wmain set 2.15 sele resnam TEA .and. type N end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 2.30 sele ( type C1 .or. type C2 .or. type C3 .or. type C4 ) .and. resnam TEA end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 2.30 sele ( type C5 .or. type C6 .or. type C7 .or. type C8 ) .and. resnam TEA end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>           ! Tetramethylamonium (TEA)
+  
+   PBEQ>     
+  
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+   PBEQ>     
+  
+   PBEQ>        apbs mgauto lpbe grdx @dcel grdy @dcel grdz @dcel -
+   PBEQ>          sdie @epssol pdie @epsprot srad @rsol temp @T -
+   PBEQ>          srfm 2 bcfl 1 chgm 1 cmeth 1 calcene 1 debug 1
+ Parameter: DCEL -> "1.0"
+ Parameter: DCEL -> "1.0"
+ Parameter: DCEL -> "1.0"
+ Parameter: EPSSOL -> "80.0"
+ Parameter: EPSPROT -> "1.0"
+ Parameter: RSOL -> "1.4"
+ Parameter: T -> "300.0"
+
+   PBEQ> Entering APBS module
+
+   Calculation with   1241 atoms
+   APBS> Molecular dimensions:   32.997  37.709  39.094
+   APBS> Grid dime not specified, calculating ...
+   APBS> Requesting dime re-calculation on the fly
+   APBS> Grid values: 
+   APBS> fglen:   52.997  57.709  59.094
+   APBS> cglen:   56.094  64.105  66.460
+   APBS> dime:   65  65  65
+   APBS> grid:    1.000   1.000   1.000
+   APBS> Required memory (in MB):     52.381
+  Using cubic spline charge discretization.
+  Grid dimensions: 65 x 65 x 65
+  Grid spacings: 0.876 x 1.002 x 1.038
+  Grid lengths: 56.094 x 64.105 x 66.460
+  Grid center: (0.558, 1.879, 2.238)
+  Multigrid levels: 5
+  Molecule ID: 1
+  Linearized traditional PBE
+  Single Debye-Huckel sphere boundary conditions
+  0 ion species (0.000 M ionic strength):
+  Solute dielectric: 1.000
+  Solvent dielectric: 80.000
+  Using spline-based surface definition;window = 0.300
+  Temperature:  300.000 K
+  Electrostatic energies will be calculated
+  Using cubic spline charge discretization.
+  Grid dimensions: 65 x 65 x 65
+  Grid spacings: 0.828 x 0.902 x 0.923
+  Grid lengths: 52.997 x 57.709 x 59.094
+  Grid center: (0.558, 1.879, 2.238)
+  Multigrid levels: 5
+  Molecule ID: 1
+  Linearized traditional PBE
+  Boundary conditions from focusing
+  0 ion species (0.000 M ionic strength):
+  Solute dielectric: 1.000
+  Solvent dielectric: 80.000
+  Using spline-based surface definition;window = 0.300
+  Temperature:  300.000 K
+  Electrostatic energies will be calculated
+   APBS> APBS return code:   0
+   APBS> esEnergy:    7894.88639 kcal/mol
+   APBS> npEnergy:     129.53363 kcal/mol
+   APBS> Total Energy:    8024.42002 kcal/mol
+  
+   PBEQ>        set pbext = ?enpb
+ RDCMND substituted energy or value "?ENPB" to "7894.89"
+ Parameter: PBEXT <- "7894.89"
+  
+   PBEQ>     
+  
+   PBEQ>        apbs mgauto lpbe grdx @dcel grdy @dcel grdz @dcel -
+   PBEQ>          sdie @epsvac pdie @epsprot srad @rsol temp @T -
+   PBEQ>          srfm 2 bcfl 1 chgm 1 cmeth 1 calcene 1 debug 1
+ Parameter: DCEL -> "1.0"
+ Parameter: DCEL -> "1.0"
+ Parameter: DCEL -> "1.0"
+ Parameter: EPSVAC -> "1.0"
+ Parameter: EPSPROT -> "1.0"
+ Parameter: RSOL -> "1.4"
+ Parameter: T -> "300.0"
+
+   PBEQ> Entering APBS module
+
+   Calculation with   1241 atoms
+   APBS> Molecular dimensions:   32.997  37.709  39.094
+   APBS> Grid dime not specified, calculating ...
+   APBS> Requesting dime re-calculation on the fly
+   APBS> Grid values: 
+   APBS> fglen:   52.997  57.709  59.094
+   APBS> cglen:   56.094  64.105  66.460
+   APBS> dime:   65  65  65
+   APBS> grid:    1.000   1.000   1.000
+   APBS> Required memory (in MB):     52.381
+  Using cubic spline charge discretization.
+  Grid dimensions: 65 x 65 x 65
+  Grid spacings: 0.876 x 1.002 x 1.038
+  Grid lengths: 56.094 x 64.105 x 66.460
+  Grid center: (0.558, 1.879, 2.238)
+  Multigrid levels: 5
+  Molecule ID: 1
+  Linearized traditional PBE
+  Single Debye-Huckel sphere boundary conditions
+  0 ion species (0.000 M ionic strength):
+  Solute dielectric: 1.000
+  Solvent dielectric: 1.000
+  Using spline-based surface definition;window = 0.300
+  Temperature:  300.000 K
+  Electrostatic energies will be calculated
+  Using cubic spline charge discretization.
+  Grid dimensions: 65 x 65 x 65
+  Grid spacings: 0.828 x 0.902 x 0.923
+  Grid lengths: 52.997 x 57.709 x 59.094
+  Grid center: (0.558, 1.879, 2.238)
+  Multigrid levels: 5
+  Molecule ID: 1
+  Linearized traditional PBE
+  Boundary conditions from focusing
+  0 ion species (0.000 M ionic strength):
+  Solute dielectric: 1.000
+  Solvent dielectric: 1.000
+  Using spline-based surface definition;window = 0.300
+  Temperature:  300.000 K
+  Electrostatic energies will be calculated
+   APBS> APBS return code:   0
+   APBS> esEnergy:   10316.78546 kcal/mol
+   APBS> npEnergy:     129.53363 kcal/mol
+   APBS> Total Energy:   10446.31909 kcal/mol
+  
+   PBEQ>        set pbvac = ?enpb
+ RDCMND substituted energy or value "?ENPB" to "10316.8"
+ Parameter: PBVAC <- "10316.8"
+  
+   PBEQ>     
+  
+   PBEQ>        calc GPB = @pbext - @pbvac
+ Parameter: PBEXT -> "7894.89"
+ Parameter: PBVAC -> "10316.8"
+Evaluating: 7894.89-10316.8
+ Parameter: GPB <- "-2421.91"
+  
+   PBEQ>        calc delta = @GPB - @avgGPB
+ Parameter: GPB -> "-2421.91"
+ Parameter: AVGGPB -> "0"
+Evaluating: -2421.91-0
+ Parameter: DELTA <- "-2421.91"
+  
+   PBEQ>        calc avgGPB = @avgGPB + @delta / @n
+ Parameter: AVGGPB -> "0"
+ Parameter: DELTA -> "-2421.91"
+ Parameter: N -> "1"
+Evaluating: 0+-2421.91/1
+ Parameter: AVGGPB <- "-2421.91"
+  
+   PBEQ>        calc varGPB = @varGPB + @delta * ( @GPB - @avgGPB )
+ Parameter: VARGPB -> "0"
+ Parameter: DELTA -> "-2421.91"
+ Parameter: GPB -> "-2421.91"
+ Parameter: AVGGPB -> "-2421.91"
+Evaluating: 0+-2421.91*(-2421.91--2421.91)
+ Parameter: VARGPB <- "0"
+  
+   PBEQ>     
+  
+   PBEQ>        reset
+   Grid is not setup!
+  
+   PBEQ>      end
+  
+ CHARMM>      != END Poisson-Bolztmann equation =
+  
+ CHARMM>     
+  
+ CHARMM>      ! write data
+  
+ CHARMM>      trim n from 1 to 10
+ Parameter: N <- "1         "
+  
+ CHARMM>      trim Egas from 0 to 10
+ Parameter: EGAS <- " -533.21   "
+  
+ CHARMM>      trim Eele from 1 to 10
+ Parameter: EELE <- "-1475.32  "
+  
+ CHARMM>      trim EvdW from 1 to 10
+ Parameter: EVDW <- "-307.653  "
+  
+ CHARMM>      trim Eint from 1 to 10
+ Parameter: EINT <- "1249.76   "
+  
+ CHARMM>      trim Gasa from 1 to 10
+ Parameter: GASA <- "28.965    "
+  
+ CHARMM>      trim GPB from 1 to 10
+ Parameter: GPB <- "-2421.91  "
+  
+ CHARMM>     
+  
+ CHARMM>      write title unit @datU
+ Parameter: DATU -> "15"
+ RDTITL> *1           -533.21    -1475.32   -307.653   1249.76    28.965     -2421.91
+ RDTITL> *
+  
+ CHARMM>     
+  
+ CHARMM>      ! reload the structure file
+  
+ CHARMM>      open read unit 2 form name @psf
+ Parameter: PSF -> ""complex.psf""
+ VOPEN> Attempting to open::complex.psf::
+ OPNLGU> Unit  2 opened for READONLY access to /home/rok/Sandbox-100309/iapbs/modules/CHARMM/examples/RAS-RAF/complex.psf
+  
+ CHARMM>      read psf card unit 2
+ MAINIO> Protein structure file being read from unit   2.
+ TITLE>  * RAS-RAF
+ TITLE>  *  DATE:     3/ 5/10     16:40:36      CREATED BY USER: hhl
+ TITLE>  *
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        3   Number of residues   =      243
+         Number of atoms         =     3906   Number of groups     =     1156
+         Number of bonds         =     3936   Number of angles     =     7099
+         Number of dihedrals     =    10345   Number of impropers  =      657
+         Number of cross-terms   =      238
+         Number of HB acceptors  =      388   Number of HB donors  =      468
+         Number of NB exclusions =        0   Total charge =   -4.00000
+  
+ CHARMM>      close unit 2
+ VCLOSE: Closing unit    2 with status "KEEP"
+  
+ CHARMM>    if @n le @nmax goto trajloop
+ Parameter: N -> "1         "
+ Parameter: NMAX -> "1"
+ Comparing "1" and "1".
+ IF test evaluated as true.  Performing command
+  
+ CHARMM>      incr n by 1
+ Parameter: N <- "2"
+  
+ CHARMM>     
+  
+ CHARMM>      traj read
+
+    2 CORD RECORDS READ FROM   1 UNITS STARTING WITH UNIT  20
+ RUNNING FROM STEP       1 TO        2 SKIPPING    1 STEPS BETWEEN RECORDS
+ Time step was   1.000000     AKMA time units.
+  
+ CHARMM>     
+  
+ CHARMM>      delete atoms select .not. @mol end
+ Parameter: MOL -> "LIGAND"
+ SELRPN>   2665 atoms have been selected out of   3906
+
+ Message from MAPIC: Atom numbers are changed.
+
+ Message from MAPIC:        167 residues deleted.
+
+ Message from MAPIC:          2 segments deleted.
+ DELTIC:      2686 bonds deleted
+ DELTIC:      4832 angles deleted
+ DELTIC:      7043 dihedrals deleted
+ DELTIC:       446 improper dihedrals deleted
+ DELTIC:       164 crossterm maps deleted
+ DELTIC:       314 donors deleted
+ DELTIC:       281 acceptors deleted
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        1   Number of residues   =       76
+         Number of atoms         =     1241   Number of groups     =      363
+         Number of bonds         =     1250   Number of angles     =     2267
+         Number of dihedrals     =     3302   Number of impropers  =      211
+         Number of cross-terms   =       74
+         Number of HB acceptors  =      107   Number of HB donors  =      154
+         Number of NB exclusions =        0   Total charge =    6.00000
+  
+ CHARMM>     
+  
+ CHARMM>      coor orient norot ! center coordinates
+
+ ORIENT THE COORDINATES TO ALIGN WITH AXIS
+
+ CENTER OF ATOMS BEFORE TRANSLATION    -8.18971    -5.66916    14.11865
+ SELECTED COORDINATES TRANSLATED IN THE MAIN SET.
+
+  
+ CHARMM>     
+  
+ CHARMM>      ! Egas
+  
+ CHARMM>      energy cutnb 999.0 ctofnb 997.0 ctonnb 995.0 ctexnb 999.0
+
+ NONBOND OPTION FLAGS: 
+     ELEC     VDW      ATOMs    CDIElec  SHIFt    VATOm    VSWItch 
+     BYGRoup  NOEXtnd  NOEWald 
+ CUTNB  =999.000 CTEXNB =999.000 CTONNB =995.000 CTOFNB =997.000
+ WMIN   =  1.500 WRNMXD =  0.500 E14FAC =  1.000 EPS    =  1.000
+ NBXMOD =      5
+ There are        0 atom  pairs and        0 atom  exclusions.
+ There are        0 group pairs and        0 group exclusions.
+ <MAKINB> with mode   5 found   3517 exclusions and   3260 interactions(1-4)
+ <MAKGRP> found   1042 group exclusions.
+ Generating nonbond list with Exclusion mode = 5
+ == PRIMARY == SPACE FOR   769421 ATOM PAIRS AND        0 GROUP PAIRS
+
+ General atom nonbond list generation found:
+   765903 ATOM PAIRS WERE FOUND FOR ATOM LIST
+        0 GROUP PAIRS REQUIRED ATOM SEARCHES
+
+ENER ENR:  Eval#     ENERgy      Delta-E         GRMS
+ENER INTERN:          BONDs       ANGLes       UREY-b    DIHEdrals    IMPRopers
+ENER CROSS:           CMAPs     
+ENER EXTERN:        VDWaals         ELEC       HBONds          ASP         USER
+ ----------       ---------    ---------    ---------    ---------    ---------
+ENER>        0   -560.32585     27.11612     17.43098
+ENER INTERN>      229.01817    590.66100     85.39105    397.73513     39.08834
+ENER CROSS>      -107.18607
+ENER EXTERN>     -310.31496  -1484.71851      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+  
+ CHARMM>     
+  
+ CHARMM>      set Egas = ?ener
+ RDCMND substituted energy or value "?ENER" to "-560.326"
+ Parameter: EGAS <- "-560.326"
+  
+ CHARMM>      calc delta = @Egas - @avgEgas
+ Parameter: EGAS -> "-560.326"
+ Parameter: AVGEGAS -> "-533.21"
+Evaluating: -560.326--533.21
+ Parameter: DELTA <- "-27.116"
+  
+ CHARMM>      calc avgEgas = @avgEgas + @delta / @n
+ Parameter: AVGEGAS -> "-533.21"
+ Parameter: DELTA -> "-27.116"
+ Parameter: N -> "2"
+Evaluating: -533.21+-27.116/2
+ Parameter: AVGEGAS <- "-546.768"
+  
+ CHARMM>      calc varEgas = @varEgas + @delta * ( @Egas - @avgEgas )
+ Parameter: VAREGAS -> "0"
+ Parameter: DELTA -> "-27.116"
+ Parameter: EGAS -> "-560.326"
+ Parameter: AVGEGAS -> "-546.768"
+Evaluating: 0+-27.116*(-560.326--546.768)
+ Parameter: VAREGAS <- "367.639"
+  
+ CHARMM>     
+  
+ CHARMM>      set Eele = ?elec
+ RDCMND substituted energy or value "?ELEC" to "-1484.72"
+ Parameter: EELE <- "-1484.72"
+  
+ CHARMM>      calc delta = @Eele - @avgEele
+ Parameter: EELE -> "-1484.72"
+ Parameter: AVGEELE -> "-1475.32"
+Evaluating: -1484.72--1475.32
+ Parameter: DELTA <- "-9.4"
+  
+ CHARMM>      calc avgEele = @avgEele + @delta / @n
+ Parameter: AVGEELE -> "-1475.32"
+ Parameter: DELTA -> "-9.4"
+ Parameter: N -> "2"
+Evaluating: -1475.32+-9.4/2
+ Parameter: AVGEELE <- "-1480.02"
+  
+ CHARMM>      calc varEele = @varEele + @delta * ( @Eele - @avgEele )
+ Parameter: VAREELE -> "0"
+ Parameter: DELTA -> "-9.4"
+ Parameter: EELE -> "-1484.72"
+ Parameter: AVGEELE -> "-1480.02"
+Evaluating: 0+-9.4*(-1484.72--1480.02)
+ Parameter: VAREELE <- "44.18"
+  
+ CHARMM>     
+  
+ CHARMM>      set Evdw = ?vdw
+ RDCMND substituted energy or value "?VDW" to "-310.315"
+ Parameter: EVDW <- "-310.315"
+  
+ CHARMM>      calc delta = @Evdw - @avgEvdw
+ Parameter: EVDW -> "-310.315"
+ Parameter: AVGEVDW -> "-307.653"
+Evaluating: -310.315--307.653
+ Parameter: DELTA <- "-2.662"
+  
+ CHARMM>      calc avgEvdw = @avgEvdw + @delta / @n
+ Parameter: AVGEVDW -> "-307.653"
+ Parameter: DELTA -> "-2.662"
+ Parameter: N -> "2"
+Evaluating: -307.653+-2.662/2
+ Parameter: AVGEVDW <- "-308.984"
+  
+ CHARMM>      calc varEvdw = @varEvdw + @delta * ( @Evdw - @avgEvdw )
+ Parameter: VAREVDW -> "0"
+ Parameter: DELTA -> "-2.662"
+ Parameter: EVDW -> "-310.315"
+ Parameter: AVGEVDW -> "-308.984"
+Evaluating: 0+-2.662*(-310.315--308.984)
+ Parameter: VAREVDW <- "3.54312"
+  
+ CHARMM>     
+  
+ CHARMM>      calc Eint = ?ener - ?elec - ?vdw
+ RDCMND substituted energy or value "?ENER" to "-560.326"
+ RDCMND substituted energy or value "?ELEC" to "-1484.72"
+ RDCMND substituted energy or value "?VDW" to "-310.315"
+Evaluating: -560.326--1484.72--310.315
+ Parameter: EINT <- "1234.71"
+  
+ CHARMM>      calc delta = @Eint - @avgEint
+ Parameter: EINT -> "1234.71"
+ Parameter: AVGEINT -> "1249.76"
+Evaluating: 1234.71-1249.76
+ Parameter: DELTA <- "-15.05"
+  
+ CHARMM>      calc avgEint = @avgEint + @delta / @n
+ Parameter: AVGEINT -> "1249.76"
+ Parameter: DELTA -> "-15.05"
+ Parameter: N -> "2"
+Evaluating: 1249.76+-15.05/2
+ Parameter: AVGEINT <- "1242.23"
+  
+ CHARMM>      calc varEint = @varEint + @delta * ( @Eint - @avgEint )
+ Parameter: VAREINT -> "0"
+ Parameter: DELTA -> "-15.05"
+ Parameter: EINT -> "1234.71"
+ Parameter: AVGEINT -> "1242.23"
+Evaluating: 0+-15.05*(1234.71-1242.23)
+ Parameter: VAREINT <- "113.176"
+  
+ CHARMM>     
+  
+ CHARMM>      ! Gasa
+  
+ CHARMM>      coor surface rprobe @rsol
+ Parameter: RSOL -> "1.4"
+ SURFAC: Lennard-Jones radii values being used
+ SURFAC: RPRObe=   1.40000
+ SURFAC: Analytic surface area method used
+  
+ CHARMM>      calc Gasa = @gammaP * ?area + @betaP
+ Parameter: GAMMAP -> "0.00542"
+ Parameter: BETAP -> "0.92"
+ RDCMND substituted energy or value "?AREA" to "5175.19"
+Evaluating: 0.00542*5175.19+0.92
+ Parameter: GASA <- "28.9695"
+  
+ CHARMM>      calc delta = @Gasa - @avgGasa
+ Parameter: GASA -> "28.9695"
+ Parameter: AVGGASA -> "28.965"
+Evaluating: 28.9695-28.965
+ Parameter: DELTA <- "4.5E-03"
+  
+ CHARMM>      calc avgGasa = @avgGasa + @delta / @n
+ Parameter: AVGGASA -> "28.965"
+ Parameter: DELTA -> "4.5E-03"
+ Parameter: N -> "2"
+Evaluating: 28.965+4.5E-03/2
+ Parameter: AVGGASA <- "28.9672"
+  
+ CHARMM>      calc varGasa = @varGasa + @delta * ( @Gasa - @avgGasa )
+ Parameter: VARGASA -> "0"
+ Parameter: DELTA -> "4.5E-03"
+ Parameter: GASA -> "28.9695"
+ Parameter: AVGGASA -> "28.9672"
+Evaluating: 0+4.5E-03*(28.9695-28.9672)
+ Parameter: VARGASA <- "1.035E-05"
+  
+ CHARMM>     
+  
+ CHARMM>      != GPB finite difference PBEQ =
+  
+ CHARMM>      ! establish grid dimensions
+  
+ CHARMM>      coor stat
+ STATISTICS FOR      1241 SELECTED ATOMS:
+    XMIN =  -14.239189 XMAX =   16.210458 XAVE =    0.000000
+    YMIN =  -15.849897 YMAX =   18.204560 YAVE =    0.000000
+    ZMIN =  -15.503375 ZMAX =   19.688852 ZAVE =    0.000000
+    WMIN =    0.000000 WMAX =   59.851246 WAVE =    4.170178
+  
+ CHARMM>     
+  
+ CHARMM>      != BEGIN Poisson-Bolztmann equation =
+  
+ CHARMM>      pbeq
+ 
+   Calculations with the Poisson-Boltzmann Equation 
+ 
+  
+   PBEQ>        !scalar wmain = radius  ! set wmain to vdW radii
+  
+   PBEQ>        stream ./data/radius.str       ! Benoit Roux's parameter
+ VOPEN> Attempting to open::./data/radius.str::
+ OPNLGU> Unit 99 opened for READONLY access to /home/rok/Sandbox-100309/iapbs/modules/CHARMM/examples/RAS-RAF/./data/radius.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * ATOMIC RADIUS DERIVED FROM SOLVENT ELECTROSTATIC CHARGE DISTRIBUTION
+ RDTITL> * TESTED WITH FREE ENERGY PERTURBATION WITH EXPLICIT SOLVENT
+ RDTITL> * AUTHORS:  MAFALDA NINA, DMITRII BELOGV, AND BENOIT ROUX
+ RDTITL> * UNIVERSITY OF MONTREAL, JUNE 1996.
+ RDTITL> * M. NINA AND B. ROUX. ATOMIC RADII FOR CONTINUUM ELECTROSTATICS CALCULATIONS BASED ON
+ RDTITL> * MOLECULAR DYNAMICS FREE ENERGY SIMULATIONS. J. PHYS. CHEM. B 101: 5239-5248 (1997).
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+   PBEQ>     
+  
+   PBEQ>    ! UPDATES:
+   PBEQ>    ! --------
+   PBEQ>    !
+   PBEQ>    ! GLU and ASP modified December 1st, 1998 by Mafalda Nina
+   PBEQ>    !
+   PBEQ>    ! Protonated histidine HSP has been included, January 1999 by Mafalda Nina
+   PBEQ>    ! dG_elec = -68.15 kcal/mol (MD/FES) or -68.10 kcal/mol (PBEQ)
+   PBEQ>    !
+   PBEQ>    ! TEA and ions added by Benoit Roux, January 1999.
+   PBEQ>    !
+   PBEQ>    ! sodium added by Benoit Roux, November 2000
+   PBEQ>     
+  
+   PBEQ>    ! Set to zero all H radii
+   PBEQ>    scalar wmain set 0.0 sele chem H* end
+ SELRPN>    633 atoms have been selected out of   1241
+  
+   PBEQ>     
+  
+   PBEQ>    ! Set heavy atoms to average default values
+   PBEQ>    scalar wmain set 2.3 sele chem C* end
+ SELRPN>    382 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 1.8 sele chem O* end
+ SELRPN>    106 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 2.3 sele chem N* end
+ SELRPN>    115 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 2.3 sele chem S* end
+ SELRPN>      5 atoms have been selected out of   1241
+  
+   PBEQ>     
+  
+   PBEQ>    !Patches CT3 N-Methylamide C-terminus
+   PBEQ>    !        ACE acetylated N-terminus (ACP for PRO)
+   PBEQ>    scalar wmain set 2.06 sele (type CAY .or. type CAT) end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 2.04 sele type CY end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 1.52 sele type OY end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 2.23 sele type NT end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 1.40 sele type OT* end ! for COO- terminus
+ SELRPN>      2 atoms have been selected out of   1241
+  
+   PBEQ>     
+  
+   PBEQ>    !Backbone
+   PBEQ>    scalar wmain set 2.04 sele type C  end
+ SELRPN>     76 atoms have been selected out of   1241
+  
+   PBEQ>           ! for peptide bond
+  
+   PBEQ>    scalar wmain set 1.52 sele type O  end
+ SELRPN>     75 atoms have been selected out of   1241
+  
+   PBEQ>           ! for peptide bond
+  
+   PBEQ>    scalar wmain set 2.23 sele type N  end
+ SELRPN>     76 atoms have been selected out of   1241
+  
+   PBEQ>           ! for peptide bond
+  
+   PBEQ>    scalar wmain set 2.86 sele type CA  end
+ SELRPN>     76 atoms have been selected out of   1241
+  
+   PBEQ>           ! for all CA except GLY
+  
+   PBEQ>    scalar wmain set 2.38 sele (resnam GLY .and. type CA) end
+ SELRPN>      4 atoms have been selected out of   1241
+  
+   PBEQ>           ! for GLY only
+  
+   PBEQ>     
+  
+   PBEQ>    !Hydrogens
+   PBEQ>    scalar wmain set 0.00 sele type H* end
+ SELRPN>    633 atoms have been selected out of   1241
+  
+   PBEQ>           ! for all hydrogens
+  
+   PBEQ>     
+  
+   PBEQ>    !Carbons
+   PBEQ>    scalar wmain set 2.67 sele type CB end
+ SELRPN>     72 atoms have been selected out of   1241
+  
+   PBEQ>           ! for all residues
+  
+   PBEQ>    scalar wmain set 2.46 sele type CG* end
+ SELRPN>     71 atoms have been selected out of   1241
+  
+   PBEQ>           ! for ARG, GLN, ILE, LYS, MET, PHE, THR, TRP, VAL, HSP, HSD
+  
+   PBEQ>    scalar wmain set 2.77 sele resnam GLU .and. type CG end
+ SELRPN>      4 atoms have been selected out of   1241
+  
+   PBEQ>           ! for GLU only
+  
+   PBEQ>    scalar wmain set 2.44 sele type CD* end
+ SELRPN>     56 atoms have been selected out of   1241
+  
+   PBEQ>           ! for ARG, ILE, LEU, LYS
+  
+   PBEQ>    scalar wmain set 1.98 sele (resnam GLN .and. type CD) .or. (resnam ASN .and. type CG) .or. -
+   PBEQ>                               (resnam GLU .and. type CD) .or. (resnam ASP .and. type CG) end
+ SELRPN>     16 atoms have been selected out of   1241
+  
+   PBEQ>           ! for ASP, GLU, ASN, GLN
+  
+   PBEQ>    scalar wmain set 1.98 sele (resnam PRO .and. (type CB .or. type CG .or. type CD)) end
+ SELRPN>      6 atoms have been selected out of   1241
+  
+   PBEQ>           ! for PRO only
+  
+   PBEQ>    scalar wmain set 2.00 sele (resnam TYR .and. (type CE* .or. type CD* .or. -
+   PBEQ>                              type CZ)) .or. (resnam PHE .and. (type CE* .or. -
+   PBEQ>                              type CD* .or. type CZ))  end
+ SELRPN>     15 atoms have been selected out of   1241
+  
+   PBEQ>           ! for TYR, PHE rings
+  
+   PBEQ>    scalar wmain set 1.78 sele (resnam TRP .and. (type CE* .or. type CD* .or. -
+   PBEQ>                              type CZ* .or. type CH2)) end
+ SELRPN>      7 atoms have been selected out of   1241
+  
+   PBEQ>           ! for TRP ring only
+  
+   PBEQ>    scalar wmain set 2.10 sele type CE end
+ SELRPN>      8 atoms have been selected out of   1241
+  
+   PBEQ>           ! for MET only
+  
+   PBEQ>    scalar wmain set 2.80 sele (resnam ARG .and. type CZ) .or. (resnam LYS .and. type CE) end
+ SELRPN>     12 atoms have been selected out of   1241
+  
+   PBEQ>           ! for ARG, LYS
+  
+   PBEQ>    scalar wmain set 1.98 select (( resnam HSD  .or. resnam HSP) .and. type CE1) -
+   PBEQ>           .or. (( resnam HSD .or. resnam HSP)  .and. type CD2) end
+ SELRPN>      6 atoms have been selected out of   1241
+  
+   PBEQ>           ! for neutral HSD and protonated HSP
+  
+   PBEQ>     
+  
+   PBEQ>    !Oxygens
+   PBEQ>    scalar wmain set 1.40 sele (resnam GLU .or. resnam ASP) .and. (type OE* .or. type OD*) end
+ SELRPN>     16 atoms have been selected out of   1241
+  
+   PBEQ>           ! for GLU, ASP
+  
+   PBEQ>    scalar wmain set 1.42 sele (resnam ASN .or. resnam GLN) .and. (type OE* .or. type OD*) end
+ SELRPN>      8 atoms have been selected out of   1241
+  
+   PBEQ>           ! for ASN, GLN
+  
+   PBEQ>    scalar wmain set 1.64 sele type OG* end
+ SELRPN>      5 atoms have been selected out of   1241
+  
+   PBEQ>           ! for SER, THR
+  
+   PBEQ>    scalar wmain set 1.85 sele (resnam TYR .and. type OH) end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>           ! for TYR only
+  
+   PBEQ>    scalar wmain set 2.2 select resname TIP3 .and. type OH2 end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>           ! for explicit water molecules
+  
+   PBEQ>     
+  
+   PBEQ>    !Nitrogens
+   PBEQ>    scalar wmain set 1.80 sele resnam HSD  .and. (type NE2 .or. type ND1) end
+ SELRPN>      2 atoms have been selected out of   1241
+  
+   PBEQ>           ! for neutral HSD
+  
+   PBEQ>    scalar wmain set 2.30 sele resnam HSP  .and. (type NE2 .or. type ND1) end
+ SELRPN>      4 atoms have been selected out of   1241
+  
+   PBEQ>           ! for protonated HSP
+  
+   PBEQ>    scalar wmain set 2.13 sele resnam ARG .and. (type NH* .or. type NE) .or. -
+   PBEQ>                          (resnam LYS .and. type NZ) end
+ SELRPN>     24 atoms have been selected out of   1241
+  
+   PBEQ>           ! for ARG, LYS
+  
+   PBEQ>    scalar wmain set 2.15 sele (resnam GLN .and. type NE2) .or. (resnam ASN .and. type ND2) end
+ SELRPN>      8 atoms have been selected out of   1241
+  
+   PBEQ>           ! for GLN, ASN
+  
+   PBEQ>    scalar wmain set 2.40 sele resnam TRP .and. type NE1 end
+ SELRPN>      1 atoms have been selected out of   1241
+  
+   PBEQ>           ! for TRP
+  
+   PBEQ>     
+  
+   PBEQ>    !Sulphur
+   PBEQ>    scalar wmain set 2.00 sele type S* end
+ SELRPN>      5 atoms have been selected out of   1241
+  
+   PBEQ>           ! for MET, CYS
+  
+   PBEQ>     
+  
+   PBEQ>     
+  
+   PBEQ>    !Ions
+   PBEQ>    scalar wmain set 2.035 select resname POT end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>           !potassium ion K+
+  
+   PBEQ>     
+  
+   PBEQ>    scalar wmain set 2.035 select resname CLA end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>           !chloride ion Cl-
+  
+   PBEQ>     
+  
+   PBEQ>    scalar wmain set 1.66 select resname SOD end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>           !sodium ion Na+
+  
+   PBEQ>     
+  
+   PBEQ>    scalar wmain set 2.15 sele resnam TEA .and. type N end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 2.30 sele ( type C1 .or. type C2 .or. type C3 .or. type C4 ) .and. resnam TEA end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>    scalar wmain set 2.30 sele ( type C5 .or. type C6 .or. type C7 .or. type C8 ) .and. resnam TEA end
+ SELRPN>      0 atoms have been selected out of   1241
+  
+   PBEQ>           ! Tetramethylamonium (TEA)
+  
+   PBEQ>     
+  
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+   PBEQ>     
+  
+   PBEQ>        apbs mgauto lpbe grdx @dcel grdy @dcel grdz @dcel -
+   PBEQ>          sdie @epssol pdie @epsprot srad @rsol temp @T -
+   PBEQ>          srfm 2 bcfl 1 chgm 1 cmeth 1 calcene 1 debug 1
+ Parameter: DCEL -> "1.0"
+ Parameter: DCEL -> "1.0"
+ Parameter: DCEL -> "1.0"
+ Parameter: EPSSOL -> "80.0"
+ Parameter: EPSPROT -> "1.0"
+ Parameter: RSOL -> "1.4"
+ Parameter: T -> "300.0"
+
+   PBEQ> Entering APBS module
+
+   Calculation with   1241 atoms
+   APBS> Molecular dimensions:   33.568  36.886  37.795
+   APBS> Grid dime not specified, calculating ...
+   APBS> Requesting dime re-calculation on the fly
+   APBS> Grid values: 
+   APBS> fglen:   53.568  56.886  57.795
+   APBS> cglen:   57.065  62.706  64.252
+   APBS> dime:   65  65  65
+   APBS> grid:    1.000   1.000   1.000
+   APBS> Required memory (in MB):     52.381
+  Using cubic spline charge discretization.
+  Grid dimensions: 65 x 65 x 65
+  Grid spacings: 0.892 x 0.980 x 1.004
+  Grid lengths: 57.065 x 62.706 x 64.252
+  Grid center: (0.986, 1.177, 2.093)
+  Multigrid levels: 5
+  Molecule ID: 1
+  Linearized traditional PBE
+  Single Debye-Huckel sphere boundary conditions
+  0 ion species (0.000 M ionic strength):
+  Solute dielectric: 1.000
+  Solvent dielectric: 80.000
+  Using spline-based surface definition;window = 0.300
+  Temperature:  300.000 K
+  Electrostatic energies will be calculated
+  Using cubic spline charge discretization.
+  Grid dimensions: 65 x 65 x 65
+  Grid spacings: 0.837 x 0.889 x 0.903
+  Grid lengths: 53.568 x 56.886 x 57.795
+  Grid center: (0.986, 1.177, 2.093)
+  Multigrid levels: 5
+  Molecule ID: 1
+  Linearized traditional PBE
+  Boundary conditions from focusing
+  0 ion species (0.000 M ionic strength):
+  Solute dielectric: 1.000
+  Solvent dielectric: 80.000
+  Using spline-based surface definition;window = 0.300
+  Temperature:  300.000 K
+  Electrostatic energies will be calculated
+   APBS> APBS return code:   0
+   APBS> esEnergy:    8059.98031 kcal/mol
+   APBS> npEnergy:     129.65604 kcal/mol
+   APBS> Total Energy:    8189.63635 kcal/mol
+  
+   PBEQ>        set pbext = ?enpb
+ RDCMND substituted energy or value "?ENPB" to "8059.98"
+ Parameter: PBEXT <- "8059.98"
+  
+   PBEQ>     
+  
+   PBEQ>        apbs mgauto lpbe grdx @dcel grdy @dcel grdz @dcel -
+   PBEQ>          sdie @epsvac pdie @epsprot srad @rsol temp @T -
+   PBEQ>          srfm 2 bcfl 1 chgm 1 cmeth 1 calcene 1 debug 1
+ Parameter: DCEL -> "1.0"
+ Parameter: DCEL -> "1.0"
+ Parameter: DCEL -> "1.0"
+ Parameter: EPSVAC -> "1.0"
+ Parameter: EPSPROT -> "1.0"
+ Parameter: RSOL -> "1.4"
+ Parameter: T -> "300.0"
+
+   PBEQ> Entering APBS module
+
+   Calculation with   1241 atoms
+   APBS> Molecular dimensions:   33.568  36.886  37.795
+   APBS> Grid dime not specified, calculating ...
+   APBS> Requesting dime re-calculation on the fly
+   APBS> Grid values: 
+   APBS> fglen:   53.568  56.886  57.795
+   APBS> cglen:   57.065  62.706  64.252
+   APBS> dime:   65  65  65
+   APBS> grid:    1.000   1.000   1.000
+   APBS> Required memory (in MB):     52.381
+  Using cubic spline charge discretization.
+  Grid dimensions: 65 x 65 x 65
+  Grid spacings: 0.892 x 0.980 x 1.004
+  Grid lengths: 57.065 x 62.706 x 64.252
+  Grid center: (0.986, 1.177, 2.093)
+  Multigrid levels: 5
+  Molecule ID: 1
+  Linearized traditional PBE
+  Single Debye-Huckel sphere boundary conditions
+  0 ion species (0.000 M ionic strength):
+  Solute dielectric: 1.000
+  Solvent dielectric: 1.000
+  Using spline-based surface definition;window = 0.300
+  Temperature:  300.000 K
+  Electrostatic energies will be calculated
+  Using cubic spline charge discretization.
+  Grid dimensions: 65 x 65 x 65
+  Grid spacings: 0.837 x 0.889 x 0.903
+  Grid lengths: 53.568 x 56.886 x 57.795
+  Grid center: (0.986, 1.177, 2.093)
+  Multigrid levels: 5
+  Molecule ID: 1
+  Linearized traditional PBE
+  Boundary conditions from focusing
+  0 ion species (0.000 M ionic strength):
+  Solute dielectric: 1.000
+  Solvent dielectric: 1.000
+  Using spline-based surface definition;window = 0.300
+  Temperature:  300.000 K
+  Electrostatic energies will be calculated
+   APBS> APBS return code:   0
+   APBS> esEnergy:   10466.46061 kcal/mol
+   APBS> npEnergy:     129.65604 kcal/mol
+   APBS> Total Energy:   10596.11666 kcal/mol
+  
+   PBEQ>        set pbvac = ?enpb
+ RDCMND substituted energy or value "?ENPB" to "10466.5"
+ Parameter: PBVAC <- "10466.5"
+  
+   PBEQ>     
+  
+   PBEQ>        calc GPB = @pbext - @pbvac
+ Parameter: PBEXT -> "8059.98"
+ Parameter: PBVAC -> "10466.5"
+Evaluating: 8059.98-10466.5
+ Parameter: GPB <- "-2406.52"
+  
+   PBEQ>        calc delta = @GPB - @avgGPB
+ Parameter: GPB -> "-2406.52"
+ Parameter: AVGGPB -> "-2421.91"
+Evaluating: -2406.52--2421.91
+ Parameter: DELTA <- "15.39"
+  
+   PBEQ>        calc avgGPB = @avgGPB + @delta / @n
+ Parameter: AVGGPB -> "-2421.91"
+ Parameter: DELTA -> "15.39"
+ Parameter: N -> "2"
+Evaluating: -2421.91+15.39/2
+ Parameter: AVGGPB <- "-2414.21"
+  
+   PBEQ>        calc varGPB = @varGPB + @delta * ( @GPB - @avgGPB )
+ Parameter: VARGPB -> "0"
+ Parameter: DELTA -> "15.39"
+ Parameter: GPB -> "-2406.52"
+ Parameter: AVGGPB -> "-2414.21"
+Evaluating: 0+15.39*(-2406.52--2414.21)
+ Parameter: VARGPB <- "118.349"
+  
+   PBEQ>     
+  
+   PBEQ>        reset
+   Grid is not setup!
+  
+   PBEQ>      end
+  
+ CHARMM>      != END Poisson-Bolztmann equation =
+  
+ CHARMM>     
+  
+ CHARMM>      ! write data
+  
+ CHARMM>      trim n from 1 to 10
+ Parameter: N <- "2         "
+  
+ CHARMM>      trim Egas from 0 to 10
+ Parameter: EGAS <- " -560.326  "
+  
+ CHARMM>      trim Eele from 1 to 10
+ Parameter: EELE <- "-1484.72  "
+  
+ CHARMM>      trim EvdW from 1 to 10
+ Parameter: EVDW <- "-310.315  "
+  
+ CHARMM>      trim Eint from 1 to 10
+ Parameter: EINT <- "1234.71   "
+  
+ CHARMM>      trim Gasa from 1 to 10
+ Parameter: GASA <- "28.9695   "
+  
+ CHARMM>      trim GPB from 1 to 10
+ Parameter: GPB <- "-2406.52  "
+  
+ CHARMM>     
+  
+ CHARMM>      write title unit @datU
+ Parameter: DATU -> "15"
+ RDTITL> *2           -560.326   -1484.72   -310.315   1234.71    28.9695    -2406.52
+ RDTITL> *
+  
+ CHARMM>     
+  
+ CHARMM>      ! reload the structure file
+  
+ CHARMM>      open read unit 2 form name @psf
+ Parameter: PSF -> ""complex.psf""
+ VOPEN> Attempting to open::complex.psf::
+ OPNLGU> Unit  2 opened for READONLY access to /home/rok/Sandbox-100309/iapbs/modules/CHARMM/examples/RAS-RAF/complex.psf
+  
+ CHARMM>      read psf card unit 2
+ MAINIO> Protein structure file being read from unit   2.
+ TITLE>  * RAS-RAF
+ TITLE>  *  DATE:     3/ 5/10     16:40:36      CREATED BY USER: hhl
+ TITLE>  *
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        3   Number of residues   =      243
+         Number of atoms         =     3906   Number of groups     =     1156
+         Number of bonds         =     3936   Number of angles     =     7099
+         Number of dihedrals     =    10345   Number of impropers  =      657
+         Number of cross-terms   =      238
+         Number of HB acceptors  =      388   Number of HB donors  =      468
+         Number of NB exclusions =        0   Total charge =   -4.00000
+  
+ CHARMM>      close unit 2
+ VCLOSE: Closing unit    2 with status "KEEP"
+  
+ CHARMM>    if @n le @nmax goto trajloop
+ Parameter: N -> "2         "
+ Parameter: NMAX -> "1"
+ Comparing "2" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>    !== END reading the trajectory ==
+ CHARMM>     
+  
+ CHARMM>    !== calculate average values ==
+ CHARMM>    trim avgEgas from 1 to 12
+ Parameter: AVGEGAS <- "-546.768    "
+  
+ CHARMM>    trim avgEele from 1 to 12
+ Parameter: AVGEELE <- "-1480.02    "
+  
+ CHARMM>    trim avgEvdW from 1 to 12
+ Parameter: AVGEVDW <- "-308.984    "
+  
+ CHARMM>    trim avgEint from 1 to 12
+ Parameter: AVGEINT <- "1242.23     "
+  
+ CHARMM>    trim avgGPB from 1 to 12
+ Parameter: AVGGPB <- "-2414.21    "
+  
+ CHARMM>    trim avgGasa from 1 to 12
+ Parameter: AVGGASA <- "28.9672     "
+  
+ CHARMM>     
+  
+ CHARMM>    calc n = @n - 1
+ Parameter: N -> "2         "
+Evaluating: 2-1
+ Parameter: N <- "1"
+  
+ CHARMM>    calc varEgas = sqrt( @varEgas / @n )
+ Parameter: VAREGAS -> "367.639"
+ Parameter: N -> "1"
+Evaluating: SQRT(367.639/1)
+ Parameter: VAREGAS <- "19.1739"
+  
+ CHARMM>    calc varEele = sqrt( @varEele / @n )
+ Parameter: VAREELE -> "44.18"
+ Parameter: N -> "1"
+Evaluating: SQRT(44.18/1)
+ Parameter: VAREELE <- "6.6468"
+  
+ CHARMM>    calc varEvdW = sqrt( @varEvdW / @n )
+ Parameter: VAREVDW -> "3.54312"
+ Parameter: N -> "1"
+Evaluating: SQRT(3.54312/1)
+ Parameter: VAREVDW <- "1.88232"
+  
+ CHARMM>    calc varEint = sqrt( @varEint / @n )
+ Parameter: VAREINT -> "113.176"
+ Parameter: N -> "1"
+Evaluating: SQRT(113.176/1)
+ Parameter: VAREINT <- "10.6384"
+  
+ CHARMM>    calc varGPB = sqrt( @varGPB / @n )
+ Parameter: VARGPB -> "118.349"
+ Parameter: N -> "1"
+Evaluating: SQRT(118.349/1)
+ Parameter: VARGPB <- "10.8788"
+  
+ CHARMM>    calc varGasa = sqrt( @varGasa / @n )
+ Parameter: VARGASA -> "1.035E-05"
+ Parameter: N -> "1"
+Evaluating: SQRT(1.035E-05/1)
+ Parameter: VARGASA <- "3.217142E-03"
+  
+ CHARMM>     
+  
+ CHARMM>    trim varEgas from 1 to 12
+ Parameter: VAREGAS <- "19.1739     "
+  
+ CHARMM>    trim varEele from 1 to 12
+ Parameter: VAREELE <- "6.6468      "
+  
+ CHARMM>    trim varEvdW from 1 to 12
+ Parameter: VAREVDW <- "1.88232     "
+  
+ CHARMM>    trim varEint from 1 to 12
+ Parameter: VAREINT <- "10.6384     "
+  
+ CHARMM>    trim varGPB from 1 to 12
+ Parameter: VARGPB <- "10.8788     "
+  
+ CHARMM>    trim varGasa from 1 to 12
+ Parameter: VARGASA <- "3.217142E-03"
+  
+ CHARMM>     
+  
+ CHARMM>    calc G = @avgEgas + @avgGPB + @avgGasa
+ Parameter: AVGEGAS -> "-546.768    "
+ Parameter: AVGGPB -> "-2414.21    "
+ Parameter: AVGGASA -> "28.9672     "
+Evaluating: -546.768+-2414.21+28.9672
+ Parameter: G <- "-2932.01"
+  
+ CHARMM>     
+  
+ CHARMM>    write title unit @datU
+ Parameter: DATU -> "15"
+ RDTITL> *#
+ RDTITL> *# MM-PBSA RESULTS FOR LIGAND (1 FRAMES)
+ RDTITL> *#
+ RDTITL> *#               MEAN         STD
+ RDTITL> *#           ============ ============
+ RDTITL> *#  EELE     -1480.02     6.6468
+ RDTITL> *#  EVDW     -308.984     1.88232
+ RDTITL> *#  EINT     1242.23      10.6384
+ RDTITL> *#  EGAS     -546.768     19.1739
+ RDTITL> *#  GASA     28.9672      3.217142E-03
+ RDTITL> *#  GPB      -2414.21     10.8788
+ RDTITL> *#
+ RDTITL> *#  G(NO_ENTROPY) = EGAS + GASA + GPB = -2932.01
+ RDTITL> *#
+ RDTITL> *
+  
+ CHARMM>     
+  
+ CHARMM>     
+  
+ CHARMM>    !== entropy calculation via QHA ==
+ CHARMM>    if @entropy ne 0 then
+ Parameter: ENTROPY -> "0"
+ Comparing "0" and "0".
+ IF test evaluated as false.  Skip to ELSE or ENDIF
+  
+ CHARMM>     
+  
+ CHARMM>    write title unit @datU
+ Parameter: DATU -> "15"
+ RDTITL> *# INPUT FILES
+ RDTITL> *#   TRAJECTORY: "short.dcd" (FIRST FRAME #1, SKIP 1)
+ RDTITL> *#   PSF: "complex.psf"
+ RDTITL> *#   CRD: "complex.crd"
+ RDTITL> *#
+ RDTITL> *# KEY PARAMETERS
+ RDTITL> *#   T = 300.0 K
+ RDTITL> *#   GASA: GAMMAP = 0.00542, BETAP = 0.92
+ RDTITL> *#   PBEQ: DCEL = 1.0, CONC = 0.0, IONR = 0.0
+ RDTITL> *#         EPSSOL = 80.0, EPSVAC = 1.0, EPSPROT = 1.0
+ RDTITL> *#         RSOL = 1.4
+ RDTITL> *#
+ RDTITL>  
+  
+ CHARMM>     
+  
+ CHARMM>    close unit @datU
+ Parameter: DATU -> "15"
+ VCLOSE: Closing unit   15 with status "KEEP"
+  
+ CHARMM>     
+  
+ CHARMM>    stop
+ VCLOSE: Closing unit   20 with status "KEEP"
+$$$$$$  New timer profile $$$$$
+   List time                       0.03 Other:            0.00
+         Electrostatic & VDW             0.15 Other:            0.00
+      Nonbond force                   0.15 Other:            0.00
+         Bond energy                     0.00 Other:            0.00
+         Angle energy                    0.00 Other:            0.00
+         Dihedral energy                 0.00 Other:            0.00
+         Restraints energy               0.00 Other:            0.00
+      INTRNL energy                   0.00 Other:            0.00
+   Energy time                     0.15 Other:            0.00
+ Total time                     13.51 Other:           13.33
+
+                    NORMAL TERMINATION BY NORMAL STOP
+                    MAXIMUM STACK SPACE USED IS   47530
+                    STACK CURRENTLY IN USE IS         0
+                    NO WARNINGS WERE ISSUED
+                    HEAP PRINTOUT-  HEAP SIZE   2048000
+                    SPACE CURRENTLY IN USE IS     27648
+                    MAXIMUM SPACE USED IS        914172
+                    FREE LIST
+            PRINHP> ADDRESS:         1 LENGTH:   2019812 NEXT:   2047461
+            PRINHP> ADDRESS:   2047461 LENGTH:       540 NEXT:         0
+
+                    $$$$$ JOB ACCOUNTING INFORMATION $$$$$
+                     ELAPSED TIME:    13.51  SECONDS 
+                         CPU TIME:    13.34  SECONDS 

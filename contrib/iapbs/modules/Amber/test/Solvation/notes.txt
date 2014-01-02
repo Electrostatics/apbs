@@ -1,0 +1,19 @@
+= This is a solvation test for iAPBS =
+
+Last Modified: 09/24/07 16:10:54 (rok)
+
+
+== Notes ==
+
+2ala.pqr: pdb2pqr could not assing ACE's Hs and NME's Hs, too info
+from amber
+
+debug directory: contains run with print and debug options jacked up
+
+APBS directory: files for apbs run
+
+PBSA directory: files for Amber/pbsa run
+
+== Run ==
+
+./Run.apbs.solv

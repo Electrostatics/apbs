@@ -1,0 +1,48 @@
+ read
+mol pqr 2ala.pqr
+end
+
+ elec name elec
+mg-manual
+dime 33 33 33
+grid 0.500 0.500 0.500
+nlev 4
+gcent mol 1
+pdie 2.000 
+ sdie 1.00
+ srad 1.400
+ swin 0.300
+            temp 298.150
+ sdens 10.000
+ mol 1
+chgm spl2
+lpbe
+bcfl sdh
+srfm spl2
+calcenergy total
+calcforce comps
+end
+
+apolar name npolar
+bconc 0.0
+ press 0.0
+ dpos 0.2
+mol 1
+ srfm sacc
+grid 0.2 0.2 0.2
+gamma 0.105
+srad 1.400
+ swin 0.300
+ temp 298.150
+ sdens 10.000
+calcenergy total
+calcforce comps
+end
+
+print elecForce elec end
+print apolforce npolar end
+
+print elecEnergy elec end
+print apolEnergy npolar end
+
+quit

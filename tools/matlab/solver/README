@@ -1,0 +1,1 @@
+This is a Matlab linearized Poisson-Boltzmann solver that uses finite differences.  It is intended primarily for prototyping solvers.

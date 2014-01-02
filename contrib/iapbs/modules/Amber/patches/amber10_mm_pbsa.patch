@@ -1,0 +1,294 @@
+diff -ur mm_pbsa.orig/mm_pbsa_calceneent.pm mm_pbsa/mm_pbsa_calceneent.pm
+--- mm_pbsa.orig/mm_pbsa_calceneent.pm	2006-05-01 02:38:51.000000000 -0700
++++ mm_pbsa/mm_pbsa_calceneent.pm	2007-10-09 13:29:15.000000000 -0700
+@@ -59,8 +59,9 @@
+       print OUT "MM\n" if($r_gen->{"MM"});
+       print OUT "GB\n" if($r_gen->{"GB"});
+       print OUT "PB\n" if($r_gen->{"PB"});
+-      print OUT "MS\n" if($r_gen->{"GB"} || $r_gen->{"PB"} || $r_gen->{"MS"}); # Implicit use of sander/pbsa SAS
+-      print OUT "NM\n" if($r_gen->{"NM"});                                     # calc if not MS set
++      print OUT "MS\n" if($r_gen->{"GB"} || ($r_gen->{"PB"} && ($r_del->{"PROC"} != 3)) ||
++			   $r_gen->{"MS"}); # Implicit use of sander/pbsa SAS (disabled for iAPBS)
++      print OUT "NM\n" if($r_gen->{"NM"});    # calc if not MS set
+     }
+     else{
+       # Re-open existing file
+@@ -138,6 +139,11 @@
+ 	  my $pbsaout = "pbsa" . $suf . "." . $number . ".out";
+ 	  &calc_pbsa(*OUT,"pbsa.in",$pbsaout,$ncrdfile,$npar,$r_gen,$r_pro,$r_del);
+ 	}
++	elsif($r_del->{"PROC"} == 3){
++	  my $pbsaout = "iapbs" . $suf . "." . $number . ".out";
++	  #my $pbsain  = "iapbs" . $suf . ".in";
++	  &calc_iapbs(*OUT,"iapbs.in",$pbsaout,$ncrdfile,$npar,$r_gen,$r_pro,$suf);
++	}
+       }
+ 
+       # Calc MS
+@@ -288,6 +294,68 @@
+   unlink $pbsaout if( ! $r_gen->{"VERBOSE"});
+ }
+ 
++sub calc_iapbs(){
++################
++
++  # Parameters: $OUT, $pbsain, $pbsaout, $ncrdfile, $npar, $r_gen, $r_pro
++
++  my $OUT = shift;
++  my $pbsain = shift;
++  my $pbsaout = shift;
++  my $ncrdfile = shift;
++  my $npar = shift;
++  my $r_gen = shift;
++  my $r_pro = shift;
++  my $suf = shift;
++
++  print "        Calc Amber/iAPBS\n";
++
++  my $command = $r_pro->{"IAPBS"} . " -O"   .
++                                    " -i "  . $pbsain .
++                                    " -o "  . $pbsaout .
++                                    " -c "  . $ncrdfile .
++                                    " -p "  . $npar;
++
++
++  my $pqrfname = "";
++  $pqrfname  = "com.pqr" if ($suf eq "_com");
++  $pqrfname  = "rec.pqr" if ($suf eq "_rec");
++  $pqrfname  = "lig.pqr" if ($suf eq "_lig");
++
++  my $lncommand = "ln -s " . $pqrfname . " ./pqr";
++  system($lncommand) && die ("Linking pqr file $pqrfname failed!\n");
++  system($command) && die("        $command not successful\n");
++  system("rm -f ./pqr");
++
++  # Write MM results
++  open(IN,"$pbsaout") || die("        $pbsaout not opened\n");
++  my $finalflg = 0;
++  my $line;
++  while(defined($line = <IN>)){
++    if($line =~ /FINAL RESULTS/){
++      $finalflg = 1;
++    }
++    elsif($finalflg > 0){
++      if ($line =~ /VDWAALS.+EEL.+EPB. += +(-?\d+\.\d+)/){
++        #print OUT $line;
++        # Convert to kT, because back-conversion to kcal/mol is done in
++        #   mm_pbsa_statistics, subroutine treat_special 
++	#  (to be compatible with delphi calculation)
++        my $kcal2kt = 1000.0 * 4.184 / (300.0 * 8.314);
++        my $rfe = $1 * $kcal2kt;
++        printf OUT "%s %15.6f\n", "corrected reaction field energy:", $rfe;
++      }
++      elsif($line =~ /ENPOLAR +=/ && $r_gen->{"PB"} > 0 && $r_gen->{"MS"} == 0){
++        print OUT $line;
++      }
++    }
++  }
++  close(IN);
++
++  # Clean up MM
++  unlink $pbsaout;
++}
++
+ sub calc_delphi(){
+ ##################
+ 
+diff -ur mm_pbsa.orig/mm_pbsa_createinput.pm mm_pbsa/mm_pbsa_createinput.pm
+--- mm_pbsa.orig/mm_pbsa_createinput.pm	2006-05-01 02:38:51.000000000 -0700
++++ mm_pbsa/mm_pbsa_createinput.pm	2007-10-09 13:25:20.000000000 -0700
+@@ -51,6 +51,9 @@
+     elsif($r_del->{"PROC"} == 2){
+       &create_pbsa_input($r_gen, $r_san, $r_del);
+     }
++    elsif($r_del->{"PROC"} == 3){
++      &create_iapbs_input($r_gen, $r_san, $r_del);
++    }
+   }
+ 
+   if($r_gen->{"GC"} || $r_gen->{"AS"}){
+@@ -372,7 +375,7 @@
+ 
+       close(OUT);
+     }
+-  }
++   }
+   return;
+ }
+ 
+@@ -466,6 +469,83 @@
+   return;
+ }
+ 
++sub create_iapbs_input() {
++#########################
++  # Parameters: \%GEN,\%SAN,\%DEL
++  my $r_gen = shift;
++  my $r_san = shift;
++  my $r_del = shift;
++
++  print "    iAPBS input\n";
++
++  my ($igb, $dielc, $epsin, $epsout, $istrng, $radiopt, $sprob, 
++      $space, $maxitn, $npopt, $cavity_surften, $cavity_offset,
++      $srad, $bcfl, $srfm, $chgm, $swin);
++  # Do iAPBS calculation
++  $igb = 6;
++  $dielc = $r_san->{"DIELC"};
++  $epsin = $r_del->{"INDI"};
++  $epsout = $r_del->{"EXDI"};
++  my $pbions = "";
++  if(exists $r_del->{"ISTRNG"} && $r_del->{"ISTRNG"} > 0.0){
++      my $ionc = $r_del->{"ISTRNG"};
++      $pbions =  "  nion = 2, \n";
++      $pbions .= "  ionq  = 1.0, -1.0,\n";
++      $pbions .= "  ionrr = 2.0, 2.0,\n";
++      $pbions .= "  ionc  = $ionc, $ionc,\n";
++  } else {
++      $pbions =  "  nion = 0,\n";
++  }
++  $radiopt = $r_del->{"RADIOPT"};
++  $sprob = $r_del->{"PRBRAD"};
++  $space = 1.0 / $r_del->{"SCALE"}->[0];
++  $srad = $r_del->{"SRAD"};
++  $bcfl = $r_del->{"BCFL"};
++  $srfm = $r_del->{"SRFM"};
++  $chgm = $r_del->{"CHGM"};
++  $swin = $r_del->{"SWIN"};
++ # ($dimex, $dimey, $dimez) = split(/,/,$r_del->{"DIME"});
++ # ($fglenx, $fgleny, $fglenz) = split(/,/,$r_del->{"FGLEN"});
++ # ($cglenx, $cgleny, $cglenz) = split(/,/,$r_del->{"CGLEN"});
++
++  my $name = "iapbs.in";
++  open(OUT,">$name") || die("    $name not opened\n");
++  print OUT "File generated by mm_pbsa.pl. Using iAPBS\n";
++  print OUT " &cntrl\n";
++  print OUT "  ntf    = 1,       ntb    = 0,\n";
++  print OUT "  igb    = ${igb},      dielc  = ${dielc},\n";
++  print OUT "  cut    = 999.0,   nsnb   = 99999,\n";
++  print OUT "  scnb   = 2.0,     scee   = 1.2,\n";
++  print OUT "  imin   = 1,       maxcyc = 0,       ntmin  = 2,\n";
++  print OUT " &end\n";
++  # Here, only REFE == 0 calculations are allowed, whereby the reference state
++  #   is assumed to be INDI/INDI.
++  #   Hence, only one pbsa calc with EXDI/INDI is performed,
++  #     and the result taken is the reaction field energy 
++  #     (given as "ELE" in the pbsa output).
++  #   Consider scaling of coulombic interactions as well (by DIELC) if using INDI != 1.
++  # If SALT > 0.0, only one calculation is done here (compared to delphi).
++  #   For NLPB, see work of Tsui & Case, J. Phys. Chem. B 2001, 105, 11314
++  #     and salt_contrib and process_phi scripts in delphi directory.
++  # Here, a PBTEMP of 300K is used to compute the Boltzmann factor for the salt effect.
++  #   If a different temperature is specified here, also correct the factor for
++  #     kcal/mol -> kT conversion in the subroutine calc_pbsa.
++
++  print OUT " &apbs\n";
++  print OUT "  apbs_print=0, apbs_debug=0, calc_type = 0,\n";
++  print OUT "  grid = ${space}, ${space}, ${space},\n";
++  print OUT "  radiopt = ${radiopt}, pqr='pqr', \n";
++  print OUT "  sdie = ${epsout}, pdie = ${epsin}, srad=${srad}, \n";
++  print OUT "  cmeth=1, bcfl=${bcfl}, srfm=${srfm}, chgm=${chgm},\n";
++  print OUT $pbions;
++  print OUT "  swin=${swin}, calcforce=0, calcnpenergy=1 \n";
++  print OUT " &end\n";
++
++  close(OUT);
++  return;
++}
++
++
+ sub create_makecrd_input(){
+ ###########################
+ 
+diff -ur mm_pbsa.orig/mm_pbsa_readinput.pm mm_pbsa/mm_pbsa_readinput.pm
+--- mm_pbsa.orig/mm_pbsa_readinput.pm	2006-05-01 02:38:51.000000000 -0700
++++ mm_pbsa/mm_pbsa_readinput.pm	2007-10-09 13:25:20.000000000 -0700
+@@ -530,8 +530,18 @@
+ 	die  ("    Results of both calculations currently need to be combined \"manually\".\n");
+       }
+     }
++    elsif($r_del->{"PROC"} == 3){
++      # Test iapbs parameters
++      &test_par(\@RL_PAR,[$r_del]);
++      &test_fil(\@RL_FIL,[$r_del,$r_pro]);
++
++      # No focussing calc for REFE > 0
++      #if($r_del->{"REFE"} > 0){
++	#die("    PB calculation with REFE > 0 doesn't work with PROC equals 2\n");
++      #}
++    }
+     else{
+-      die("    PROC parameter in PB section must be 1 or 2\n");
++      die("    PROC parameter in PB section must be 1, 2 or 3\n");
+     }
+ 
+     # Test if DIELC and INDI agree (if REFE > 0, no test is performed)
+diff -ur mm_pbsa.orig/mm_pbsa_statistics.pm mm_pbsa/mm_pbsa_statistics.pm
+--- mm_pbsa.orig/mm_pbsa_statistics.pm	2006-05-01 02:38:51.000000000 -0700
++++ mm_pbsa/mm_pbsa_statistics.pm	2007-10-09 13:25:20.000000000 -0700
+@@ -132,6 +132,7 @@
+                      "PB"    => [1,0,'corrected reaction field energy: +(-?\d+\.\d+)'],
+                      "PBDIS" => [1,0,'EDISPER = +(-?\d+\.\d+)'],
+                      "PBCAV" => [1,0,'ECAVITY = +(\d+\.\d+)'],
++		     "PBNONPOL" => [1,0,'ENPOLAR = +(\d+\.\d+)'],
+                      "PBSUR" => [3,5],
+                      "PBCAL" => [3,6],
+                      "PBSOL" => [2,7,'+PB_PBCAL+PB_PBSUR+PB_PBDIS'],
+@@ -1338,13 +1339,32 @@
+             }
+           }
+           elsif($calc eq "PB" && $var eq "PBSUR"){
++            # Convert PB from kT to kcal/mol
++            my $kt2kcal = $R * $TEMP / 4.184 / 1000.0;
+             # Calc nonpolar contribution for PB
+             $DATA->[$i]->{$calc}->{$var} = [];
+             my $j;
+-            for($j = 0; $j < scalar(@{$DATA->[$i]->{"PB"}->{"PBCAV"}}); $j++){
+-              push @{$DATA->[$i]->{$calc}->{$var}}, $gammaP * $DATA->[$i]->{"PB"}->{"PBCAV"}->[$j] + $betaP;
+-            }
+-          }
++	    if (defined ($DATA->[$i]->{"PB"}->{"PBNONPOL"}->[0])){
++		for($j = 0; $j < scalar(@{$DATA->[$i]->{"PB"}->{"PBNONPOL"}}); $j++){
++		    push @{$DATA->[$i]->{$calc}->{$var}}, $DATA->[$i]->{"PB"}->{"PBNONPOL"}->[$j];
++		    # PBCAV and PBDIS are missing when doing iAPBS calculation
++		    # zero them out so the rest of the script can proceed
++		    $DATA->[$i]->{"PB"}->{"PBCAV"}->[$j] = 0.;
++		    $DATA->[$i]->{"PB"}->{"PBDIS"}->[$j] = 0.;
++		    print "rok INSIDE\n";
++		    #print "$DATA->[$i]->{$calc}->{$var}->[$j] \n";
++		}
++	    }
++	    else {
++		for($j = 0; $j < scalar(@{$DATA->[$i]->{"PB"}->{"PBCAV"}}); $j++){
++		    push @{$DATA->[$i]->{$calc}->{$var}}, $gammaP * $DATA->[$i]->{"PB"}->{"PBCAV"}->[$j] + $betaP;
++		    # zero out PBNONPOL
++		    $DATA->[$i]->{"PB"}->{"PBNONPOL"}->[$j] = 0.;
++		    print "rok OUTSIDE\n";
++		}
++	    }
++	}
++
+ #          elsif($calc eq "GB" && $var eq "GBSUR"){
+ #            # Calc nonpolar contribution for GB
+ #            $DATA->[$i]->{$calc}->{$var} = [];
+diff -ur mm_pbsa.orig/mm_pbsa_util.pm mm_pbsa/mm_pbsa_util.pm
+--- mm_pbsa.orig/mm_pbsa_util.pm	2006-05-01 02:38:51.000000000 -0700
++++ mm_pbsa/mm_pbsa_util.pm	2007-10-09 13:30:21.000000000 -0700
+@@ -42,6 +42,7 @@
+ 
+   $r_pro->{"SANDER"}   = "$amberexe" . "/" . "sander";
+   $r_pro->{"PBSA"}     = "$amberexe" . "/" . "sander"; # Was "pbsa" up to Amber9.
++  $r_pro->{"IAPBS"}    = "$amberexe" . "/" . "sander.APBS";
+   $r_pro->{"NMODE"}    = "$amberexe" . "/" . "nmode";
+   $r_pro->{"AMBPDB"}   = "$amberexe" . "/" . "ambpdb";
+   $r_pro->{"MS"}       = "$amberexe" . "/" . "molsurf";
+@@ -67,6 +68,9 @@
+     elsif($r_del->{"PROC"} == 2){
+       unlink "pbsa.in" if(-e "pbsa.in" && ! $r_gen->{"VERBOSE"});
+     }
++    elsif($r_del->{"PROC"} == 3){
++      unlink "iapbs.in" if(-e "iapbs.in");
++    }
+   }
+ 
+   if( ! $r_gen->{"VERBOSE"}){

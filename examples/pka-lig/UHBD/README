@@ -1,0 +1,22 @@
+The calculations were done two ways:
+
+UHBD1 ==> molecular surface-baed dielectric definition
+
+  The files uhbd1-bin.out, uhbd1-apo.out, and uhbd1-lig.out contain the
+  total electrostatic energies for the complex, apo protein, and ligand
+  respectively.  Subtracting the apo and ligand energies from the
+  complex energy gives the change binding energy:
+
+    DGbind = 161106.68491555 - 159047.22267973 - 2038.8019114004 kcal/mol
+           = 20.660 kcal/mol = 86.50 kJ/mol
+
+UHBD2 ==> van der Waals-based dielectric definition
+
+  The files uhbd2-bin.out, uhbd2-apo.out, and uhbd2-lig.out contain the
+  total electrostatic energies for the complex, apo protein, and ligand
+  respectively.  Subtracting the apo and ligand energies from the
+  complex energy gives the change binding energy:
+
+    DGbind = 160097.85343977 - 158065.92915468 - 2029.8041091354 kcal/mol
+           = 2.120 kcal/mol = 8.876 kJ/mol
+

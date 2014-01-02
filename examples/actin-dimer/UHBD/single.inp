@@ -1,0 +1,32 @@
+read                   ! read
+    mol 1              ! molecule 1
+    file 'prot3.pdb'      ! from pdb file
+    pdb                ! in free-format PDB format
+end
+read                   ! read
+    mol 2              ! molecule 1
+    file 'prot4.pdb'      ! from pdb file
+    pdb                ! in free-format PDB format
+end
+set
+    charge             ! the charges
+    radii              ! and the radii
+    param CHARMM23        ! using parameter set "amber"
+    file 'aheall-atom.charmm.dat'     ! from the file "ahe.dat"
+end
+
+elec                   ! calculate the electrostatic potential
+    calc
+    dime 97 97 97 
+    grid 1.5           ! using a grid spacing of 1.0 Angstroms
+    all 
+    ions 50.0 
+    maxits 500
+    pdie  2.0
+    nsph 200
+    sdie 78.4
+    rion 2.0
+    nmap 1.4           ! use probe-accessible surface
+    bcfl 1             ! using boundary condition 2
+    gcent   2.821 -0.073 0.815 
+end

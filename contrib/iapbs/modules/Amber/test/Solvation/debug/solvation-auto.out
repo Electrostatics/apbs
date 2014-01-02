@@ -1,0 +1,392 @@
+
+          -------------------------------------------------------
+          Amber 9  SANDER                              2006
+          -------------------------------------------------------
+
+| Run on 09/24/2007 at 22:02:40
+  [-O]verwriting output
+
+File Assignments:
+|  MDIN: solvation-auto.in                                                     
+| MDOUT: Ba                                                                    
+|INPCRD: 2ala.prmcrd                                                           
+|  PARM: 2ala.prmtop                                                           
+|RESTRT: restrt                                                                
+|  REFC: refc                                                                  
+| MDVEL: mdvel                                                                 
+|  MDEN: mden                                                                  
+| MDCRD: mdcrd                                                                 
+|MDINFO: mdinfo                                                                
+|INPDIP: inpdip                                                                
+|RSTDIP: rstdip                                                                
+
+ 
+ Here is the input file:
+ 
+APBS solvation energy example                                                  
+&cntrl                                                                         
+   maxcyc=0, imin=1,                                                           
+   cut=12.0,                                                                   
+   igb=6, ntb=0,                                                               
+   ntpr=1,                                                                     
+ /                                                                             
+&apbs                                                                          
+    apbs_debug=9,                                                              
+    apbs_print=1,                                                              
+fglen= 13.801,  18.154,  10.192,                                               
+cglen=   13.801,  18.154  10.192,                                              
+dime=  33, 33, 33,                                                             
+    calc_type=1,                                                               
+    cmeth=1,                                                                   
+ bcfl=2,                                                                       
+ srfm=1,                                                                       
+ chgm=1,                                                                       
+ pdie=1.0,                                                                     
+ sdie=78.54,                                                                   
+ srad = 1.4,                                                                   
+ radiopt=3, pqr='2ala.pqr',                                                    
+ calcforce=0, calcnpenergy=1,                                                  
+&end                                                                           
+
+--------------------------------------------------------------------------------
+   1.  RESOURCE   USE: 
+--------------------------------------------------------------------------------
+
+| Flags:                                                                        
+| New format PARM file being parsed.
+| Version =    1.000 Date = 10/18/06 Time = 21:21:36
+ NATOM  =      22 NTYPES =       7 NBONH =      12 MBONA  =       9
+ NTHETH =      25 MTHETA =      11 NPHIH =      42 MPHIA  =      18
+ NHPARM =       0 NPARM  =       0 NNB   =      99 NRES   =       3
+ NBONA  =       9 NTHETA =      11 NPHIA =      18 NUMBND =       8
+ NUMANG =      16 NPTRA  =      16 NATYP =       7 NPHB   =       0
+ IFBOX  =       0 NMXRS  =      10 IFCAP =       0 NEXTRA =       0
+ NCOPY  =       0
+
+ Implicit solvent radii are modified Bondi radii (mbondi)                                                   
+
+|     Memory Use     Allocated
+|     Real                1592
+|     Hollerith            137
+|     Integer            21004
+|     Max Pairs              1
+|     nblistReal             0
+|     nblist Int             0
+|       Total               95 kbytes
+| Duplicated    0 dihedrals
+| Duplicated    0 dihedrals
+
+--------------------------------------------------------------------------------
+   2.  CONTROL  DATA  FOR  THE  RUN
+--------------------------------------------------------------------------------
+
+ACE                                                                             
+
+General flags:
+     imin    =       1, nmropt  =       0
+
+Nature and format of input:
+     ntx     =       1, irest   =       0, ntrx    =       1
+
+Nature and format of output:
+     ntxo    =       1, ntpr    =       1, ntrx    =       1, ntwr    =     500
+     iwrap   =       0, ntwx    =       0, ntwv    =       0, ntwe    =       0
+     ioutfm  =       0, ntwprt  =       0, idecomp =       0, rbornstat=      0
+
+Potential function:
+     ntf     =       1, ntb     =       0, igb     =       6, nsnb    =      25
+     ipol    =       0, gbsa    =       0, iesp    =       0
+     dielc   =   1.00000, cut     =  12.00000, intdiel =   1.00000
+     saltcon =   0.00000, offset  =   0.09000, gbalpha=    1.00000
+     gbbeta  =   0.00000, gbgamma =   0.00000, surften =   0.00500
+     rdt     =   0.00000, rgbmax  =  25.00000
+     alpb  =        0
+     scnb    =   2.00000, scee    =   1.20000
+
+Frozen or restrained atoms:
+     ibelly  =       0, ntr     =       0
+
+Energy minimization:
+     maxcyc  =       0, ncyc    =      10, ntmin   =       1
+     dx0     =   0.01000, drms    =   0.00010
+|  INFO: Old style inpcrd file read
+
+
+--------------------------------------------------------------------------------
+   3.  ATOMIC COORDINATES AND VELOCITIES
+--------------------------------------------------------------------------------
+
+ACE                                                                             
+ begin time read from input coords =     0.000 ps
+
+iAPBS: Initializing APBS interface
+iAPBS: Reading radii definition from pqr filename: 2ala.pqr                                                                                                                                                                                                                                                        
+
+ APBS calculation parameters:
+
+Nonlinear traditional PBE
+Multiple Debye-Huckel boundary conditions
+Smoothed molecular surface definition.
+Using cubic B-spline discretization
+Grid dimension:  33  33  33
+Coarse grid lengths:  13.801  18.154  10.192
+Fine grid lengths:  13.801  18.154  10.192
+Solute dielectric (pdie):   1.000
+Solvent dielectric (sdie):  78.540
+Temperature: 298.150
+Surface sphere density (sdens):  10.000
+Surface tension:   0.105
+radiopt is set to 3
+
+ Number of triangulated 3-point waters found:        0
+
+--------------------------------------------------------------------------------
+   4.  RESULTS
+--------------------------------------------------------------------------------
+
+iAPBS: unpacked coordinates, charge and radius:
+   1   2.000   1.000   0.000   0.112   1.487
+   2   2.000   2.090   0.000  -0.366   1.908
+   3   1.486   2.454   0.890   0.112   1.487
+   4   1.486   2.454  -0.890   0.112   1.487
+   5   3.427   2.641   0.000   0.597   1.908
+   6   4.391   1.877   0.000  -0.568   1.661
+   7   3.555   3.970   0.000  -0.416   1.824
+   8   2.733   4.556   0.000   0.272   0.600
+   9   4.853   4.614   0.000   0.034   1.908
+  10   5.408   4.316   0.890   0.082   1.387
+  11   5.661   4.221  -1.232  -0.182   1.908
+  12   5.123   4.521  -2.131   0.060   1.487
+  13   6.630   4.719  -1.206   0.060   1.487
+  14   5.809   3.141  -1.241   0.060   1.487
+  15   4.713   6.129   0.000   0.597   1.908
+  16   3.601   6.653   0.000  -0.568   1.661
+  17   5.846   6.835   0.000  -0.416   1.824
+  18   6.737   6.359   0.000   0.272   0.600
+  19   5.846   8.284   0.000  -0.149   1.908
+  20   4.819   8.648   0.000   0.098   1.387
+  21   6.360   8.648   0.890   0.098   1.387
+  22   6.360   8.648  -0.890   0.098   1.387
+iAPBS: Calling apbsdrv
+iAPBS: apbs return code:            0
+iAPBS: apbs return code:            0
+iAPBS: TotalForces:       1   4.108   0.761  -0.017
+iAPBS: TotalForces:       2   6.437   8.400   0.055
+iAPBS: TotalForces:       3   0.126  -1.054  -1.019
+iAPBS: TotalForces:       4   0.162  -1.035   0.979
+iAPBS: TotalForces:       5 -10.816  -5.205   3.291
+iAPBS: TotalForces:       6 -15.856  -9.593   9.277
+iAPBS: TotalForces:       7  -1.998 -18.943  -5.755
+iAPBS: TotalForces:       8   1.173   1.094  -0.176
+iAPBS: TotalForces:       9   8.610   9.436   1.432
+iAPBS: TotalForces:      10  -0.417  -0.207   1.012
+iAPBS: TotalForces:      11   0.958  -4.145  -7.140
+iAPBS: TotalForces:      12   0.424  -0.661  -1.502
+iAPBS: TotalForces:      13   1.974  -4.806  -3.120
+iAPBS: TotalForces:      14   9.767   6.261  -7.979
+iAPBS: TotalForces:      15  -1.239   0.475   7.502
+iAPBS: TotalForces:      16  -5.177  -1.051  -0.431
+iAPBS: TotalForces:      17  -1.541   8.188   3.810
+iAPBS: TotalForces:      18  -3.350  -2.477  -0.165
+iAPBS: TotalForces:      19   6.599   4.841  -0.004
+iAPBS: TotalForces:      20   0.937   6.805  -0.022
+iAPBS: TotalForces:      21  -0.437   1.472   0.515
+iAPBS: TotalForces:      22  -0.447   1.444  -0.543
+iAPBS: SolventForces:     1   0.000   0.000   0.000
+iAPBS: SolventForces:     2   0.000   0.000   0.000
+iAPBS: SolventForces:     3   0.000   0.000   0.000
+iAPBS: SolventForces:     4   0.000   0.000   0.000
+iAPBS: SolventForces:     5   0.000   0.000   0.000
+iAPBS: SolventForces:     6   0.000   0.000   0.000
+iAPBS: SolventForces:     7   0.000   0.000   0.000
+iAPBS: SolventForces:     8   0.000   0.000   0.000
+iAPBS: SolventForces:     9   0.000   0.000   0.000
+iAPBS: SolventForces:    10   0.000   0.000   0.000
+iAPBS: SolventForces:    11   0.000   0.000   0.000
+iAPBS: SolventForces:    12   0.000   0.000   0.000
+iAPBS: SolventForces:    13   0.000   0.000   0.000
+iAPBS: SolventForces:    14   0.000   0.000   0.000
+iAPBS: SolventForces:    15   0.000   0.000   0.000
+iAPBS: SolventForces:    16   0.000   0.000   0.000
+iAPBS: SolventForces:    17   0.000   0.000   0.000
+iAPBS: SolventForces:    18   0.000   0.000   0.000
+iAPBS: SolventForces:    19   0.000   0.000   0.000
+iAPBS: SolventForces:    20   0.000   0.000   0.000
+iAPBS: SolventForces:    21   0.000   0.000   0.000
+iAPBS: SolventForces:    22   0.000   0.000   0.000
+iAPBS: VacuumForces:      1   0.000   0.000   0.000
+iAPBS: VacuumForces:      2   0.000   0.000   0.000
+iAPBS: VacuumForces:      3   0.000   0.000   0.000
+iAPBS: VacuumForces:      4   0.000   0.000   0.000
+iAPBS: VacuumForces:      5   0.000   0.000   0.000
+iAPBS: VacuumForces:      6   0.000   0.000   0.000
+iAPBS: VacuumForces:      7   0.000   0.000   0.000
+iAPBS: VacuumForces:      8   0.000   0.000   0.000
+iAPBS: VacuumForces:      9   0.000   0.000   0.000
+iAPBS: VacuumForces:     10   0.000   0.000   0.000
+iAPBS: VacuumForces:     11   0.000   0.000   0.000
+iAPBS: VacuumForces:     12   0.000   0.000   0.000
+iAPBS: VacuumForces:     13   0.000   0.000   0.000
+iAPBS: VacuumForces:     14   0.000   0.000   0.000
+iAPBS: VacuumForces:     15   0.000   0.000   0.000
+iAPBS: VacuumForces:     16   0.000   0.000   0.000
+iAPBS: VacuumForces:     17   0.000   0.000   0.000
+iAPBS: VacuumForces:     18   0.000   0.000   0.000
+iAPBS: VacuumForces:     19   0.000   0.000   0.000
+iAPBS: VacuumForces:     20   0.000   0.000   0.000
+iAPBS: VacuumForces:     21   0.000   0.000   0.000
+iAPBS: VacuumForces:     22   0.000   0.000   0.000
+iAPBS: SolvForces:        1   0.000   0.000   0.000
+iAPBS: SolvForces:        2   0.000   0.000   0.000
+iAPBS: SolvForces:        3   0.000   0.000   0.000
+iAPBS: SolvForces:        4   0.000   0.000   0.000
+iAPBS: SolvForces:        5   0.000   0.000   0.000
+iAPBS: SolvForces:        6   0.000   0.000   0.000
+iAPBS: SolvForces:        7   0.000   0.000   0.000
+iAPBS: SolvForces:        8   0.000   0.000   0.000
+iAPBS: SolvForces:        9   0.000   0.000   0.000
+iAPBS: SolvForces:       10   0.000   0.000   0.000
+iAPBS: SolvForces:       11   0.000   0.000   0.000
+iAPBS: SolvForces:       12   0.000   0.000   0.000
+iAPBS: SolvForces:       13   0.000   0.000   0.000
+iAPBS: SolvForces:       14   0.000   0.000   0.000
+iAPBS: SolvForces:       15   0.000   0.000   0.000
+iAPBS: SolvForces:       16   0.000   0.000   0.000
+iAPBS: SolvForces:       17   0.000   0.000   0.000
+iAPBS: SolvForces:       18   0.000   0.000   0.000
+iAPBS: SolvForces:       19   0.000   0.000   0.000
+iAPBS: SolvForces:       20   0.000   0.000   0.000
+iAPBS: SolvForces:       21   0.000   0.000   0.000
+iAPBS: SolvForces:       22   0.000   0.000   0.000
+iAPBS: qfForces:          1   0.000   0.000   0.000
+iAPBS: qfForces:          2   0.000   0.000   0.000
+iAPBS: qfForces:          3   0.000   0.000   0.000
+iAPBS: qfForces:          4   0.000   0.000   0.000
+iAPBS: qfForces:          5   0.000   0.000   0.000
+iAPBS: qfForces:          6   0.000   0.000   0.000
+iAPBS: qfForces:          7   0.000   0.000   0.000
+iAPBS: qfForces:          8   0.000   0.000   0.000
+iAPBS: qfForces:          9   0.000   0.000   0.000
+iAPBS: qfForces:         10   0.000   0.000   0.000
+iAPBS: qfForces:         11   0.000   0.000   0.000
+iAPBS: qfForces:         12   0.000   0.000   0.000
+iAPBS: qfForces:         13   0.000   0.000   0.000
+iAPBS: qfForces:         14   0.000   0.000   0.000
+iAPBS: qfForces:         15   0.000   0.000   0.000
+iAPBS: qfForces:         16   0.000   0.000   0.000
+iAPBS: qfForces:         17   0.000   0.000   0.000
+iAPBS: qfForces:         18   0.000   0.000   0.000
+iAPBS: qfForces:         19   0.000   0.000   0.000
+iAPBS: qfForces:         20   0.000   0.000   0.000
+iAPBS: qfForces:         21   0.000   0.000   0.000
+iAPBS: qfForces:         22   0.000   0.000   0.000
+iAPBS: ibForces:          1   0.000   0.000   0.000
+iAPBS: ibForces:          2   0.000   0.000   0.000
+iAPBS: ibForces:          3   0.000   0.000   0.000
+iAPBS: ibForces:          4   0.000   0.000   0.000
+iAPBS: ibForces:          5   0.000   0.000   0.000
+iAPBS: ibForces:          6   0.000   0.000   0.000
+iAPBS: ibForces:          7   0.000   0.000   0.000
+iAPBS: ibForces:          8   0.000   0.000   0.000
+iAPBS: ibForces:          9   0.000   0.000   0.000
+iAPBS: ibForces:         10   0.000   0.000   0.000
+iAPBS: ibForces:         11   0.000   0.000   0.000
+iAPBS: ibForces:         12   0.000   0.000   0.000
+iAPBS: ibForces:         13   0.000   0.000   0.000
+iAPBS: ibForces:         14   0.000   0.000   0.000
+iAPBS: ibForces:         15   0.000   0.000   0.000
+iAPBS: ibForces:         16   0.000   0.000   0.000
+iAPBS: ibForces:         17   0.000   0.000   0.000
+iAPBS: ibForces:         18   0.000   0.000   0.000
+iAPBS: ibForces:         19   0.000   0.000   0.000
+iAPBS: ibForces:         20   0.000   0.000   0.000
+iAPBS: ibForces:         21   0.000   0.000   0.000
+iAPBS: ibForces:         22   0.000   0.000   0.000
+iAPBS: npForces:          1   0.000   0.000   0.000
+iAPBS: npForces:          2   0.000   0.000   0.000
+iAPBS: npForces:          3   0.000   0.000   0.000
+iAPBS: npForces:          4   0.000   0.000   0.000
+iAPBS: npForces:          5   0.000   0.000   0.000
+iAPBS: npForces:          6   0.000   0.000   0.000
+iAPBS: npForces:          7   0.000   0.000   0.000
+iAPBS: npForces:          8   0.000   0.000   0.000
+iAPBS: npForces:          9   0.000   0.000   0.000
+iAPBS: npForces:         10   0.000   0.000   0.000
+iAPBS: npForces:         11   0.000   0.000   0.000
+iAPBS: npForces:         12   0.000   0.000   0.000
+iAPBS: npForces:         13   0.000   0.000   0.000
+iAPBS: npForces:         14   0.000   0.000   0.000
+iAPBS: npForces:         15   0.000   0.000   0.000
+iAPBS: npForces:         16   0.000   0.000   0.000
+iAPBS: npForces:         17   0.000   0.000   0.000
+iAPBS: npForces:         18   0.000   0.000   0.000
+iAPBS: npForces:         19   0.000   0.000   0.000
+iAPBS: npForces:         20   0.000   0.000   0.000
+iAPBS: npForces:         21   0.000   0.000   0.000
+iAPBS: npForces:         22   0.000   0.000   0.000
+iAPBS: dbForces:          1   0.000   0.000   0.000
+iAPBS: dbForces:          2   0.000   0.000   0.000
+iAPBS: dbForces:          3   0.000   0.000   0.000
+iAPBS: dbForces:          4   0.000   0.000   0.000
+iAPBS: dbForces:          5   0.000   0.000   0.000
+iAPBS: dbForces:          6   0.000   0.000   0.000
+iAPBS: dbForces:          7   0.000   0.000   0.000
+iAPBS: dbForces:          8   0.000   0.000   0.000
+iAPBS: dbForces:          9   0.000   0.000   0.000
+iAPBS: dbForces:         10   0.000   0.000   0.000
+iAPBS: dbForces:         11   0.000   0.000   0.000
+iAPBS: dbForces:         12   0.000   0.000   0.000
+iAPBS: dbForces:         13   0.000   0.000   0.000
+iAPBS: dbForces:         14   0.000   0.000   0.000
+iAPBS: dbForces:         15   0.000   0.000   0.000
+iAPBS: dbForces:         16   0.000   0.000   0.000
+iAPBS: dbForces:         17   0.000   0.000   0.000
+iAPBS: dbForces:         18   0.000   0.000   0.000
+iAPBS: dbForces:         19   0.000   0.000   0.000
+iAPBS: dbForces:         20   0.000   0.000   0.000
+iAPBS: dbForces:         21   0.000   0.000   0.000
+iAPBS: dbForces:         22   0.000   0.000   0.000
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+      1      -1.8500E+01     5.3610E+00     1.8943E+01     N           7
+
+ BOND    =        0.0206  ANGLE   =        0.3620  DIHED      =        8.1071
+ VDWAALS =        2.8120  EEL     =      -80.1238  EPB        =      -13.5448
+ 1-4 VDW =        5.0157  1-4 EEL =       48.9355  RESTRAINT  =        0.0000
+ ENPOLAR =        9.9161
+
+
+  Maximum number of minimization cycles reached.
+
+
+                    FINAL RESULTS
+
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+      1      -1.8500E+01     5.3610E+00     1.8943E+01     N           7
+
+ BOND    =        0.0206  ANGLE   =        0.3620  DIHED      =        8.1071
+ VDWAALS =        2.8120  EEL     =      -80.1238  EPB        =      -13.5448
+ 1-4 VDW =        5.0157  1-4 EEL =       48.9355  RESTRAINT  =        0.0000
+ ENPOLAR =        9.9161
+
+--------------------------------------------------------------------------------
+   5.  TIMINGS
+--------------------------------------------------------------------------------
+
+|    Read coords time           0.00 ( 0.02% of Total)
+|             PB Nonbond                 2.13 (100.0% of Nonbo)
+|          Nonbond force              2.13 (100.0% of Force)
+|       Force time                 2.13 (100.0% of Runmd)
+|    Runmd Time                 2.13 (99.87% of Total)
+|    Other                      0.00 ( 0.10% of Total)
+| Total time                 2.14 (100.0% of ALL  )
+
+| Highest rstack allocated:          0
+| Highest istack allocated:          0
+|           Job began  at 22:02:40.741  on 09/24/2007
+|           Setup done at 22:02:40.743  on 09/24/2007
+|           Run   done at 22:02:42.878  on 09/24/2007
+|     wallclock() was called      22 times

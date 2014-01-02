@@ -1,0 +1,35 @@
+APBS SMPBE example
+&cntrl
+   maxcyc=0, imin=1,
+   cut=12.0,
+   igb=6, ntb=0
+   ntpr=1,
+ /
+&apbs
+   apbs_debug = 0,
+   apbs_print= 1,
+   calc_type = 1,
+   fglen = 32, 32, 32,
+   cglen = 64, 64, 64,
+   dime =  65, 65, 65,
+   bcfl =2,
+   pdie= 2.0,
+   sdie= 78.54,
+   srfm=1,
+   chgm =1,
+   srad= 1.4,
+   swin= 0.3,
+   sdens= 10.0,
+   nonlin=4,
+   smvolume = 3, smsize= 5,
+   temp= 298.15,
+   gamma= 0.105,
+   calcenergy=1, calcforce=0, calcnpenergy=0,
+   nion=3,
+   ionq = 1, 1, -1,
+   ionc = 0.1, 0.1, 0.2,
+   ionrr = 1.7, 1.7, 1.7,
+   wpot = 1, wchg = 1, wsmol =1,
+   sp_apbs=.true.,
+&end
+    

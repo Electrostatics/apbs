@@ -1,0 +1,13 @@
+# One ion (+1), zero ionic strength, 298.15 K, 78.5 dielectric -- 
+# energies calculated with respect to vacuum and in units of kJ/mol
+# APBS/MC calculations to >30000 vertices
+# APBS/PMG calculations on 65^3 0.33 A mesh 
+#
+# Rad (A)  Analytical    APBS/MC        APBS/PMG
+#---------------------------------------------------------------------------
+1.00       -6.85695e+02	 -6.929870e+02  -656.997
+2.00       -3.42848e+02  -3.468645e+02  -338.54
+3.00       -2.28565e+02  -2.312688e+02  -225.462
+4.00       -1.71424e+02  -1.724572e+02  -169.833
+5.00       -1.37139e+02  -1.379879e+02  -136.117
+6.00       -1.14283e+02  -1.150489e+02  -113.592

@@ -1,0 +1,208 @@
+Index: Make.depends
+===================================================================
+RCS file: /namd/cvsroot/namd2/Make.depends,v
+retrieving revision 1.128
+diff -u -p -r1.128 Make.depends
+--- Make.depends	27 Oct 2009 18:52:28 -0000	1.128
++++ Make.depends	18 Nov 2009 04:00:59 -0000
+@@ -1497,6 +1497,7 @@ obj/ComputeMgr.o: \
+ 	src/GlobalMasterEasy.h \
+ 	src/GlobalMasterMisc.h \
+ 	src/GlobalMasterFreeEnergy.h \
++	src/GlobalMasterAPBS.h \
+ 	src/GlobalMasterColvars.h \
+ 	src/colvarmodule.h \
+ 	src/colvartypes.h \
+@@ -2657,6 +2658,17 @@ obj/GlobalMasterServer.o: \
+ 	src/GlobalMasterServer.h \
+ 	src/Debug.h
+ 	$(CXX) $(CXXFLAGS) $(COPTO)obj/GlobalMasterServer.o $(COPTC) src/GlobalMasterServer.C
++obj/GlobalMasterAPBS.o: \
++	src/GlobalMasterAPBS.C \
++	src/NamdTypes.h \
++	src/Vector.h \
++	src/common.h \
++	src/ResizeArray.h \
++	src/ResizeArrayRaw.h \
++	src/GlobalMaster.h \
++	src/GlobalMasterAPBS.h \
++	src/Debug.h
++	$(CXX) $(CXXFLAGS) $(COPTO)obj/GlobalMasterAPBS.o $(COPTC) src/GlobalMasterAPBS.C
+ obj/GlobalMasterTest.o: \
+ 	src/GlobalMasterTest.C \
+ 	src/NamdTypes.h \
+Index: Makefile
+===================================================================
+RCS file: /namd/cvsroot/namd2/Makefile,v
+retrieving revision 1.1261
+diff -u -p -r1.1261 Makefile
+--- Makefile	11 Nov 2009 05:19:01 -0000	1.1261
++++ Makefile	18 Nov 2009 04:00:59 -0000
+@@ -133,6 +133,7 @@ OBJS = \
+         $(DSTDIR)/FreeEnergyVector.o \
+ 	$(DSTDIR)/GlobalMaster.o \
+ 	$(DSTDIR)/GlobalMasterServer.o \
++	$(DSTDIR)/GlobalMasterAPBS.o \
+ 	$(DSTDIR)/GlobalMasterTest.o \
+ 	$(DSTDIR)/GlobalMasterIMD.o \
+ 	$(DSTDIR)/GlobalMasterTcl.o \
+@@ -309,7 +310,7 @@ CHARMLIB = $(CHARM)/lib
+ LIBS = $(CUDAOBJS) $(PLUGINLIB) $(DPMTALIBS) $(DPMELIBS) $(TCLDLL)
+ 
+ # CXX is platform dependent
+-CXXBASEFLAGS = $(COPTI)$(CHARMINC) $(COPTI)$(SRCDIR) $(COPTI)$(INCDIR) $(DPMTA) $(DPME) $(COPTI)$(PLUGININCDIR) $(COPTD)STATIC_PLUGIN $(TCL) $(FFT) $(CUDA) $(MEMOPT) $(CCS) $(RELEASE) $(EXTRADEFINES) $(TRACEOBJDEF)
++CXXBASEFLAGS = $(COPTI)$(CHARMINC) $(COPTI)$(SRCDIR) $(COPTI)$(INCDIR) $(DPMTA) $(DPME) $(COPTI)$(PLUGININCDIR) $(COPTD)STATIC_PLUGIN $(TCL) $(FFT) $(CUDA) $(MEMOPT) $(CCS) $(APBS) $(RELEASE) $(EXTRADEFINES) $(TRACEOBJDEF)
+ CXXFLAGS = $(CXXBASEFLAGS) $(CXXOPTS)
+ CXXTHREADFLAGS = $(CXXBASEFLAGS) $(CXXTHREADOPTS)
+ CXXSIMPARAMFLAGS = $(CXXBASEFLAGS) $(CXXSIMPARAMOPTS)
+@@ -351,6 +352,7 @@ namd2:	$(INCDIR) $(DSTDIR) $(OBJS) $(LIB
+ 	$(TCLLIB) \
+ 	$(FFTLIB) \
+ 	$(PLUGINLIB) \
++	$(APBSLIB) \
+ 	$(CHARMOPTS) \
+ 	-lm -o namd2
+ 
+Index: config
+===================================================================
+RCS file: /namd/cvsroot/namd2/config,v
+retrieving revision 1.55
+diff -u -p -r1.55 config
+--- config	12 Nov 2009 22:51:36 -0000	1.55
++++ config	18 Nov 2009 04:00:59 -0000
+@@ -28,6 +28,7 @@ syntax:
+   echo '  --arch-suffix <suffix for NAMD platform printed at startup>'
+   echo '  (the following are experimental features)'
+   echo '  --without-memopt (default)  --with-memopt'
++  echo '  --without-apbs (default)  --with-apbs'
+   echo '  --without-cuda (default)  --with-cuda'
+   echo '      (do NOT use CUDA-enabled Charm++, NAMD does not need it)'
+   echo '  --cuda-prefix <directory containing CUDA bin, lib, and include>'
+@@ -96,6 +97,7 @@ begin:
+   set use_fftw = 1
+   set use_cuda = 0
+   set use_memopt = 0
++  set use_apbs = 0
+ 
+   if ($#argv < 1) then
+     set PRINT_ARCH_LIST
+@@ -120,6 +122,14 @@ begin:
+   endif
+ 
+   if ($#argv < 1) goto syntax
++  if ( $1 == apbs ) then
++    set use_apbs = 1
++    shift
++  else
++    set use_apbs = 0
++  endif
++
++  if ($#argv < 1) goto syntax
+   if ( $1 == plugins ) then
+     echo 'The "plugins" flag is not needed; plugins are built automatically.'
+     shift
+@@ -230,6 +240,13 @@ begin:
+         set use_memopt = 1
+       breaksw
+ 
++      case --with-apbs:
++        set use_apbs = 1
++      breaksw
++      case --without-apbs:
++        set use_apbs = 0
++      breaksw
++
+       case --charm-base:
+         shift
+         if ( ! -d $1 ) then
+@@ -363,6 +380,8 @@ begin:
+ 
+   if ( $use_memopt ) echo 'MEMOPT=-DMEM_OPT_VERSION' >> Make.config
+ 
++  if ( $use_apbs ) echo 'include .rootdir/arch/$(NAMD_ARCH).apbs' >> Make.config
++
+   if ( $use_tcl ) then
+     if ( $?TCL_PREFIX ) then
+       echo "TCLDIR = $TCL_PREFIX" >> Make.config
+Index: src/ComputeMgr.C
+===================================================================
+RCS file: /namd/cvsroot/namd2/src/ComputeMgr.C,v
+retrieving revision 1.1081
+diff -u -p -r1.1081 ComputeMgr.C
+--- src/ComputeMgr.C	20 Jul 2009 20:51:39 -0000	1.1081
++++ src/ComputeMgr.C	18 Nov 2009 04:01:01 -0000
+@@ -74,6 +74,9 @@
+ #include "GlobalMasterEasy.h"
+ #include "GlobalMasterMisc.h"
+ #include "GlobalMasterFreeEnergy.h"
++#ifdef NAMD_APBS
++#include "GlobalMasterAPBS.h"
++#endif NAMD_APBS
+ #include "GlobalMasterColvars.h"
+ 
+ ComputeMgr::ComputeMgr()
+@@ -632,6 +635,10 @@ ComputeMgr::createComputes(ComputeMap *m
+             masterServerObject->addClient(new GlobalMasterFreeEnergy());
+ 		if ( simParams->colvarsOn )
+ 			masterServerObject->addClient(new GlobalMasterColvars());
++#ifdef NAMD_APBS
++	if ( simParams->apbsForcesOn )
++	    masterServerObject->addClient(new GlobalMasterAPBS);
++#endif NAMD_APBS
+ 
+     }
+ 
+Index: src/SimParameters.C
+===================================================================
+RCS file: /namd/cvsroot/namd2/src/SimParameters.C,v
+retrieving revision 1.1294
+diff -u -p -r1.1294 SimParameters.C
+--- src/SimParameters.C	12 Nov 2009 20:28:16 -0000	1.1294
++++ src/SimParameters.C	18 Nov 2009 04:01:01 -0000
+@@ -1169,6 +1169,13 @@ void SimParameters::config_parser_constr
+        "Configuration file for constant forces", PARSE_STRING);
+    opts.require("constantforce", "consForceScaling",
+        "Scaling factor for constant forces", &consForceScaling, 1.0);
++
++    ////  APBS solvation forces
++    opts.optionalB("main", "apbsForces", "Apply APBS solvation forces?",
++      &apbsForcesOn, FALSE);
++    opts.require("apbsForces", "apbsPQRFile", "Path to PQR file", apbsPQRFile);
++    opts.require("apbsForces", "apbsForcesConfig",
++        "Configuration file for APBS solvation forces", PARSE_MULTIPLES);
+  
+     //// Collective variables
+     opts.optionalB("main", "colvars", "Is the colvars module enabled?",
+@@ -3369,8 +3376,14 @@ void SimParameters::print_config(ParseOp
+    // Global forces configuration
+ 
+    globalForcesOn = ( tclForcesOn || freeEnergyOn || miscForcesOn ||
+-                      (IMDon) || SMDOn || TMDOn || colvarsOn );
++                      (IMDon) || SMDOn || TMDOn || colvarsOn ||
++                      apbsForcesOn );
+ 
++   if (apbsForcesOn) {
++      iout << iINFO << "APBS SOLVATION FORCES ACTIVE\n";
++      iout << iINFO << "    APBS PQR FILE: " << apbsPQRFile << "\n";
++      iout << endi;
++      }
+ 
+    if (tclForcesOn)
+    {
+Index: src/SimParameters.h
+===================================================================
+RCS file: /namd/cvsroot/namd2/src/SimParameters.h,v
+retrieving revision 1.1158
+diff -u -p -r1.1158 SimParameters.h
+--- src/SimParameters.h	11 Nov 2009 20:36:45 -0000	1.1158
++++ src/SimParameters.h	18 Nov 2009 04:01:02 -0000
+@@ -345,6 +345,9 @@ public:
+ 	Bool miscForcesOn;		//  Using misc forces?
+ 	Bool colvarsOn;         //  Using the colvars module?
+ 
++    Bool apbsForcesOn;      // Using APBS to compute solvation forces?
++    char apbsPQRFile[128];  // path to PQR file for charges and radii.
++
+ 	Bool fixedAtomsOn;		//  Are there fixed atoms?
+ 	Bool fixedAtomsForces;		//  Calculate forces anyway?
+ 

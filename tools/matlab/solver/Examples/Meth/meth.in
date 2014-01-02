@@ -1,0 +1,141 @@
+##########################################################################
+### ELECTROSTATIC ENERGY FOR METHANOL -> METHOXIDE IONIZATION
+### $Id: apbs-mol.in 1346 2009-02-10 21:11:14Z sdg0919 $
+###
+### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for
+### syntax help.
+##########################################################################
+
+read 
+    mol pqr methanol.pqr
+    mol pqr methoxide.pqr
+end
+
+# METHANOL SOLVATION ENERGY -- SOLVATED STATE
+elec name methanol-solv
+    mg-manual
+    dime 65 65 65
+    nlev 4
+    grid 0.25 0.25 0.25
+    gcent mol 1
+    mol 1
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.000 radius 2.0                
+    ion charge -1 conc 0.000 radius 2.0      
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm mol
+    srad 0.0
+    swin 0.3
+	sdens 10.0
+    temp 300.00
+    calcenergy total
+    calcforce no
+   write pot dx solvated-methanol-pot
+   write charge dx methanol-charge
+   write dielx dx solvated-methanol-dielx
+   write diely dx solvated-methanol-diely
+   write dielz dx solvated-methanol-dielz
+   write kappa dx solvated-methanol-kappa            
+end
+
+# METHANOL SOLVATION ENERGY -- REFERENCE STATE
+elec name methanol-ref
+    mg-manual
+    dime 65 65 65
+    nlev 4
+    grid 0.25 0.25 0.25
+    gcent mol 1
+    mol 1
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.000 radius 2.0                
+    ion charge -1 conc 0.000 radius 2.0 
+    pdie 2.0
+    sdie 1.00
+    chgm spl0
+    srfm mol
+    srad 0.0
+    swin 0.3      
+	sdens 10.0
+    temp 300.00
+    calcenergy total
+    calcforce no
+   write pot dx ref-methanol-pot
+   write dielx dx ref-methanol-dielx
+   write diely dx ref-methanol-diely
+   write dielz dx ref-methanol-dielz
+   write kappa dx ref-methanol-kappa            
+end
+
+# METHOXIDE SOLVATION ENERGY -- SOLVATED STATE
+elec name methoxide-solv
+    mg-manual
+    dime 65 65 65
+    nlev 4
+    grid 0.25 0.25 0.25
+    gcent mol 2
+    mol 2
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.000 radius 2.0                
+    ion charge -1 conc 0.000 radius 2.0 
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm mol
+    srad 0.0
+    swin 0.3      
+	sdens 10.0
+    temp 300.00
+    calcenergy total
+    calcforce no
+   write pot dx solvated-methoxide-pot
+   write charge dx methoxide-charge
+   write dielx dx solvated-methoxide-dielx
+   write diely dx solvated-methoxide-diely
+   write dielz dx solvated-methoxide-dielz
+   write kappa dx solvated-methoxide-kappa            
+end
+
+# METHOXIDE SOLVATION ENERGY -- REFERENCE STATE
+elec name methoxide-ref
+    mg-manual
+    dime 65 65 65
+    nlev 4
+    grid 0.25 0.25 0.25
+    gcent mol 2
+    mol 2
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.000 radius 2.0                
+    ion charge -1 conc 0.000 radius 2.0 
+    pdie 2.0
+    sdie 1.0
+    chgm spl0
+    srfm mol
+    srad 0.0
+    swin 0.3      
+	sdens 10.0
+    temp 300.00
+    calcenergy total
+    calcforce no
+   write pot dx ref-methoxide-pot
+   write dielx dx ref-methoxide-dielx
+   write diely dx ref-methoxide-diely
+   write dielz dx ref-methoxide-dielz
+   write kappa dx ref-methoxide-kappa            
+end
+
+# Methanol solvation energy
+print elecEnergy methanol-solv - methanol-ref end
+
+# Methoxide solvation energy
+print elecEnergy methoxide-solv - methoxide-ref end
+
+# Solvation energy difference
+print elecEnergy methoxide-solv - methoxide-ref - methanol-solv + methanol-ref end
+
+quit

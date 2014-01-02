@@ -1,0 +1,474 @@
+Charm++: standalone mode (not using charmrun)
+Charm++> cpu topology info is being gathered. 
+Charm++> 1 unique compute nodes detected. 
+Info: NAMD 2.7b1 for Linux-x86_64
+Info: 
+Info: Please visit http://www.ks.uiuc.edu/Research/namd/
+Info: and send feedback or bug reports to namd@ks.uiuc.edu
+Info: 
+Info: Please cite Phillips et al., J. Comp. Chem. 26:1781-1802 (2005)
+Info: in all publications reporting results obtained with NAMD.
+Info: 
+Info: Based on Charm++/Converse 60100 for net-linux-x86_64-iccstatic
+Info: Built Mon May 4 16:23:25 PDT 2009 by rok on morgan.ucsd.edu
+Info: 1 NAMD  2.7b1  Linux-x86_64  1    morgan.ucsd.edu  rok
+Info: Running on 1 processors.
+Info: Charm++/Converse parallel runtime startup completed at 0.00307703 s
+Info: 1.51997 MB of memory in use based on CmiMemoryUsage
+Info: Configuration file is apbs-md.conf
+TCL: Suspending until startup complete.
+Warning: The following variables were set in the
+Warning: configuation file but were not needed
+Warning:    langevinTemp
+Warning:    langevinDamping
+Warning:    langevinHydrogen
+Info: SIMULATION PARAMETERS:
+Info: TIMESTEP               1
+Info: NUMBER OF STEPS        100
+Info: STEPS PER CYCLE        20
+Info: LOAD BALANCE STRATEGY  New Load Balancers -- ASB
+Info: LDB PERIOD             4000 steps
+Info: FIRST LDB TIMESTEP     100
+Info: LAST LDB TIMESTEP     -1
+Info: LDB BACKGROUND SCALING 1
+Info: HOM BACKGROUND SCALING 1
+Info: MAX SELF PARTITIONS    20
+Info: MAX PAIR PARTITIONS    8
+Info: SELF PARTITION ATOMS   154
+Info: SELF2 PARTITION ATOMS   154
+Info: PAIR PARTITION ATOMS   318
+Info: PAIR2 PARTITION ATOMS  637
+Info: MIN ATOMS PER PATCH    100
+Info: INITIAL TEMPERATURE    300
+Info: CENTER OF MASS MOVING INITIALLY? NO
+Info: DIELECTRIC             1
+Info: EXCLUDE                SCALED ONE-FOUR
+Info: 1-4 SCALE FACTOR       0.833333
+Info: DCD FILENAME           output.dcd
+Info: DCD FREQUENCY          500
+Info: DCD FIRST STEP         500
+Info: NO EXTENDED SYSTEM TRAJECTORY OUTPUT
+Info: NO VELOCITY DCD OUTPUT
+Info: OUTPUT FILENAME        output
+Info: BINARY OUTPUT FILES WILL BE USED
+Info: RESTART FILENAME       output.restart
+Info: RESTART FREQUENCY      500
+Info: BINARY RESTART FILES WILL BE USED
+Info: SWITCHING ACTIVE
+Info: SWITCHING ON           9
+Info: SWITCHING OFF          10
+Info: PAIRLIST DISTANCE      11
+Info: PAIRLIST SHRINK RATE   0.01
+Info: PAIRLIST GROW RATE     0.01
+Info: PAIRLIST TRIGGER       0.3
+Info: PAIRLISTS PER CYCLE    2
+Info: PAIRLISTS ENABLED
+Info: MARGIN                 0
+Info: HYDROGEN GROUP CUTOFF  2.5
+Info: PATCH DIMENSION        13.5
+Info: CROSSTERM ENERGY INCLUDED IN DIHEDRAL
+Info: TIMING OUTPUT STEPS    100
+Info: APBS SOLVATION FORCES ACTIVE
+Info:     APBS PQR FILE: dipeptide.pqr
+Info: USING VERLET I (r-RESPA) MTS SCHEME.
+Info: C1 SPLITTING OF LONG RANGE ELECTROSTATICS
+Info: PLACING ATOMS IN PATCHES BY HYDROGEN GROUPS
+Info: RANDOM NUMBER SEED     1241479416
+Info: USE HYDROGEN BONDS?    NO
+Info: Using AMBER format force field!
+Info: AMBER PARM FILE        dipeptide.top
+Info: AMBER COORDINATE FILE  dipeptide.crd
+Info: Exclusions will be read from PARM file!
+Info: SCNB (VDW SCALING)     2
+Info: USING ARITHMETIC MEAN TO COMBINE L-J SIGMA PARAMETERS
+Reading parm file (dipeptide.top) ...
+PARM file in AMBER 7 format
+Info: SUMMARY OF PARAMETERS:
+Info: 8 BONDS
+Info: 14 ANGLES
+Info: 20 DIHEDRAL
+Info: 0 IMPROPER
+Info: 0 CROSSTERM
+Info: 0 VDW
+Info: 28 VDW_PAIRS
+Info: TIME FOR READING PDB FILE: 9.53674e-07
+Info: 
+Info: ****************************
+Info: STRUCTURE SUMMARY:
+Info: 20 ATOMS
+Info: 19 BONDS
+Info: 32 ANGLES
+Info: 53 DIHEDRALS
+Info: 0 IMPROPERS
+Info: 0 CROSSTERMS
+Info: 91 EXCLUSIONS
+Info: 57 DEGREES OF FREEDOM
+Info: 10 HYDROGEN GROUPS
+Info: TOTAL MASS = 142.16 amu
+Info: TOTAL CHARGE = 1.11759e-08 e
+Info: *****************************
+Info: 
+Info: Entering startup at 0.00748491 s, 1.75606 MB of memory in use
+Info: Startup phase 0 took 2.5034e-05 s, 1.75615 MB of memory in use
+Info: Startup phase 1 took 9.70364e-05 s, 1.76851 MB of memory in use
+Info: Startup phase 2 took 2.40803e-05 s, 1.77177 MB of memory in use
+Info: PATCH GRID IS 1 BY 1 BY 1
+Info: PATCH GRID IS 1-AWAY BY 1-AWAY BY 1-AWAY
+Info: REMOVING COM VELOCITY -1.51525 -0.693786 -0.544728
+Info: LARGEST PATCH (0) HAS 20 ATOMS
+Info: CREATING 12 COMPUTE OBJECTS
+Info: Startup phase 3 took 0.000138998 s, 1.80528 MB of memory in use
+Info: Startup phase 4 took 1.4782e-05 s, 1.80516 MB of memory in use
+Info: Startup phase 5 took 1.50204e-05 s, 1.80504 MB of memory in use
+LDB: Measuring processor speeds ... Done.
+Info: Startup phase 6 took 4.31538e-05 s, 1.80644 MB of memory in use
+Info: CREATING 12 COMPUTE OBJECTS
+Info: useSync: 1 useProxySync: 0
+Info: NONBONDED TABLE R-SQUARED SPACING: 0.0625
+Info: NONBONDED TABLE SIZE: 705 POINTS
+Info: ABSOLUTE IMPRECISION IN VDWA TABLE ENERGY: 7.88861e-31 AT 9.99687
+Info: RELATIVE IMPRECISION IN VDWA TABLE ENERGY: 1.10587e-16 AT 9.99687
+APBS: reading PQR file dipeptide.pqr
+APBS: total charge: 0.4061
+Info: Startup phase 7 took 0.00159788 s, 2.19533 MB of memory in use
+Info: Startup phase 8 took 4.31538e-05 s, 2.44765 MB of memory in use
+Info: Finished startup at 0.00948405 s, 2.44765 MB of memory in use
+
+APBS ENERGIES: ELEC: -34.9938 NONPOLAR: 9.09946
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:       0         0.0006         0.6006         3.6494         0.0000             18.5634         7.3412         0.0000       -25.8943        18.3465             22.6074       323.9440         4.2609        22.6178       323.9440
+
+APBS ENERGIES: ELEC: -34.804 NONPOLAR: 9.06852
+ENERGY:       1         1.5376         0.8360         3.6761         0.0000             18.7128         7.0544         0.0000       -25.7355        16.6587             22.7402       294.1422         6.0815        22.6135       294.1422
+
+APBS ENERGIES: ELEC: -34.7814 NONPOLAR: 9.04257
+ENERGY:       2         4.1050         2.0265         3.7312         0.0000             18.7697         6.7471         0.0000       -25.7389        13.2978             22.9383       234.7984         9.6405        22.6307       234.7984
+
+APBS ENERGIES: ELEC: -34.9342 NONPOLAR: 9.0473
+ENERGY:       3         4.8330         3.8936         3.8096         0.0000             18.6937         6.4551         0.0000       -25.8869        11.1742             22.9724       197.3027        11.7982        22.6723       197.3027
+
+APBS ENERGIES: ELEC: -35.2475 NONPOLAR: 9.06266
+ENERGY:       4         3.7935         5.9455         3.9038         0.0000             18.4950         6.1973         0.0000       -26.1849        10.6924             22.8427       188.7947        12.1503        22.7025       188.7947
+
+APBS ENERGIES: ELEC: -35.6706 NONPOLAR: 9.10248
+ENERGY:       5         3.4839         7.6588         4.0055         0.0000             18.2325         5.9866         0.0000       -26.5681        10.0062             22.8055       176.6793        12.7993        22.7469       176.6793
+
+APBS ENERGIES: ELEC: -36.0883 NONPOLAR: 9.1289
+ENERGY:       6         5.1893         8.6430         4.1079         0.0000             17.9867         5.8340         0.0000       -26.9594         8.1559             22.9573       144.0078        14.8015        22.7957       144.0078
+
+APBS ENERGIES: ELEC: -36.3549 NONPOLAR: 9.17654
+ENERGY:       7         7.1444         8.7300         4.2061         0.0000             17.8209         5.7473         0.0000       -27.1783         6.7204             23.1908       118.6620        16.4703        22.8974       118.6620
+
+APBS ENERGIES: ELEC: -36.3838 NONPOLAR: 9.18928
+ENERGY:       8         6.8290         8.0003         4.2975         0.0000             17.7522         5.7304         0.0000       -27.1946         7.8185             23.2333       138.0501        15.4148        22.9831       138.0501
+
+APBS ENERGIES: ELEC: -36.2204 NONPOLAR: 9.19457
+ENERGY:       9         4.2543         6.7580         4.3816         0.0000             17.7486         5.7847         0.0000       -27.0258        11.1984             23.0999       197.7300        11.9015        23.0525       197.7300
+
+APBS ENERGIES: ELEC: -36.0002 NONPOLAR: 9.14963
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      10         1.9874         5.4485         4.4603         0.0000             17.7496         5.9102         0.0000       -26.8505        14.2380             22.9434       251.3989         8.7054        23.0480       251.3989
+
+APBS ENERGIES: ELEC: -35.8406 NONPOLAR: 9.10707
+ENERGY:      11         2.0415         4.5216         4.5365         0.0000             17.6968         6.1032         0.0000       -26.7336        14.7961             22.9621       261.2544         8.1660        23.0312       261.2544
+
+APBS ENERGIES: ELEC: -35.8027 NONPOLAR: 9.08566
+ENERGY:      12         3.7246         4.2685         4.6121         0.0000             17.5620         6.3522         0.0000       -26.7170        13.2858             23.0882       234.5860         9.8024        23.0287       234.5860
+
+APBS ENERGIES: ELEC: -35.9065 NONPOLAR: 9.08106
+ENERGY:      13         5.0038         4.7032         4.6863         0.0000             17.3575         6.6320         0.0000       -26.8254        11.5781             23.1354       204.4339        11.5573        23.0313       204.4339
+
+APBS ENERGIES: ELEC: -36.1434 NONPOLAR: 9.07688
+ENERGY:      14         5.2255         5.5638         4.7547         0.0000             17.1267         6.8992         0.0000       -27.0665        10.5530             23.0563       186.3332        12.5033        23.0178       186.3332
+
+APBS ENERGIES: ELEC: -36.4606 NONPOLAR: 9.08577
+ENERGY:      15         5.5472         6.4390         4.8097         0.0000             16.9251         7.0939         0.0000       -27.3748         9.5644             23.0044       168.8783        13.4400        23.0115       168.8783
+
+APBS ENERGIES: ELEC: -36.7472 NONPOLAR: 9.15109
+ENERGY:      16         6.8547         6.9392         4.8438         0.0000             16.8004         7.1493         0.0000       -27.5961         8.1321             23.1233       143.5883        14.9912        23.0719       143.5883
+
+APBS ENERGIES: ELEC: -36.867 NONPOLAR: 9.1934
+ENERGY:      17         8.2790         6.8398         4.8513         0.0000             16.7782         7.0138         0.0000       -27.6736         7.1687             23.2572       126.5772        16.0885        23.1232       126.5772
+
+APBS ENERGIES: ELEC: -36.7468 NONPOLAR: 9.20965
+ENERGY:      18         8.2944         6.1535         4.8314         0.0000             16.8597         6.6754         0.0000       -27.5371         7.9887             23.2660       141.0566        15.2773        23.1504       141.0566
+
+APBS ENERGIES: ELEC: -36.4459 NONPOLAR: 9.24108
+ENERGY:      19         6.7250         5.1177         4.7881         0.0000             17.0254         6.1725         0.0000       -27.2048        10.5517             23.1756       186.3108        12.6239        23.1773       186.3108
+
+APBS ENERGIES: ELEC: -36.1042 NONPOLAR: 9.24291
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      20         4.9081         4.1106         4.7294         0.0000             17.2412         5.5786         0.0000       -26.8613        13.3589             23.0655       235.8767         9.7066        23.1627       235.8767
+
+APBS ENERGIES: ELEC: -35.8525 NONPOLAR: 9.24385
+ENERGY:      21         3.9693         3.5282         4.6659         0.0000             17.4651         4.9717         0.0000       -26.6086        15.0643             23.0558       265.9903         7.9914        23.1521       265.9903
+
+APBS ENERGIES: ELEC: -35.7662 NONPOLAR: 9.24364
+ENERGY:      22         3.7073         3.6482         4.6070         0.0000             17.6561         4.4091         0.0000       -26.5226        15.5946             23.0997       275.3524         7.5051        23.1562       275.3524
+
+APBS ENERGIES: ELEC: -35.8712 NONPOLAR: 9.24848
+ENERGY:      23         3.4623         4.5186         4.5586         0.0000             17.7868         3.9206         0.0000       -26.6227        15.4930             23.1172       273.5582         7.6243        23.1757       273.5582
+
+APBS ENERGIES: ELEC: -36.1571 NONPOLAR: 9.22942
+ENERGY:      24         3.3799         5.9210         4.5214         0.0000             17.8542         3.5142         0.0000       -26.9276        14.8291             23.0922       261.8361         8.2632        23.1746       261.8361
+
+APBS ENERGIES: ELEC: -36.576 NONPOLAR: 9.22303
+ENERGY:      25         4.0819         7.4435         4.4912         0.0000             17.8836         3.1868         0.0000       -27.3529        13.3999             23.1340       236.6015         9.7341        23.1860       236.6015
+
+APBS ENERGIES: ELEC: -37.02 NONPOLAR: 9.24672
+ENERGY:      26         5.3501         8.6298         4.4615         0.0000             17.9187         2.9315         0.0000       -27.7733        11.7370             23.2553       207.2396        11.5183        23.2252       207.2396
+
+APBS ENERGIES: ELEC: -37.3412 NONPOLAR: 9.25115
+ENERGY:      27         5.9937         9.1396         4.4262         0.0000             17.9992         2.7412         0.0000       -28.0900        11.0935             23.3033       195.8772        12.2098        23.2369       195.8772
+
+APBS ENERGIES: ELEC: -37.4427 NONPOLAR: 9.26295
+ENERGY:      28         5.3067         8.8583         4.3814         0.0000             18.1386         2.6083         0.0000       -28.1798        12.1222             23.2357       214.0417        11.1135        23.2351       214.0417
+
+APBS ENERGIES: ELEC: -37.3463 NONPOLAR: 9.2922
+ENERGY:      29         4.0646         7.9198         4.3268         0.0000             18.3148         2.5238         0.0000       -28.0541        14.0374             23.1332       247.8580         9.0958        23.2273       247.8580
+
+APBS ENERGIES: ELEC: -37.1566 NONPOLAR: 9.30949
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      30         3.5188         6.6476         4.2664         0.0000             18.4787         2.4789         0.0000       -27.8471        15.5517             23.0950       274.5953         7.5433        23.2034       274.5953
+
+APBS ENERGIES: ELEC: -36.9825 NONPOLAR: 9.31823
+ENERGY:      31         3.7106         5.4477         4.2081         0.0000             18.5765         2.4663         0.0000       -27.6642        16.3960             23.1410       289.5029         6.7450        23.1919       289.5029
+
+APBS ENERGIES: ELEC: -36.895 NONPOLAR: 9.32652
+ENERGY:      32         3.5436         4.6859         4.1632         0.0000             18.5756         2.4817         0.0000       -27.5684        17.2882             23.1697       305.2571         5.8815        23.2085       305.2571
+
+APBS ENERGIES: ELEC: -36.9273 NONPOLAR: 9.28553
+ENERGY:      33         2.6129         4.5828         4.1442         0.0000             18.4781         2.5204         0.0000       -27.6418        18.3728             23.0694       324.4079         4.6966        23.1933       324.4079
+
+APBS ENERGIES: ELEC: -37.0748 NONPOLAR: 9.26506
+ENERGY:      34         2.1340         5.1608         4.1617         0.0000             18.3171         2.5729         0.0000       -27.8097        18.4715             23.0082       326.1506         4.5367        23.2088       326.1506
+
+APBS ENERGIES: ELEC: -37.2947 NONPOLAR: 9.25844
+ENERGY:      35         3.4051         6.2527         4.2216         0.0000             18.1416         2.6204         0.0000       -28.0363        16.4966             23.1017       291.2788         6.6051        23.2443       291.2788
+
+APBS ENERGIES: ELEC: -37.503 NONPOLAR: 9.27263
+ENERGY:      36         5.7819         7.5512         4.3231         0.0000             17.9998         2.6376         0.0000       -28.2304        13.2409             23.3041       233.7934        10.0632        23.2927       233.7934
+
+APBS ENERGIES: ELEC: -37.5752 NONPOLAR: 9.28311
+ENERGY:      37         7.0976         8.6888         4.4590         0.0000             17.9243         2.5999         0.0000       -28.2921        10.9316             23.4091       193.0185        12.4775        23.3203       193.0185
+
+APBS ENERGIES: ELEC: -37.4348 NONPOLAR: 9.3191
+ENERGY:      38         6.2359         9.3515         4.6188         0.0000             17.9229         2.4929         0.0000       -28.1157        10.8435             23.3499       191.4626        12.5064        23.3456       191.4626
+
+APBS ENERGIES: ELEC: -37.1144 NONPOLAR: 9.38075
+ENERGY:      39         4.5158         9.3902         4.7915         0.0000             17.9775         2.3175         0.0000       -27.7337        11.9874             23.2463       211.6612        11.2588        23.3717       211.6612
+
+APBS ENERGIES: ELEC: -36.7281 NONPOLAR: 9.42033
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      40         3.9677         8.8754         4.9684         0.0000             18.0497         2.0874         0.0000       -27.3078        12.6027             23.2434       222.5258        10.6407        23.3782       222.5258
+
+APBS ENERGIES: ELEC: -36.4078 NONPOLAR: 9.45414
+ENERGY:      41         4.7179         8.0702         5.1444         0.0000             18.0947         1.8228         0.0000       -26.9536        12.4793             23.3757       220.3469        10.8964        23.4079       220.3469
+
+APBS ENERGIES: ELEC: -36.263 NONPOLAR: 9.51029
+ENERGY:      42         4.9944         7.3367         5.3171         0.0000             18.0792         1.5449         0.0000       -26.7527        12.9706             23.4902       229.0220        10.5196        23.4783       229.0220
+
+APBS ENERGIES: ELEC: -36.3441 NONPOLAR: 9.53321
+ENERGY:      43         3.7748         7.0107         5.4848         0.0000             17.9934         1.2721         0.0000       -26.8109        14.6906             23.4155       259.3913         8.7249        23.5113       259.3913
+
+APBS ENERGIES: ELEC: -36.6431 NONPOLAR: 9.55165
+ENERGY:      44         2.4470         7.2882         5.6435         0.0000             17.8540         1.0179         0.0000       -27.0915        16.1389             23.2981       284.9643         7.1591        23.5293       284.9643
+
+APBS ENERGIES: ELEC: -37.0971 NONPOLAR: 9.54902
+ENERGY:      45         3.1048         8.1546         5.7859         0.0000             17.6966         0.7906         0.0000       -27.5481        15.3316             23.3162       270.7094         7.9845        23.5262       270.7094
+
+APBS ENERGIES: ELEC: -37.5763 NONPOLAR: 9.53232
+ENERGY:      46         5.6724         9.3805         5.9030         0.0000             17.5618         0.5940         0.0000       -28.0440        12.4231             23.4908       219.3537        11.0678        23.5280       219.3537
+
+APBS ENERGIES: ELEC: -37.9421 NONPOLAR: 9.52286
+ENERGY:      47         7.7494        10.5975         5.9864         0.0000             17.4779         0.4291         0.0000       -28.4192         9.8104             23.6316       173.2221        13.8212        23.5430       173.2221
+
+APBS ENERGIES: ELEC: -38.1091 NONPOLAR: 9.51702
+ENERGY:      48         7.5071        11.4476         6.0321         0.0000             17.4476         0.2960         0.0000       -28.5921         9.4300             23.5684       166.5054        14.1383        23.5421       166.5054
+
+APBS ENERGIES: ELEC: -38.0901 NONPOLAR: 9.52689
+ENERGY:      49         5.8945        11.7390         6.0412         0.0000             17.4455         0.1940         0.0000       -28.5632        10.6518             23.4028       188.0786        12.7510        23.5322       188.0786
+
+APBS ENERGIES: ELEC: -37.9712 NONPOLAR: 9.54258
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      50         5.2890        11.5163         6.0205         0.0000             17.4288         0.1212         0.0000       -28.4286        11.4053             23.3525       201.3819        11.9472        23.5296       201.3819
+
+APBS ENERGIES: ELEC: -37.8624 NONPOLAR: 9.5609
+ENERGY:      51         6.4087        11.0035         5.9794         0.0000             17.3584         0.0739         0.0000       -28.3015        10.9606             23.4829       193.5304        12.5224        23.5576       193.5304
+
+APBS ENERGIES: ELEC: -37.8588 NONPOLAR: 9.58753
+ENERGY:      52         7.5742        10.4690         5.9260         0.0000             17.2181         0.0483         0.0000       -28.2713        10.6656             23.6298       188.3212        12.9643        23.6165       188.3212
+
+APBS ENERGIES: ELEC: -37.9897 NONPOLAR: 9.59104
+ENERGY:      53         7.2103        10.1095         5.8648         0.0000             17.0229         0.0411         0.0000       -28.3986        11.7628             23.6127       207.6952        11.8499        23.6641       207.6952
+
+APBS ENERGIES: ELEC: -38.236 NONPOLAR: 9.57696
+ENERGY:      54         6.1157        10.0043         5.7974         0.0000             16.8086         0.0504         0.0000       -28.6591        13.3898             23.5073       236.4221        10.1175        23.6997       236.4221
+
+APBS ENERGIES: ELEC: -38.5494 NONPOLAR: 9.53144
+ENERGY:      55         6.4349        10.1290         5.7253         0.0000             16.6157         0.0741         0.0000       -29.0180        13.5194             23.4804       238.7105         9.9610        23.7022       238.7105
+
+APBS ENERGIES: ELEC: -38.8388 NONPOLAR: 9.51367
+ENERGY:      56         8.7444        10.3826         5.6508         0.0000             16.4750         0.1072         0.0000       -29.3251        11.5902             23.6251       204.6479        12.0348        23.7173       204.6479
+
+APBS ENERGIES: ELEC: -38.9732 NONPOLAR: 9.51545
+ENERGY:      57        11.1679        10.6156         5.5764         0.0000             16.4035         0.1404         0.0000       -29.4577         9.3284             23.7744       164.7109        14.4460        23.7347       164.7109
+
+APBS ENERGIES: ELEC: -38.8777 NONPOLAR: 9.49292
+ENERGY:      58        11.6907        10.6654         5.5034         0.0000             16.4036         0.1620         0.0000       -29.3848         8.6806             23.7211       153.2733        15.0404        23.6999       153.2733
+
+APBS ENERGIES: ELEC: -38.5863 NONPOLAR: 9.50076
+ENERGY:      59        10.5840        10.4068         5.4319         0.0000             16.4635         0.1615         0.0000       -29.0855         9.5990             23.5612       169.4886        13.9622        23.6619       169.4886
+
+APBS ENERGIES: ELEC: -38.2021 NONPOLAR: 9.51775
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      60         9.7917         9.8099         5.3612         0.0000             16.5582         0.1336         0.0000       -28.6844        10.5087             23.4790       185.5519        12.9703        23.6345       185.5519
+
+APBS ENERGIES: ELEC: -37.8636 NONPOLAR: 9.53542
+ENERGY:      61        10.2633         8.9835         5.2921         0.0000             16.6554         0.0800         0.0000       -28.3282        10.6110             23.5571       187.3570        12.9462        23.6427       187.3570
+
+APBS ENERGIES: ELEC: -37.686 NONPOLAR: 9.56884
+ENERGY:      62        10.8821         8.1611         5.2281         0.0000             16.7270         0.0073         0.0000       -28.1172        10.7949             23.6834       190.6058        12.8884        23.6944       190.6058
+
+APBS ENERGIES: ELEC: -37.7212 NONPOLAR: 9.61329
+ENERGY:      63        10.2757         7.6130         5.1756         0.0000             16.7606        -0.0767         0.0000       -28.1079        12.0664             23.7067       213.0560        11.6403        23.7598       213.0560
+
+APBS ENERGIES: ELEC: -37.9672 NONPOLAR: 9.64377
+ENERGY:      64         8.8597         7.5357         5.1405         0.0000             16.7649        -0.1644         0.0000       -28.3234        13.8212             23.6341       244.0406         9.8129        23.7986       244.0406
+
+APBS ENERGIES: ELEC: -38.3656 NONPOLAR: 9.69197
+ENERGY:      65         8.2963         7.9811         5.1257         0.0000             16.7673        -0.2499         0.0000       -28.6736        14.4039             23.6508       254.3292         9.2469        23.8456       254.3292
+
+APBS ENERGIES: ELEC: -38.7914 NONPOLAR: 9.68222
+ENERGY:      66         9.1819         8.8457         5.1293         0.0000             16.8043        -0.3277         0.0000       -29.1092        13.2132             23.7375       233.3049        10.5243        23.8342       233.3049
+
+APBS ENERGIES: ELEC: -39.1035 NONPOLAR: 9.67454
+ENERGY:      67        10.1783         9.9042         5.1460         0.0000             16.9053        -0.3926         0.0000       -29.4290        11.5137             23.8259       203.2968        12.3122        23.8165       203.2968
+
+APBS ENERGIES: ELEC: -39.2224 NONPOLAR: 9.6415
+ENERGY:      68         9.7807        10.8720         5.1699         0.0000             17.0769        -0.4394         0.0000       -29.5809        10.8651             23.7444       191.8451        12.8792        23.7466       191.8451
+
+APBS ENERGIES: ELEC: -39.151 NONPOLAR: 9.58276
+ENERGY:      69         8.2893        11.4828         5.1971         0.0000             17.2946        -0.4636         0.0000       -29.5683        11.3036             23.5354       199.5862        12.2319        23.6296       199.5862
+
+APBS ENERGIES: ELEC: -38.9663 NONPOLAR: 9.54935
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      70         7.2967        11.5700         5.2266         0.0000             17.5083        -0.4616         0.0000       -29.4170        11.7026             23.4255       206.6315        11.7230        23.5524       206.6315
+
+APBS ENERGIES: ELEC: -38.8008 NONPOLAR: 9.50149
+ENERGY:      71         7.4757        11.1335         5.2609         0.0000             17.6623        -0.4313         0.0000       -29.2993        11.6261             23.4280       205.2817        11.8019        23.4906       205.2817
+
+APBS ENERGIES: ELEC: -38.7452 NONPOLAR: 9.45754
+ENERGY:      72         7.7859        10.3480         5.3044         0.0000             17.7208        -0.3719         0.0000       -29.2876        11.9486             23.4482       210.9755        11.4996        23.4578       210.9755
+
+APBS ENERGIES: ELEC: -38.8318 NONPOLAR: 9.45124
+ENERGY:      73         7.1215         9.4748         5.3597         0.0000             17.6847        -0.2845         0.0000       -29.3806        13.4286             23.4043       237.1080         9.9757        23.4690       237.1080
+
+APBS ENERGIES: ELEC: -39.0465 NONPOLAR: 9.47012
+ENERGY:      74         6.0327         8.7218         5.4247         0.0000             17.5895        -0.1710         0.0000       -29.5763        15.3111             23.3324       270.3470         8.0214        23.5025       270.3470
+
+APBS ENERGIES: ELEC: -39.3304 NONPOLAR: 9.45505
+ENERGY:      75         6.0539         8.1587         5.4923         0.0000             17.4883        -0.0332         0.0000       -29.8754        16.0304             23.3151       283.0473         7.2848        23.5018       283.0473
+
+APBS ENERGIES: ELEC: -39.5659 NONPOLAR: 9.43938
+ENERGY:      76         7.5371         7.7377         5.5538         0.0000             17.4311         0.1276         0.0000       -30.1265        15.1588             23.4195       267.6573         8.2607        23.5037       267.6573
+
+APBS ENERGIES: ELEC: -39.623 NONPOLAR: 9.40852
+ENERGY:      77         8.9975         7.3734         5.6026         0.0000             17.4467         0.3108         0.0000       -30.2145        13.9859             23.5025       246.9488         9.5165        23.4914       246.9488
+
+APBS ENERGIES: ELEC: -39.4422 NONPOLAR: 9.39754
+ENERGY:      78         8.9366         7.0090         5.6366         0.0000             17.5380         0.5146         0.0000       -30.0446        13.8852             23.4754       245.1695         9.5902        23.4914       245.1695
+
+APBS ENERGIES: ELEC: -39.0625 NONPOLAR: 9.36535
+ENERGY:      79         7.6814         6.6382         5.6577         0.0000             17.6839         0.7341         0.0000       -29.6971        14.6474             23.3455       258.6279         8.6981        23.4591       258.6279
+
+APBS ENERGIES: ELEC: -38.6025 NONPOLAR: 9.34301
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      80         6.7573         6.2818         5.6693         0.0000             17.8488         0.9594         0.0000       -29.2595        15.0378             23.2948       265.5215         8.2570        23.4356       265.5215
+
+APBS ENERGIES: ELEC: -38.2104 NONPOLAR: 9.32633
+ENERGY:      81         6.7595         5.9549         5.6737         0.0000             17.9945         1.1765         0.0000       -28.8840        14.6857             23.3608       259.3039         8.6751        23.4262       259.3039
+
+APBS ENERGIES: ELEC: -37.994 NONPOLAR: 9.30604
+ENERGY:      82         6.6779         5.6695         5.6710         0.0000             18.0932         1.3714         0.0000       -28.6880        14.6213             23.4164       258.1675         8.7951        23.4190       258.1675
+
+APBS ENERGIES: ELEC: -38.0017 NONPOLAR: 9.30756
+ENERGY:      83         5.4990         5.4707         5.6613         0.0000             18.1357         1.5347         0.0000       -28.6941        15.7626             23.3700       278.3202         7.6073        23.4221       278.3202
+
+APBS ENERGIES: ELEC: -38.219 NONPOLAR: 9.30816
+ENERGY:      84         3.7840         5.4477         5.6461         0.0000             18.1335         1.6650         0.0000       -28.9109        17.4800             23.2454       308.6435         5.7654        23.4059       308.6435
+
+APBS ENERGIES: ELEC: -38.5591 NONPOLAR: 9.33394
+ENERGY:      85         3.0415         5.6759         5.6278         0.0000             18.1138         1.7671         0.0000       -29.2251        18.2204             23.2214       321.7168         5.0010        23.4136       321.7168
+
+APBS ENERGIES: ELEC: -38.8898 NONPOLAR: 9.36285
+ENERGY:      86         3.7672         6.1391         5.6059         0.0000             18.1093         1.8476         0.0000       -29.5270        17.3855             23.3276       306.9743         5.9422        23.4386       306.9743
+
+APBS ENERGIES: ELEC: -39.0806 NONPOLAR: 9.40288
+ENERGY:      87         4.8341         6.7090         5.5759         0.0000             18.1448         1.9111         0.0000       -29.6777        15.9680             23.4652       281.9458         7.4972        23.4888       281.9458
+
+APBS ENERGIES: ELEC: -39.0551 NONPOLAR: 9.42591
+ENERGY:      88         5.0250         7.1967         5.5311         0.0000             18.2264         1.9597         0.0000       -29.6291        15.1902             23.4999       268.2125         8.3097        23.5292       268.2125
+
+APBS ENERGIES: ELEC: -38.8482 NONPOLAR: 9.42222
+ENERGY:      89         4.5447         7.4314         5.4661         0.0000             18.3379         1.9944         0.0000       -29.4259        15.1000             23.4486       266.6200         8.3486        23.5409       266.6200
+
+APBS ENERGIES: ELEC: -38.5751 NONPOLAR: 9.41192
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:      90         4.4943         7.3202         5.3797         0.0000             18.4463         2.0185         0.0000       -29.1632        14.9450             23.4407       263.8832         8.4957        23.5465       263.8832
+
+APBS ENERGIES: ELEC: -38.3643 NONPOLAR: 9.36661
+ENERGY:      91         5.1731         6.8732         5.2767         0.0000             18.5159         2.0377         0.0000       -28.9977        14.5910             23.4700       257.6332         8.8790        23.5204       257.6332
+
+APBS ENERGIES: ELEC: -38.3056 NONPOLAR: 9.31408
+ENERGY:      92         5.6569         6.2014         5.1680         0.0000             18.5259         2.0603         0.0000       -28.9915        14.8379             23.4589       261.9912         8.6211        23.4780       261.9912
+
+APBS ENERGIES: ELEC: -38.4293 NONPOLAR: 9.27285
+ENERGY:      93         5.1914         5.4953         5.0678         0.0000             18.4816         2.0944         0.0000       -29.1565        16.1726             23.3465       285.5581         7.1740        23.4245       285.5581
+
+APBS ENERGIES: ELEC: -38.716 NONPOLAR: 9.21492
+ENERGY:      94         4.3442         4.9715         4.9882         0.0000             18.4138         2.1449         0.0000       -29.5011        17.8072             23.1687       314.4210         5.3614        23.3332       314.4210
+
+APBS ENERGIES: ELEC: -39.0907 NONPOLAR: 9.20769
+ENERGY:      95         4.2430         4.7838         4.9357         0.0000             18.3643         2.2116         0.0000       -29.8830        18.4634             23.1188       326.0077         4.6554        23.2890       326.0077
+
+APBS ENERGIES: ELEC: -39.4146 NONPOLAR: 9.21227
+ENERGY:      96         4.9770         4.9520         4.9105         0.0000             18.3667         2.2893         0.0000       -30.2023        17.8907             23.1839       315.8947         5.2932        23.2750       315.8947
+
+APBS ENERGIES: ELEC: -39.5349 NONPOLAR: 9.21767
+ENERGY:      97         5.4479         5.3675         4.9089         0.0000             18.4311         2.3714         0.0000       -30.3173        17.0435             23.2530       300.9362         6.2095        23.2864       300.9362
+
+APBS ENERGIES: ELEC: -39.372 NONPOLAR: 9.19476
+ENERGY:      98         4.9144         5.8551         4.9265         0.0000             18.5434         2.4530         0.0000       -30.1772        16.7062             23.2215       294.9811         6.5153        23.2865       294.9811
+
+APBS ENERGIES: ELEC: -38.9656 NONPOLAR: 9.16259
+ENERGY:      99         4.0483         6.2281         4.9604         0.0000             18.6758         2.5315         0.0000       -29.8030        16.5303             23.1713       291.8744         6.6410        23.2904       291.8744
+
+LDB: ============= START OF LOAD BALANCING ============== 33.5434
+LDB: ============== END OF LOAD BALANCING =============== 33.5435
+
+APBS ENERGIES: ELEC: -38.4698 NONPOLAR: 9.13825
+Info: Initial time: 1 CPUs 0.33538 s/step 3.88171 days/ns 2.4666 MB memory
+TIMING: 100  CPU: 33.8341, 0.335021/step  Wall: 33.869, 0.335388/step, 0 hours remaining, 2.466599 MB of memory in use.
+ETITLE:      TS           BOND          ANGLE          DIHED          IMPRP               ELECT            VDW       BOUNDARY           MISC        KINETIC               TOTAL           TEMP      POTENTIAL         TOTAL3        TEMPAVG
+
+ENERGY:     100         3.9480         6.3224         5.0092         0.0000             18.8009         2.6042         0.0000       -29.3315        15.8598             23.2130       280.0355         7.3532        23.3101       280.0355
+
+WRITING EXTENDED SYSTEM TO OUTPUT FILE AT STEP 100
+WRITING COORDINATES TO OUTPUT FILE AT STEP 100
+COORDINATE DCD FILE WAS NOT CREATED
+WRITING VELOCITIES TO OUTPUT FILE AT STEP 100
+====================================================
+
+WallClock: 33.877743  CPUTime: 33.842113  Memory: 2.347824 MB
+Program finished.

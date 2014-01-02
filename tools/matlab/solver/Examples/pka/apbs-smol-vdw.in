@@ -1,0 +1,194 @@
+##########################################################################
+### PROTEIN KINASE BINDING ENERGY -- VAN DER WAALS SURFACE
+### $Id: apbs-smol-vdw.in 1346 2009-02-10 21:11:14Z sdg0919 $
+###
+### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for
+### syntax help.
+##########################################################################
+
+read 
+    mol pqr bx6_7_lig_apbs.pqr
+    mol pqr bx6_7_apo_apbs.pqr
+    mol pqr bx6_7_bin_apbs.pqr
+end
+
+# LIGAND ENERGY (FOCUSING)
+elec name lig-coarse
+    mg-manual
+    dime 97 97 97
+    nlev 4
+    glen 70 70 70
+    gcent mol 3
+    mol 1
+    lpbe
+    bcfl sdh
+    ion charge 1 conc 0.000 radius 2.0                 
+    ion charge -1 conc 0.000 radius 2.0              
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm smol
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+    write pot dx coarse-ligand-pot
+    write charge dx coarse-ligand-charge
+    write dielx dx coarse-ligand-dielx
+    write diely dx coarse-ligand-diely
+    write dielz dx coarse-ligand-dielz
+    write kappa dx coarse-ligand-kappa
+end
+
+elec name lig-fine
+    mg-manual
+    dime 97 97 97
+    nlev 4
+    grid 0.25 0.25 0.25
+    gcent mol 1
+    mol 1
+    lpbe
+    bcfl focus
+    ion charge 1 conc 0.000 radius 2.0                 
+    ion charge -1 conc 0.000 radius 2.0 
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm smol
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+    write pot dx ligand-pot
+    write charge dx ligand-charge
+    write dielx dx ligand-dielx
+    write diely dx ligand-diely
+    write dielz dx ligand-dielz
+    write kappa dx ligand-kappa
+end
+
+# KINASE ENERGY (FOCUSING)
+elec name pka-coarse
+    mg-manual
+    dime 97 97 97
+    nlev 4
+    glen 70 70 70
+    gcent mol 3
+    mol 2
+    lpbe
+    bcfl sdh
+    ion charge 1 conc 0.000 radius 2.0                 
+    ion charge -1 conc 0.000 radius 2.0 
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm smol
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+    write pot dx coarse-pka-pot
+    write charge dx coarse-pka-charge
+    write dielx dx coarse-pka-dielx
+    write diely dx coarse-pka-diely
+    write dielz dx coarse-pka-dielz
+    write kappa dx coarse-pka-kappa
+end
+elec name pka-fine
+    mg-manual
+    dime 97 97 97
+    nlev 4
+    grid 0.25 0.25 0.25
+    gcent mol 1
+    mol 2
+    lpbe
+    bcfl focus
+    ion charge 1 conc 0.000 radius 2.0                 
+    ion charge -1 conc 0.000 radius 2.0 
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm smol
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+    write pot dx pka-pot
+    write charge dx pka-charge
+    write dielx dx pka-dielx
+    write diely dx pka-diely
+    write dielz dx pka-dielz
+    write kappa dx pka-kappa
+
+end
+
+# COMPLEX ENERGY (FOCUSING)
+elec name complex-coarse
+    mg-manual
+    dime 97 97 97
+    nlev 4
+    glen 70 70 70
+    gcent mol 3
+    mol 3
+    lpbe 
+    bcfl sdh
+    ion charge 1 conc 0.000 radius 2.0                 
+    ion charge -1 conc 0.000 radius 2.0 
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm smol
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+    write pot dx coarse-complex-pot
+    write charge dx coarse-complex-charge
+    write dielx dx coarse-complex-dielx
+    write diely dx coarse-complex-diely
+    write dielz dx coarse-complex-dielz
+    write kappa dx coarse-complex-kappa
+
+end
+elec name complex-fine
+    mg-manual
+    dime 97 97 97
+    nlev 4
+    grid 0.25 0.25 0.25
+    gcent mol 1
+    mol 3
+    lpbe
+    bcfl focus
+    ion charge 1 conc 0.000 radius 2.0                 
+    ion charge -1 conc 0.000 radius 2.0 
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm smol
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+    write pot dx complex-pot
+    write charge dx complex-charge
+    write dielx dx complex-dielx
+    write diely dx complex-diely
+    write dielz dx complex-dielz
+    write kappa dx complex-kappa
+end
+
+print elecEnergy complex-fine - lig-fine - pka-fine end
+
+quit

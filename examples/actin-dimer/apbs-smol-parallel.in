@@ -1,0 +1,100 @@
+##########################################################################
+### ACTIN DIMER BINDING ENERGY
+### $Id$
+###
+### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for
+### syntax help.
+##########################################################################
+
+read 
+    mol pqr mol1.pqr
+    mol pqr mol2.pqr
+    mol pqr complex.pqr
+end
+
+# CALCULATE POTENTIAL FOR COMPONENT 1
+elec name mol1
+    mg-para
+    ofrac 0.1
+    pdime 2 2 2
+    dime  97  97  97
+    fglen 112 91 116
+    cglen 156 121 162
+    cgcent mol 3
+    fgcent mol 3
+    mol 1
+    npbe
+    bcfl sdh
+    ion charge 1 conc 0.050 radius 2.0
+    ion charge -1 conc 0.050 radius 2.0
+    pdie 2.0
+    sdie 78.54
+    srfm smol
+    chgm spl0
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+
+# CALCULATE POTENTIAL FOR COMPONENT 2
+elec name mol2
+    mg-para
+    ofrac 0.1
+    pdime 2 2 2
+    dime  97  97  97
+    fglen 112 91 116
+    cglen 156 121 162
+    cgcent mol 3
+    fgcent mol 3
+    mol 2
+    npbe
+    bcfl sdh
+    ion charge 1 conc 0.050 radius 2.0
+    ion charge -1 conc 0.050 radius 2.0
+    pdie 2.0
+    sdie 78.54
+    srfm smol
+    chgm spl0
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+
+# CALCULATE POTENTIAL FOR COMPLEX
+elec name complex
+    mg-para
+    ofrac 0.1
+    pdime 2 2 2
+    dime  97  97  97
+    fglen 112 91 116
+    cglen 156 121 162
+    cgcent mol 3
+    fgcent mol 3
+    mol 3
+    npbe
+    bcfl sdh
+    ion charge 1 conc 0.050 radius 2.0
+    ion charge -1 conc 0.050 radius 2.0 
+    pdie 2.0
+    sdie 78.54
+    srfm smol
+    chgm spl0
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+    write pot dx pot
+end
+
+# COMBINE TO GIVE BINDING ENERGY
+print elecEnergy complex - mol1 - mol2 end
+
+quit

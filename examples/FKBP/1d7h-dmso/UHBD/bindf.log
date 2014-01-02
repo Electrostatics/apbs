@@ -1,0 +1,2761 @@
+
+
+ UNIVERSITY OF HOUSTON BROWNIAN DYNAMICS  (Release experimental)
+
+   AUTHORS                 : Jeffry Madura
+                           : Malcolm Davis
+                           : Rebecca Wade
+                           : Brock Luty
+                           : Michael Gilson
+                           : Jan Antosiewicz
+
+   date/time               : 27-Jan-2002  10:10:15 CST
+
+
+ CURRENT MAXIMUM PROGRAM DIMENSIONS     
+   Maximum Number of Atoms                           :     13000
+   Maximum Grid Size                                 :        65^3 
+   Maximum Number of Subunits                        :        40
+   Maximum Entries in Atomic Database                :      1000
+   Maximum Equivalences in Atomic Database           :      1000
+   Maximum Number of Runs                            :      1000
+   Maximum Number of Reaction Sites                  :        40
+   Maximum Number of Criteria per Reaction Site      :        10
+   Maximum Number of Columns in an Atomic Database   :        16
+   Maximum Number of Diffusing Units                 :         5
+   Maximum Number of Diffusing Subunits              :        15
+   Maximum Number of Distance Constraints            :        30
+   Maximum Number of Molecules                       :        50
+   Maximum Number of Time Step Regions               :         5
+   Maximum Number of Time Steps for Correlation Func.:        11
+   Maximum Number of Bins for Dihedral Distributions :       360
+   Maximum Number of Trajectories for Analysis       :         1
+   Maximum Number of Traj. Files to be Concatenated  :        10
+
+
+Main >  !
+Main >  ! Compute the binding energy of DMSO to
+Main >  ! the active site of FKBP-12. This example
+Main >  ! illustrates the use of focusing and the ability of UHBD to
+Main >  ! handle mathematical operations specified by the user in
+Main >  ! the input stream (see the assign statements below).
+Main >  !
+Main >  ! Files: bindf.inp - this file
+Main >  !        1d7h-min.qcd - coords for FKBP with charges and radii
+Main >  !        dmso-min.qcd - coords for substrate (DMSO) with charges and radii
+Main >  !
+Main >  
+Main >  !
+Main >  ! read in the coords., charges, and radii in CHARMM qcard
+Main >  ! format
+Main >  !
+Main >  read mol 1 file "1d7h-min.qcd" qcard end ! FKBP
+
+ READ MODULE
+ READ COORDINATES
+   Molecule number                                   :         1
+   Coordinate file                                   :1d7h-min.qcd        
+   File format                                       :qcard format        
+Total Net Charge for molecule  1 =    0.99100
+   Atoms read                                        :      1663
+
+
+Main >  read mol 2 file "dmso-min.qcd" qcard end ! DMSO
+
+ READ MODULE
+ READ COORDINATES
+   Molecule number                                   :         2
+   Coordinate file                                   :dmso-min.qcd        
+   File format                                       :qcard format        
+Total Net Charge for molecule  2 =    0.00000
+   Atoms read                                        :        10
+
+
+Main >  
+Main >  !
+Main >  ! Regular Runs:
+Main >  !               compute the potential on a coarse grid for
+Main >  !               molecule 1
+Main >  !
+Main >  
+Main >  elec calc mol 1
+Elec >   pdie   2.00                          ! internal dielectric=2
+Elec >   sdie  78.00                          ! solvent  dielectric=78
+Elec >   temp 300.00                          ! temperature in K
+Elec >   ions   0.10                          ! ionic strength
+Elec >   bcfl   2                             ! boundary condition - each atom
+Elec >                                        ! is a Debye-Huckel sphere
+Elec >   efld    .00                          ! external electric field
+Elec >   grid   1.50                          ! grid spacing
+Elec >   dime   60  60  60                    ! grid dimension
+Elec >   center                               ! center the grid on the molecule
+Elec >   maxit 200                            ! maximum # of iteration for FDPBE
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :   -22.065  A
+                                                         -29.091  A
+                                                         -27.672  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     1.500  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.100  mM
+   Debye-Huckel parameter                            :     0.003  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :      1663
+   X-coordinate of the center of geometry            :    23.685    A
+   Y-coordinate of the center of geometry            :    16.659    A
+   Z-coordinate of the center of geometry            :    18.078    A
+   Net charge of the selected atoms                  :     0.991    e
+   Effective radius of the selected atoms            :     1.821    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       200
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        82
+   Norm of the constant vector                       :0.1500E+03
+   Norm of the residual vector                       :0.1235E-03
+   Convergence achieved                              :0.8231E-06
+Main >  
+Main >  print elec phizero mol1 end           ! zero out the phisite accumulator
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phisave mol1 end           ! compute and store phi at atoms on grid
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  
+Main >  !
+Main >  !               compute the potential on a fine grid
+Main >  !               molecule 1 using the coarse grid to set the
+Main >  !               boundary potentials for this grid.
+Main >  !
+Main >  
+Main >  elec calc mol 1
+Elec >   pdie   2.00                          ! internal dielectric=2
+Elec >   sdie  78.00                          ! solvent  dielectric=78
+Elec >   temp 300.00                          ! temperature in K
+Elec >   ions   0.10                          ! ionic strength
+Elec >   bcfl   4                             ! focusing - use the coarse grid to
+Elec >                                        ! set the boundary potential of this
+Elec >                                        ! focused grid.
+Elec >   efld    .00                          ! external electric field
+Elec >   grid   0.225                         ! spacing for focused grid
+Elec >   dime   60  60  60                    ! grid dimension
+Elec >   mcenter 2
+Elec >   maxit 200                            ! maximum # of iteration for FDPBE
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid origin                                       :    11.135  A
+                                                          10.927  A
+                                                          13.593  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.225  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         4
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.100  mM
+   Debye-Huckel parameter                            :     0.003  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :      1663
+   X-coordinate of the center of geometry            :    23.685    A
+   Y-coordinate of the center of geometry            :    16.659    A
+   Z-coordinate of the center of geometry            :    18.078    A
+   Net charge of the selected atoms                  :     0.991    e
+   Effective radius of the selected atoms            :     1.821    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       200
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        96
+   Norm of the constant vector                       :0.3332E+03
+   Norm of the residual vector                       :0.3224E-03
+   Convergence achieved                              :0.9676E-06
+Main >  
+Main >  print elec phisave mol1 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phiwrite mol1 end          ! write the phisite potentials to the outp
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic Potential
+          Atom    Residue         X       Y       Z       Q      Potential
+PHI       1 n    gly     1      21.421   3.562  16.781   0.294  0.65462601E+02
+PHI       2 h1   gly     1      20.981   4.248  17.380   0.164  0.51312817E+02
+PHI       3 h2   gly     1      21.296   2.650  17.198   0.164  0.45638580E+02
+PHI       4 h3   gly     1      20.946   3.610  15.894   0.164  0.33050095E+02
+PHI       5 ca   gly     1      22.848   3.896  16.606  -0.010  0.48191444E+02
+PHI       6 ha2  gly     1      23.342   3.909  17.577   0.090  0.29477638E+02
+PHI       7 ha3  gly     1      23.326   3.156  15.966   0.090  0.23148483E+02
+PHI       8 c    gly     1      23.000   5.267  15.968   0.616  0.69238022E+02
+PHI       9 o    gly     1      22.003   5.938  15.724  -0.572  -.12882082E+00
+PHI      10 n    val     2      24.236   5.682  15.691  -0.416  -.16678632E+01
+PHI      11 h    val     2      25.030   5.093  15.909   0.272  -.31908271E+01
+PHI      12 ca   val     2      24.575   6.992  15.101  -0.088  0.13044152E+02
+PHI      13 ha   val     2      23.773   7.284  14.430   0.097  0.15072883E+02
+PHI      14 cb   val     2      24.727   8.093  16.168   0.299  0.14000528E+02
+PHI      15 hb   val     2      23.735   8.345  16.542  -0.030  0.13024246E+02
+PHI      16 cg1  val     2      25.599   7.609  17.325  -0.319  -.11991055E+02
+PHI      17 hg11 val     2      26.592   7.358  16.952   0.079  -.67937369E+01
+PHI      18 hg12 val     2      25.682   8.398  18.073   0.079  -.25374951E+01
+PHI      19 hg13 val     2      25.147   6.726  17.777   0.079  -.34101548E+01
+PHI      20 cg2  val     2      25.330   9.357  15.567  -0.319  0.17768261E+01
+PHI      21 hg21 val     2      24.682   9.727  14.772   0.079  0.68587723E+01
+PHI      22 hg22 val     2      25.426  10.118  16.341   0.079  -.28492019E+01
+PHI      23 hg23 val     2      26.315   9.131  15.156   0.079  0.99696326E+00
+PHI      24 c    val     2      25.873   6.898  14.303   0.597  0.92852829E+02
+PHI      25 o    val     2      26.802   6.217  14.729  -0.568  0.97818165E+01
+PHI      26 n    gln     3      25.876   7.506  13.123  -0.416  0.29134576E+01
+PHI      27 h    gln     3      25.029   7.948  12.797   0.272  -.45737634E+01
+PHI      28 ca   gln     3      27.045   7.549  12.269  -0.003  0.22428526E+02
+PHI      29 ha   gln     3      27.803   6.870  12.660   0.085  0.16898966E+02
+PHI      30 cb   gln     3      26.708   7.132  10.838  -0.004  0.11144646E+02
+PHI      31 hb2  gln     3      26.451   6.073  10.845   0.017  0.38821399E+01
+PHI      32 hb3  gln     3      25.846   7.713  10.510   0.017  0.25210152E+01
+PHI      33 cg   gln     3      27.871   7.365   9.881  -0.065  0.13773381E+02
+PHI      34 hg2  gln     3      27.905   8.430   9.650   0.035  0.66096506E+01
+PHI      35 hg3  gln     3      28.798   7.072  10.375   0.035  0.94752302E+01
+PHI      36 cd   gln     3      27.748   6.590   8.581   0.695  0.27095826E+01
+PHI      37 oe1  gln     3      28.318   5.504   8.436  -0.609  -.45942059E+02
+PHI      38 ne2  gln     3      27.013   7.149   7.621  -0.941  0.14958690E+01
+PHI      39 he21 gln     3      26.899   6.676   6.736   0.425  -.17759436E+01
+PHI      40 he22 gln     3      26.574   8.044   7.782   0.425  0.80428243E+00
+PHI      41 c    gln     3      27.565   8.984  12.298   0.597  0.21175629E+02
+PHI      42 o    gln     3      26.801   9.941  12.117  -0.568  -.21887739E+02
+PHI      43 n    val     4      28.863   9.133  12.544  -0.416  -.12985055E+02
+PHI      44 h    val     4      29.444   8.319  12.687   0.272  0.58025088E+01
+PHI      45 ca   val     4      29.486  10.446  12.618  -0.088  -.10328026E+02
+PHI      46 ha   val     4      28.774  11.268  12.552   0.097  0.27557211E+01
+PHI      47 cb   val     4      30.272  10.583  13.923   0.299  0.31855147E+01
+PHI      48 hb   val     4      31.121   9.900  13.900  -0.030  0.33018088E+01
+PHI      49 cg1  val     4      30.772  12.002  14.092  -0.319  -.34865582E+01
+PHI      50 hg11 val     4      29.924  12.686  14.115   0.079  -.31934395E+01
+PHI      51 hg12 val     4      31.330  12.083  15.025   0.079  -.31712883E+01
+PHI      52 hg13 val     4      31.424  12.260  13.257   0.079  0.21929002E+01
+PHI      53 cg2  val     4      29.417  10.134  15.103  -0.319  -.89118500E+01
+PHI      54 hg21 val     4      29.130   9.092  14.968   0.079  -.48291526E+01
+PHI      55 hg22 val     4      29.988  10.237  16.026   0.079  -.60157924E+01
+PHI      56 hg23 val     4      28.522  10.753  15.160   0.079  -.43612590E+01
+PHI      57 c    val     4      30.439  10.652  11.451   0.597  0.13431835E+02
+PHI      58 o    val     4      31.342   9.844  11.234  -0.568  -.35440071E+02
+PHI      59 n    glu     5      30.242  11.722  10.688  -0.516  0.18181772E+01
+PHI      60 h    glu     5      29.429  12.298  10.885   0.294  0.12164192E+00
+PHI      61 ca   glu     5      31.001  12.027   9.471   0.040  0.43838453E+01
+PHI      62 ha   glu     5      31.809  11.309   9.331   0.111  0.12343156E+02
+PHI      63 cb   glu     5      30.056  11.946   8.254   0.056  0.48409438E+01
+PHI      64 hb2  glu     5      29.244  12.654   8.407  -0.017  0.17420701E+01
+PHI      65 hb3  glu     5      30.606  12.253   7.362  -0.017  0.17827361E+01
+PHI      66 cg   glu     5      29.445  10.550   8.006   0.014  0.10418739E+01
+PHI      67 hg2  glu     5      30.208   9.897   7.578  -0.043  -.74337697E+00
+PHI      68 hg3  glu     5      29.131  10.121   8.955  -0.043  -.50639443E+01
+PHI      69 cd   glu     5      28.224  10.614   7.073   0.805  -.17140419E+02
+PHI      70 oe1  glu     5      27.151  10.029   7.382  -0.819  -.46797207E+02
+PHI      71 oe2  glu     5      28.270  11.341   6.053  -0.819  -.28083214E+02
+PHI      72 c    glu     5      31.605  13.431   9.630   0.537  0.81424370E+01
+PHI      73 o    glu     5      30.864  14.399   9.812  -0.582  -.70303268E+02
+PHI      74 n    thr     6      32.937  13.571   9.642  -0.416  0.25090384E+01
+PHI      75 h    thr     6      33.533  12.789   9.413   0.272  0.89449720E+01
+PHI      76 ca   thr     6      33.559  14.873   9.863  -0.039  0.18211619E+01
+PHI      77 ha   thr     6      33.132  15.334  10.753   0.101  0.82161236E+01
+PHI      78 cb   thr     6      35.081  14.736  10.062   0.365  0.20084036E+02
+PHI      79 hb   thr     6      35.523  14.344   9.146   0.004  0.14541633E+02
+PHI      80 cg2  thr     6      35.702  16.082  10.387  -0.244  0.50533791E+01
+PHI      81 hg21 thr     6      35.261  16.475  11.303   0.064  -.85929757E+00
+PHI      82 hg22 thr     6      36.777  15.964  10.523   0.064  0.96703517E+00
+PHI      83 hg23 thr     6      35.515  16.777   9.568   0.064  0.73689637E+01
+PHI      84 og1  thr     6      35.334  13.831  11.142  -0.676  -.20366945E+02
+PHI      85 hg1  thr     6      36.282  13.743  11.270   0.410  0.73395844E+01
+PHI      86 c    thr     6      33.331  15.829   8.723   0.597  0.36209106E+02
+PHI      87 o    thr     6      33.287  15.409   7.570  -0.568  -.18560791E+01
+PHI      88 n    ile     7      33.110  17.097   9.056  -0.416  0.93934278E+01
+PHI      89 h    ile     7      33.038  17.347  10.032   0.272  0.12075534E+02
+PHI      90 ca   ile     7      32.930  18.148   8.057  -0.060  0.17862751E+02
+PHI      91 ha   ile     7      32.921  17.695   7.065   0.087  0.23465514E+01
+PHI      92 cb   ile     7      31.615  18.957   8.271   0.130  0.25822340E+02
+PHI      93 hb   ile     7      31.542  19.237   9.322   0.019  0.16682859E+02
+PHI      94 cg2  ile     7      31.604  20.213   7.410  -0.320  -.77234826E+01
+PHI      95 hg21 ile     7      31.677  19.934   6.358   0.088  -.66524882E+01
+PHI      96 hg22 ile     7      30.677  20.761   7.577   0.088  -.10241809E+01
+PHI      97 hg23 ile     7      32.452  20.845   7.677   0.088  -.40996323E+01
+PHI      98 cg1  ile     7      30.406  18.080   7.919  -0.043  0.43681397E+01
+PHI      99 hg12 ile     7      30.377  17.982   6.834   0.024  0.24961057E+01
+PHI     100 hg13 ile     7      30.570  17.100   8.368   0.024  0.20252717E+01
+PHI     101 cd1  ile     7      29.088  18.648   8.411  -0.066  -.33305309E+01
+PHI     102 hd11 ile     7      28.924  19.628   7.962   0.019  -.22529683E+01
+PHI     103 hd12 ile     7      28.276  17.979   8.128   0.019  -.13335583E+01
+PHI     104 hd13 ile     7      29.117  18.746   9.496   0.019  0.18030068E+01
+PHI     105 c    ile     7      34.167  19.052   8.177   0.597  0.33355690E+02
+PHI     106 o    ile     7      34.752  19.469   7.174  -0.568  -.23913555E+02
+PHI     107 n    ser     8      34.582  19.379   9.404  -0.416  0.74841911E+00
+PHI     108 h    ser     8      34.037  19.070  10.202   0.272  -.14112005E+01
+PHI     109 ca   ser     8      35.850  20.049   9.699  -0.025  0.14371499E+02
+PHI     110 ha   ser     8      36.533  19.860   8.872   0.084  0.17839109E+02
+PHI     111 cb   ser     8      35.675  21.570   9.821   0.212  0.29369049E+01
+PHI     112 hb2  ser     8      36.649  22.036   9.974   0.035  0.21673635E+02
+PHI     113 hb3  ser     8      35.259  21.948   8.885   0.035  -.55804658E+01
+PHI     114 og   ser     8      34.813  21.938  10.882  -0.655  -.42480049E+02
+PHI     115 hg   ser     8      35.328  22.071  11.690   0.428  -.26186424E+02
+PHI     116 c    ser     8      36.436  19.458  10.981   0.597  0.33207867E+02
+PHI     117 o    ser     8      35.679  19.173  11.915  -0.568  -.60393457E+01
+PHI     118 n    pro     9      37.759  19.227  11.047  -0.255  -.11246960E+02
+PHI     119 cd   pro     9      38.769  19.568  10.054   0.019  0.39825909E+01
+PHI     120 hd2  pro     9      38.651  20.593   9.700   0.039  0.71759639E+01
+PHI     121 hd3  pro     9      38.709  18.868   9.220   0.039  0.29587851E+01
+PHI     122 cg   pro     9      40.115  19.414  10.761   0.019  0.34238942E+01
+PHI     123 hg2  pro     9      40.386  20.355  11.242   0.021  0.25699072E+01
+PHI     124 hg3  pro     9      40.900  19.096  10.074   0.021  0.49974785E+01
+PHI     125 cb   pro     9      39.829  18.358  11.828  -0.007  0.37250488E+01
+PHI     126 hb2  pro     9      40.515  18.439  12.671   0.025  0.22482259E+01
+PHI     127 hb3  pro     9      39.897  17.365  11.381   0.025  0.42380214E+01
+PHI     128 ca   pro     9      38.376  18.637  12.226  -0.027  0.61286840E+01
+PHI     129 ha   pro     9      37.882  17.699  12.479   0.064  0.12718159E+02
+PHI     130 c    pro     9      38.280  19.595  13.417   0.590  -.45536504E+01
+PHI     131 o    pro     9      38.417  20.807  13.262  -0.575  -.14318487E+02
+PHI     132 n    gly    10      38.084  19.027  14.606  -0.416  -.17763222E+02
+PHI     133 h    gly    10      37.986  18.026  14.648   0.272  -.17027184E+01
+PHI     134 ca   gly    10      38.401  19.704  15.860  -0.025  0.74866738E+01
+PHI     135 ha2  gly    10      38.201  20.773  15.788   0.070  0.82628403E+01
+PHI     136 ha3  gly    10      37.807  19.291  16.674   0.070  -.73514657E+01
+PHI     137 c    gly    10      39.874  19.513  16.186   0.597  0.50139375E+01
+PHI     138 o    gly    10      40.656  19.075  15.340  -0.568  -.31557571E+02
+PHI     139 n    asp    11      40.267  19.771  17.427  -0.516  -.12335505E+02
+PHI     140 h    asp    11      39.592  20.050  18.125   0.294  -.16060053E+01
+PHI     141 ca   asp    11      41.668  19.639  17.830   0.038  -.30373247E+01
+PHI     142 ha   asp    11      42.308  20.087  17.069   0.088  0.97165670E+01
+PHI     143 cb   asp    11      41.933  20.345  19.174  -0.030  0.16387559E+00
+PHI     144 hb2  asp    11      43.013  20.371  19.324  -0.012  0.53965783E+00
+PHI     145 hb3  asp    11      41.555  21.363  19.083  -0.012  -.13753549E+01
+PHI     146 cg   asp    11      41.276  19.667  20.355   0.799  -.14359397E+02
+PHI     147 od1  asp    11      41.378  20.229  21.462  -0.801  -.46818314E+02
+PHI     148 od2  asp    11      40.658  18.594  20.211  -0.801  -.43986221E+02
+PHI     149 c    asp    11      42.186  18.197  17.857   0.537  0.75341153E+01
+PHI     150 o    asp    11      43.387  17.967  18.001  -0.582  -.10103812E+02
+PHI     151 n    gly    12      41.296  17.228  17.659  -0.416  -.57891197E+01
+PHI     152 h    gly    12      40.384  17.573  17.420   0.272  0.10437860E+01
+PHI     153 ca   gly    12      41.566  15.794  17.721  -0.025  0.11991360E+02
+PHI     154 ha2  gly    12      40.648  15.246  17.510   0.070  0.55105882E+01
+PHI     155 ha3  gly    12      42.300  15.543  16.954   0.070  0.66275282E+01
+PHI     156 c    gly    12      42.109  15.305  19.069   0.597  0.50282712E+01
+PHI     157 o    gly    12      42.696  14.224  19.104  -0.568  -.28621071E+02
+PHI     158 n    arg    13      41.946  16.059  20.173  -0.348  -.17551462E+02
+PHI     159 h    arg    13      41.408  16.911  20.110   0.275  -.92364311E+01
+PHI     160 ca   arg    13      42.486  15.675  21.475  -0.264  -.73924165E+01
+PHI     161 ha   arg    13      42.789  14.628  21.467   0.156  -.66946661E-02
+PHI     162 cb   arg    13      43.719  16.541  21.789  -0.001  0.73319993E+01
+PHI     163 hb2  arg    13      43.359  17.560  21.934   0.033  0.72416272E+01
+PHI     164 hb3  arg    13      44.137  16.167  22.723   0.033  0.60296130E+01
+PHI     165 cg   arg    13      44.793  16.533  20.717   0.039  0.73564005E+01
+PHI     166 hg2  arg    13      45.296  15.566  20.731   0.029  0.66620364E+01
+PHI     167 hg3  arg    13      44.321  16.683  19.746   0.029  -.18495648E+01
+PHI     168 cd   arg    13      45.811  17.636  20.960   0.049  0.88923178E+01
+PHI     169 hd2  arg    13      45.313  18.603  20.887   0.069  0.82421637E+01
+PHI     170 hd3  arg    13      46.232  17.519  21.958   0.069  0.18403496E+02
+PHI     171 ne   arg    13      46.901  17.596  19.984  -0.530  -.13840136E+02
+PHI     172 he   arg    13      46.644  17.675  19.010   0.346  0.77530966E+01
+PHI     173 cz   arg    13      48.192  17.465  20.293   0.808  0.55784588E+02
+PHI     174 nh1  arg    13      49.099  17.436  19.322  -0.863  0.18868174E+02
+PHI     175 hh11 arg    13      48.806  17.513  18.358   0.448  0.52100170E+00
+PHI     176 hh12 arg    13      50.078  17.337  19.552   0.448  0.15038062E+02
+PHI     177 nh2  arg    13      48.581  17.364  21.564  -0.863  -.26007477E+02
+PHI     178 hh21 arg    13      47.893  17.387  22.303   0.448  -.17939989E+02
+PHI     179 hh22 arg    13      49.562  17.266  21.782   0.448  0.10167324E+02
+PHI     180 c    arg    13      41.519  15.814  22.648   0.734  0.15181175E+02
+PHI     181 o    arg    13      41.565  15.015  23.589  -0.589  -.96930914E+01
+PHI     182 n    thr    14      40.632  16.806  22.580  -0.416  0.10899947E+02
+PHI     183 h    thr    14      40.674  17.437  21.781   0.272  0.17340940E+02
+PHI     184 ca   thr    14      39.771  17.220  23.695  -0.039  0.12798964E+02
+PHI     185 ha   thr    14      40.175  16.827  24.627   0.101  0.91049757E+01
+PHI     186 cb   thr    14      39.761  18.754  23.824   0.365  0.98729553E+01
+PHI     187 hb   thr    14      39.243  19.200  22.974   0.004  0.19311701E+02
+PHI     188 cg2  thr    14      39.101  19.203  25.127  -0.244  0.70384228E+00
+PHI     189 hg21 thr    14      39.635  18.785  25.980   0.064  0.27495730E+00
+PHI     190 hg22 thr    14      39.131  20.291  25.188   0.064  0.74556720E+00
+PHI     191 hg23 thr    14      38.062  18.878  25.151   0.064  0.38046107E+01
+PHI     192 og1  thr    14      41.082  19.238  23.852  -0.676  -.32691933E+02
+PHI     193 hg1  thr    14      41.232  19.667  22.971   0.410  -.29010344E+02
+PHI     194 c    thr    14      38.363  16.664  23.495   0.597  0.46185532E+01
+PHI     195 o    thr    14      37.554  17.258  22.785  -0.568  -.14248329E+02
+PHI     196 n    phe    15      38.064  15.503  24.094  -0.416  0.26461141E+01
+PHI     197 h    phe    15      38.738  15.107  24.734   0.272  0.64958010E+01
+PHI     198 ca   phe    15      36.785  14.812  23.916  -0.002  0.17955217E+02
+PHI     199 ha   phe    15      36.245  15.241  23.072   0.098  0.10862929E+02
+PHI     200 cb   phe    15      37.022  13.328  23.641  -0.034  0.45696583E+01
+PHI     201 hb2  phe    15      37.646  12.894  24.422   0.030  0.36398752E+01
+PHI     202 hb3  phe    15      36.069  12.800  23.602   0.030  0.38006442E+01
+PHI     203 cg   phe    15      37.712  13.059  22.345   0.012  -.14461348E+02
+PHI     204 cd1  phe    15      36.978  12.788  21.199  -0.126  -.15442753E+02
+PHI     205 hd1  phe    15      35.890  12.770  21.261   0.133  -.54155326E+01
+PHI     206 ce1  phe    15      37.610  12.541  19.982  -0.170  -.22637407E+02
+PHI     207 he1  phe    15      37.016  12.332  19.092   0.143  -.23229766E+01
+PHI     208 cz   phe    15      39.008  12.562  19.901  -0.107  -.20943563E+02
+PHI     209 hz   phe    15      39.514  12.370  18.955   0.130  0.34854140E+01
+PHI     210 ce2  phe    15      39.754  12.833  21.049  -0.170  -.25715218E+02
+PHI     211 he2  phe    15      40.843  12.852  20.998   0.143  0.31330996E+01
+PHI     212 cd2  phe    15      39.105  13.080  22.265  -0.126  -.20892490E+02
+PHI     213 hd2  phe    15      39.689  13.292  23.161   0.133  -.95741051E+00
+PHI     214 c    phe    15      35.909  14.983  25.149   0.597  0.12908341E+02
+PHI     215 o    phe    15      36.394  14.908  26.284  -0.568  -.51512661E+02
+PHI     216 n    pro    16      34.600  15.265  24.942  -0.255  0.46037025E+01
+PHI     217 cd   pro    16      33.923  15.459  23.659   0.019  0.65821528E+01
+PHI     218 hd2  pro    16      33.794  14.496  23.161   0.039  0.43993759E+01
+PHI     219 hd3  pro    16      34.463  16.153  23.015   0.039  0.34144442E+01
+PHI     220 cg   pro    16      32.563  16.067  23.968   0.019  0.62497315E+01
+PHI     221 hg2  pro    16      31.803  15.756  23.259   0.021  0.68168912E+01
+PHI     222 hg3  pro    16      32.648  17.146  23.966   0.021  0.48672042E+01
+PHI     223 cb   pro    16      32.264  15.562  25.368  -0.007  0.72092786E+01
+PHI     224 hb2  pro    16      31.788  14.588  25.274   0.025  0.76019173E+01
+PHI     225 hb3  pro    16      31.625  16.250  25.922   0.025  0.39106178E+01
+PHI     226 ca   pro    16      33.639  15.412  26.025  -0.027  0.16353746E+02
+PHI     227 ha   pro    16      33.875  16.315  26.589   0.064  0.70534530E+01
+PHI     228 c    pro    16      33.643  14.204  26.952   0.590  0.12540779E+02
+PHI     229 o    pro    16      33.717  13.050  26.510  -0.575  -.48218422E+02
+PHI     230 n    lys    17      33.484  14.456  28.249  -0.348  -.83026533E+01
+PHI     231 h    lys    17      33.555  15.413  28.565   0.275  -.63575476E+00
+PHI     232 ca   lys    17      33.344  13.405  29.250  -0.240  -.16469141E+02
+PHI     233 ha   lys    17      33.366  12.431  28.761   0.143  -.68853183E+01
+PHI     234 cb   lys    17      34.483  13.465  30.273  -0.009  -.37642032E+00
+PHI     235 hb2  lys    17      34.473  14.466  30.705   0.036  0.11176603E+01
+PHI     236 hb3  lys    17      34.256  12.733  31.048   0.036  0.52719998E+01
+PHI     237 cg   lys    17      35.869  13.176  29.689   0.019  0.18903520E+01
+PHI     238 hg2  lys    17      36.134  13.986  29.008   0.010  -.14934878E+01
+PHI     239 hg3  lys    17      36.589  13.141  30.507   0.010  0.33635347E+01
+PHI     240 cd   lys    17      35.891  11.847  28.933  -0.048  0.70182223E+01
+PHI     241 hd2  lys    17      35.807  11.039  29.659   0.062  0.61967235E+01
+PHI     242 hd3  lys    17      35.034  11.821  28.260   0.062  0.62740932E+01
+PHI     243 ce   lys    17      37.173  11.675  28.128  -0.014  0.12384779E+02
+PHI     244 he2  lys    17      37.396  12.616  27.625   0.114  0.10317266E+02
+PHI     245 he3  lys    17      37.984  11.430  28.814   0.114  0.16203199E+02
+PHI     246 nz   lys    17      37.036  10.592  27.115  -0.385  0.22567854E+02
+PHI     247 hz1  lys    17      36.286  10.820  26.478   0.340  0.23059237E+02
+PHI     248 hz2  lys    17      37.900  10.503  26.599   0.340  0.22418558E+02
+PHI     249 hz3  lys    17      36.830   9.720  27.580   0.340  0.25478371E+02
+PHI     250 c    lys    17      32.013  13.597  29.964   0.734  0.16032789E+02
+PHI     251 o    lys    17      31.483  14.714  30.007  -0.589  -.47136240E+01
+PHI     252 n    arg    18      31.483  12.509  30.519  -0.348  0.15000700E+02
+PHI     253 h    arg    18      31.972  11.629  30.439   0.275  0.25413563E+02
+PHI     254 ca   arg    18      30.220  12.537  31.255  -0.264  0.70023289E+01
+PHI     255 ha   arg    18      29.401  12.747  30.567   0.156  0.91306677E+01
+PHI     256 cb   arg    18      29.954  11.185  31.939  -0.001  0.12205143E+02
+PHI     257 hb2  arg    18      30.795  10.999  32.608   0.033  0.97002497E+01
+PHI     258 hb3  arg    18      29.043  11.302  32.525   0.033  0.13007938E+02
+PHI     259 cg   arg    18      29.796  10.010  30.985   0.039  0.13989983E+02
+PHI     260 hg2  arg    18      30.680   9.953  30.349   0.029  0.11971111E+02
+PHI     261 hg3  arg    18      29.709   9.094  31.568   0.029  0.70127735E+01
+PHI     262 cd   arg    18      28.547  10.179  30.110   0.049  0.17278545E+01
+PHI     263 hd2  arg    18      27.732   9.586  30.525   0.069  0.12173421E+02
+PHI     264 hd3  arg    18      28.259  11.230  30.091   0.069  0.12944422E+02
+PHI     265 ne   arg    18      28.792   9.744  28.759  -0.530  -.74167180E+01
+PHI     266 he   arg    18      29.600   9.142  28.689   0.346  0.78696632E+00
+PHI     267 cz   arg    18      27.986   9.853  27.702   0.808  0.22827223E+02
+PHI     268 nh1  arg    18      28.481   9.497  26.531  -0.863  -.64206147E+01
+PHI     269 hh11 arg    18      29.432   9.161  26.469   0.448  -.63275604E+01
+PHI     270 hh12 arg    18      27.907   9.563  25.702   0.448  0.24253912E+01
+PHI     271 nh2  arg    18      26.672  10.056  27.801  -0.863  0.97743607E+01
+PHI     272 hh21 arg    18      26.244  10.135  28.712   0.448  0.19264400E+02
+PHI     273 hh22 arg    18      26.111  10.131  26.964   0.448  0.17806559E+02
+PHI     274 c    arg    18      30.307  13.615  32.319   0.734  0.49029804E+02
+PHI     275 o    arg    18      31.301  13.697  33.041  -0.589  0.43843975E+01
+PHI     276 n    gly    19      29.286  14.459  32.397  -0.416  -.44703503E+01
+PHI     277 h    gly    19      28.492  14.389  31.776   0.272  -.98220720E+01
+PHI     278 ca   gly    19      29.291  15.514  33.389  -0.025  0.11113119E+02
+PHI     279 ha2  gly    19      28.295  15.549  33.829   0.070  0.92268848E+01
+PHI     280 ha3  gly    19      30.016  15.236  34.153   0.070  0.53309302E+01
+PHI     281 c    gly    19      29.641  16.886  32.855   0.597  -.78100592E+00
+PHI     282 o    gly    19      29.278  17.897  33.449  -0.568  -.19780075E+02
+PHI     283 n    gln    20      30.404  16.964  31.759  -0.416  -.36757288E+01
+PHI     284 h    gln    20      30.690  16.120  31.282   0.272  0.11288183E+02
+PHI     285 ca   gln    20      30.764  18.248  31.152  -0.003  0.13181953E+02
+PHI     286 ha   gln    20      31.028  18.966  31.934   0.085  0.13104556E+02
+PHI     287 cb   gln    20      31.966  18.086  30.218  -0.004  0.39335215E+01
+PHI     288 hb2  gln    20      31.754  17.333  29.458   0.017  0.18391335E+01
+PHI     289 hb3  gln    20      32.147  19.037  29.714   0.017  0.27197738E+01
+PHI     290 cg   gln    20      33.227  17.704  30.997  -0.065  0.15516430E+02
+PHI     291 hg2  gln    20      33.365  18.399  31.827   0.035  0.67352347E+01
+PHI     292 hg3  gln    20      33.130  16.695  31.397   0.035  0.83740454E+01
+PHI     293 cd   gln    20      34.437  17.765  30.087   0.695  -.10115060E+02
+PHI     294 oe1  gln    20      34.763  16.817  29.387  -0.609  -.41138760E+02
+PHI     295 ne2  gln    20      35.123  18.885  30.038  -0.941  -.43162811E+02
+PHI     296 he21 gln    20      35.905  18.920  29.414   0.425  -.96381989E+01
+PHI     297 he22 gln    20      34.798  19.686  30.562   0.425  -.16197550E+02
+PHI     298 c    gln    20      29.594  18.832  30.367   0.597  0.21073833E+02
+PHI     299 o    gln    20      28.758  18.090  29.838  -0.568  -.16529951E+02
+PHI     300 n    thr    21      29.578  20.154  30.238  -0.416  -.24153652E+01
+PHI     301 h    thr    21      30.322  20.686  30.666   0.272  0.34562912E+01
+PHI     302 ca   thr    21      28.579  20.866  29.473  -0.039  0.32128849E+01
+PHI     303 ha   thr    21      27.656  20.291  29.406   0.101  0.10323126E+02
+PHI     304 cb   thr    21      28.270  22.209  30.112   0.365  -.68168192E+01
+PHI     305 hb   thr    21      29.206  22.748  30.261   0.004  0.16989347E+01
+PHI     306 cg2  thr    21      27.352  23.029  29.239  -0.244  -.15673354E+02
+PHI     307 hg21 thr    21      26.416  22.491  29.089   0.064  -.24979427E+01
+PHI     308 hg22 thr    21      27.149  23.985  29.722   0.064  -.75531278E+01
+PHI     309 hg23 thr    21      27.828  23.204  28.274   0.064  -.36250317E+01
+PHI     310 og1  thr    21      27.671  21.980  31.384  -0.676  -.36701836E+02
+PHI     311 hg1  thr    21      27.471  22.822  31.799   0.410  -.11881288E+02
+PHI     312 c    thr    21      29.113  21.122  28.086   0.597  0.12490945E+02
+PHI     313 o    thr    21      30.167  21.743  27.920  -0.568  -.58139843E+02
+PHI     314 n    cys    22      28.434  20.592  27.087  -0.416  0.37047009E+01
+PHI     315 h    cys    22      27.626  20.012  27.260   0.272  0.28321826E+01
+PHI     316 ca   cys    22      28.833  20.818  25.718   0.021  -.17371547E+01
+PHI     317 ha   cys    22      29.906  21.006  25.667   0.112  0.99606669E+00
+PHI     318 cb   cys    22      28.515  19.599  24.879  -0.123  -.69603810E+01
+PHI     319 hb2  cys    22      27.447  19.383  24.901   0.111  0.66031618E+01
+PHI     320 hb3  cys    22      28.834  19.747  23.847   0.111  0.13537369E+01
+PHI     321 sg   cys    22      29.331  18.116  25.440  -0.312  -.10001252E+02
+PHI     322 hg   cys    22      28.828  17.318  24.503   0.193  0.67461462E+01
+PHI     323 c    cys    22      28.085  22.025  25.180   0.597  0.14945132E+02
+PHI     324 o    cys    22      26.889  22.196  25.443  -0.568  -.14864644E+01
+PHI     325 n    val    23      28.800  22.901  24.487  -0.416  -.26218152E+01
+PHI     326 h    val    23      29.792  22.751  24.371   0.272  0.42571750E+01
+PHI     327 ca   val    23      28.203  24.087  23.877  -0.088  0.77348866E+01
+PHI     328 ha   val    23      27.157  24.198  24.160   0.097  0.61360111E+01
+PHI     329 cb   val    23      28.954  25.366  24.266   0.299  0.10621406E+02
+PHI     330 hb   val    23      29.993  25.286  23.945  -0.030  0.56046076E+01
+PHI     331 cg1  val    23      28.312  26.563  23.599  -0.319  -.63236318E+01
+PHI     332 hg11 val    23      27.274  26.645  23.919   0.079  -.10503961E+01
+PHI     333 hg12 val    23      28.851  27.468  23.879   0.079  0.70440608E+00
+PHI     334 hg13 val    23      28.349  26.440  22.516   0.079  -.55856436E+00
+PHI     335 cg2  val    23      28.972  25.518  25.765  -0.319  -.32631378E+01
+PHI     336 hg21 val    23      29.473  24.659  26.212   0.079  -.62130404E+01
+PHI     337 hg22 val    23      29.508  26.429  26.032   0.079  -.66806155E+00
+PHI     338 hg23 val    23      27.949  25.576  26.137   0.079  0.40358911E+01
+PHI     339 c    val    23      28.287  23.861  22.366   0.597  -.11151269E+02
+PHI     340 o    val    23      29.384  23.811  21.794  -0.568  -.26499985E+02
+PHI     341 n    val    24      27.136  23.757  21.703  -0.416  -.11259105E+02
+PHI     342 h    val    24      26.268  23.828  22.227   0.272  0.21357281E+01
+PHI     343 ca   val    24      27.051  23.388  20.285  -0.088  0.63057580E+01
+PHI     344 ha   val    24      28.057  23.402  19.877   0.097  0.73388624E+00
+PHI     345 cb   val    24      26.507  21.951  20.095   0.299  0.16345955E+02
+PHI     346 hb   val    24      26.486  21.743  19.025  -0.030  0.12703587E+02
+PHI     347 cg1  val    24      27.397  20.890  20.753  -0.319  -.88834696E+01
+PHI     348 hg11 val    24      27.425  21.026  21.834   0.079  -.38355606E+01
+PHI     349 hg12 val    24      27.015  19.894  20.528   0.079  -.78333240E+01
+PHI     350 hg13 val    24      28.404  20.964  20.352   0.079  0.35461792E+00
+PHI     351 cg2  val    24      25.086  21.748  20.635  -0.319  0.58754892E+01
+PHI     352 hg21 val    24      24.401  22.446  20.161   0.079  0.10554313E+03
+PHI     353 hg22 val    24      24.753  20.735  20.409   0.079  0.65315289E+01
+PHI     354 hg23 val    24      25.064  21.897  21.715   0.079  0.57442927E+01
+PHI     355 c    val    24      26.235  24.379  19.456   0.597  0.87441111E+01
+PHI     356 o    val    24      25.238  24.945  19.915  -0.568  -.11568557E+02
+PHI     357 n    hid    25      26.593  24.523  18.182  -0.416  0.13382229E+02
+PHI     358 h    hid    25      27.425  24.027  17.864   0.272  0.15107853E+02
+PHI     359 ca   hid    25      25.702  25.083  17.165   0.019  0.16781210E+02
+PHI     360 ha   hid    25      24.803  25.439  17.652   0.088  0.23212902E+02
+PHI     361 cb   hid    25      26.348  26.282  16.449  -0.046  0.11001685E+02
+PHI     362 hb2  hid    25      27.428  26.280  16.614   0.040  0.96642971E+01
+PHI     363 hb3  hid    25      26.188  26.184  15.376   0.040  0.13640942E+02
+PHI     364 cg   hid    25      25.773  27.617  16.872  -0.027  -.47554374E+01
+PHI     365 nd1  hid    25      24.435  27.945  16.958  -0.381  -.30654518E+02
+PHI     366 hd1  hid    25      23.646  27.344  16.750   0.365  0.28925500E+01
+PHI     367 ce1  hid    25      24.334  29.240  17.280   0.206  0.30708199E+01
+PHI     368 he1  hid    25      23.405  29.782  17.379   0.139  0.18466024E+02
+PHI     369 ne2  hid    25      25.550  29.776  17.430  -0.573  -.38242760E+02
+PHI     370 cd2  hid    25      26.474  28.759  17.154   0.129  -.19392036E+02
+PHI     371 hd2  hid    25      27.550  28.867  17.133   0.115  0.98351660E+01
+PHI     372 c    hid    25      25.285  23.960  16.212   0.597  -.70746408E+01
+PHI     373 o    hid    25      26.127  23.171  15.797  -0.568  -.44462868E+02
+PHI     374 n    tyr    26      23.992  23.847  15.893  -0.416  -.38603989E+03
+PHI     375 h    tyr    26      23.320  24.550  16.166   0.272  0.22445145E+02
+PHI     376 ca   tyr    26      23.463  22.687  15.180  -0.001  0.12737885E+02
+PHI     377 ha   tyr    26      24.270  22.347  14.559   0.088  0.75535034E+02
+PHI     378 cb   tyr    26      23.082  21.570  16.166  -0.015  -.50063620E+01
+PHI     379 hb2  tyr    26      22.958  20.640  15.609   0.030  0.42428967E+02
+PHI     380 hb3  tyr    26      23.897  21.410  16.875   0.030  0.27704414E+02
+PHI     381 cg   tyr    26      21.798  21.854  16.921  -0.001  -.11990492E+02
+PHI     382 cd1  tyr    26      20.552  21.428  16.409  -0.191  -.17123988E+03
+PHI     383 hd1  tyr    26      20.507  20.860  15.492   0.170  0.14584607E+03
+PHI     384 ce1  tyr    26      19.358  21.756  17.080  -0.234  -.19835281E+03
+PHI     385 he1  tyr    26      18.402  21.442  16.687   0.166  0.13880394E+03
+PHI     386 cz   tyr    26      19.413  22.495  18.280   0.323  0.28354541E+03
+PHI     387 oh   tyr    26      18.299  22.874  18.952  -0.558  -.69465906E+03
+PHI     388 hh   tyr    26      17.477  22.530  18.516   0.399  0.35904996E+03
+PHI     389 ce2  tyr    26      20.657  22.883  18.796  -0.234  -.26069824E+03
+PHI     390 he2  tyr    26      20.659  23.396  19.732   0.166  0.12320377E+03
+PHI     391 cd2  tyr    26      21.849  22.589  18.117  -0.191  -.20726915E+03
+PHI     392 hd2  tyr    26      22.801  22.893  18.527   0.170  0.22279965E+03
+PHI     393 c    tyr    26      22.265  23.000  14.279   0.597  0.57473462E+03
+PHI     394 o    tyr    26      21.636  24.048  14.443  -0.568  -.46557178E+03
+PHI     395 n    thr    27      21.923  22.048  13.395  -0.416  -.46112986E+01
+PHI     396 h    thr    27      22.568  21.278  13.288   0.272  0.81675882E+01
+PHI     397 ca   thr    27      20.816  22.150  12.469  -0.039  0.17217385E+01
+PHI     398 ha   thr    27      20.080  22.817  12.918   0.101  0.13363001E+02
+PHI     399 cb   thr    27      21.229  22.721  11.119   0.365  -.27784195E+01
+PHI     400 hb   thr    27      22.073  22.149  10.733   0.004  0.11375050E+02
+PHI     401 cg2  thr    27      20.059  22.642  10.124  -0.244  -.27452257E+01
+PHI     402 hg21 thr    27      19.215  23.215  10.508   0.064  0.60478538E+00
+PHI     403 hg22 thr    27      20.370  23.054   9.163   0.064  -.39480963E+00
+PHI     404 hg23 thr    27      19.762  21.602   9.993   0.064  -.16495624E+01
+PHI     405 og1  thr    27      21.569  24.097  11.285  -0.676  -.32131397E+02
+PHI     406 hg1  thr    27      21.831  24.466  10.438   0.410  -.77619958E+01
+PHI     407 c    thr    27      20.302  20.714  12.308   0.597  0.13938764E+02
+PHI     408 o    thr    27      21.083  19.798  12.020  -0.568  -.74651394E+01
+PHI     409 n    gly    28      19.027  20.476  12.598  -0.416  0.27708070E+01
+PHI     410 h    gly    28      18.416  21.265  12.787   0.272  0.11061606E+01
+PHI     411 ca   gly    28      18.406  19.154  12.526  -0.025  0.19553221E+02
+PHI     412 ha2  gly    28      19.160  18.365  12.531   0.070  0.97692451E+01
+PHI     413 ha3  gly    28      17.751  19.006  13.385   0.070  0.10913072E+02
+PHI     414 c    gly    28      17.566  19.044  11.263   0.597  0.37388496E+02
+PHI     415 o    gly    28      16.803  19.966  10.952  -0.568  -.17296036E+02
+PHI     416 n    met    29      17.708  17.933  10.540  -0.416  0.10613430E+02
+PHI     417 h    met    29      18.317  17.206  10.887   0.272  0.13849317E+02
+PHI     418 ca   met    29      16.984  17.694   9.298  -0.024  0.31343186E+01
+PHI     419 ha   met    29      16.172  18.415   9.197   0.088  0.18477517E+00
+PHI     420 cb   met    29      17.920  17.844   8.102   0.034  0.10482853E+02
+PHI     421 hb2  met    29      18.775  17.188   8.269   0.024  0.74087272E+01
+PHI     422 hb3  met    29      17.377  17.514   7.216   0.024  0.94007320E+01
+PHI     423 cg   met    29      18.404  19.256   7.897   0.002  0.26941381E+01
+PHI     424 hg2  met    29      17.639  19.815   7.358   0.044  0.16385392E+01
+PHI     425 hg3  met    29      18.570  19.715   8.871   0.044  0.28250337E+01
+PHI     426 sd   met    29      19.920  19.296   6.967  -0.274  -.40252239E+02
+PHI     427 ce   met    29      21.176  19.051   8.332  -0.054  -.18832430E+01
+PHI     428 he1  met    29      20.994  18.098   8.827   0.068  -.13854096E+01
+PHI     429 he2  met    29      22.180  19.053   7.907   0.068  0.77734208E+00
+PHI     430 he3  met    29      21.088  19.860   9.057   0.068  0.42200729E+00
+PHI     431 c    met    29      16.360  16.301   9.262   0.597  -.87258167E+01
+PHI     432 o    met    29      16.770  15.396  10.009  -0.568  -.28131084E+02
+PHI     433 n    leu    30      15.225  16.162   8.585  -0.416  -.15003131E+02
+PHI     434 h    leu    30      14.880  16.956   8.060   0.272  0.25477707E+01
+PHI     435 ca   leu    30      14.632  14.852   8.315  -0.052  0.53227487E+01
+PHI     436 ha   leu    30      14.723  14.199   9.186   0.092  0.76690130E+01
+PHI     437 cb   leu    30      13.147  15.041   7.964  -0.110  0.27729788E+01
+PHI     438 hb2  leu    30      13.101  15.668   7.077   0.046  -.60013914E+00
+PHI     439 hb3  leu    30      12.721  14.069   7.712   0.046  0.24199374E+00
+PHI     440 cg   leu    30      12.281  15.703   9.053   0.353  0.73423581E+01
+PHI     441 hg   leu    30      12.635  16.720   9.228  -0.036  0.57277198E+01
+PHI     442 cd1  leu    30      10.827  15.788   8.584  -0.412  -.37565216E+02
+PHI     443 hd11 leu    30      10.426  14.785   8.442   0.100  -.87668695E+01
+PHI     444 hd12 leu    30      10.234  16.318   9.330   0.100  -.10141567E+02
+PHI     445 hd13 leu    30      10.788  16.326   7.637   0.100  -.18246323E+02
+PHI     446 cd2  leu    30      12.302  14.943  10.381  -0.412  -.88613033E+01
+PHI     447 hd21 leu    30      13.307  14.979  10.801   0.100  -.10388474E+01
+PHI     448 hd22 leu    30      11.620  15.413  11.088   0.100  -.29584510E+01
+PHI     449 hd23 leu    30      12.012  13.904  10.223   0.100  -.86716576E+01
+PHI     450 c    leu    30      15.413  14.204   7.162   0.597  0.30497833E+02
+PHI     451 o    leu    30      16.215  14.885   6.523  -0.568  0.68892553E-01
+PHI     452 n    glu    31      15.166  12.925   6.871  -0.516  -.47733822E+02
+PHI     453 h    glu    31      14.564  12.402   7.490   0.294  -.11960696E+02
+PHI     454 ca   glu    31      15.841  12.206   5.789   0.040  0.53320770E+01
+PHI     455 ha   glu    31      16.882  12.027   6.057   0.111  0.46064153E+01
+PHI     456 cb   glu    31      15.161  10.858   5.538   0.056  0.78944702E+01
+PHI     457 hb2  glu    31      14.086  11.036   5.510  -0.017  0.19878532E+01
+PHI     458 hb3  glu    31      15.495  10.502   4.563  -0.017  0.32647371E+01
+PHI     459 cg   glu    31      15.473   9.813   6.593   0.014  0.11602741E+02
+PHI     460 hg2  glu    31      16.484   9.443   6.424  -0.043  0.38842750E+01
+PHI     461 hg3  glu    31      15.429  10.321   7.556  -0.043  0.53463501E+00
+PHI     462 cd   glu    31      14.495   8.641   6.590   0.805  -.79978962E+01
+PHI     463 oe1  glu    31      14.497   7.859   5.612  -0.819  -.31159555E+02
+PHI     464 oe2  glu    31      13.741   8.493   7.581  -0.819  -.45432487E+02
+PHI     465 c    glu    31      15.928  12.983   4.473   0.537  -.10342957E+02
+PHI     466 o    glu    31      16.988  13.043   3.850  -0.582  -.91401718E+02
+PHI     467 n    asp    32      14.829  13.622   4.089  -0.516  -.34345348E+01
+PHI     468 h    asp    32      13.986  13.537   4.637   0.294  0.15694741E+01
+PHI     469 ca   asp    32      14.770  14.379   2.840   0.038  0.64205346E+01
+PHI     470 ha   asp    32      15.191  13.789   2.025   0.088  0.12018399E+02
+PHI     471 cb   asp    32      13.316  14.716   2.500  -0.030  -.17529501E-01
+PHI     472 hb2  asp    32      13.313  15.119   1.487  -0.012  -.68385738E+00
+PHI     473 hb3  asp    32      12.723  13.802   2.528  -0.012  -.25753281E+01
+PHI     474 cg   asp    32      12.721  15.734   3.450   0.799  -.43889823E+01
+PHI     475 od1  asp    32      12.358  16.837   2.991  -0.801  -.39784573E+02
+PHI     476 od2  asp    32      12.642  15.437   4.661  -0.801  -.30326473E+02
+PHI     477 c    asp    32      15.599  15.663   2.787   0.537  0.89480190E+01
+PHI     478 o    asp    32      15.917  16.156   1.706  -0.582  -.37477248E+01
+PHI     479 n    gly    33      16.021  16.163   3.949  -0.416  -.69346380E+01
+PHI     480 h    gly    33      15.848  15.598   4.777   0.272  0.18381266E+00
+PHI     481 ca   gly    33      16.782  17.399   4.107  -0.025  0.54598398E+01
+PHI     482 ha2  gly    33      17.608  17.213   4.793   0.070  0.52516994E+01
+PHI     483 ha3  gly    33      17.194  17.709   3.147   0.070  0.92721707E+00
+PHI     484 c    gly    33      15.945  18.552   4.664   0.597  0.70444560E+01
+PHI     485 o    gly    33      16.471  19.653   4.850  -0.568  -.92760401E+01
+PHI     486 n    lys    34      14.651  18.339   4.958  -0.348  -.31627674E+01
+PHI     487 h    lys    34      14.282  17.403   4.872   0.275  0.11794190E+02
+PHI     488 ca   lys    34      13.801  19.366   5.548  -0.240  -.15402576E+02
+PHI     489 ha   lys    34      13.854  20.271   4.942   0.143  0.63028541E+01
+PHI     490 cb   lys    34      12.339  18.908   5.618  -0.009  -.46804352E+01
+PHI     491 hb2  lys    34      12.014  18.716   4.595   0.036  -.69495373E+01
+PHI     492 hb3  lys    34      12.321  17.978   6.186   0.036  -.30873687E+01
+PHI     493 cg   lys    34      11.389  19.931   6.276   0.019  0.75901990E+01
+PHI     494 hg2  lys    34      11.693  20.054   7.315   0.010  0.63485088E+01
+PHI     495 hg3  lys    34      11.499  20.880   5.751   0.010  0.51777449E+01
+PHI     496 cd   lys    34       9.927  19.485   6.221  -0.048  0.10470692E+02
+PHI     497 hd2  lys    34       9.827  18.545   6.763   0.062  0.86285248E+01
+PHI     498 hd3  lys    34       9.310  20.247   6.697   0.062  0.12786055E+02
+PHI     499 ce   lys    34       9.470  19.290   4.777  -0.014  0.11812428E+02
+PHI     500 he2  lys    34       9.471  20.266   4.292   0.114  0.13826427E+02
+PHI     501 he3  lys    34      10.192  18.639   4.283   0.114  0.79862452E+01
+PHI     502 nz   lys    34       8.112  18.689   4.679  -0.385  0.26121668E+02
+PHI     503 hz1  lys    34       7.443  19.293   5.135   0.340  0.13844831E+02
+PHI     504 hz2  lys    34       7.861  18.583   3.706   0.340  0.28170502E+02
+PHI     505 hz3  lys    34       8.111  17.785   5.128   0.340  0.22496973E+02
+PHI     506 c    lys    34      14.294  19.698   6.946   0.734  0.30373947E+02
+PHI     507 o    lys    34      14.377  18.826   7.826  -0.589  -.19735203E+02
+PHI     508 n    lys    35      14.613  20.967   7.141  -0.348  0.24293205E+02
+PHI     509 h    lys    35      14.514  21.634   6.388   0.275  0.14186903E+02
+PHI     510 ca   lys    35      15.088  21.444   8.422  -0.240  -.74895072E+01
+PHI     511 ha   lys    35      15.874  20.792   8.802   0.143  -.71568638E+00
+PHI     512 cb   lys    35      15.657  22.845   8.257  -0.009  -.25993898E+01
+PHI     513 hb2  lys    35      16.458  22.782   7.519   0.036  0.31603346E+01
+PHI     514 hb3  lys    35      14.856  23.474   7.869   0.036  0.46124773E+01
+PHI     515 cg   lys    35      16.194  23.444   9.530   0.019  0.84524565E+01
+PHI     516 hg2  lys    35      15.546  23.157  10.358   0.010  0.73989186E+01
+PHI     517 hg3  lys    35      17.199  23.061   9.706   0.010  0.61214867E+01
+PHI     518 cd   lys    35      16.241  24.951   9.427  -0.048  0.10078753E+02
+PHI     519 hd2  lys    35      15.223  25.322   9.306   0.062  0.69124613E+01
+PHI     520 hd3  lys    35      16.665  25.348  10.349   0.062  0.66748047E+01
+PHI     521 ce   lys    35      17.081  25.397   8.256  -0.014  0.10934940E+02
+PHI     522 he2  lys    35      18.085  24.984   8.355   0.114  0.17788031E+02
+PHI     523 he3  lys    35      16.630  25.036   7.331   0.114  0.12475968E+02
+PHI     524 nz   lys    35      17.157  26.875   8.223  -0.385  0.59084380E+00
+PHI     525 hz1  lys    35      17.576  27.210   9.079   0.340  -.12139087E+02
+PHI     526 hz2  lys    35      17.721  27.166   7.437   0.340  0.39468338E+01
+PHI     527 hz3  lys    35      16.227  27.258   8.130   0.340  0.37578177E+01
+PHI     528 c    lys    35      13.921  21.495   9.398   0.734  0.35673439E+02
+PHI     529 o    lys    35      12.824  21.932   9.037  -0.589  -.25709797E+02
+PHI     530 n    phe    36      14.082  20.968  10.608  -0.416  0.14974519E+02
+PHI     531 h    phe    36      14.966  20.523  10.824   0.272  0.13828117E+02
+PHI     532 ca   phe    36      13.008  20.963  11.620  -0.002  0.21465108E+01
+PHI     533 ha   phe    36      12.151  21.526  11.247   0.098  0.20223327E+01
+PHI     534 cb   phe    36      12.505  19.534  11.876  -0.034  0.23364816E+01
+PHI     535 hb2  phe    36      11.572  19.594  12.439   0.030  0.13758440E+01
+PHI     536 hb3  phe    36      12.273  19.058  10.922   0.030  0.11865188E+01
+PHI     537 cg   phe    36      13.471  18.665  12.653   0.012  -.80383291E+01
+PHI     538 cd1  phe    36      14.346  17.800  11.974  -0.126  -.86469517E+01
+PHI     539 hd1  phe    36      14.307  17.728  10.897   0.133  0.28608055E+01
+PHI     540 ce1  phe    36      15.276  17.036  12.699  -0.170  -.24253729E+02
+PHI     541 he1  phe    36      15.949  16.369  12.182   0.143  -.51260486E+01
+PHI     542 cz   phe    36      15.334  17.141  14.097  -0.107  -.94490166E+02
+PHI     543 hz   phe    36      16.056  16.562  14.642   0.130  0.15503593E+03
+PHI     544 ce2  phe    36      14.453  17.994  14.781  -0.170  -.15001358E+03
+PHI     545 he2  phe    36      14.494  18.075  15.858   0.143  0.18962125E+03
+PHI     546 cd2  phe    36      13.514  18.748  14.059  -0.126  -.12878241E+03
+PHI     547 hd2  phe    36      12.839  19.410  14.584   0.133  0.95991127E+02
+PHI     548 c    phe    36      13.420  21.676  12.910   0.597  0.87804356E+01
+PHI     549 o    phe    36      12.560  22.118  13.665  -0.568  -.29774977E+02
+PHI     550 n    asp    37      14.725  21.852  13.131  -0.516  0.21206543E+01
+PHI     551 h    asp    37      15.389  21.447  12.488   0.294  -.96512133E+00
+PHI     552 ca   asp    37      15.261  22.676  14.208   0.038  0.46440975E+02
+PHI     553 ha   asp    37      14.589  23.522  14.361   0.088  0.94579643E+02
+PHI     554 cb   asp    37      15.303  21.844  15.501  -0.030  -.33773777E+01
+PHI     555 hb2  asp    37      14.334  21.373  15.668  -0.012  -.65506163E+01
+PHI     556 hb3  asp    37      16.054  21.057  15.399  -0.012  -.16593016E+02
+PHI     557 cg   asp    37      15.623  22.707  16.717   0.799  0.93118665E+03
+PHI     558 od1  asp    37      15.381  23.935  16.673  -0.801  -.81990192E+03
+PHI     559 od2  asp    37      16.227  22.198  17.679  -0.801  -.87347485E+03
+PHI     560 c    asp    37      16.651  23.227  13.835   0.537  0.40302832E+03
+PHI     561 o    asp    37      17.339  22.683  12.970  -0.582  -.15398622E+02
+PHI     562 n    ser    38      17.075  24.320  14.469  -0.416  -.30709708E+03
+PHI     563 h    ser    38      16.481  24.686  15.208   0.272  0.68151093E+00
+PHI     564 ca   ser    38      18.375  24.962  14.247  -0.025  0.16399088E+02
+PHI     565 ha   ser    38      19.158  24.209  14.281   0.084  0.11461390E+03
+PHI     566 cb   ser    38      18.390  25.615  12.864   0.212  0.11805939E+02
+PHI     567 hb2  ser    38      18.365  24.846  12.092   0.035  0.17611179E+02
+PHI     568 hb3  ser    38      17.503  26.240  12.755   0.035  0.69193822E+00
+PHI     569 og   ser    38      19.543  26.407  12.677  -0.655  -.60824787E+02
+PHI     570 hg   ser    38      19.349  26.955  11.872   0.428  -.18622734E+02
+PHI     571 c    ser    38      18.662  26.025  15.305   0.597  0.11685382E+02
+PHI     572 o    ser    38      17.900  26.978  15.476  -0.568  -.52265644E+01
+PHI     573 n    ser    39      19.784  25.894  16.017  -0.416  -.52208443E+01
+PHI     574 h    ser    39      20.288  25.020  15.974   0.272  0.13865564E+02
+PHI     575 ca   ser    39      20.223  26.900  16.984  -0.025  0.57316213E+01
+PHI     576 ha   ser    39      19.375  27.232  17.583   0.084  0.75321336E+01
+PHI     577 cb   ser    39      21.288  26.312  17.924   0.212  0.10669189E+02
+PHI     578 hb2  ser    39      21.579  27.068  18.654   0.035  0.13006035E+02
+PHI     579 hb3  ser    39      20.872  25.448  18.442   0.035  0.89553099E+01
+PHI     580 og   ser    39      22.433  25.910  17.175  -0.655  0.52360978E+01
+PHI     581 hg   ser    39      23.092  25.545  17.769   0.428  0.15188696E+02
+PHI     582 c    ser    39      20.821  28.061  16.199   0.597  0.26485189E+02
+PHI     583 o    ser    39      20.843  29.203  16.656  -0.568  -.11944371E+02
+PHI     584 n    arg    40      21.279  27.765  14.993  -0.348  0.41248350E+01
+PHI     585 h    arg    40      21.300  26.804  14.683   0.275  0.72852125E+01
+PHI     586 ca   arg    40      21.905  28.774  14.154  -0.264  0.71273527E+01
+PHI     587 ha   arg    40      22.613  29.355  14.745   0.156  0.15733283E+02
+PHI     588 cb   arg    40      22.665  28.117  12.981  -0.001  0.77798567E+01
+PHI     589 hb2  arg    40      21.953  27.554  12.378   0.033  0.23545699E+01
+PHI     590 hb3  arg    40      23.113  28.904  12.373   0.033  0.70661793E+01
+PHI     591 cg   arg    40      23.772  27.167  13.491   0.039  0.84209700E+01
+PHI     592 hg2  arg    40      24.111  27.590  14.437   0.029  0.83226709E+01
+PHI     593 hg3  arg    40      23.279  26.213  13.676   0.029  0.86983376E+01
+PHI     594 cd   arg    40      24.976  26.949  12.570   0.049  0.76454329E+01
+PHI     595 hd2  arg    40      25.034  27.750  11.832   0.069  0.92356024E+01
+PHI     596 hd3  arg    40      25.896  26.928  13.154   0.069  0.10998116E+02
+PHI     597 ne   arg    40      24.839  25.694  11.879  -0.530  0.13776587E+02
+PHI     598 he   arg    40      24.404  25.838  10.979   0.346  0.14716804E+02
+PHI     599 cz   arg    40      25.450  24.530  12.113   0.808  0.10452532E+02
+PHI     600 nh1  arg    40      26.453  24.338  12.972  -0.863  0.30394287E+01
+PHI     601 hh11 arg    40      26.809  25.115  13.510   0.448  0.46694236E+01
+PHI     602 hh12 arg    40      26.852  23.417  13.080   0.448  0.11160158E+02
+PHI     603 nh2  arg    40      24.775  23.464  11.721  -0.863  -.19326000E+02
+PHI     604 hh21 arg    40      23.872  23.575  11.283   0.448  -.60497026E+01
+PHI     605 hh22 arg    40      25.166  22.543  11.860   0.448  -.62391620E+01
+PHI     606 c    arg    40      20.908  29.833  13.706   0.734  0.34107780E+01
+PHI     607 o    arg    40      21.249  31.020  13.638  -0.589  -.28874685E+02
+PHI     608 n    asp    41      19.708  29.367  13.338  -0.516  -.13326908E+02
+PHI     609 h    asp    41      19.595  28.361  13.346   0.294  0.30015726E+01
+PHI     610 ca   asp    41      18.542  30.166  12.926   0.038  0.13552113E+02
+PHI     611 ha   asp    41      18.832  30.855  12.130   0.088  0.14920923E+02
+PHI     612 cb   asp    41      17.415  29.241  12.406  -0.030  0.18006488E+01
+PHI     613 hb2  asp    41      17.222  28.473  13.155  -0.012  -.14990516E+01
+PHI     614 hb3  asp    41      16.506  29.839  12.329  -0.012  0.69193995E+00
+PHI     615 cg   asp    41      17.626  28.562  11.035   0.799  -.12754089E+02
+PHI     616 od1  asp    41      16.691  28.568  10.209  -0.801  -.29816525E+02
+PHI     617 od2  asp    41      18.649  27.877  10.794  -0.801  -.48271786E+02
+PHI     618 c    asp    41      18.001  31.014  14.099   0.537  0.28374058E+02
+PHI     619 o    asp    41      17.251  31.963  13.895  -0.582  -.20478949E+02
+PHI     620 n    arg    42      18.411  30.692  15.336  -0.348  -.97926178E+01
+PHI     621 h    arg    42      19.002  29.876  15.414   0.275  0.96920413E+00
+PHI     622 ca   arg    42      18.144  31.456  16.567  -0.264  -.71985922E+01
+PHI     623 ha   arg    42      17.376  32.207  16.366   0.156  0.53682351E+01
+PHI     624 cb   arg    42      17.631  30.499  17.661  -0.001  0.15176615E+01
+PHI     625 hb2  arg    42      18.361  29.706  17.827   0.033  0.18571727E+01
+PHI     626 hb3  arg    42      17.518  31.057  18.591   0.033  0.24048996E+01
+PHI     627 cg   arg    42      16.269  29.882  17.310   0.039  0.98225451E+01
+PHI     628 hg2  arg    42      15.577  30.688  17.065   0.029  0.76348362E+01
+PHI     629 hg3  arg    42      16.361  29.229  16.441   0.029  0.37725379E+01
+PHI     630 cd   arg    42      15.690  29.094  18.496   0.049  0.78383265E+01
+PHI     631 hd2  arg    42      15.759  29.707  19.397   0.069  0.85915403E+01
+PHI     632 hd3  arg    42      14.628  28.920  18.311   0.069  0.43548026E+01
+PHI     633 ne   arg    42      16.374  27.803  18.725  -0.530  -.18427860E+02
+PHI     634 he   arg    42      17.115  27.783  19.401   0.346  -.76185689E+01
+PHI     635 cz   arg    42      16.044  26.645  18.175   0.808  -.98939180E+01
+PHI     636 nh1  arg    42      15.123  26.545  17.266  -0.863  -.48060593E+02
+PHI     637 hh11 arg    42      14.704  27.357  16.865   0.448  -.91143513E+01
+PHI     638 hh12 arg    42      14.948  25.606  16.902   0.448  -.20074755E+02
+PHI     639 nh2  arg    42      16.610  25.528  18.526  -0.863  -.29305620E+01
+PHI     640 hh21 arg    42      17.299  25.444  19.245   0.448  -.24779444E+01
+PHI     641 hh22 arg    42      16.279  24.681  18.052   0.448  -.46124377E+01
+PHI     642 c    arg    42      19.369  32.243  17.059   0.734  0.29637920E+02
+PHI     643 o    arg    42      19.304  32.829  18.136  -0.589  0.25153244E+01
+PHI     644 n    asn    43      20.475  32.226  16.305  -0.416  0.17622753E+02
+PHI     645 h    asn    43      20.401  31.779  15.400   0.272  0.59212456E+01
+PHI     646 ca   asn    43      21.783  32.814  16.626   0.014  0.19467907E+02
+PHI     647 ha   asn    43      22.525  32.227  16.082   0.105  0.19805565E+02
+PHI     648 cb   asn    43      21.830  34.237  16.039  -0.204  0.99268847E+01
+PHI     649 hb2  asn    43      21.373  34.236  15.049   0.080  0.75797361E+00
+PHI     650 hb3  asn    43      21.268  34.923  16.673   0.080  0.41899743E+01
+PHI     651 cg   asn    43      23.253  34.737  15.864   0.713  0.29819540E+02
+PHI     652 od1  asn    43      23.904  34.482  14.870  -0.593  -.88062649E+01
+PHI     653 nd2  asn    43      23.797  35.437  16.828  -0.919  -.75114245E+01
+PHI     654 hd21 asn    43      24.739  35.745  16.677   0.420  -.11172523E+02
+PHI     655 hd22 asn    43      23.324  35.485  17.716   0.420  -.66151376E+01
+PHI     656 c    asn    43      22.173  32.714  18.124   0.597  0.10109286E+02
+PHI     657 o    asn    43      22.602  33.691  18.743  -0.568  -.51137463E+02
+PHI     658 n    lys    44      21.983  31.535  18.744  -0.348  0.24542782E+01
+PHI     659 h    lys    44      21.678  30.743  18.197   0.275  0.67785654E+01
+PHI     660 ca   lys    44      22.201  31.346  20.167  -0.240  0.19239502E+02
+PHI     661 ha   lys    44      22.970  32.030  20.527   0.143  0.26451782E+02
+PHI     662 cb   lys    44      20.900  31.632  20.921  -0.009  0.45170898E+01
+PHI     663 hb2  lys    44      20.762  32.713  20.891   0.036  0.23659794E+01
+PHI     664 hb3  lys    44      20.106  31.149  20.352   0.036  0.58758698E+01
+PHI     665 cg   lys    44      20.852  31.155  22.361   0.019  0.76861110E+01
+PHI     666 hg2  lys    44      19.807  31.098  22.663   0.010  0.58473849E+01
+PHI     667 hg3  lys    44      21.297  30.161  22.402   0.010  0.48200264E+01
+PHI     668 cd   lys    44      21.596  32.078  23.297  -0.048  0.90090122E+01
+PHI     669 hd2  lys    44      22.663  32.008  23.086   0.062  0.10691901E+02
+PHI     670 hd3  lys    44      21.259  33.100  23.125   0.062  0.73657098E+01
+PHI     671 ce   lys    44      21.337  31.693  24.760  -0.014  0.15800413E+02
+PHI     672 he2  lys    44      20.258  31.675  24.913   0.114  0.11061113E+02
+PHI     673 he3  lys    44      21.743  30.694  24.918   0.114  0.17172825E+02
+PHI     674 nz   lys    44      21.964  32.647  25.733  -0.385  0.23914639E+02
+PHI     675 hz1  lys    44      21.588  33.573  25.587   0.340  0.16673548E+02
+PHI     676 hz2  lys    44      21.763  32.347  26.676   0.340  0.24974937E+02
+PHI     677 hz3  lys    44      22.964  32.664  25.591   0.340  0.25281481E+02
+PHI     678 c    lys    44      22.599  29.874  20.291   0.734  0.41591293E+02
+PHI     679 o    lys    44      21.860  28.989  19.846  -0.589  -.76662433E+00
+PHI     680 n    pro    45      23.853  29.595  20.718  -0.255  0.16554127E+02
+PHI     681 cd   pro    45      24.939  30.551  20.909   0.019  0.85108538E+01
+PHI     682 hd2  pro    45      24.814  31.056  21.867   0.039  0.10274112E+02
+PHI     683 hd3  pro    45      24.975  31.279  20.096   0.039  0.77945027E+01
+PHI     684 cg   pro    45      26.236  29.741  20.917   0.019  0.66403108E+01
+PHI     685 hg2  pro    45      26.986  30.188  21.570   0.021  0.53167524E+01
+PHI     686 hg3  pro    45      26.625  29.654  19.903   0.021  0.24398651E+01
+PHI     687 cb   pro    45      25.798  28.370  21.414  -0.007  0.13029405E+02
+PHI     688 hb2  pro    45      25.826  28.363  22.505   0.025  0.95437613E+01
+PHI     689 hb3  pro    45      26.430  27.575  21.016   0.025  0.91663675E+01
+PHI     690 ca   pro    45      24.354  28.234  20.919  -0.027  0.20756721E+02
+PHI     691 ha   pro    45      24.350  27.711  19.962   0.064  0.15575027E+02
+PHI     692 c    pro    45      23.526  27.456  21.940   0.590  0.11043462E+02
+PHI     693 o    pro    45      22.976  28.043  22.878  -0.575  -.43114197E+02
+PHI     694 n    phe    46      23.497  26.133  21.795  -0.416  -.51525049E+01
+PHI     695 h    phe    46      23.995  25.723  21.017   0.272  0.12590972E+01
+PHI     696 ca   phe    46      22.738  25.249  22.674  -0.002  0.20400454E+02
+PHI     697 ha   phe    46      22.027  25.826  23.264   0.098  0.14748071E+02
+PHI     698 cb   phe    46      21.959  24.222  21.830  -0.034  -.29293341E+02
+PHI     699 hb2  phe    46      21.232  24.712  21.182   0.030  0.76347570E+01
+PHI     700 hb3  phe    46      22.668  23.661  21.221   0.030  0.35947674E+02
+PHI     701 cg   phe    46      21.203  23.218  22.640   0.012  0.29595128E+00
+PHI     702 cd1  phe    46      21.506  21.860  22.545  -0.126  -.13617378E+03
+PHI     703 hd1  phe    46      22.281  21.539  21.848   0.133  0.11378727E+03
+PHI     704 ce1  phe    46      20.831  20.913  23.329  -0.170  -.17913715E+03
+PHI     705 he1  phe    46      21.079  19.855  23.243   0.143  0.14376117E+03
+PHI     706 cz   phe    46      19.842  21.327  24.218  -0.107  -.11593456E+03
+PHI     707 hz   phe    46      19.315  20.599  24.834   0.130  0.17414522E+03
+PHI     708 ce2  phe    46      19.527  22.687  24.317  -0.170  -.15624481E+03
+PHI     709 he2  phe    46      18.752  23.017  25.008   0.143  0.13394989E+03
+PHI     710 cd2  phe    46      20.206  23.623  23.530  -0.126  -.12162621E+03
+PHI     711 hd2  phe    46      19.959  24.682  23.607   0.133  0.82423668E+01
+PHI     712 c    phe    46      23.698  24.553  23.637   0.597  0.11607480E+02
+PHI     713 o    phe    46      24.786  24.163  23.245  -0.568  -.13823964E+02
+PHI     714 n    lys    47      23.293  24.418  24.902  -0.348  -.41974341E+03
+PHI     715 h    lys    47      22.324  24.603  25.125   0.275  0.11137080E+01
+PHI     716 ca   lys    47      24.110  23.847  25.977  -0.240  -.22387140E+03
+PHI     717 ha   lys    47      25.062  23.521  25.576   0.143  0.14682779E+01
+PHI     718 cb   lys    47      24.365  24.869  27.097  -0.009  0.23863032E+01
+PHI     719 hb2  lys    47      23.416  25.175  27.541   0.036  0.51987147E+01
+PHI     720 hb3  lys    47      24.938  24.352  27.869   0.036  0.72577038E+01
+PHI     721 cg   lys    47      25.138  26.119  26.651   0.019  0.67044201E+01
+PHI     722 hg2  lys    47      25.858  25.836  25.887   0.010  0.68456721E+01
+PHI     723 hg3  lys    47      24.448  26.844  26.218   0.010  0.54789834E+01
+PHI     724 cd   lys    47      25.865  26.739  27.858  -0.048  0.60197916E+01
+PHI     725 hd2  lys    47      25.128  27.105  28.575   0.062  0.49364100E+01
+PHI     726 hd3  lys    47      26.459  25.960  28.343   0.062  0.40907922E+01
+PHI     727 ce   lys    47      26.816  27.874  27.461  -0.014  0.61073995E+01
+PHI     728 he2  lys    47      27.480  27.500  26.678   0.114  0.12720984E+02
+PHI     729 he3  lys    47      26.247  28.714  27.058   0.114  0.61174092E+01
+PHI     730 nz   lys    47      27.636  28.294  28.623  -0.385  0.15087740E+02
+PHI     731 hz1  lys    47      27.967  27.464  29.128   0.340  0.68138747E+01
+PHI     732 hz2  lys    47      28.534  28.697  28.370   0.340  0.48980093E+01
+PHI     733 hz3  lys    47      27.149  28.855  29.301   0.340  0.24481899E+02
+PHI     734 c    lys    47      23.407  22.636  26.569   0.734  0.70051593E+03
+PHI     735 o    lys    47      22.208  22.737  26.812  -0.589  -.46448569E+03
+PHI     736 n    phe    48      24.145  21.559  26.833  -0.416  -.41028378E+03
+PHI     737 h    phe    48      25.112  21.529  26.542   0.272  0.11159196E+01
+PHI     738 ca   phe    48      23.595  20.401  27.520  -0.002  0.19377369E+02
+PHI     739 ha   phe    48      22.866  20.736  28.257   0.098  0.92761564E+01
+PHI     740 cb   phe    48      22.904  19.440  26.549  -0.034  -.27714657E+02
+PHI     741 hb2  phe    48      22.326  18.672  27.062   0.030  0.17817751E+02
+PHI     742 hb3  phe    48      22.241  20.033  25.919   0.030  0.22234430E+02
+PHI     743 cg   phe    48      23.844  18.725  25.628   0.012  -.48853855E+01
+PHI     744 cd1  phe    48      24.284  17.439  25.930  -0.126  -.14662555E+03
+PHI     745 hd1  phe    48      23.983  16.987  26.874   0.133  0.19024544E+03
+PHI     746 ce1  phe    48      25.092  16.736  25.052  -0.170  -.19540138E+02
+PHI     747 he1  phe    48      25.427  15.729  25.301   0.143  -.25804520E+01
+PHI     748 cz   phe    48      25.476  17.317  23.852  -0.107  -.15571085E+02
+PHI     749 hz   phe    48      26.108  16.766  23.155   0.130  -.35991311E+00
+PHI     750 ce2  phe    48      25.053  18.608  23.537  -0.170  -.16818399E+02
+PHI     751 he2  phe    48      25.357  19.072  22.598   0.143  -.28213449E+01
+PHI     752 cd2  phe    48      24.239  19.306  24.428  -0.126  -.13354176E+03
+PHI     753 hd2  phe    48      23.907  20.316  24.186   0.133  0.14046245E+03
+PHI     754 c    phe    48      24.735  19.678  28.217   0.597  0.50935650E+01
+PHI     755 o    phe    48      25.872  19.716  27.733  -0.568  -.43798229E+02
+PHI     756 n    met    49      24.427  19.050  29.355  -0.416  -.47326126E+02
+PHI     757 h    met    49      23.456  19.103  29.675   0.272  -.13001423E+02
+PHI     758 ca   met    49      25.373  18.259  30.145  -0.024  0.21446846E+01
+PHI     759 ha   met    49      26.369  18.670  30.005   0.088  0.59827023E+01
+PHI     760 cb   met    49      25.037  18.360  31.641   0.034  0.34025524E+01
+PHI     761 hb2  met    49      25.060  19.409  31.937   0.024  0.20188773E+01
+PHI     762 hb3  met    49      24.037  17.967  31.822   0.024  -.11604539E+01
+PHI     763 cg   met    49      26.071  17.575  32.468   0.002  0.10675900E+00
+PHI     764 hg2  met    49      26.041  16.531  32.160   0.044  0.56060486E+01
+PHI     765 hg3  met    49      27.059  17.964  32.223   0.044  0.38359580E+01
+PHI     766 sd   met    49      25.881  17.598  34.275  -0.274  -.34299889E+02
+PHI     767 ce   met    49      26.348  19.324  34.591  -0.054  -.38909481E+01
+PHI     768 he1  met    49      25.631  19.996  34.120   0.068  -.23519965E+00
+PHI     769 he2  met    49      26.362  19.511  35.664   0.068  -.62145406E+00
+PHI     770 he3  met    49      27.341  19.519  34.181   0.068  -.57778740E+00
+PHI     771 c    met    49      25.380  16.797  29.686   0.597  -.32384470E+01
+PHI     772 o    met    49      24.375  16.089  29.773  -0.568  -.53263687E+02
+PHI     773 n    leu    50      26.541  16.299  29.258  -0.416  -.16417878E+01
+PHI     774 h    leu    50      27.366  16.883  29.276   0.272  0.10169573E+02
+PHI     775 ca   leu    50      26.677  14.924  28.788  -0.052  0.13436151E+02
+PHI     776 ha   leu    50      25.993  14.748  27.957   0.092  0.16704479E+02
+PHI     777 cb   leu    50      28.104  14.663  28.309  -0.110  0.96352520E+01
+PHI     778 hb2  leu    50      28.626  15.589  28.552   0.046  0.14199445E+01
+PHI     779 hb3  leu    50      28.451  13.868  28.968   0.046  0.11843866E+02
+PHI     780 cg   leu    50      28.392  14.283  26.859   0.353  0.74573565E+01
+PHI     781 hg   leu    50      28.477  15.169  26.230  -0.036  0.35216315E+01
+PHI     782 cd1  leu    50      29.724  13.540  26.871  -0.412  0.12695750E+01
+PHI     783 hd11 leu    50      29.641  12.654  27.499   0.100  0.18459382E+01
+PHI     784 hd12 leu    50      29.984  13.242  25.855   0.100  -.17342478E+01
+PHI     785 hd13 leu    50      30.502  14.194  27.267   0.100  0.22553604E+01
+PHI     786 cd2  leu    50      27.325  13.391  26.247  -0.412  -.28728210E+02
+PHI     787 hd21 leu    50      26.365  13.907  26.266   0.100  -.61493583E+01
+PHI     788 hd22 leu    50      27.592  13.159  25.216   0.100  -.94262924E+01
+PHI     789 hd23 leu    50      27.252  12.467  26.819   0.100  -.16684443E+02
+PHI     790 c    leu    50      26.363  13.944  29.908   0.597  0.89870186E+01
+PHI     791 o    leu    50      26.811  14.138  31.035  -0.568  -.15894006E+02
+PHI     792 n    gly    51      25.615  12.887  29.588  -0.416  -.89118204E+01
+PHI     793 h    gly    51      25.278  12.764  28.644   0.272  -.11225223E+02
+PHI     794 ca   gly    51      25.262  11.882  30.585  -0.025  0.18149370E+02
+PHI     795 ha2  gly    51      25.212  10.929  30.059   0.070  0.16626163E+02
+PHI     796 ha3  gly    51      26.082  11.857  31.303   0.070  0.94290705E+01
+PHI     797 c    gly    51      23.951  12.106  31.335   0.597  0.91348782E+01
+PHI     798 o    gly    51      23.413  11.184  31.952  -0.568  -.23406618E+02
+PHI     799 n    lys    52      23.439  13.329  31.292  -0.348  0.54383416E+01
+PHI     800 h    lys    52      23.952  14.067  30.830   0.275  0.16278046E+02
+PHI     801 ca   lys    52      22.197  13.670  31.966  -0.240  0.27588413E+01
+PHI     802 ha   lys    52      22.093  13.086  32.880   0.143  0.44797912E+01
+PHI     803 cb   lys    52      22.198  15.154  32.332  -0.009  -.47322030E+01
+PHI     804 hb2  lys    52      22.423  15.719  31.427   0.036  -.38065557E+01
+PHI     805 hb3  lys    52      21.198  15.411  32.681   0.036  -.15708625E+01
+PHI     806 cg   lys    52      23.206  15.495  33.401   0.019  0.25273178E+01
+PHI     807 hg2  lys    52      24.185  15.125  33.097   0.010  0.39505663E+01
+PHI     808 hg3  lys    52      23.248  16.578  33.516   0.010  0.29426101E+00
+PHI     809 cd   lys    52      22.810  14.855  34.734  -0.048  0.64096446E+01
+PHI     810 hd2  lys    52      21.937  15.387  35.111   0.062  0.56670294E+01
+PHI     811 hd3  lys    52      22.546  13.816  34.538   0.062  0.55563908E+01
+PHI     812 ce   lys    52      23.931  14.908  35.779  -0.014  0.91543427E+01
+PHI     813 he2  lys    52      24.277  15.940  35.845   0.114  0.14094413E+02
+PHI     814 he3  lys    52      23.509  14.605  36.737   0.114  0.10751256E+02
+PHI     815 nz   lys    52      25.087  14.015  35.438  -0.385  0.17918316E+02
+PHI     816 hz1  lys    52      25.479  14.296  34.550   0.340  0.14955956E+02
+PHI     817 hz2  lys    52      25.793  14.089  36.156   0.340  0.16944317E+02
+PHI     818 hz3  lys    52      24.768  13.059  35.377   0.340  0.29622692E+02
+PHI     819 c    lys    52      20.949  13.316  31.142   0.734  0.18615971E+02
+PHI     820 o    lys    52      19.817  13.552  31.576  -0.589  -.17387680E+02
+PHI     821 n    gln    53      21.131  12.753  29.938  -0.416  0.85600452E+01
+PHI     822 h    gln    53      22.072  12.575  29.611   0.272  -.32860384E+01
+PHI     823 ca   gln    53      20.061  12.339  29.021  -0.003  0.65506592E+01
+PHI     824 ha   gln    53      20.527  12.099  28.065   0.085  -.97678199E-01
+PHI     825 cb   gln    53      19.406  11.041  29.537  -0.004  0.66017075E+01
+PHI     826 hb2  gln    53      18.979  11.219  30.525   0.017  0.31155255E+01
+PHI     827 hb3  gln    53      18.597  10.766  28.859   0.017  0.63541546E+01
+PHI     828 cg   gln    53      20.390   9.858  29.607  -0.065  0.10899775E+02
+PHI     829 hg2  gln    53      20.703   9.601  28.595   0.035  0.55532923E+01
+PHI     830 hg3  gln    53      21.273  10.144  30.179   0.035  0.26242695E+01
+PHI     831 cd   gln    53      19.797   8.614  30.266   0.695  0.13765088E+02
+PHI     832 oe1  gln    53      20.478   7.845  30.923  -0.609  -.84206934E+01
+PHI     833 ne2  gln    53      18.516   8.346  30.126  -0.941  -.48787643E+02
+PHI     834 he21 gln    53      18.179   7.532  30.605   0.425  -.16455290E+02
+PHI     835 he22 gln    53      17.919   8.984  29.631   0.425  -.17101110E+02
+PHI     836 c    gln    53      19.054  13.458  28.696   0.597  -.17065867E+01
+PHI     837 o    gln    53      17.868  13.188  28.517  -0.568  -.10678546E+02
+PHI     838 n    glu    54      19.514  14.717  28.605  -0.516  -.35774407E+00
+PHI     839 h    glu    54      20.500  14.900  28.728   0.294  -.20854342E+01
+PHI     840 ca   glu    54      18.638  15.836  28.318   0.040  0.32446091E+02
+PHI     841 ha   glu    54      17.625  15.592  28.638   0.111  0.13223467E+02
+PHI     842 cb   glu    54      19.090  17.103  29.047   0.056  0.80154753E+01
+PHI     843 hb2  glu    54      18.528  17.923  28.600  -0.017  0.27983849E+01
+PHI     844 hb3  glu    54      18.784  16.977  30.085  -0.017  -.80299872E+00
+PHI     845 cg   glu    54      20.572  17.418  28.992   0.014  0.68343434E+01
+PHI     846 hg2  glu    54      21.113  16.473  29.039  -0.043  0.18886763E+01
+PHI     847 hg3  glu    54      20.801  17.920  28.052  -0.043  -.36631064E+01
+PHI     848 cd   glu    54      20.997  18.305  30.158   0.805  -.25726372E+02
+PHI     849 oe1  glu    54      20.714  17.934  31.324  -0.819  -.25611275E+02
+PHI     850 oe2  glu    54      21.592  19.378  29.916  -0.819  -.35378197E+02
+PHI     851 c    glu    54      18.524  16.047  26.821   0.537  0.53140558E+03
+PHI     852 o    glu    54      17.837  16.961  26.358  -0.582  -.59020801E+03
+PHI     853 n    val    55      19.190  15.166  26.074  -0.416  -.38304822E+03
+PHI     854 h    val    55      19.746  14.469  26.549   0.272  0.20288574E+03
+PHI     855 ca   val    55      19.187  15.170  24.612  -0.088  -.10926434E+03
+PHI     856 ha   val    55      18.345  15.747  24.229   0.097  0.99602783E+02
+PHI     857 cb   val    55      20.509  15.768  24.027   0.299  0.21732635E+03
+PHI     858 hb   val    55      20.488  15.688  22.940  -0.030  -.90553055E+01
+PHI     859 cg1  val    55      20.646  17.241  24.427  -0.319  -.38571887E+03
+PHI     860 hg11 val    55      20.669  17.323  25.513   0.079  0.60576611E+02
+PHI     861 hg12 val    55      21.570  17.646  24.014   0.079  0.57558975E+02
+PHI     862 hg13 val    55      19.798  17.804  24.038   0.079  0.41659576E+02
+PHI     863 cg2  val    55      21.708  14.973  24.518  -0.319  -.43916071E+03
+PHI     864 hg21 val    55      21.614  13.936  24.196   0.079  0.52819565E+02
+PHI     865 hg22 val    55      22.622  15.400  24.103   0.079  0.83695999E+02
+PHI     866 hg23 val    55      21.750  15.013  25.606   0.079  0.59355282E+02
+PHI     867 c    val    55      19.003  13.723  24.141   0.597  0.69899481E+03
+PHI     868 o    val    55      19.136  12.788  24.924  -0.568  -.44301114E+03
+PHI     869 n    ile    56      18.709  13.518  22.868  -0.416  -.31536639E+03
+PHI     870 h    ile    56      18.538  14.283  22.231   0.272  0.30157675E+03
+PHI     871 ca   ile    56      18.507  12.164  22.387  -0.060  -.50160217E+02
+PHI     872 ha   ile    56      17.802  11.642  23.033   0.087  0.10208820E+03
+PHI     873 cb   ile    56      17.972  12.168  20.937   0.130  0.98614365E+02
+PHI     874 hb   ile    56      17.918  11.145  20.564   0.019  0.12369079E+02
+PHI     875 cg2  ile    56      16.555  12.801  20.917  -0.320  -.29306842E+03
+PHI     876 hg21 ile    56      16.608  13.824  21.289   0.088  0.77994835E+02
+PHI     877 hg22 ile    56      16.173  12.806  19.896   0.088  0.76307999E+02
+PHI     878 hg23 ile    56      15.887  12.218  21.551   0.088  0.71844208E+02
+PHI     879 cg1  ile    56      18.914  12.950  20.020  -0.043  -.34189972E+02
+PHI     880 hg12 ile    56      18.894  13.988  20.353   0.024  0.25112234E+02
+PHI     881 hg13 ile    56      19.914  12.541  20.167   0.024  0.39829300E+02
+PHI     882 cd1  ile    56      18.561  12.887  18.580  -0.066  -.79493530E+02
+PHI     883 hd11 ile    56      17.562  13.297  18.432   0.019  0.13327488E+02
+PHI     884 hd12 ile    56      19.281  13.468  18.003   0.019  0.18444338E+02
+PHI     885 hd13 ile    56      18.581  11.850  18.245   0.019  0.25783791E+02
+PHI     886 c    ile    56      19.767  11.294  22.510   0.597  0.39633817E+03
+PHI     887 o    ile    56      20.894  11.804  22.502  -0.568  -.50955035E+03
+PHI     888 n    arg    57      19.603   9.964  22.534  -0.348  -.34515963E+01
+PHI     889 h    arg    57      18.657   9.611  22.524   0.275  0.82521667E+01
+PHI     890 ca   arg    57      20.716   9.004  22.665  -0.264  0.13159515E+02
+PHI     891 ha   arg    57      21.217   9.205  23.615   0.156  0.70257578E+01
+PHI     892 cb   arg    57      20.146   7.576  22.703  -0.001  0.10102276E+02
+PHI     893 hb2  arg    57      19.391   7.512  23.488   0.033  0.49067802E+01
+PHI     894 hb3  arg    57      19.680   7.345  21.746   0.033  0.10804543E+02
+PHI     895 cg   arg    57      21.251   6.554  22.991   0.039  0.13155165E+02
+PHI     896 hg2  arg    57      21.999   6.590  22.200   0.029  0.10340505E+02
+PHI     897 hg3  arg    57      21.735   6.812  23.935   0.029  0.89163074E+01
+PHI     898 cd   arg    57      20.733   5.119  23.078   0.049  0.61532931E+01
+PHI     899 hd2  arg    57      20.020   5.039  23.900   0.069  0.12434381E+02
+PHI     900 hd3  arg    57      20.244   4.851  22.139   0.069  0.91560707E+01
+PHI     901 ne   arg    57      21.884   4.243  23.311  -0.530  -.75246887E+01
+PHI     902 he   arg    57      22.809   4.678  23.264   0.346  0.12959215E+02
+PHI     903 cz   arg    57      21.946   2.967  23.599   0.808  -.20664562E+02
+PHI     904 nh1  arg    57      20.884   2.218  23.709  -0.863  -.56424981E+00
+PHI     905 hh11 arg    57      19.990   2.646  23.550   0.448  0.19859556E+02
+PHI     906 hh12 arg    57      20.970   1.262  23.986   0.448  0.42829852E+01
+PHI     907 nh2  arg    57      23.122   2.453  23.783  -0.863  -.44359722E+02
+PHI     908 hh21 arg    57      23.909   3.107  23.650   0.448  -.22358715E+02
+PHI     909 hh22 arg    57      23.280   1.486  23.959   0.448  -.11161955E+02
+PHI     910 c    arg    57      21.794   9.154  21.582   0.734  0.21914015E+02
+PHI     911 o    arg    57      22.981   9.022  21.867  -0.589  -.41499302E+02
+PHI     912 n    gly    58      21.405   9.453  20.342  -0.416  -.12910178E+02
+PHI     913 h    gly    58      20.409   9.502  20.153   0.272  0.96435328E+01
+PHI     914 ca   gly    58      22.346   9.670  19.240  -0.025  0.20665054E+02
+PHI     915 ha2  gly    58      22.985   8.793  19.132   0.070  0.21756330E+02
+PHI     916 ha3  gly    58      21.785   9.801  18.320   0.070  0.19302675E+02
+PHI     917 c    gly    58      23.248  10.894  19.426   0.597  0.11254241E+02
+PHI     918 o    gly    58      24.371  10.891  18.930  -0.568  -.46213219E+02
+PHI     919 n    trp    59      22.794  11.908  20.170  -0.416  -.38280258E+03
+PHI     920 h    trp    59      21.893  11.818  20.622   0.272  0.32013251E+03
+PHI     921 ca   trp    59      23.633  13.034  20.586  -0.028  -.21767159E+02
+PHI     922 ha   trp    59      24.263  13.357  19.756   0.112  0.91337349E+02
+PHI     923 cb   trp    59      22.751  14.209  21.012  -0.005  -.63157277E+01
+PHI     924 hb2  trp    59      21.890  13.856  21.573   0.034  0.35661087E+02
+PHI     925 hb3  trp    59      23.334  14.822  21.700   0.034  0.40283749E+02
+PHI     926 cg   trp    59      22.267  15.124  19.934  -0.142  -.13244698E+03
+PHI     927 cd1  trp    59      21.734  14.794  18.735  -0.164  -.21814081E+03
+PHI     928 hd1  trp    59      21.596  13.781  18.386   0.206  0.15665431E+03
+PHI     929 ne1  trp    59      21.372  15.944  18.053  -0.342  -.29063040E+03
+PHI     930 he1  trp    59      20.926  15.939  17.142   0.341  0.27243103E+03
+PHI     931 ce2  trp    59      21.662  17.075  18.790   0.138  0.12869598E+03
+PHI     932 cz2  trp    59      21.474  18.448  18.578  -0.260  -.29994150E+03
+PHI     933 hz2  trp    59      21.007  18.805  17.675   0.157  0.22778217E+03
+PHI     934 ch2  trp    59      21.891  19.351  19.573  -0.113  -.10618754E+03
+PHI     935 hh2  trp    59      21.734  20.408  19.445   0.142  0.21711504E+03
+PHI     936 cz3  trp    59      22.502  18.878  20.747  -0.197  -.17790436E+03
+PHI     937 hz3  trp    59      22.839  19.557  21.510   0.145  0.16118254E+03
+PHI     938 ce3  trp    59      22.668  17.504  20.957  -0.239  -.23043729E+03
+PHI     939 he3  trp    59      23.108  17.149  21.878   0.170  0.15270065E+03
+PHI     940 cd2  trp    59      22.249  16.573  19.988   0.124  0.98676392E+02
+PHI     941 c    trp    59      24.565  12.659  21.742   0.597  0.44412418E+03
+PHI     942 o    trp    59      25.749  12.985  21.676  -0.568  -.54360275E+02
+PHI     943 n    glu    60      24.069  11.941  22.760  -0.516  -.36717712E+03
+PHI     944 h    glu    60      23.094  11.679  22.735   0.294  0.23535992E+03
+PHI     945 ca   glu    60      24.872  11.500  23.887   0.040  0.54809370E+01
+PHI     946 ha   glu    60      25.239  12.361  24.446   0.111  0.15625335E+01
+PHI     947 cb   glu    60      24.028  10.641  24.816   0.056  0.85378618E+01
+PHI     948 hb2  glu    60      23.610   9.840  24.206  -0.017  0.39532497E+01
+PHI     949 hb3  glu    60      24.710  10.217  25.553  -0.017  0.11265463E+02
+PHI     950 cg   glu    60      22.923  11.363  25.516   0.014  0.29732584E+02
+PHI     951 hg2  glu    60      22.515  12.110  24.835  -0.043  -.45054230E+02
+PHI     952 hg3  glu    60      22.152  10.632  25.757  -0.043  0.42516880E+01
+PHI     953 cd   glu    60      23.384  12.033  26.772   0.805  0.65221899E+03
+PHI     954 oe1  glu    60      24.182  12.981  26.689  -0.819  -.11424513E+04
+PHI     955 oe2  glu    60      22.937  11.613  27.845  -0.819  -.13329434E+03
+PHI     956 c    glu    60      26.055  10.659  23.390   0.537  0.24041168E+02
+PHI     957 o    glu    60      27.193  10.821  23.848  -0.582  -.14885702E+02
+PHI     958 n    glu    61      25.820   9.735  22.452  -0.516  -.10522138E+02
+PHI     959 h    glu    61      24.859   9.594  22.149   0.294  0.29613109E+01
+PHI     960 ca   glu    61      26.859   8.834  21.938   0.040  0.12529339E+02
+PHI     961 ha   glu    61      27.591   8.655  22.725   0.111  0.13840199E+02
+PHI     962 cb   glu    61      26.252   7.472  21.577   0.056  0.46095819E+01
+PHI     963 hb2  glu    61      25.398   7.607  20.910  -0.017  0.28147907E+01
+PHI     964 hb3  glu    61      27.012   6.885  21.060  -0.017  0.30074790E+01
+PHI     965 cg   glu    61      25.819   6.718  22.848   0.014  -.62691188E+00
+PHI     966 hg2  glu    61      26.666   6.670  23.536  -0.043  0.92341143E+00
+PHI     967 hg3  glu    61      25.020   7.279  23.340  -0.043  -.70605350E+01
+PHI     968 cd   glu    61      25.330   5.290  22.576   0.805  -.12229620E+02
+PHI     969 oe1  glu    61      25.696   4.701  21.541  -0.819  -.27745981E+02
+PHI     970 oe2  glu    61      24.558   4.763  23.412  -0.819  -.51349648E+02
+PHI     971 c    glu    61      27.664   9.412  20.765   0.537  0.99740791E+01
+PHI     972 o    glu    61      28.841   9.072  20.646  -0.582  -.31670731E+02
+PHI     973 n    gly    62      27.095  10.305  19.943  -0.416  0.77734103E+01
+PHI     974 h    gly    62      26.114  10.519  20.053   0.272  0.10665993E+02
+PHI     975 ca   gly    62      27.812  10.910  18.829  -0.025  0.88244314E+01
+PHI     976 ha2  gly    62      28.417  10.127  18.371   0.070  0.69593090E+00
+PHI     977 ha3  gly    62      27.065  11.256  18.114   0.070  0.72987485E+01
+PHI     978 c    gly    62      28.717  12.079  19.207   0.597  0.11155704E+02
+PHI     979 o    gly    62      29.845  12.184  18.722  -0.568  -.17256586E+02
+PHI     980 n    val    63      28.210  12.995  20.039  -0.416  0.57912284E+00
+PHI     981 h    val    63      27.279  12.867  20.424   0.272  0.11565656E+02
+PHI     982 ca   val    63      28.986  14.170  20.460  -0.088  -.14408388E+01
+PHI     983 ha   val    63      29.416  14.633  19.570   0.097  -.14367017E+01
+PHI     984 cb   val    63      28.105  15.234  21.152   0.299  -.32520196E+01
+PHI     985 hb   val    63      27.648  14.803  22.043  -0.030  0.51724114E+01
+PHI     986 cg1  val    63      28.900  16.479  21.575  -0.319  -.14151431E+02
+PHI     987 hg11 val    63      29.443  16.883  20.719   0.079  -.33205812E+01
+PHI     988 hg12 val    63      28.228  17.243  21.965   0.079  -.28647540E+01
+PHI     989 hg13 val    63      29.612  16.222  22.358   0.079  -.49252329E+01
+PHI     990 cg2  val    63      26.999  15.721  20.201  -0.319  -.16496408E+02
+PHI     991 hg21 val    63      26.353  14.894  19.911   0.079  -.33345704E+01
+PHI     992 hg22 val    63      26.383  16.472  20.695   0.079  -.57714348E+01
+PHI     993 hg23 val    63      27.444  16.155  19.304   0.079  -.54754095E+01
+PHI     994 c    val    63      30.164  13.727  21.326   0.597  0.11411998E+00
+PHI     995 o    val    63      31.203  14.376  21.306  -0.568  -.20676521E+02
+PHI     996 n    ala    64      30.081  12.571  22.007  -0.416  0.14897928E+01
+PHI     997 h    ala    64      29.231  12.026  21.982   0.272  0.92779169E+01
+PHI     998 ca   ala    64      31.188  12.090  22.827   0.034  0.10148948E+02
+PHI     999 ha   ala    64      31.537  12.909  23.456   0.082  0.14334562E+02
+PHI    1000 cb   ala    64      30.735  10.937  23.729  -0.183  -.14002303E+01
+PHI    1001 hb1  ala    64      30.391  10.107  23.112   0.060  0.16979336E+01
+PHI    1002 hb2  ala    64      31.571  10.609  24.347   0.060  0.33482730E+01
+PHI    1003 hb3  ala    64      29.921  11.275  24.370   0.060  -.98023260E+00
+PHI    1004 c    ala    64      32.368  11.633  21.956   0.597  0.20503590E+02
+PHI    1005 o    ala    64      33.451  11.404  22.476  -0.568  -.48683456E+02
+PHI    1006 n    gln    65      32.144  11.455  20.654  -0.416  -.62750592E+01
+PHI    1007 h    gln    65      31.219  11.616  20.283   0.272  -.52858883E+00
+PHI    1008 ca   gln    65      33.201  11.022  19.726  -0.003  0.73611612E+01
+PHI    1009 ha   gln    65      34.012  10.566  20.294   0.085  0.18369908E+01
+PHI    1010 cb   gln    65      32.683  10.008  18.718  -0.004  0.59927149E+01
+PHI    1011 hb2  gln    65      31.936  10.520  18.112   0.017  -.27555873E+01
+PHI    1012 hb3  gln    65      33.529   9.728  18.090   0.017  0.45029173E+01
+PHI    1013 cg   gln    65      32.081   8.782  19.318  -0.065  0.16707010E+02
+PHI    1014 hg2  gln    65      32.875   8.198  19.784   0.035  0.82551317E+01
+PHI    1015 hg3  gln    65      31.347   9.064  20.073   0.035  0.37853122E+01
+PHI    1016 cd   gln    65      31.397   7.924  18.275   0.695  -.10233656E+02
+PHI    1017 oe1  gln    65      31.881   7.789  17.154  -0.609  -.39552666E+02
+PHI    1018 ne2  gln    65      30.261   7.351  18.631  -0.941  -.40957256E+02
+PHI    1019 he21 gln    65      29.765   6.769  17.972   0.425  -.14483086E+02
+PHI    1020 he22 gln    65      29.895   7.498  19.560   0.425  -.18111696E+02
+PHI    1021 c    gln    65      33.770  12.206  18.942   0.597  0.14116703E+02
+PHI    1022 o    gln    65      34.589  12.028  18.052  -0.568  -.11279614E+02
+PHI    1023 n    met    66      33.231  13.412  19.155  -0.416  0.22150247E+00
+PHI    1024 h    met    66      32.559  13.510  19.904   0.272  -.34508669E+01
+PHI    1025 ca   met    66      33.704  14.646  18.532  -0.024  -.12853863E+01
+PHI    1026 ha   met    66      34.167  14.419  17.574   0.088  0.64598417E+01
+PHI    1027 cb   met    66      32.536  15.623  18.312   0.034  0.34660027E+01
+PHI    1028 hb2  met    66      32.028  15.801  19.259   0.024  0.12729137E+01
+PHI    1029 hb3  met    66      32.942  16.573  17.965   0.024  0.31391535E+01
+PHI    1030 cg   met    66      31.518  15.123  17.279   0.002  -.42552729E+01
+PHI    1031 hg2  met    66      32.013  15.035  16.311   0.044  0.29707220E+01
+PHI    1032 hg3  met    66      31.182  14.129  17.574   0.044  -.23329408E+01
+PHI    1033 sd   met    66      30.042  16.171  17.091  -0.274  -.29699530E+02
+PHI    1034 ce   met    66      30.778  17.703  16.456  -0.054  -.51937313E+01
+PHI    1035 he1  met    66      31.319  17.502  15.532   0.068  0.45781562E+00
+PHI    1036 he2  met    66      29.990  18.428  16.259   0.068  -.35819528E+01
+PHI    1037 he3  met    66      31.464  18.124  17.191   0.068  -.45400855E+00
+PHI    1038 c    met    66      34.740  15.297  19.446   0.597  -.35887301E+01
+PHI    1039 o    met    66      34.699  15.095  20.662  -0.568  -.23294781E+02
+PHI    1040 n    ser    67      35.622  16.130  18.894  -0.416  -.97403069E+01
+PHI    1041 h    ser    67      35.672  16.222  17.889   0.272  -.21323941E+01
+PHI    1042 ca   ser    67      36.573  16.884  19.706  -0.025  0.45078764E+01
+PHI    1043 ha   ser    67      36.454  16.595  20.750   0.084  0.79103398E+01
+PHI    1044 cb   ser    67      38.036  16.623  19.286   0.212  -.75595617E+01
+PHI    1045 hb2  ser    67      38.680  17.191  19.957   0.035  -.63936238E+01
+PHI    1046 hb3  ser    67      38.232  15.558  19.410   0.035  0.10282975E+01
+PHI    1047 og   ser    67      38.303  16.999  17.944  -0.655  -.18613602E+02
+PHI    1048 hg   ser    67      39.223  16.816  17.737   0.428  0.91640310E+01
+PHI    1049 c    ser    67      36.248  18.352  19.594   0.597  -.87679625E+01
+PHI    1050 o    ser    67      35.637  18.783  18.618  -0.568  -.35731644E+02
+PHI    1051 n    val    68      36.682  19.123  20.580  -0.416  -.80423985E+01
+PHI    1052 h    val    68      37.140  18.715  21.382   0.272  0.91367149E+00
+PHI    1053 ca   val    68      36.436  20.557  20.582  -0.088  0.86569536E+00
+PHI    1054 ha   val    68      35.363  20.734  20.650   0.097  0.74217401E+01
+PHI    1055 cb   val    68      37.133  21.277  21.763   0.299  0.67414112E+01
+PHI    1056 hb   val    68      38.206  21.092  21.708  -0.030  0.56751380E+01
+PHI    1057 cg1  val    68      36.872  22.779  21.700  -0.319  -.19006271E+01
+PHI    1058 hg11 val    68      35.800  22.965  21.755   0.079  -.11015512E+01
+PHI    1059 hg12 val    68      37.369  23.270  22.537   0.079  -.11888397E+01
+PHI    1060 hg13 val    68      37.262  23.177  20.763   0.079  0.17896266E+01
+PHI    1061 cg2  val    68      36.617  20.748  23.080  -0.319  -.17345978E+02
+PHI    1062 hg21 val    68      36.820  19.679  23.147   0.079  -.80683489E+01
+PHI    1063 hg22 val    68      37.117  21.264  23.900   0.079  -.53305793E+01
+PHI    1064 hg23 val    68      35.543  20.919  23.144   0.079  -.43637486E+01
+PHI    1065 c    val    68      36.842  21.226  19.278   0.597  -.81767654E+01
+PHI    1066 o    val    68      37.978  21.057  18.787  -0.568  -.54177071E+02
+PHI    1067 n    gly    69      35.946  22.000  18.666  -0.416  -.23899891E+01
+PHI    1068 h    gly    69      35.031  22.115  19.086   0.272  0.69444690E+01
+PHI    1069 ca   gly    69      36.137  22.665  17.371  -0.025  0.13061750E+02
+PHI    1070 ha2  gly    69      35.578  23.601  17.371   0.070  0.80967121E+01
+PHI    1071 ha3  gly    69      37.193  22.896  17.225   0.070  0.70146232E+01
+PHI    1072 c    gly    69      35.661  21.837  16.172   0.597  0.20125587E+02
+PHI    1073 o    gly    69      35.554  22.360  15.065  -0.568  -.36977509E+00
+PHI    1074 n    gln    70      35.376  20.544  16.359  -0.416  -.13463469E+02
+PHI    1075 h    gln    70      35.480  20.141  17.284   0.272  0.20573678E+01
+PHI    1076 ca   gln    70      34.923  19.675  15.280  -0.003  -.11296287E+02
+PHI    1077 ha   gln    70      35.584  19.828  14.428   0.085  0.14113567E+01
+PHI    1078 cb   gln    70      35.006  18.200  15.707  -0.004  -.28543420E+01
+PHI    1079 hb2  gln    70      35.985  18.029  16.152   0.017  -.50059962E+01
+PHI    1080 hb3  gln    70      34.247  17.999  16.465   0.017  -.10828409E+01
+PHI    1081 cg   gln    70      34.834  17.202  14.547  -0.065  0.69548125E+01
+PHI    1082 hg2  gln    70      33.822  17.272  14.150   0.035  0.77419605E+01
+PHI    1083 hg3  gln    70      35.539  17.442  13.755   0.035  0.35968337E+01
+PHI    1084 cd   gln    70      35.097  15.762  14.978   0.695  0.14592201E+02
+PHI    1085 oe1  gln    70      35.631  15.492  16.038  -0.609  -.68208585E+01
+PHI    1086 ne2  gln    70      34.751  14.771  14.187  -0.941  -.29175299E+02
+PHI    1087 he21 gln    70      34.931  13.845  14.540   0.425  -.31418343E+02
+PHI    1088 he22 gln    70      34.375  14.919  13.267   0.425  -.31943829E+01
+PHI    1089 c    gln    70      33.505  20.037  14.856   0.597  0.13245161E+02
+PHI    1090 o    gln    70      32.595  20.165  15.684  -0.568  -.30891954E+02
+PHI    1091 n    arg    71      33.306  20.074  13.540  -0.348  0.83969126E+01
+PHI    1092 h    arg    71      34.114  19.947  12.935   0.275  -.45093460E+01
+PHI    1093 ca   arg    71      31.985  20.052  12.924  -0.264  -.64152341E+01
+PHI    1094 ha   arg    71      31.235  20.147  13.703   0.156  -.19698108E+01
+PHI    1095 cb   arg    71      31.845  21.235  11.965  -0.001  -.17553353E+01
+PHI    1096 hb2  arg    71      32.241  22.130  12.445   0.033  -.25484048E-01
+PHI    1097 hb3  arg    71      32.418  21.046  11.057   0.033  -.35193461E+00
+PHI    1098 cg   arg    71      30.382  21.471  11.589   0.039  0.14334785E+02
+PHI    1099 hg2  arg    71      30.069  20.713  10.869   0.029  0.79648399E+01
+PHI    1100 hg3  arg    71      29.746  21.406  12.470   0.029  0.41059942E+01
+PHI    1101 cd   arg    71      30.226  22.863  10.983   0.049  0.12573417E+02
+PHI    1102 hd2  arg    71      30.347  23.612  11.770   0.069  0.89993677E+01
+PHI    1103 hd3  arg    71      31.003  23.011  10.230   0.069  0.87942476E+01
+PHI    1104 ne   arg    71      28.909  22.989  10.350  -0.530  -.31930723E+01
+PHI    1105 he   arg    71      28.293  22.173  10.387   0.346  -.53345127E+01
+PHI    1106 cz   arg    71      28.458  24.018   9.678   0.808  -.14637363E+02
+PHI    1107 nh1  arg    71      29.045  25.182   9.747  -0.863  -.42304516E+02
+PHI    1108 hh11 arg    71      29.790  25.286  10.424   0.448  -.10088005E+02
+PHI    1109 hh12 arg    71      28.715  25.970   9.231   0.448  -.70391455E+01
+PHI    1110 nh2  arg    71      27.406  23.881   8.924  -0.863  -.77715487E+01
+PHI    1111 hh21 arg    71      27.002  22.936   8.841   0.448  -.12184138E+02
+PHI    1112 hh22 arg    71      27.127  24.594   8.287   0.448  0.93135948E+01
+PHI    1113 c    arg    71      31.794  18.711  12.246   0.734  0.41418003E+02
+PHI    1114 o    arg    71      32.697  18.222  11.565  -0.589  -.21693857E+01
+PHI    1115 n    ala    72      30.635  18.102  12.442  -0.416  0.15951821E+01
+PHI    1116 h    ala    72      29.930  18.561  13.014   0.272  0.13908173E+01
+PHI    1117 ca   ala    72      30.328  16.775  11.931   0.034  -.29393411E+01
+PHI    1118 ha   ala    72      30.895  16.600  11.016   0.082  0.54915204E+01
+PHI    1119 cb   ala    72      30.749  15.734  12.980  -0.183  -.10812696E+02
+PHI    1120 hb1  ala    72      30.169  15.869  13.894   0.060  -.54100552E+01
+PHI    1121 hb2  ala    72      30.571  14.730  12.595   0.060  -.22015457E+01
+PHI    1122 hb3  ala    72      31.810  15.837  13.207   0.060  0.23404286E+01
+PHI    1123 c    ala    72      28.843  16.645  11.589   0.597  0.25935966E+02
+PHI    1124 o    ala    72      27.995  17.379  12.101  -0.568  -.19222410E+02
+PHI    1125 n    lys    73      28.538  15.672  10.733  -0.348  0.15383213E+02
+PHI    1126 h    lys    73      29.305  15.116  10.362   0.275  -.10417266E+01
+PHI    1127 ca   lys    73      27.181  15.229  10.447  -0.240  0.23986123E+01
+PHI    1128 ha   lys    73      26.494  16.020  10.727   0.143  -.89905989E+00
+PHI    1129 cb   lys    73      27.041  14.975   8.942  -0.009  0.13588957E+00
+PHI    1130 hb2  lys    73      27.554  15.761   8.386   0.036  0.41143684E+01
+PHI    1131 hb3  lys    73      27.524  14.030   8.700   0.036  -.24719551E+00
+PHI    1132 cg   lys    73      25.570  14.962   8.502   0.019  0.54409828E+01
+PHI    1133 hg2  lys    73      24.957  14.443   9.241   0.010  0.38832779E+01
+PHI    1134 hg3  lys    73      25.216  15.992   8.428   0.010  0.38360219E+01
+PHI    1135 cd   lys    73      25.425  14.270   7.140  -0.048  0.87101831E+01
+PHI    1136 hd2  lys    73      24.473  14.545   6.687   0.062  0.11182690E+02
+PHI    1137 hd3  lys    73      26.239  14.582   6.482   0.062  0.53051233E+01
+PHI    1138 ce   lys    73      25.458  12.757   7.371  -0.014  0.65285182E+01
+PHI    1139 he2  lys    73      26.248  12.523   8.091   0.114  0.51948066E+01
+PHI    1140 he3  lys    73      24.510  12.449   7.818   0.114  0.16958680E+01
+PHI    1141 nz   lys    73      25.727  11.989   6.140  -0.385  0.15583947E+02
+PHI    1142 hz1  lys    73      26.665  12.202   5.787   0.340  0.26747460E+01
+PHI    1143 hz2  lys    73      25.909  11.017   6.407   0.340  0.14356502E+02
+PHI    1144 hz3  lys    73      25.030  12.075   5.422   0.340  0.12443394E+02
+PHI    1145 c    lys    73      26.898  13.973  11.275   0.734  0.16908966E+02
+PHI    1146 o    lys    73      27.614  12.985  11.127  -0.589  -.50796951E+02
+PHI    1147 n    leu    74      25.871  14.009  12.122  -0.416  0.25495908E+01
+PHI    1148 h    leu    74      25.345  14.875  12.168   0.272  0.61987227E+00
+PHI    1149 ca   leu    74      25.355  12.847  12.854  -0.052  0.11023012E+01
+PHI    1150 ha   leu    74      26.123  12.078  12.913   0.092  -.67390245E+00
+PHI    1151 cb   leu    74      24.940  13.233  14.294  -0.110  0.32069843E+01
+PHI    1152 hb2  leu    74      24.030  13.825  14.243   0.046  0.56342659E+02
+PHI    1153 hb3  leu    74      24.691  12.314  14.824   0.046  0.44245396E+01
+PHI    1154 cg   leu    74      25.954  14.024  15.141   0.353  0.95529556E+01
+PHI    1155 hg   leu    74      26.156  14.984  14.666  -0.036  0.73732634E+01
+PHI    1156 cd1  leu    74      25.369  14.278  16.533  -0.412  -.24570973E+01
+PHI    1157 hd11 leu    74      25.185  13.333  17.046   0.100  0.24391005E+01
+PHI    1158 hd12 leu    74      26.071  14.872  17.119   0.100  -.44084754E+01
+PHI    1159 hd13 leu    74      24.431  14.827  16.447   0.100  0.90347282E+02
+PHI    1160 cd2  leu    74      27.265  13.269  15.320  -0.412  -.15178660E+02
+PHI    1161 hd21 leu    74      27.706  13.072  14.345   0.100  -.65508809E+01
+PHI    1162 hd22 leu    74      27.963  13.871  15.903   0.100  -.10380773E+02
+PHI    1163 hd23 leu    74      27.080  12.330  15.837   0.100  -.94901457E+01
+PHI    1164 c    leu    74      24.138  12.296  12.097   0.597  0.26192563E+01
+PHI    1165 o    leu    74      23.143  13.010  11.986  -0.568  -.35736912E+02
+PHI    1166 n    thr    75      24.173  11.053  11.611  -0.416  -.44500232E+01
+PHI    1167 h    thr    75      25.020  10.515  11.729   0.272  -.74154329E+01
+PHI    1168 ca   thr    75      23.006  10.392  11.025  -0.039  0.20824348E+02
+PHI    1169 ha   thr    75      22.280  11.161  10.761   0.101  0.58494538E+00
+PHI    1170 cb   thr    75      23.366   9.613   9.769   0.365  0.23766333E+02
+PHI    1171 hb   thr    75      24.172   8.917  10.003   0.004  0.83063059E+01
+PHI    1172 cg2  thr    75      22.152   8.833   9.252  -0.244  0.60562711E+01
+PHI    1173 hg21 thr    75      21.346   9.528   9.017   0.064  0.35908558E+01
+PHI    1174 hg22 thr    75      22.430   8.282   8.353   0.064  0.15524287E+01
+PHI    1175 hg23 thr    75      21.817   8.133  10.017   0.064  0.19736935E+01
+PHI    1176 og1  thr    75      23.766  10.547   8.763  -0.676  -.41315851E+01
+PHI    1177 hg1  thr    75      23.998  10.074   7.960   0.410  -.62306476E+00
+PHI    1178 c    thr    75      22.518   9.465  12.133   0.597  0.52700162E+01
+PHI    1179 o    thr    75      23.257   8.582  12.583  -0.568  -.32334423E+02
+PHI    1180 n    ile    76      21.278   9.612  12.604  -0.416  -.16298801E+02
+PHI    1181 h    ile    76      20.687  10.315  12.170   0.272  -.93425484E+01
+PHI    1182 ca   ile    76      20.759   8.974  13.829  -0.060  0.15442890E+02
+PHI    1183 ha   ile    76      21.498   8.272  14.216   0.087  0.17766840E+02
+PHI    1184 cb   ile    76      20.496  10.034  14.929   0.130  0.58311400E+01
+PHI    1185 hb   ile    76      19.683  10.682  14.596   0.019  0.68492284E+01
+PHI    1186 cg2  ile    76      20.055   9.323  16.223  -0.320  -.49954963E+01
+PHI    1187 hg21 ile    76      20.837   8.645  16.565   0.088  0.46669946E+01
+PHI    1188 hg22 ile    76      19.825  10.045  17.004   0.088  0.51044426E+01
+PHI    1189 hg23 ile    76      19.146   8.750  16.052   0.088  -.38230536E+01
+PHI    1190 cg1  ile    76      21.736  10.922  15.200  -0.043  0.31345356E+01
+PHI    1191 hg12 ile    76      22.549  10.303  15.574   0.024  0.62413077E+01
+PHI    1192 hg13 ile    76      22.060  11.387  14.270   0.024  0.33081345E+02
+PHI    1193 cd1  ile    76      21.491  12.066  16.192  -0.066  -.79210777E+02
+PHI    1194 hd11 ile    76      21.356  11.682  17.200   0.019  0.24667353E+02
+PHI    1195 hd12 ile    76      22.350  12.736  16.189   0.019  0.22970163E+02
+PHI    1196 hd13 ile    76      20.601  12.621  15.900   0.019  0.20382677E+02
+PHI    1197 c    ile    76      19.480   8.186  13.513   0.597  0.89827938E+01
+PHI    1198 o    ile    76      18.498   8.754  13.040  -0.568  -.48565228E+02
+PHI    1199 n    ser    77      19.493   6.876  13.776  -0.416  -.81160479E+01
+PHI    1200 h    ser    77      20.319   6.487  14.208   0.272  -.22046523E+01
+PHI    1201 ca   ser    77      18.351   5.996  13.549  -0.025  0.29481025E+01
+PHI    1202 ha   ser    77      17.929   6.176  12.560   0.084  0.19331362E+01
+PHI    1203 cb   ser    77      18.803   4.527  13.631   0.212  0.45684590E+01
+PHI    1204 hb2  ser    77      17.930   3.886  13.516   0.035  0.44102459E+01
+PHI    1205 hb3  ser    77      19.506   4.332  12.821   0.035  0.91309404E+01
+PHI    1206 og   ser    77      19.430   4.254  14.878  -0.655  -.92749510E+01
+PHI    1207 hg   ser    77      19.703   3.334  14.904   0.428  -.52847013E+01
+PHI    1208 c    ser    77      17.250   6.311  14.596   0.597  0.12506594E+02
+PHI    1209 o    ser    77      17.548   6.767  15.713  -0.568  -.46226795E+02
+PHI    1210 n    pro    78      15.984   5.969  14.278  -0.255  0.38370259E+01
+PHI    1211 cd   pro    78      15.552   5.237  13.094   0.019  0.53762217E+01
+PHI    1212 hd2  pro    78      15.786   4.179  13.211   0.039  0.60921221E+01
+PHI    1213 hd3  pro    78      15.993   5.628  12.178   0.039  0.43404317E+01
+PHI    1214 cg   pro    78      14.047   5.413  13.024   0.019  0.83147163E+01
+PHI    1215 hg2  pro    78      13.555   4.551  12.572   0.021  0.43673615E+01
+PHI    1216 hg3  pro    78      13.850   6.310  12.449   0.021  -.81593424E+00
+PHI    1217 cb   pro    78      13.623   5.625  14.474  -0.007  0.76367564E+01
+PHI    1218 hb2  pro    78      13.417   4.656  14.931   0.025  0.79488440E+01
+PHI    1219 hb3  pro    78      12.755   6.278  14.553   0.025  0.62542915E+01
+PHI    1220 ca   pro    78      14.840   6.283  15.125  -0.027  0.46322131E+01
+PHI    1221 ha   pro    78      14.700   7.365  15.120   0.064  0.10849034E+01
+PHI    1222 c    pro    78      15.003   5.811  16.566   0.590  0.30274417E+01
+PHI    1223 o    pro    78      14.679   6.563  17.484  -0.575  -.22443268E+02
+PHI    1224 n    asp    79      15.532   4.602  16.792  -0.516  -.17007726E+01
+PHI    1225 h    asp    79      15.716   3.986  16.013   0.294  0.78751955E+01
+PHI    1226 ca   asp    79      15.730   4.090  18.138   0.038  0.84627571E+01
+PHI    1227 ha   asp    79      14.813   4.206  18.716   0.088  0.14031139E+02
+PHI    1228 cb   asp    79      16.098   2.607  18.097  -0.030  0.23737848E+02
+PHI    1229 hb2  asp    79      16.280   2.293  19.124  -0.012  0.62126546E+01
+PHI    1230 hb3  asp    79      15.251   2.054  17.692  -0.012  0.55105729E+01
+PHI    1231 cg   asp    79      17.332   2.328  17.257   0.799  0.50414722E+02
+PHI    1232 od1  asp    79      17.382   2.753  16.080  -0.801  -.34068275E+02
+PHI    1233 od2  asp    79      18.255   1.661  17.782  -0.801  -.22523418E+02
+PHI    1234 c    asp    79      16.718   4.887  18.998   0.537  0.22993866E+02
+PHI    1235 o    asp    79      16.752   4.722  20.224  -0.582  -.38290627E+02
+PHI    1236 n    tyr    80      17.577   5.699  18.388  -0.416  0.13243555E+02
+PHI    1237 h    tyr    80      17.521   5.789  17.376   0.272  0.10157906E+02
+PHI    1238 ca   tyr    80      18.493   6.574  19.116  -0.001  0.17479977E+02
+PHI    1239 ha   tyr    80      18.474   6.317  20.174   0.088  0.11572049E+02
+PHI    1240 cb   tyr    80      19.937   6.357  18.629  -0.015  0.59967484E+01
+PHI    1241 hb2  tyr    80      19.933   6.271  17.541   0.030  0.51833229E+01
+PHI    1242 hb3  tyr    80      20.524   7.241  18.873   0.030  0.11725034E+02
+PHI    1243 cg   tyr    80      20.661   5.152  19.225  -0.001  -.49108791E+01
+PHI    1244 cd1  tyr    80      20.022   3.899  19.358  -0.191  -.16553396E+02
+PHI    1245 hd1  tyr    80      18.987   3.766  19.097   0.170  0.90424311E+00
+PHI    1246 ce1  tyr    80      20.722   2.764  19.796  -0.234  -.14907044E+01
+PHI    1247 he1  tyr    80      20.202   1.816  19.859   0.166  0.17739322E+01
+PHI    1248 cz   tyr    80      22.084   2.866  20.124   0.323  -.13224034E+02
+PHI    1249 oh   tyr    80      22.772   1.757  20.491  -0.558  -.22442825E+02
+PHI    1250 hh   tyr    80      22.219   0.974  20.513   0.399  0.26185780E+01
+PHI    1251 ce2  tyr    80      22.731   4.114  20.009  -0.234  -.13029776E+02
+PHI    1252 he2  tyr    80      23.777   4.183  20.271   0.166  -.45661063E+01
+PHI    1253 cd2  tyr    80      22.026   5.252  19.567  -0.191  -.43001466E+01
+PHI    1254 hd2  tyr    80      22.542   6.202  19.495   0.170  0.70125804E+01
+PHI    1255 c    tyr    80      18.007   8.025  19.051   0.597  0.11102188E+02
+PHI    1256 o    tyr    80      18.749   8.927  19.454  -0.568  0.47093110E+01
+PHI    1257 n    ala    81      16.768   8.254  18.591  -0.416  -.12198109E+02
+PHI    1258 h    ala    81      16.248   7.495  18.175   0.272  -.13610054E+01
+PHI    1259 ca   ala    81      16.201   9.600  18.525   0.034  0.26079943E+02
+PHI    1260 ha   ala    81      16.824  10.264  19.124   0.082  0.17188538E+02
+PHI    1261 cb   ala    81      16.200  10.102  17.080  -0.183  0.48472166E+01
+PHI    1262 hb1  ala    81      15.573   9.452  16.469   0.060  0.61353517E+01
+PHI    1263 hb2  ala    81      15.808  11.119  17.048   0.060  0.10144261E+02
+PHI    1264 hb3  ala    81      17.219  10.094  16.691   0.060  0.15626503E+01
+PHI    1265 c    ala    81      14.787   9.643  19.125   0.597  0.19849096E+02
+PHI    1266 o    ala    81      14.626   9.499  20.338  -0.568  -.30424088E+02
+PHI    1267 n    tyr    82      13.765   9.765  18.289  -0.416  0.13270575E+02
+PHI    1268 h    tyr    82      13.891   9.947  17.303   0.272  0.31977058E+02
+PHI    1269 ca   tyr    82      12.420   9.833  18.837  -0.001  0.12664954E+02
+PHI    1270 ha   tyr    82      12.465   9.815  19.926   0.088  0.73307934E+01
+PHI    1271 cb   tyr    82      11.722  11.125  18.397  -0.015  0.22457433E+01
+PHI    1272 hb2  tyr    82      11.623  11.082  17.312   0.030  0.63833737E+01
+PHI    1273 hb3  tyr    82      10.732  11.157  18.851   0.030  -.24935667E+00
+PHI    1274 cg   tyr    82      12.488  12.359  18.780  -0.001  -.18548597E+02
+PHI    1275 cd1  tyr    82      13.304  13.012  17.854  -0.191  -.20605479E+03
+PHI    1276 hd1  tyr    82      13.366  12.616  16.840   0.170  0.14572227E+03
+PHI    1277 ce1  tyr    82      14.030  14.148  18.203  -0.234  -.20973509E+03
+PHI    1278 he1  tyr    82      14.691  14.629  17.481   0.166  0.13597597E+03
+PHI    1279 cz   tyr    82      13.942  14.634  19.483   0.323  0.23672745E+03
+PHI    1280 oh   tyr    82      14.611  15.772  19.809  -0.558  -.38503513E+03
+PHI    1281 hh   tyr    82      15.104  16.142  19.072   0.399  0.30881683E+03
+PHI    1282 ce2  tyr    82      13.148  14.010  20.435  -0.234  -.23808560E+03
+PHI    1283 he2  tyr    82      13.089  14.397  21.452   0.166  0.14815048E+03
+PHI    1284 cd2  tyr    82      12.419  12.872  20.076  -0.191  -.18367308E+03
+PHI    1285 hd2  tyr    82      11.788  12.375  20.812   0.170  0.17559282E+03
+PHI    1286 c    tyr    82      11.535   8.616  18.614   0.597  0.11137542E+02
+PHI    1287 o    tyr    82      10.328   8.741  18.692  -0.568  -.98229084E+01
+PHI    1288 n    gly    83      12.125   7.489  18.234  -0.416  0.21567552E+01
+PHI    1289 h    gly    83      13.118   7.480  18.050   0.272  -.33174498E+01
+PHI    1290 ca   gly    83      11.379   6.245  18.070  -0.025  0.96915054E+01
+PHI    1291 ha2  gly    83      12.132   5.541  17.714   0.070  0.13737514E+02
+PHI    1292 ha3  gly    83      11.091   5.984  19.088   0.070  0.66560674E+01
+PHI    1293 c    gly    83      10.149   6.157  17.167   0.597  0.56029668E+01
+PHI    1294 o    gly    83       9.991   6.908  16.192  -0.568  -.34800114E+02
+PHI    1295 n    ala    84       9.322   5.154  17.482  -0.416  -.73221021E+01
+PHI    1296 h    ala    84       9.571   4.585  18.273   0.272  0.13006552E+01
+PHI    1297 ca   ala    84       8.093   4.783  16.777   0.034  0.79086733E+01
+PHI    1298 ha   ala    84       8.304   4.724  15.709   0.082  0.70096006E+01
+PHI    1299 cb   ala    84       7.683   3.390  17.272  -0.183  -.88311882E+01
+PHI    1300 hb1  ala    84       7.459   3.414  18.338   0.060  -.14611880E+00
+PHI    1301 hb2  ala    84       6.792   3.063  16.731   0.060  -.27751923E+01
+PHI    1302 hb3  ala    84       8.484   2.676  17.081   0.060  -.52379642E+01
+PHI    1303 c    ala    84       6.926   5.774  16.957   0.597  0.11546486E+02
+PHI    1304 o    ala    84       6.017   5.798  16.145  -0.568  -.17425447E+02
+PHI    1305 n    thr    85       6.912   6.564  18.029  -0.416  0.46071749E+01
+PHI    1306 h    thr    85       7.360   6.165  18.842   0.272  0.79392586E+01
+PHI    1307 ca   thr    85       5.964   7.656  18.227  -0.039  0.16175892E+02
+PHI    1308 ha   thr    85       5.068   7.472  17.634   0.101  0.96564837E+01
+PHI    1309 cb   thr    85       5.548   7.817  19.723   0.365  -.52606387E+01
+PHI    1310 hb   thr    85       4.797   8.604  19.793   0.004  0.10193664E+02
+PHI    1311 cg2  thr    85       4.982   6.531  20.273  -0.244  -.16467916E+02
+PHI    1312 hg21 thr    85       5.733   5.744  20.204   0.064  -.50929217E+01
+PHI    1313 hg22 thr    85       4.702   6.674  21.316   0.064  -.36775234E+01
+PHI    1314 hg23 thr    85       4.103   6.245  19.696   0.064  -.22516334E+01
+PHI    1315 og1  thr    85       6.658   8.198  20.530  -0.676  -.40778069E+02
+PHI    1316 hg1  thr    85       6.374   8.290  21.442   0.410  0.12535781E+00
+PHI    1317 c    thr    85       6.398   9.015  17.650   0.597  0.21001205E+02
+PHI    1318 o    thr    85       5.553   9.838  17.286  -0.568  -.46644115E+02
+PHI    1319 n    gly    86       7.707   9.243  17.497  -0.416  -.15840139E+02
+PHI    1320 h    gly    86       8.370   8.581  17.877   0.272  -.59129004E+01
+PHI    1321 ca   gly    86       8.249  10.514  17.024  -0.025  -.24736889E+00
+PHI    1322 ha2  gly    86       9.331  10.440  16.929   0.070  0.23878393E+01
+PHI    1323 ha3  gly    86       7.842  10.720  16.034   0.070  0.78565245E+01
+PHI    1324 c    gly    86       7.912  11.679  17.963   0.597  0.31515875E+01
+PHI    1325 o    gly    86       7.899  11.553  19.187  -0.568  -.35748844E+02
+PHI    1326 n    hid    87       7.600  12.824  17.368  -0.416  -.20583942E+02
+PHI    1327 h    hid    87       7.620  12.826  16.354   0.272  -.12605644E+01
+PHI    1328 ca   hid    87       6.991  13.976  18.026   0.019  0.20459351E+02
+PHI    1329 ha   hid    87       6.511  13.654  18.951   0.088  0.14008629E+02
+PHI    1330 cb   hid    87       8.070  15.003  18.405  -0.046  0.28638728E+01
+PHI    1331 hb2  hid    87       8.887  14.479  18.904   0.040  0.46724133E+01
+PHI    1332 hb3  hid    87       8.475  15.467  17.507   0.040  0.74007277E+01
+PHI    1333 cg   hid    87       7.574  16.085  19.332  -0.027  -.14342699E+02
+PHI    1334 nd1  hid    87       7.992  16.280  20.629  -0.381  -.26614922E+02
+PHI    1335 hd1  hid    87       8.673  15.723  21.122   0.365  -.64227901E+01
+PHI    1336 ce1  hid    87       7.333  17.340  21.126   0.206  -.15321572E+02
+PHI    1337 he1  hid    87       7.453  17.736  22.127   0.139  0.99335699E+01
+PHI    1338 ne2  hid    87       6.500  17.846  20.206  -0.573  -.64134338E+02
+PHI    1339 cd2  hid    87       6.642  17.054  19.063   0.129  -.58719649E+01
+PHI    1340 hd2  hid    87       6.109  17.192  18.133   0.115  0.48611202E+01
+PHI    1341 c    hid    87       5.919  14.535  17.073   0.597  0.35803265E+02
+PHI    1342 o    hid    87       6.236  15.413  16.264  -0.568  -.10316619E+02
+PHI    1343 n    pro    88       4.690  13.979  17.063  -0.255  0.68301668E+01
+PHI    1344 cd   pro    88       4.208  12.957  17.982   0.019  0.15411298E+01
+PHI    1345 hd2  pro    88       4.023  13.410  18.958   0.039  0.44264736E+01
+PHI    1346 hd3  pro    88       4.916  12.135  18.082   0.039  -.21968379E+01
+PHI    1347 cg   pro    88       2.893  12.453  17.393   0.019  0.31152925E+01
+PHI    1348 hg2  pro    88       2.206  12.114  18.169   0.021  0.25431426E+01
+PHI    1349 hg3  pro    88       3.096  11.651  16.680   0.021  0.22373974E+01
+PHI    1350 cb   pro    88       2.360  13.680  16.654  -0.007  0.62006993E+01
+PHI    1351 hb2  pro    88       1.871  14.345  17.369   0.025  0.57470479E+01
+PHI    1352 hb3  pro    88       1.671  13.404  15.855   0.025  0.57820258E+01
+PHI    1353 ca   pro    88       3.635  14.332  16.109  -0.027  0.14701934E+02
+PHI    1354 ha   pro    88       3.883  13.869  15.154   0.064  0.85266418E+01
+PHI    1355 c    pro    88       3.484  15.847  15.914   0.590  0.71916031E+02
+PHI    1356 o    pro    88       3.372  16.588  16.885  -0.575  -.13043685E+02
+PHI    1357 n    gly    89       3.532  16.310  14.658  -0.416  0.85643215E+01
+PHI    1358 h    gly    89       3.556  15.642  13.900   0.272  0.31300569E+00
+PHI    1359 ca   gly    89       3.523  17.723  14.329  -0.025  -.74686227E+01
+PHI    1360 ha2  gly    89       2.862  17.868  13.474   0.070  -.11848820E+01
+PHI    1361 ha3  gly    89       3.131  18.268  15.187   0.070  -.27325537E+01
+PHI    1362 c    gly    89       4.897  18.264  13.987   0.597  0.12729090E+02
+PHI    1363 o    gly    89       5.005  19.302  13.342  -0.568  -.17325016E+02
+PHI    1364 n    ile    90       5.975  17.609  14.425  -0.416  -.14138263E+02
+PHI    1365 h    ile    90       5.833  16.799  15.019   0.272  -.59637504E+01
+PHI    1366 ca   ile    90       7.357  18.065  14.201  -0.060  0.57572751E+01
+PHI    1367 ha   ile    90       7.362  18.861  13.455   0.087  0.25459039E+01
+PHI    1368 cb   ile    90       8.000  18.629  15.496   0.130  0.18193855E+02
+PHI    1369 hb   ile    90       8.182  17.801  16.184   0.019  0.14552902E+02
+PHI    1370 cg2  ile    90       9.356  19.282  15.154  -0.320  -.97531157E+01
+PHI    1371 hg21 ile    90       9.197  20.187  14.566   0.088  -.17268397E-01
+PHI    1372 hg22 ile    90       9.895  19.539  16.065   0.088  -.64121437E+01
+PHI    1373 hg23 ile    90       9.987  18.605  14.581   0.088  -.39238198E+01
+PHI    1374 cg1  ile    90       7.079  19.646  16.215  -0.043  0.38039248E+01
+PHI    1375 hg12 ile    90       6.826  20.455  15.528   0.024  0.10297354E+01
+PHI    1376 hg13 ile    90       6.154  19.147  16.504   0.024  0.12416005E+01
+PHI    1377 cd1  ile    90       7.673  20.253  17.493  -0.066  -.52793713E+01
+PHI    1378 hd11 ile    90       8.489  20.933  17.249   0.019  -.30439551E+01
+PHI    1379 hd12 ile    90       6.899  20.816  18.016   0.019  -.21163712E+01
+PHI    1380 hd13 ile    90       8.039  19.462  18.148   0.019  -.86450994E+00
+PHI    1381 c    ile    90       8.178  16.915  13.624   0.597  0.62864752E+01
+PHI    1382 o    ile    90       8.761  17.064  12.552  -0.568  -.14161927E+02
+PHI    1383 n    ile    91       8.180  15.751  14.289  -0.416  -.14750727E+02
+PHI    1384 h    ile    91       7.715  15.707  15.184   0.272  0.28019431E+01
+PHI    1385 ca   ile    91       8.956  14.606  13.861  -0.060  0.11037047E+02
+PHI    1386 ha   ile    91       9.385  14.773  12.872   0.087  0.12781419E+02
+PHI    1387 cb   ile    91      10.088  14.317  14.870   0.130  0.64911127E+01
+PHI    1388 hb   ile    91       9.654  14.204  15.863   0.019  0.13354170E+02
+PHI    1389 cg2  ile    91      10.841  13.033  14.492  -0.320  -.33323376E+02
+PHI    1390 hg21 ile    91      11.276  13.146  13.499   0.088  -.12135951E+02
+PHI    1391 hg22 ile    91      11.634  12.850  15.217   0.088  0.63975998E+02
+PHI    1392 hg23 ile    91      10.148  12.192  14.491   0.088  -.13096064E+02
+PHI    1393 cg1  ile    91      11.040  15.517  14.911  -0.043  -.32276134E+01
+PHI    1394 hg12 ile    91      11.895  15.283  14.276   0.024  0.22059774E+02
+PHI    1395 hg13 ile    91      10.508  16.376  14.501   0.024  -.29512687E+01
+PHI    1396 cd1  ile    91      11.517  15.839  16.290  -0.066  -.75935890E+02
+PHI    1397 hd11 ile    91      12.050  14.981  16.700   0.019  0.26735292E+02
+PHI    1398 hd12 ile    91      12.188  16.698  16.252   0.019  0.14620269E+02
+PHI    1399 hd13 ile    91      10.663  16.074  16.925   0.019  -.18179512E+00
+PHI    1400 c    ile    91       8.122  13.361  13.632   0.597  -.39425194E+01
+PHI    1401 o    ile    91       7.527  12.818  14.553  -0.568  -.23563723E+02
+PHI    1402 n    pro    92       8.048  12.911  12.345  -0.255  0.89597398E+00
+PHI    1403 cd   pro    92       8.545  13.564  11.126   0.019  0.25078704E+01
+PHI    1404 hd2  pro    92       9.625  13.418  11.057   0.039  0.51059241E+01
+PHI    1405 hd3  pro    92       8.309  14.629  11.114   0.039  0.78927755E+01
+PHI    1406 cg   pro    92       7.867  12.894   9.938   0.019  0.68836756E+01
+PHI    1407 hg2  pro    92       8.493  12.920   9.045   0.021  0.41488738E+01
+PHI    1408 hg3  pro    92       6.899  13.362   9.753   0.021  0.47621050E+01
+PHI    1409 cb   pro    92       7.667  11.479  10.450  -0.007  0.65729241E+01
+PHI    1410 hb2  pro    92       8.591  10.913  10.316   0.025  0.18344750E+01
+PHI    1411 hb3  pro    92       6.841  10.980   9.942   0.025  0.45146732E+01
+PHI    1412 ca   pro    92       7.380  11.682  11.943  -0.027  0.13013381E+02
+PHI    1413 ha   pro    92       6.324  11.886  12.076   0.064  0.75294900E+01
+PHI    1414 c    pro    92       7.801  10.425  12.719   0.590  0.35272369E+02
+PHI    1415 o    pro    92       8.891  10.373  13.291  -0.575  -.81782351E+01
+PHI    1416 n    pro    93       6.955   9.383  12.710  -0.255  0.91075745E+01
+PHI    1417 cd   pro    93       5.567   9.388  12.214   0.019  0.24139016E+01
+PHI    1418 hd2  pro    93       5.538   9.058  11.175   0.039  0.21362929E+01
+PHI    1419 hd3  pro    93       5.145  10.390  12.288   0.039  0.44105840E+01
+PHI    1420 cg   pro    93       4.901   8.413  13.151   0.019  0.77216964E+01
+PHI    1421 hg2  pro    93       3.971   8.027  12.735   0.021  0.43023028E+01
+PHI    1422 hg3  pro    93       4.705   8.861  14.125   0.021  0.39037242E+01
+PHI    1423 cb   pro    93       5.928   7.353  13.254  -0.007  0.51409049E+01
+PHI    1424 hb2  pro    93       5.901   6.876  12.274   0.025  0.44914622E+01
+PHI    1425 hb3  pro    93       5.852   6.592  14.031   0.025  0.35325322E+01
+PHI    1426 ca   pro    93       7.239   8.138  13.416  -0.027  0.13762948E+02
+PHI    1427 ha   pro    93       7.561   8.338  14.438   0.064  0.11183802E+02
+PHI    1428 c    pro    93       8.366   7.444  12.655   0.590  0.19829210E+02
+PHI    1429 o    pro    93       8.460   7.578  11.431  -0.575  -.31438374E+02
+PHI    1430 n    hid    94       9.198   6.687  13.373  -0.416  0.11916090E+01
+PHI    1431 h    hid    94       9.120   6.716  14.381   0.272  0.68714404E+01
+PHI    1432 ca   hid    94      10.333   5.957  12.802   0.019  0.14021978E+02
+PHI    1433 ha   hid    94      10.933   5.609  13.637   0.088  0.18498545E+02
+PHI    1434 cb   hid    94       9.829   4.700  12.062  -0.046  -.41722207E+01
+PHI    1435 hb2  hid    94       9.152   4.995  11.258   0.040  -.37417016E+01
+PHI    1436 hb3  hid    94      10.679   4.199  11.596   0.040  0.71987039E+00
+PHI    1437 cg   hid    94       9.145   3.685  12.941  -0.027  -.12367880E+02
+PHI    1438 nd1  hid    94       9.739   2.578  13.502  -0.381  -.18109198E+02
+PHI    1439 hd1  hid    94      10.700   2.303  13.379   0.365  0.85484447E+01
+PHI    1440 ce1  hid    94       8.793   1.884  14.155   0.206  -.26474016E+02
+PHI    1441 he1  hid    94       8.954   0.953  14.681   0.139  0.10143589E+02
+PHI    1442 ne2  hid    94       7.606   2.501  14.055  -0.573  -.59211502E+02
+PHI    1443 cd2  hid    94       7.817   3.644  13.274   0.129  -.76563072E+00
+PHI    1444 hd2  hid    94       7.066   4.360  12.973   0.115  0.94532394E+01
+PHI    1445 c    hid    94      11.272   6.828  11.931   0.597  0.23760515E+02
+PHI    1446 o    hid    94      11.825   6.319  10.960  -0.568  -.65213914E+01
+PHI    1447 n    ala    95      11.479   8.112  12.267  -0.416  0.45072269E+01
+PHI    1448 h    ala    95      11.099   8.472  13.130   0.272  0.91508656E+01
+PHI    1449 ca   ala    95      12.280   9.007  11.438   0.034  0.38341916E+00
+PHI    1450 ha   ala    95      12.092   8.710  10.406   0.082  0.10855231E+01
+PHI    1451 cb   ala    95      11.831  10.442  11.618  -0.183  -.13819704E+01
+PHI    1452 hb1  ala    95      12.022  10.757  12.644   0.060  -.71591449E+00
+PHI    1453 hb2  ala    95      12.383  11.085  10.932   0.060  0.14476923E+01
+PHI    1454 hb3  ala    95      10.765  10.519  11.407   0.060  -.51901426E+01
+PHI    1455 c    ala    95      13.786   8.908  11.686   0.597  0.12634997E+02
+PHI    1456 o    ala    95      14.232   8.805  12.827  -0.568  -.46091057E+02
+PHI    1457 n    thr    96      14.551   8.865  10.603  -0.416  0.11932355E+02
+PHI    1458 h    thr    96      14.128   8.874   9.686   0.272  0.40173292E+00
+PHI    1459 ca   thr    96      16.003   8.849  10.693  -0.039  0.68453207E+01
+PHI    1460 ha   thr    96      16.314   8.360  11.616   0.101  0.17654264E+01
+PHI    1461 cb   thr    96      16.627   8.093   9.500   0.365  0.64414167E+01
+PHI    1462 hb   thr    96      16.083   8.357   8.593   0.004  0.42691693E+01
+PHI    1463 cg2  thr    96      18.107   8.462   9.334  -0.244  -.42022142E+01
+PHI    1464 hg21 thr    96      18.652   8.198  10.240   0.064  -.11068336E+02
+PHI    1465 hg22 thr    96      18.525   7.917   8.487   0.064  -.28150175E+01
+PHI    1466 hg23 thr    96      18.197   9.534   9.156   0.064  0.13043802E+01
+PHI    1467 og1  thr    96      16.506   6.685   9.727  -0.676  -.41334076E+02
+PHI    1468 hg1  thr    96      16.892   6.208   8.989   0.410  -.11330433E+02
+PHI    1469 c    thr    96      16.367  10.325  10.628   0.597  0.25242374E+01
+PHI    1470 o    thr    96      15.953  11.022   9.698  -0.568  -.31445000E+02
+PHI    1471 n    leu    97      17.086  10.821  11.630  -0.416  -.72261372E+01
+PHI    1472 h    leu    97      17.347  10.243  12.416   0.272  0.81699982E-01
+PHI    1473 ca   leu    97      17.457  12.237  11.657  -0.052  0.55748944E+01
+PHI    1474 ha   leu    97      16.877  12.793  10.920   0.092  0.64119349E+01
+PHI    1475 cb   leu    97      17.170  12.820  13.048  -0.110  -.18560569E+01
+PHI    1476 hb2  leu    97      17.887  12.318  13.697   0.046  0.35803041E+01
+PHI    1477 hb3  leu    97      17.396  13.886  13.014   0.046  0.42444730E+01
+PHI    1478 cg   leu    97      15.752  12.615  13.597   0.353  -.46276240E+01
+PHI    1479 hg   leu    97      15.548  11.549  13.690  -0.036  0.63924444E+00
+PHI    1480 cd1  leu    97      15.639  13.272  14.959  -0.412  -.53366113E+03
+PHI    1481 hd11 leu    97      15.843  14.339  14.866   0.100  0.94017395E+02
+PHI    1482 hd12 leu    97      14.632  13.127  15.350   0.100  0.72814461E+02
+PHI    1483 hd13 leu    97      16.362  12.823  15.640   0.100  0.82590111E+02
+PHI    1484 cd2  leu    97      14.736  13.195  12.605  -0.412  -.73079834E+01
+PHI    1485 hd21 leu    97      14.833  12.687  11.646   0.100  0.38128007E-01
+PHI    1486 hd22 leu    97      13.727  13.051  12.991   0.100  -.85493641E+01
+PHI    1487 hd23 leu    97      14.925  14.260  12.471   0.100  -.10401578E-01
+PHI    1488 c    leu    97      18.919  12.513  11.279   0.597  0.20446058E+02
+PHI    1489 o    leu    97      19.800  11.694  11.520  -0.568  -.48682671E+02
+PHI    1490 n    val    98      19.159  13.683  10.701  -0.416  0.10163297E+02
+PHI    1491 h    val    98      18.368  14.291  10.499   0.272  0.14412673E+02
+PHI    1492 ca   val    98      20.481  14.116  10.250  -0.088  0.27161539E+01
+PHI    1493 ha   val    98      21.234  13.389  10.545   0.097  0.48663406E+01
+PHI    1494 cb   val    98      20.524  14.244   8.715   0.299  0.11377301E+01
+PHI    1495 hb   val    98      19.789  14.980   8.388  -0.030  0.58847156E+01
+PHI    1496 cg1  val    98      21.914  14.688   8.242  -0.319  -.88125191E+01
+PHI    1497 hg11 val    98      22.660  13.968   8.575   0.079  -.59570217E+01
+PHI    1498 hg12 val    98      21.923  14.751   7.154   0.079  -.28693339E-01
+PHI    1499 hg13 val    98      22.152  15.674   8.641   0.079  -.19978221E+00
+PHI    1500 cg2  val    98      20.212  12.904   8.032  -0.319  -.26518850E+02
+PHI    1501 hg21 val    98      19.194  12.592   8.266   0.079  -.14473287E+02
+PHI    1502 hg22 val    98      20.283  13.014   6.950   0.079  -.64111509E+01
+PHI    1503 hg23 val    98      20.909  12.137   8.369   0.079  -.94775362E+01
+PHI    1504 c    val    98      20.776  15.436  10.940   0.597  -.39156742E+01
+PHI    1505 o    val    98      20.013  16.388  10.786  -0.568  -.24750088E+02
+PHI    1506 n    phe    99      21.858  15.513  11.714  -0.416  0.31520698E+01
+PHI    1507 h    phe    99      22.463  14.711  11.819   0.272  0.84366760E+01
+PHI    1508 ca   phe    99      22.228  16.754  12.394  -0.002  0.14842646E+02
+PHI    1509 ha   phe    99      21.495  17.529  12.170   0.098  0.11127240E+02
+PHI    1510 cb   phe    99      22.274  16.545  13.919  -0.034  -.18200811E+02
+PHI    1511 hb2  phe    99      22.817  15.632  14.164   0.030  0.37858875E+02
+PHI    1512 hb3  phe    99      22.773  17.398  14.379   0.030  0.34724533E+02
+PHI    1513 cg   phe    99      20.923  16.432  14.573   0.012  -.17215781E-01
+PHI    1514 cd1  phe    99      20.279  15.198  14.668  -0.126  -.14803430E+03
+PHI    1515 hd1  phe    99      20.759  14.315  14.246   0.133  0.17235974E+03
+PHI    1516 ce1  phe    99      19.024  15.084  15.299  -0.170  -.16416119E+03
+PHI    1517 he1  phe    99      18.530  14.115  15.370   0.143  0.18233827E+03
+PHI    1518 cz   phe    99      18.416  16.217  15.833  -0.107  -.11297891E+03
+PHI    1519 hz   phe    99      17.445  16.138  16.321   0.130  0.18362764E+03
+PHI    1520 ce2  phe    99      19.053  17.457  15.742  -0.170  -.19958125E+03
+PHI    1521 he2  phe    99      18.582  18.347  16.158   0.143  0.17337900E+03
+PHI    1522 cd2  phe    99      20.302  17.555  15.113  -0.126  -.11016290E+03
+PHI    1523 hd2  phe    99      20.802  18.521  15.041   0.133  0.13930347E+03
+PHI    1524 c    phe    99      23.607  17.264  11.954   0.597  0.15142288E+02
+PHI    1525 o    phe    99      24.557  16.490  11.824  -0.568  -.21712902E+02
+PHI    1526 n    asp   100      23.697  18.558  11.696  -0.516  -.18552258E+01
+PHI    1527 h    asp   100      22.876  19.139  11.789   0.294  0.81230927E+01
+PHI    1528 ca   asp   100      24.957  19.196  11.349   0.038  -.12240249E+02
+PHI    1529 ha   asp   100      25.661  18.451  10.978   0.088  0.96222854E+00
+PHI    1530 cb   asp   100      24.737  20.242  10.262  -0.030  0.11434985E+02
+PHI    1531 hb2  asp   100      24.383  19.700   9.385  -0.012  0.15380696E+01
+PHI    1532 hb3  asp   100      23.970  20.943  10.590  -0.012  0.49873605E+01
+PHI    1533 cg   asp   100      26.005  21.009   9.906   0.799  0.50422478E+02
+PHI    1534 od1  asp   100      26.851  21.254  10.798  -0.801  -.69298334E+01
+PHI    1535 od2  asp   100      26.139  21.400   8.730  -0.801  -.25155910E+02
+PHI    1536 c    asp   100      25.279  19.854  12.683   0.537  -.60006604E+01
+PHI    1537 o    asp   100      24.615  20.816  13.084  -0.582  -.28433893E+02
+PHI    1538 n    val   101      26.284  19.347  13.399  -0.416  0.28886545E+01
+PHI    1539 h    val   101      26.852  18.615  12.977   0.272  0.25921612E+01
+PHI    1540 ca   val   101      26.638  19.773  14.766  -0.088  0.94355936E+01
+PHI    1541 ha   val   101      25.978  20.578  15.083   0.097  0.60274472E+01
+PHI    1542 cb   val   101      26.502  18.612  15.778   0.299  0.13250404E+02
+PHI    1543 hb   val   101      27.257  17.854  15.567  -0.030  0.25041540E+01
+PHI    1544 cg1  val   101      26.687  19.098  17.224  -0.319  -.12330814E+02
+PHI    1545 hg11 val   101      25.957  19.872  17.458   0.079  0.31061062E+00
+PHI    1546 hg12 val   101      26.557  18.262  17.913   0.079  -.57025380E+01
+PHI    1547 hg13 val   101      27.694  19.488  17.368   0.079  -.73572183E+01
+PHI    1548 cg2  val   101      25.126  17.943  15.701  -0.319  -.16505347E+01
+PHI    1549 hg21 val   101      25.037  17.421  14.749   0.079  -.56461420E-01
+PHI    1550 hg22 val   101      25.021  17.212  16.501   0.079  -.27824550E+01
+PHI    1551 hg23 val   101      24.340  18.691  15.793   0.079  0.64666634E+02
+PHI    1552 c    val   101      28.070  20.288  14.789   0.597  0.64886065E+01
+PHI    1553 o    val   101      28.967  19.650  14.245  -0.568  -.45217686E+02
+PHI    1554 n    glu   102      28.292  21.414  15.468  -0.516  0.19187970E+01
+PHI    1555 h    glu   102      27.493  21.922  15.819   0.294  0.31416985E+02
+PHI    1556 ca   glu   102      29.610  21.973  15.686   0.040  -.10330358E+01
+PHI    1557 ha   glu   102      30.371  21.309  15.277   0.111  0.10731425E+02
+PHI    1558 cb   glu   102      29.720  23.321  14.995   0.056  0.11214994E+01
+PHI    1559 hb2  glu   102      29.352  23.203  13.976  -0.017  -.23963782E+00
+PHI    1560 hb3  glu   102      29.082  24.022  15.532  -0.017  -.33589902E+01
+PHI    1561 cg   glu   102      31.138  23.854  14.960   0.014  0.30702028E+01
+PHI    1562 hg2  glu   102      31.521  23.849  15.980  -0.043  -.35972459E+01
+PHI    1563 hg3  glu   102      31.733  23.178  14.346  -0.043  -.21785631E+01
+PHI    1564 cd   glu   102      31.226  25.259  14.395   0.805  -.77111954E-02
+PHI    1565 oe1  glu   102      32.253  25.920  14.649  -0.819  -.28329067E+02
+PHI    1566 oe2  glu   102      30.281  25.707  13.702  -0.819  -.22588720E+02
+PHI    1567 c    glu   102      29.834  22.121  17.196   0.537  0.13733846E+02
+PHI    1568 o    glu   102      29.040  22.782  17.879  -0.582  -.20569790E+02
+PHI    1569 n    leu   103      30.878  21.476  17.727  -0.416  0.13492661E+02
+PHI    1570 h    leu   103      31.460  20.899  17.137   0.272  0.35234501E+01
+PHI    1571 ca   leu   103      31.198  21.552  19.166  -0.052  0.93144331E+01
+PHI    1572 ha   leu   103      30.285  21.706  19.740   0.092  0.94585285E+01
+PHI    1573 cb   leu   103      31.860  20.250  19.638  -0.110  0.83507242E+01
+PHI    1574 hb2  leu   103      31.148  19.469  19.372   0.046  0.12688198E+01
+PHI    1575 hb3  leu   103      32.764  20.136  19.038   0.046  -.23736246E+01
+PHI    1576 cg   leu   103      32.217  20.132  21.131   0.353  0.59599032E+01
+PHI    1577 hg   leu   103      32.900  20.941  21.390  -0.036  0.51624932E+01
+PHI    1578 cd1  leu   103      30.968  20.220  22.007  -0.412  -.11757318E+02
+PHI    1579 hd11 leu   103      30.285  19.411  21.748   0.100  -.60671144E+01
+PHI    1580 hd12 leu   103      31.253  20.134  23.055   0.100  0.14144436E+01
+PHI    1581 hd13 leu   103      30.475  21.178  21.842   0.100  -.73122525E+01
+PHI    1582 cd2  leu   103      32.914  18.817  21.390  -0.412  -.18209606E+02
+PHI    1583 hd21 leu   103      33.827  18.766  20.797   0.100  -.11673878E+02
+PHI    1584 hd22 leu   103      33.164  18.740  22.448   0.100  -.12316426E+02
+PHI    1585 hd23 leu   103      32.255  17.995  21.112   0.100  -.42470922E+01
+PHI    1586 c    leu   103      32.130  22.743  19.394   0.597  0.98686447E+01
+PHI    1587 o    leu   103      33.311  22.660  19.071  -0.568  -.37596195E+02
+PHI    1588 n    leu   104      31.602  23.825  19.969  -0.416  0.49142523E+01
+PHI    1589 h    leu   104      30.620  23.806  20.202   0.272  0.18089500E+02
+PHI    1590 ca   leu   104      32.345  25.070  20.191  -0.052  0.88321817E+00
+PHI    1591 ha   leu   104      33.034  25.249  19.365   0.092  0.58029919E+01
+PHI    1592 cb   leu   104      31.368  26.250  20.279  -0.110  0.30236297E+01
+PHI    1593 hb2  leu   104      30.855  26.066  21.222   0.046  0.65970263E+01
+PHI    1594 hb3  leu   104      32.002  27.132  20.377   0.046  -.49450710E+00
+PHI    1595 cg   leu   104      30.334  26.485  19.172   0.353  0.30265987E+02
+PHI    1596 hg   leu   104      29.848  25.543  18.919  -0.036  0.11526619E+02
+PHI    1597 cd1  leu   104      29.288  27.481  19.665  -0.412  -.40809689E+01
+PHI    1598 hd11 leu   104      29.774  28.424  19.917   0.100  -.36655619E+01
+PHI    1599 hd12 leu   104      28.550  27.652  18.881   0.100  -.18370260E+01
+PHI    1600 hd13 leu   104      28.792  27.080  20.549   0.100  -.23556683E+01
+PHI    1601 cd2  leu   104      30.994  27.002  17.927  -0.412  0.34158390E+01
+PHI    1602 hd21 leu   104      31.727  26.276  17.575   0.100  -.24844546E+01
+PHI    1603 hd22 leu   104      30.241  27.162  17.155   0.100  -.36479621E+01
+PHI    1604 hd23 leu   104      31.495  27.945  18.145   0.100  -.47685656E+00
+PHI    1605 c    leu   104      33.282  25.122  21.396   0.597  0.29696884E+02
+PHI    1606 o    leu   104      34.344  25.737  21.328  -0.568  -.48829398E+01
+PHI    1607 n    lys   105      32.881  24.492  22.502  -0.348  0.95153399E+01
+PHI    1608 h    lys   105      31.996  24.001  22.462   0.275  0.69145908E+01
+PHI    1609 ca   lys   105      33.668  24.378  23.736  -0.240  0.23938148E+01
+PHI    1610 ha   lys   105      34.665  24.022  23.473   0.143  0.11480219E+02
+PHI    1611 cb   lys   105      33.825  25.754  24.432  -0.009  0.39462128E+01
+PHI    1612 hb2  lys   105      34.495  25.629  25.283   0.036  0.73301692E+01
+PHI    1613 hb3  lys   105      34.310  26.458  23.756   0.036  0.22989993E+01
+PHI    1614 cg   lys   105      32.495  26.365  24.910   0.019  0.92352867E+01
+PHI    1615 hg2  lys   105      31.900  26.634  24.036   0.010  0.60218148E+01
+PHI    1616 hg3  lys   105      31.942  25.628  25.492   0.010  0.45474458E+01
+PHI    1617 cd   lys   105      32.665  27.618  25.780  -0.048  0.10333336E+02
+PHI    1618 hd2  lys   105      33.194  28.391  25.219   0.062  0.69550533E+01
+PHI    1619 hd3  lys   105      31.668  27.985  26.030   0.062  0.91966858E+01
+PHI    1620 ce   lys   105      33.426  27.296  27.073  -0.014  0.11205681E+02
+PHI    1621 he2  lys   105      33.108  26.308  27.420   0.114  0.11594798E+02
+PHI    1622 he3  lys   105      34.497  27.233  26.863   0.114  0.64495044E+01
+PHI    1623 nz   lys   105      33.155  28.285  28.142  -0.385  0.18300367E+02
+PHI    1624 hz1  lys   105      32.150  28.296  28.346   0.340  0.12363378E+02
+PHI    1625 hz2  lys   105      33.610  27.992  28.997   0.340  0.26281580E+02
+PHI    1626 hz3  lys   105      33.458  29.212  27.888   0.340  0.37708206E+02
+PHI    1627 c    lys   105      33.053  23.351  24.685   0.734  0.54943974E+02
+PHI    1628 o    lys   105      31.934  22.874  24.467  -0.589  -.21054771E+02
+PHI    1629 n    leu   106      33.770  23.117  25.779  -0.416  0.21382307E+02
+PHI    1630 h    leu   106      34.644  23.607  25.877   0.272  0.17888985E+02
+PHI    1631 ca   leu   106      33.287  22.438  26.974  -0.052  0.45869384E+01
+PHI    1632 ha   leu   106      32.250  22.144  26.835   0.092  -.23241160E+01
+PHI    1633 cb   leu   106      34.142  21.184  27.236  -0.110  0.20960681E+01
+PHI    1634 hb2  leu   106      35.182  21.491  27.356   0.046  0.14628581E+01
+PHI    1635 hb3  leu   106      33.817  20.729  28.174   0.046  0.91870558E+00
+PHI    1636 cg   leu   106      34.053  20.128  26.122   0.353  0.28736725E+01
+PHI    1637 hg   leu   106      34.312  20.581  25.166  -0.036  0.56310129E+01
+PHI    1638 cd1  leu   106      35.036  18.987  26.374  -0.412  -.57813274E+02
+PHI    1639 hd11 leu   106      34.752  18.442  27.272   0.100  -.23067705E+02
+PHI    1640 hd12 leu   106      35.031  18.306  25.523   0.100  -.18373823E+02
+PHI    1641 hd13 leu   106      36.042  19.387  26.494   0.100  -.11752230E+02
+PHI    1642 cd2  leu   106      32.645  19.550  26.027  -0.412  -.60855050E+01
+PHI    1643 hd21 leu   106      31.955  20.319  25.695   0.100  -.32393138E+01
+PHI    1644 hd22 leu   106      32.624  18.755  25.295   0.100  -.38390682E+01
+PHI    1645 hd23 leu   106      32.320  19.165  26.994   0.100  -.72233968E+01
+PHI    1646 c    leu   106      33.324  23.398  28.169   0.597  0.42250576E+02
+PHI    1647 o    leu   106      34.065  24.389  28.159  -0.568  -.73418541E+01
+PHI    1648 n    glu   107      32.521  23.081  29.178  -0.519  -.22836124E+02
+PHI    1649 h    glu   107      31.938  22.255  29.077   0.306  -.84229269E+01
+PHI    1650 ca   glu   107      32.446  23.696  30.512  -0.206  -.14002816E+02
+PHI    1651 ha   glu   107      33.397  24.158  30.768   0.140  0.37395935E+01
+PHI    1652 cb   glu   107      31.336  24.773  30.562   0.007  -.65694680E+01
+PHI    1653 hb2  glu   107      30.376  24.306  30.400  -0.008  -.20824196E+01
+PHI    1654 hb3  glu   107      31.323  25.228  31.553  -0.008  -.41194439E+01
+PHI    1655 cg   glu   107      31.495  25.887  29.518   0.068  0.17426470E+02
+PHI    1656 hg2  glu   107      32.395  26.451  29.771  -0.055  0.77112532E+01
+PHI    1657 hg3  glu   107      31.626  25.450  28.528  -0.055  0.14467863E+01
+PHI    1658 cd   glu   107      30.304  26.849  29.392   0.818  0.30481916E+02
+PHI    1659 oe1  glu   107      29.171  26.543  29.823  -0.822  -.39928932E+02
+PHI    1660 oe2  glu   107      30.476  27.923  28.751  -0.822  -.65696510E+02
+PHI    1661 c    glu   107      32.215  22.596  31.565   0.742  -.40575054E+02
+PHI    1662 o    glu   107      31.885  21.454  31.158  -0.793  -.61472530E+02
+PHI    1663 oxt  glu   107      32.432  22.900  32.753  -0.793  -.28794292E+02
+   TOTAL PHISITE ENERGY (SUM (1/2)(Q)(PHI)):    0.857969E+04
+ ASSIGNMENT
+   Set the variable:               energy             = 0.85796894531250E+04
+
+
+Main >  print elec phinrg mol1 end            ! compute and save to a user variable the
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic Potential
+          Atom    Residue         X       Y       Z       Q      Potential
+   TOTAL PHISITE ENERGY (SUM (1/2)(Q)(PHI)):    0.857969E+04
+ ASSIGNMENT
+   Set the variable:               phinrg             = 0.85796894531250E+04
+
+
+Main >                                        ! phi energy
+Main >  assign e1 = $phinrg end               ! assign the phi energy to a local variabl
+ ASSIGNMENT
+   Set the variable:                   e1             = 0.85796894531250E+04
+Main >                                        ! for later use
+Main >  
+Main >  !
+Main >  ! Reference Runs (i.e. self energy):
+Main >  !               coarse grid
+Main >  !               molecule 1
+Main >  !
+Main >  
+Main >  elec calc mol 1
+Elec >   pdie   2.00                          ! internal dielectric=2
+Elec >   sdie   2.00                          ! exterior dielectric=2. This is
+Elec >                                        ! the computation for the self
+Elec >                                        ! energy
+Elec >   temp 300.00                          ! temperature in K
+Elec >   ions   0.10                          ! ionic strength
+Elec >   bcfl   2                             ! boundary condition - each atom
+Elec >                                        ! is a Debye-Huckel sphere
+Elec >   efld    .00                          ! external electric field
+Elec >   grid   1.50                          ! grid spacing
+Elec >   dime   60  60  60                    ! grid dimension
+Elec >   center                               ! center the grid on the molecule
+Elec >   maxit 200                            ! maximum # of iteration for FDPBE
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :   -22.065  A
+                                                         -29.091  A
+                                                         -27.672  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     1.500  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :     2.000
+   Solvent permittivity                              :0.1146E-05 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.100  mM
+   Debye-Huckel parameter                            :     0.021  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :      1663
+   X-coordinate of the center of geometry            :    23.685    A
+   Y-coordinate of the center of geometry            :    16.659    A
+   Z-coordinate of the center of geometry            :    18.078    A
+   Net charge of the selected atoms                  :     0.991    e
+   Effective radius of the selected atoms            :     1.821    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       200
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        64
+   Norm of the constant vector                       :0.1353E+03
+   Norm of the residual vector                       :0.9659E-04
+   Convergence achieved                              :0.7136E-06
+Main >  
+Main >  print elec phizero mol1 end           ! zero out the phisite accumulator
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phisave mol1 end           ! compute and store phi at atoms on grid
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  
+Main >  !
+Main >  !               fine grid
+Main >  !               molecule 1
+Main >  !
+Main >  
+Main >  elec calc mol 1
+Elec >   pdie   2.00                          ! internal dielectric=2
+Elec >   sdie   2.00                          ! exterior dielectric=2. This is
+Elec >                                        ! the copmputation for the self
+Elec >                                        ! energy
+Elec >   temp 300.00                          ! temperature in K
+Elec >   ions   0.10                          ! ionic strength
+Elec >   bcfl   4                             ! focusing - use the coarse grid to
+Elec >                                        ! set the boundary potential of this
+Elec >                                        ! focused grid.
+Elec >   efld    .00                          ! external electric field
+Elec >   grid   0.225                         ! spacing for focused grid
+Elec >   dime   60  60  60                    ! grid dimension
+Elec >   mcenter 2
+Elec >   maxit 200                            ! maximum # of iteration for FDPBE
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid origin                                       :    11.135  A
+                                                          10.927  A
+                                                          13.593  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.225  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         4
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :     2.000
+   Solvent permittivity                              :0.1146E-05 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.100  mM
+   Debye-Huckel parameter                            :     0.021  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :      1663
+   X-coordinate of the center of geometry            :    23.685    A
+   Y-coordinate of the center of geometry            :    16.659    A
+   Z-coordinate of the center of geometry            :    18.078    A
+   Net charge of the selected atoms                  :     0.991    e
+   Effective radius of the selected atoms            :     1.821    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       200
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        64
+   Norm of the constant vector                       :0.2637E+03
+   Norm of the residual vector                       :0.1933E-03
+   Convergence achieved                              :0.7329E-06
+Main >  
+Main >  print elec phisave mol1 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phinrg mol1 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic Potential
+          Atom    Residue         X       Y       Z       Q      Potential
+   TOTAL PHISITE ENERGY (SUM (1/2)(Q)(PHI)):    0.925276E+04
+ ASSIGNMENT
+   Set the variable:               phinrg             = 0.92527646484375E+04
+
+
+Main >  assign e2 = $phinrg end               ! save the phi "self" energy for mol1
+ ASSIGNMENT
+   Set the variable:                   e2             = 0.92527646484375E+04
+Main >  
+Main >  !
+Main >  ! Regular Runs:
+Main >  !               coarse grid
+Main >  !               molecule 2
+Main >  !
+Main >  
+Main >  elec calc mol 2
+Elec >   pdie   2.00                          ! internal dielectric=2
+Elec >   sdie  78.00                          ! solvent  dielectric=78
+Elec >   temp 300.00                          ! temperature in K
+Elec >   ions   0.10                          ! ionic strength
+Elec >   bcfl   2                             ! boundary condition - each atom
+Elec >                                        ! is a Debye-Huckel sphere
+Elec >   efld    .00                          ! external electric field
+Elec >   grid   1.50                          ! grid spacing
+Elec >   dime   60  60  60                    ! grid dimension
+Elec >   center                               ! center the grid on the molecule
+Elec >   maxit 200                            ! maximum # of iteration for FDPBE
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :   -27.752  A
+                                                         -27.961  A
+                                                         -25.295  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     1.500  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.100  mM
+   Debye-Huckel parameter                            :     0.003  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :        10
+   X-coordinate of the center of geometry            :    17.998    A
+   Y-coordinate of the center of geometry            :    17.789    A
+   Z-coordinate of the center of geometry            :    20.455    A
+   Net charge of the selected atoms                  :     0.000    e
+   Effective radius of the selected atoms            :     1.821    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       200
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :       106
+   Norm of the constant vector                       :0.8639E+00
+   Norm of the residual vector                       :0.7457E-06
+   Convergence achieved                              :0.8632E-06
+Main >  
+Main >  print elec phizero mol2 end           ! zero out the phisite accumulator
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phisave mol2 end           ! compute and store phi at atoms on grid
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  
+Main >  !
+Main >  !               fine grid
+Main >  !               molecule 2
+Main >  !
+Main >  
+Main >  elec calc mol 2
+Elec >   pdie   2.00                          ! internal dielectric=2
+Elec >   sdie  78.00                          ! solvent  dielectric=78
+Elec >   temp 300.00                          ! temperature in K
+Elec >   ions   0.10                          ! ionic strength
+Elec >   bcfl   4                             ! focusing - use the coarse grid to
+Elec >                                        ! set the boundary potential of this
+Elec >                                        ! focused grid.
+Elec >   efld    .00                          ! external electric field
+Elec >   grid   0.225                         ! spacing for focused grid
+Elec >   dime   60  60  60                    ! grid dimension
+Elec >   mcenter 2
+Elec >   maxit 200                            ! maximum # of iteration for FDPBE
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid origin                                       :    11.135  A
+                                                          10.927  A
+                                                          13.593  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.225  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         4
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.100  mM
+   Debye-Huckel parameter                            :     0.003  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :        10
+   X-coordinate of the center of geometry            :    17.998    A
+   Y-coordinate of the center of geometry            :    17.789    A
+   Z-coordinate of the center of geometry            :    20.455    A
+   Net charge of the selected atoms                  :     0.000    e
+   Effective radius of the selected atoms            :     1.821    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       200
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        75
+   Norm of the constant vector                       :0.2501E+02
+   Norm of the residual vector                       :0.2261E-04
+   Convergence achieved                              :0.9038E-06
+Main >  
+Main >  print elec phisave mol2 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phinrg mol2 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic Potential
+          Atom    Residue         X       Y       Z       Q      Potential
+   TOTAL PHISITE ENERGY (SUM (1/2)(Q)(PHI)):    0.195320E+03
+ ASSIGNMENT
+   Set the variable:               phinrg             = 0.19531977844238E+03
+
+
+Main >  assign e3 = $phinrg end
+ ASSIGNMENT
+   Set the variable:                   e3             = 0.19531977844238E+03
+Main >  
+Main >  !
+Main >  ! Reference Runs:
+Main >  !               coarse grid
+Main >  !               molecule 2
+Main >  !
+Main >  
+Main >  elec calc mol 2
+Elec >   pdie   2.00                          ! internal dielectric=2
+Elec >   sdie   2.00                          ! exterior dielectric=2. This is
+Elec >                                        ! the copmputation for the self
+Elec >                                        ! energy
+Elec >   temp 300.00                          ! temperature in K
+Elec >   ions   0.10                          ! ionic strength
+Elec >   bcfl   2                             ! boundary condition - each atom
+Elec >                                        ! is a Debye-Huckel sphere
+Elec >   efld    .00                          ! external electric field
+Elec >   grid   1.50                          ! grid spacing
+Elec >   dime   60  60  60                    ! grid dimension
+Elec >   center                               ! center the grid on the molecule
+Elec >   maxit 200                            ! maximum # of iteration for FDPBE
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :   -27.752  A
+                                                         -27.961  A
+                                                         -25.295  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     1.500  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :     2.000
+   Solvent permittivity                              :0.1146E-05 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.100  mM
+   Debye-Huckel parameter                            :     0.021  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :        10
+   X-coordinate of the center of geometry            :    17.998    A
+   Y-coordinate of the center of geometry            :    17.789    A
+   Z-coordinate of the center of geometry            :    20.455    A
+   Net charge of the selected atoms                  :     0.000    e
+   Effective radius of the selected atoms            :     1.821    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       200
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        78
+   Norm of the constant vector                       :0.7749E+00
+   Norm of the residual vector                       :0.6836E-06
+   Convergence achieved                              :0.8822E-06
+Main >  
+Main >  print elec phizero mol2 end           ! zero out the phisite accumulator
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phisave mol2 end           ! compute and store phi at atoms on grid
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  
+Main >  !
+Main >  !               fine grid
+Main >  !               molecule 2
+Main >  !
+Main >  
+Main >  elec calc mol 2
+Elec >   pdie   2.00                          ! internal dielectric=2
+Elec >   sdie   2.00                          ! exterior dielectric=2. This is
+Elec >                                        ! the copmputation for the self
+Elec >                                        ! energy
+Elec >   temp 300.00                          ! temperature in K
+Elec >   ions   0.10                          ! ionic strength
+Elec >   bcfl   4                             ! focusing - use the coarse grid to
+Elec >                                        ! set the boundary potential of this
+Elec >                                        ! focused grid.
+Elec >   efld    .00                          ! external electric field
+Elec >   grid   0.225                         ! spacing for focused grid
+Elec >   dime   60  60  60                    ! grid dimension
+Elec >   mcenter 2
+Elec >   maxit 200                            ! maximum # of iteration for FDPBE
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid origin                                       :    11.135  A
+                                                          10.927  A
+                                                          13.593  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.225  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         4
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :     2.000
+   Solvent permittivity                              :0.1146E-05 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.100  mM
+   Debye-Huckel parameter                            :     0.021  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :        10
+   X-coordinate of the center of geometry            :    17.998    A
+   Y-coordinate of the center of geometry            :    17.789    A
+   Z-coordinate of the center of geometry            :    20.455    A
+   Net charge of the selected atoms                  :     0.000    e
+   Effective radius of the selected atoms            :     1.821    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       200
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        72
+   Norm of the constant vector                       :0.1883E+02
+   Norm of the residual vector                       :0.1552E-04
+   Convergence achieved                              :0.8240E-06
+Main >  
+Main >  print elec phisave mol2 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phinrg mol2 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic Potential
+          Atom    Residue         X       Y       Z       Q      Potential
+   TOTAL PHISITE ENERGY (SUM (1/2)(Q)(PHI)):    0.200495E+03
+ ASSIGNMENT
+   Set the variable:               phinrg             = 0.20049523925781E+03
+
+
+Main >  assign e4 = $phinrg end
+ ASSIGNMENT
+   Set the variable:                   e4             = 0.20049523925781E+03
+Main >  
+Main >  !
+Main >  ! Regular Runs:
+Main >  !               coarse grid
+Main >  !               molecule complex
+Main >  !
+Main >  
+Main >  elec calc all
+Elec >   pdie   2.00                          ! internal dielectric=2
+Elec >   sdie  78.00                          ! solvent  dielectric=78
+Elec >   temp 300.00                          ! temperature in K
+Elec >   ions   0.10                          ! ionic strength
+Elec >   bcfl   2                             ! boundary condition - each atom
+Elec >                                        ! is a Debye-Huckel sphere
+Elec >   efld    .00                          ! external electric field
+Elec >   grid   1.50                          ! grid spacing
+Elec >   dime   60  60  60                    ! grid dimension
+Elec >   center                               ! center the grid on the molecule
+Elec >   maxit 200                            ! maximum # of iteration for FDPBE
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :   -22.099  A
+                                                         -29.084  A
+                                                         -27.658  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     1.500  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.100  mM
+   Debye-Huckel parameter                            :     0.003  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :      1673
+   X-coordinate of the center of geometry            :    23.651    A
+   Y-coordinate of the center of geometry            :    16.666    A
+   Z-coordinate of the center of geometry            :    18.092    A
+   Net charge of the selected atoms                  :     0.991    e
+   Effective radius of the selected atoms            :     1.821    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       200
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        93
+   Norm of the constant vector                       :0.1508E+03
+   Norm of the residual vector                       :0.1335E-03
+   Convergence achieved                              :0.8848E-06
+Main >  
+Main >  print elec phizero all end            ! zero out the phisite accumulator
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phisave all end            ! compute and store phi at atoms on grid
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  
+Main >  !
+Main >  !               fine grid
+Main >  !               molecule complex
+Main >  !
+Main >  
+Main >  elec calc all
+Elec >   pdie   2.00                          ! internal dielectric=2
+Elec >   sdie  78.00                          ! solvent  dielectric=78
+Elec >   temp 300.00                          ! temperature in K
+Elec >   ions   0.10                          ! ionic strength
+Elec >   bcfl   4                             ! focusing - use the coarse grid to
+Elec >                                        ! set the boundary potential of this
+Elec >                                        ! focused grid.
+Elec >   efld    .00                          ! external electric field
+Elec >   grid   0.225                         ! spacing for focused grid
+Elec >   dime   60  60  60                    ! grid dimension
+Elec >   mcenter 2
+Elec >   maxit 200                            ! maximum # of iteration for FDPBE
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid origin                                       :    11.135  A
+                                                          10.927  A
+                                                          13.593  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.225  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         4
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.100  mM
+   Debye-Huckel parameter                            :     0.003  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :      1673
+   X-coordinate of the center of geometry            :    23.651    A
+   Y-coordinate of the center of geometry            :    16.666    A
+   Z-coordinate of the center of geometry            :    18.092    A
+   Net charge of the selected atoms                  :     0.991    e
+   Effective radius of the selected atoms            :     1.821    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       200
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        94
+   Norm of the constant vector                       :0.3418E+03
+   Norm of the residual vector                       :0.3416E-03
+   Convergence achieved                              :0.9995E-06
+Main >  
+Main >  print elec phisave all end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phinrg all end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic Potential
+          Atom    Residue         X       Y       Z       Q      Potential
+   TOTAL PHISITE ENERGY (SUM (1/2)(Q)(PHI)):    0.878308E+04
+ ASSIGNMENT
+   Set the variable:               phinrg             = 0.87830771484375E+04
+
+
+Main >  assign e5 = $phinrg end
+ ASSIGNMENT
+   Set the variable:                   e5             = 0.87830771484375E+04
+Main >  
+Main >  !
+Main >  ! Reference Runs:
+Main >  !               coarse grid
+Main >  !               molecule complex
+Main >  !
+Main >  
+Main >  elec calc  all
+Elec >   pdie   2.00                          ! internal dielectric=2
+Elec >   sdie   2.00                          ! exterior dielectric=2. This is
+Elec >                                        ! the copmputation for the self
+Elec >                                        ! energy
+Elec >   temp 300.00                          ! temperature in K
+Elec >   ions   0.10                          ! ionic strength
+Elec >   bcfl   2                             ! boundary condition - each atom
+Elec >                                        ! is a Debye-Huckel sphere
+Elec >   efld    .00                          ! external electric field
+Elec >   grid   1.50                          ! grid spacing
+Elec >   dime   60  60  60                    ! grid dimension
+Elec >   center                               ! center the grid on the molecule
+Elec >   maxit 200                            ! maximum # of iteration for FDPBE
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :   -22.099  A
+                                                         -29.084  A
+                                                         -27.658  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     1.500  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :     2.000
+   Solvent permittivity                              :0.1146E-05 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.100  mM
+   Debye-Huckel parameter                            :     0.021  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :      1673
+   X-coordinate of the center of geometry            :    23.651    A
+   Y-coordinate of the center of geometry            :    16.666    A
+   Z-coordinate of the center of geometry            :    18.092    A
+   Net charge of the selected atoms                  :     0.991    e
+   Effective radius of the selected atoms            :     1.821    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       200
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        64
+   Norm of the constant vector                       :0.1361E+03
+   Norm of the residual vector                       :0.1056E-03
+   Convergence achieved                              :0.7757E-06
+Main >  
+Main >  print elec phizero all end            ! zero out the phisite accumulator
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phisave all end            ! compute and store phi at atoms on grid
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  
+Main >  !
+Main >  !               fine grid
+Main >  !               molecule complex
+Main >  !
+Main >  
+Main >  elec calc all
+Elec >   pdie   2.00                          ! internal dielectric=2
+Elec >   sdie   2.00                          ! exterior dielectric=2. This is
+Elec >                                        ! the copmputation for the self
+Elec >                                        ! energy
+Elec >   temp 300.00                          ! temperature in K
+Elec >   ions   0.10                          ! ionic strength
+Elec >   bcfl   4                             ! focusing - use the coarse grid to
+Elec >                                        ! set the boundary potential of this
+Elec >                                        ! focused grid.
+Elec >   efld    .00                          ! external electric field
+Elec >   grid   0.225                         ! spacing for focused grid
+Elec >   dime   60  60  60                    ! grid dimension
+Elec >   mcenter 2
+Elec >   maxit 200                            ! maximum # of iteration for FDPBE
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid origin                                       :    11.135  A
+                                                          10.927  A
+                                                          13.593  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.225  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         4
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :     2.000
+   Solvent permittivity                              :0.1146E-05 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.100  mM
+   Debye-Huckel parameter                            :     0.021  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :      1673
+   X-coordinate of the center of geometry            :    23.651    A
+   Y-coordinate of the center of geometry            :    16.666    A
+   Z-coordinate of the center of geometry            :    18.092    A
+   Net charge of the selected atoms                  :     0.991    e
+   Effective radius of the selected atoms            :     1.821    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       200
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        64
+   Norm of the constant vector                       :0.2749E+03
+   Norm of the residual vector                       :0.2109E-03
+   Convergence achieved                              :0.7671E-06
+Main >  
+Main >  print elec phisave all end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phinrg all end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic Potential
+          Atom    Residue         X       Y       Z       Q      Potential
+   TOTAL PHISITE ENERGY (SUM (1/2)(Q)(PHI)):    0.945677E+04
+ ASSIGNMENT
+   Set the variable:               phinrg             = 0.94567666015625E+04
+
+
+Main >  assign e6 = $phinrg end
+ ASSIGNMENT
+   Set the variable:                   e6             = 0.94567666015625E+04
+Main >  
+Main >  print mcou 1 2 end                    ! print the electrostatic interaction
+
+ PRINT MODULE     
+ PRINTING MOLECULE-MOLECULE COULOMBIC INTERACTION
+   Mols, energy (kcal/mole):    1    2    -.360728E+01
+ ASSIGNMENT
+   Set the variable:                 mcou             = -.36072750091553E+01
+
+
+Main >                                        ! between mol1 and mol2
+Main >  assign ecoul12 = $mcou end
+ ASSIGNMENT
+   Set the variable:              ecoul12             = -.36072750091553E+01
+Main >  
+Main >  !
+Main >  ! Now compute the solvation energies of mol1, mol2, the mol1-mol2
+Main >  ! complex and the coulombic interaction metween mol1 and mol2. The
+Main >  ! binding energy is then: esolv12 - (esolv1 + esolv2) + ecoul12.
+Main >  
+Main >  assign
+Assign >    esolv1 = $e1 $e2 -
+Eval >  end
+ ASSIGNMENT
+   Set the variable:               esolv1             = -.67307519531250E+03
+Main >  assign
+Assign >    esolv2 = $e3 $e4 -
+Eval >  end
+ ASSIGNMENT
+   Set the variable:               esolv2             = -.51754608154297E+01
+Main >  assign
+Assign >    esolv12 = $e5 $e6 -
+Eval >  end
+ ASSIGNMENT
+   Set the variable:              esolv12             = -.67368945312500E+03
+Main >  assign
+Assign >    ebind = $esolv12
+Eval >            $esolv1 -
+Eval >            $esolv2 -
+Eval >            $ecoul12 +
+Eval >  end
+ ASSIGNMENT
+   Set the variable:                ebind             = 0.95392799377441E+00
+Main >  
+Main >  stop
+ UHBD termination
+   date/time               : 27-Jan-2002  10:14:07 CST
+   total CPU seconds       :    225.536
+ total usr/sys CPU seconds :    225.028/     0.508
+
+

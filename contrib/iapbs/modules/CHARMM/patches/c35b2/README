@@ -1,0 +1,25 @@
+#
+# Patching c35b2
+# April 7, 2009
+
+To apply the patches:
+
+export PATCH_DIR=`pwd`
+
+cd to your CHARMM_DIR
+
+patch -p0 < $PATCH_DIR/pbeq.patch
+patch -p0 < $PATCH_DIR/Makefile_gnu.patch
+patch -p0 < $PATCH_DIR/install.patch
+
+
+After patching the source you have to copy modules/CHARMM/*.f modules
+to the source tree.
+
+cp iapbs/modules/CHARMM/apbs.f     $CHARMM_DIR/source/misc/apbs.src
+cp iapbs/modules/CHARMM/apbs_fcm.f $CHARMM_DIR/source/fcm/apbs.fcm
+
+
+
+
+

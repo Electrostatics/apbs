@@ -1,0 +1,343 @@
+!
+! Compute the binding energy of DMSO to
+! the active site of FKBP-12. This example
+! illustrates the use of focusing and the ability of UHBD to
+! handle mathematical operations specified by the user in
+! the input stream (see the assign statements below).
+!
+! Files: bindf.inp - this file
+!        1d7h-min.qcd - coords for FKBP with charges and radii
+!        dmso-min.qcd - coords for substrate (DMSO) with charges and radii
+!
+
+!
+! read in the coords., charges, and radii in CHARMM qcard
+! format
+!
+read mol 1 file "1d7h-min.qcd" qcard end ! FKBP
+read mol 2 file "dmso-min.qcd" qcard end ! DMSO
+
+!
+! Regular Runs:
+!               compute the potential on a coarse grid for
+!               molecule 1
+!
+
+elec calc mol 1
+ pdie   2.00                          ! internal dielectric=2
+ sdie  78.00                          ! solvent  dielectric=78
+ temp 300.00                          ! temperature in K
+ ions   0.10                          ! ionic strength
+ bcfl   2                             ! boundary condition - each atom
+                                      ! is a Debye-Huckel sphere
+ efld    .00                          ! external electric field
+ grid   1.50                          ! grid spacing
+ dime   60  60  60                    ! grid dimension
+ center                               ! center the grid on the molecule
+ maxit 200                            ! maximum # of iteration for FDPBE
+end
+
+print elec phizero mol1 end           ! zero out the phisite accumulator
+print elec phisave mol1 end           ! compute and store phi at atoms on grid
+
+!  
+!               compute the potential on a fine grid
+!               molecule 1 using the coarse grid to set the
+!               boundary potentials for this grid.
+!
+
+elec calc mol 1
+ pdie   2.00                          ! internal dielectric=2
+ sdie  78.00                          ! solvent  dielectric=78
+ temp 300.00                          ! temperature in K
+ ions   0.10                          ! ionic strength
+ bcfl   4                             ! focusing - use the coarse grid to
+                                      ! set the boundary potential of this
+                                      ! focused grid.
+ efld    .00                          ! external electric field
+ grid   0.225                         ! spacing for focused grid
+ dime   60  60  60                    ! grid dimension
+ mcenter 2
+ maxit 200                            ! maximum # of iteration for FDPBE
+end
+
+print elec phisave mol1 end
+print elec phiwrite mol1 end          ! write the phisite potentials to the output
+print elec phinrg mol1 end            ! compute and save to a user variable the
+                                      ! phi energy
+assign e1 = $phinrg end               ! assign the phi energy to a local variable 
+                                      ! for later use
+
+!
+! Reference Runs (i.e. self energy):
+!               coarse grid
+!               molecule 1
+!
+
+elec calc mol 1
+ pdie   2.00                          ! internal dielectric=2
+ sdie   2.00                          ! exterior dielectric=2. This is
+                                      ! the computation for the self
+                                      ! energy
+ temp 300.00                          ! temperature in K
+ ions   0.10                          ! ionic strength
+ bcfl   2                             ! boundary condition - each atom
+                                      ! is a Debye-Huckel sphere
+ efld    .00                          ! external electric field
+ grid   1.50                          ! grid spacing
+ dime   60  60  60                    ! grid dimension
+ center                               ! center the grid on the molecule
+ maxit 200                            ! maximum # of iteration for FDPBE
+end
+
+print elec phizero mol1 end           ! zero out the phisite accumulator
+print elec phisave mol1 end           ! compute and store phi at atoms on grid
+
+!  
+!               fine grid
+!               molecule 1
+!
+
+elec calc mol 1
+ pdie   2.00                          ! internal dielectric=2
+ sdie   2.00                          ! exterior dielectric=2. This is
+                                      ! the copmputation for the self
+                                      ! energy
+ temp 300.00                          ! temperature in K
+ ions   0.10                          ! ionic strength
+ bcfl   4                             ! focusing - use the coarse grid to
+                                      ! set the boundary potential of this
+                                      ! focused grid.
+ efld    .00                          ! external electric field
+ grid   0.225                         ! spacing for focused grid
+ dime   60  60  60                    ! grid dimension
+ mcenter 2
+ maxit 200                            ! maximum # of iteration for FDPBE
+end
+
+print elec phisave mol1 end
+print elec phinrg mol1 end  
+assign e2 = $phinrg end               ! save the phi "self" energy for mol1
+
+!
+! Regular Runs:
+!               coarse grid
+!               molecule 2
+!
+
+elec calc mol 2
+ pdie   2.00                          ! internal dielectric=2
+ sdie  78.00                          ! solvent  dielectric=78
+ temp 300.00                          ! temperature in K
+ ions   0.10                          ! ionic strength
+ bcfl   2                             ! boundary condition - each atom
+                                      ! is a Debye-Huckel sphere
+ efld    .00                          ! external electric field
+ grid   1.50                          ! grid spacing
+ dime   60  60  60                    ! grid dimension
+ center                               ! center the grid on the molecule
+ maxit 200                            ! maximum # of iteration for FDPBE
+end
+
+print elec phizero mol2 end           ! zero out the phisite accumulator
+print elec phisave mol2 end           ! compute and store phi at atoms on grid
+
+!  
+!               fine grid
+!               molecule 2
+!
+
+elec calc mol 2
+ pdie   2.00                          ! internal dielectric=2
+ sdie  78.00                          ! solvent  dielectric=78
+ temp 300.00                          ! temperature in K
+ ions   0.10                          ! ionic strength
+ bcfl   4                             ! focusing - use the coarse grid to
+                                      ! set the boundary potential of this
+                                      ! focused grid.
+ efld    .00                          ! external electric field
+ grid   0.225                         ! spacing for focused grid
+ dime   60  60  60                    ! grid dimension
+ mcenter 2
+ maxit 200                            ! maximum # of iteration for FDPBE
+end
+
+print elec phisave mol2 end
+print elec phinrg mol2 end  
+assign e3 = $phinrg end
+
+!
+! Reference Runs:
+!               coarse grid
+!               molecule 2
+!
+
+elec calc mol 2
+ pdie   2.00                          ! internal dielectric=2
+ sdie   2.00                          ! exterior dielectric=2. This is
+                                      ! the copmputation for the self
+                                      ! energy
+ temp 300.00                          ! temperature in K
+ ions   0.10                          ! ionic strength
+ bcfl   2                             ! boundary condition - each atom
+                                      ! is a Debye-Huckel sphere
+ efld    .00                          ! external electric field
+ grid   1.50                          ! grid spacing
+ dime   60  60  60                    ! grid dimension
+ center                               ! center the grid on the molecule
+ maxit 200                            ! maximum # of iteration for FDPBE
+end
+
+print elec phizero mol2 end           ! zero out the phisite accumulator
+print elec phisave mol2 end           ! compute and store phi at atoms on grid
+
+!  
+!               fine grid
+!               molecule 2
+!
+
+elec calc mol 2
+ pdie   2.00                          ! internal dielectric=2
+ sdie   2.00                          ! exterior dielectric=2. This is
+                                      ! the copmputation for the self
+                                      ! energy
+ temp 300.00                          ! temperature in K
+ ions   0.10                          ! ionic strength
+ bcfl   4                             ! focusing - use the coarse grid to
+                                      ! set the boundary potential of this
+                                      ! focused grid.
+ efld    .00                          ! external electric field
+ grid   0.225                         ! spacing for focused grid
+ dime   60  60  60                    ! grid dimension
+ mcenter 2
+ maxit 200                            ! maximum # of iteration for FDPBE
+end
+
+print elec phisave mol2 end
+print elec phinrg mol2 end  
+assign e4 = $phinrg end
+
+!
+! Regular Runs:
+!               coarse grid
+!               molecule complex
+!
+
+elec calc all 
+ pdie   2.00                          ! internal dielectric=2
+ sdie  78.00                          ! solvent  dielectric=78
+ temp 300.00                          ! temperature in K
+ ions   0.10                          ! ionic strength
+ bcfl   2                             ! boundary condition - each atom
+                                      ! is a Debye-Huckel sphere
+ efld    .00                          ! external electric field
+ grid   1.50                          ! grid spacing
+ dime   60  60  60                    ! grid dimension
+ center                               ! center the grid on the molecule
+ maxit 200                            ! maximum # of iteration for FDPBE
+end
+
+print elec phizero all end            ! zero out the phisite accumulator
+print elec phisave all end            ! compute and store phi at atoms on grid
+
+!  
+!               fine grid
+!               molecule complex
+!
+
+elec calc all 
+ pdie   2.00                          ! internal dielectric=2
+ sdie  78.00                          ! solvent  dielectric=78
+ temp 300.00                          ! temperature in K
+ ions   0.10                          ! ionic strength
+ bcfl   4                             ! focusing - use the coarse grid to
+                                      ! set the boundary potential of this
+                                      ! focused grid.
+ efld    .00                          ! external electric field
+ grid   0.225                         ! spacing for focused grid
+ dime   60  60  60                    ! grid dimension
+ mcenter 2
+ maxit 200                            ! maximum # of iteration for FDPBE
+end
+
+print elec phisave all end
+print elec phinrg all end  
+assign e5 = $phinrg end
+
+!
+! Reference Runs:
+!               coarse grid
+!               molecule complex
+!
+
+elec calc  all
+ pdie   2.00                          ! internal dielectric=2
+ sdie   2.00                          ! exterior dielectric=2. This is
+                                      ! the copmputation for the self
+                                      ! energy
+ temp 300.00                          ! temperature in K
+ ions   0.10                          ! ionic strength
+ bcfl   2                             ! boundary condition - each atom
+                                      ! is a Debye-Huckel sphere
+ efld    .00                          ! external electric field
+ grid   1.50                          ! grid spacing
+ dime   60  60  60                    ! grid dimension
+ center                               ! center the grid on the molecule
+ maxit 200                            ! maximum # of iteration for FDPBE
+end
+
+print elec phizero all end            ! zero out the phisite accumulator
+print elec phisave all end            ! compute and store phi at atoms on grid
+
+!  
+!               fine grid
+!               molecule complex
+!
+
+elec calc all
+ pdie   2.00                          ! internal dielectric=2
+ sdie   2.00                          ! exterior dielectric=2. This is
+                                      ! the copmputation for the self
+                                      ! energy
+ temp 300.00                          ! temperature in K
+ ions   0.10                          ! ionic strength
+ bcfl   4                             ! focusing - use the coarse grid to
+                                      ! set the boundary potential of this
+                                      ! focused grid.
+ efld    .00                          ! external electric field
+ grid   0.225                         ! spacing for focused grid
+ dime   60  60  60                    ! grid dimension
+ mcenter 2
+ maxit 200                            ! maximum # of iteration for FDPBE
+end
+
+print elec phisave all end
+print elec phinrg all end  
+assign e6 = $phinrg end
+
+print mcou 1 2 end                    ! print the electrostatic interaction
+                                      ! between mol1 and mol2
+assign ecoul12 = $mcou end
+
+!
+! Now compute the solvation energies of mol1, mol2, the mol1-mol2
+! complex and the coulombic interaction metween mol1 and mol2. The
+! binding energy is then: esolv12 - (esolv1 + esolv2) + ecoul12.
+
+assign
+  esolv1 = $e1 $e2 -
+end
+assign
+  esolv2 = $e3 $e4 -
+end
+assign
+  esolv12 = $e5 $e6 -
+end
+assign
+  ebind = $esolv12 
+          $esolv1 -
+          $esolv2 -
+          $ecoul12 +
+end
+
+stop

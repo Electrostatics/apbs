@@ -1,0 +1,45 @@
+--- build/UNX/misc.mk.orig	2005-04-13 17:24:04.000000000 -0700
++++ build/UNX/misc.mk	2005-04-13 17:24:09.000000000 -0700
+@@ -1,6 +1,7 @@
+ # misc makefile
+ # misc library rules
+ OBJS_misc= \
++	$(LIB)/misc.a(apbs.o) \
+ 	$(LIB)/misc.a(aspener.o) \
+ 	$(LIB)/misc.a(distrib.o) \
+ 	$(LIB)/misc.a(drawsp.o) \
+@@ -37,6 +38,13 @@
+ 	@echo misc COMPLETED
+ #
+ # misc source file rules
++$(LIB)/misc.a(apbs.o)  : $(SRC)/misc/apbs.src
++	$(FLX) $(SRC)/misc/apbs.src
++	$(FC2) apbs.f
++	ar rucv $(LIB)/misc.a apbs.o
++	$(REMOVE_F) apbs.f
++	$(REMOVE_O) apbs.o
++#
+ $(LIB)/misc.a(aspener.o)  : $(SRC)/misc/aspener.src
+ 	$(FLX) $(SRC)/misc/aspener.src
+ 	$(FC2) aspener.f
+@@ -250,6 +258,20 @@
+ #
+ # misc dependency file
+ #
++$(LIB)/misc.a(apbs.o) : comand.fcm
++$(LIB)/misc.a(apbs.o) : coord.fcm
++$(LIB)/misc.a(apbs.o) : dimens.fcm
++$(LIB)/misc.a(apbs.o) : exfunc.fcm
++$(LIB)/misc.a(apbs.o) : impnon.fcm
++$(LIB)/misc.a(apbs.o) : number.fcm
++$(LIB)/misc.a(apbs.o) : psf.fcm
++$(LIB)/misc.a(apbs.o) : stack.fcm
++$(LIB)/misc.a(apbs.o) : stream.fcm
++$(LIB)/misc.a(apbs.o) : heap.fcm
++$(LIB)/misc.a(apbs.o) : pbeq.fcm
++$(LIB)/misc.a(apbs.o) : timer.fcm
++#
++#
+ $(LIB)/misc.a(aspener.o) : consta.fcm
+ $(LIB)/misc.a(aspener.o) : coord.fcm
+ $(LIB)/misc.a(aspener.o) : ctitla.fcm

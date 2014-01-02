@@ -1,0 +1,206 @@
+
+          -------------------------------------------------------
+          Amber 10 SANDER                              2008
+          -------------------------------------------------------
+
+| Run on 09/10/2008 at 14:00:31
+  [-O]verwriting output
+
+File Assignments:
+|  MDIN: smpbe.in                                                              
+| MDOUT: smpbe.out                                                             
+|INPCRD: 2ala.prmcrd                                                           
+|  PARM: 2ala.prmtop                                                           
+|RESTRT: restrt                                                                
+|  REFC: refc                                                                  
+| MDVEL: mdvel                                                                 
+|  MDEN: mden                                                                  
+| MDCRD: mdcrd                                                                 
+|MDINFO: mdinfo                                                                
+|  MTMD: mtmd                                                                  
+|INPDIP: inpdip                                                                
+|RSTDIP: rstdip                                                                
+
+|INPTRA: inptraj                                                               
+|
+ 
+ Here is the input file:
+ 
+APBS SMPBE example                                                             
+&cntrl                                                                         
+   maxcyc=0, imin=1,                                                           
+   cut=12.0,                                                                   
+   igb=6, ntb=0                                                                
+   ntpr=1,                                                                     
+ /                                                                             
+&apbs                                                                          
+   apbs_debug = 0,                                                             
+   apbs_print= 1,                                                              
+   calc_type = 1,                                                              
+   fglen = 32, 32, 32,                                                         
+   cglen = 64, 64, 64,                                                         
+   dime =  65, 65, 65,                                                         
+   bcfl =2,                                                                    
+   pdie= 2.0,                                                                  
+   sdie= 78.54,                                                                
+   srfm=1,                                                                     
+   chgm =1,                                                                    
+   srad= 1.4,                                                                  
+   swin= 0.3,                                                                  
+   sdens= 10.0,                                                                
+   nonlin=4,                                                                   
+   smvolume = 3, smsize= 5,                                                    
+   temp= 298.15,                                                               
+   gamma= 0.105,                                                               
+   calcenergy=1, calcforce=0, calcnpenergy=0,                                  
+   nion=3,                                                                     
+   ionq = 1, 1, -1,                                                            
+   ionc = 0.1, 0.1, 0.2,                                                       
+   ionrr = 1.7, 1.7, 1.7,                                                      
+   wpot = 1, wchg = 1, wsmol =1,                                               
+   sp_apbs=.true.,                                                             
+&end                                                                           
+                                                                               
+
+--------------------------------------------------------------------------------
+   1.  RESOURCE   USE: 
+--------------------------------------------------------------------------------
+
+| Flags:                                                                        
+| New format PARM file being parsed.
+| Version =    1.000 Date = 10/18/06 Time = 21:21:36
+ NATOM  =      22 NTYPES =       7 NBONH =      12 MBONA  =       9
+ NTHETH =      25 MTHETA =      11 NPHIH =      42 MPHIA  =      18
+ NHPARM =       0 NPARM  =       0 NNB   =      99 NRES   =       3
+ NBONA  =       9 NTHETA =      11 NPHIA =      18 NUMBND =       8
+ NUMANG =      16 NPTRA  =      16 NATYP =       7 NPHB   =       0
+ IFBOX  =       0 NMXRS  =      10 IFCAP =       0 NEXTRA =       0
+ NCOPY  =       0
+
+ Implicit solvent radii are modified Bondi radii (mbondi)                                                   
+
+|     Memory Use     Allocated
+|     Real                1592
+|     Hollerith            137
+|     Integer            21004
+|     Max Pairs              1
+|     nblistReal             0
+|     nblist Int             0
+|       Total               95 kbytes
+| Duplicated    0 dihedrals
+| Duplicated    0 dihedrals
+
+--------------------------------------------------------------------------------
+   2.  CONTROL  DATA  FOR  THE  RUN
+--------------------------------------------------------------------------------
+
+ACE                                                                             
+
+General flags:
+     imin    =       1, nmropt  =       0
+
+Nature and format of input:
+     ntx     =       1, irest   =       0, ntrx    =       1
+
+Nature and format of output:
+     ntxo    =       1, ntpr    =       1, ntrx    =       1, ntwr    =     500
+     iwrap   =       0, ntwx    =       0, ntwv    =       0, ntwe    =       0
+     ioutfm  =       0, ntwprt  =       0, idecomp =       0, rbornstat=      0
+
+Potential function:
+     ntf     =       1, ntb     =       0, igb     =       6, nsnb    =      25
+     ipol    =       0, gbsa    =       0, iesp    =       0
+     dielc   =   1.00000, cut     =  12.00000, intdiel =   1.00000
+     saltcon =   0.00000, offset  =   0.09000, gbalpha=    1.00000
+     gbbeta  =   0.00000, gbgamma =   0.00000, surften =   0.00500
+     rdt     =   0.00000, rgbmax  =  25.00000  extdiel =  78.50000
+     alpb  =        0
+     scnb    =   2.00000, scee    =   1.20000
+
+Frozen or restrained atoms:
+     ibelly  =       0, ntr     =       0
+
+Energy minimization:
+     maxcyc  =       0, ncyc    =      10, ntmin   =       1
+     dx0     =   0.01000, drms    =   0.00010
+|  INFO: Old style inpcrd file read
+
+
+--------------------------------------------------------------------------------
+   3.  ATOMIC COORDINATES AND VELOCITIES
+--------------------------------------------------------------------------------
+
+ACE                                                                             
+ begin time read from input coords =     0.000 ps
+
+iAPBS: Initializing APBS interface
+iAPBS: Using charge/radii definition from prmtop file
+
+ APBS calculation parameters:
+
+Size-Modified PBE
+Multiple Debye-Huckel boundary conditions
+Smoothed molecular surface definition
+Using cubic B-spline discretization
+Grid dimension:  65  65  65
+Coarse grid lengths:  64.000  64.000  64.000 A
+Fine grid lengths:  32.000  32.000  32.000 A
+Solute dielectric (pdie):   2.000
+Solvent dielectric (sdie):  78.540
+Temperature: 298.150 K
+Surface sphere density (sdens):  10.000 grid points/A^2
+Surface tension:   0.105 kJ/mol/A
+Using charge/radii information from prmtop file
+
+ Number of triangulated 3-point waters found:        0
+
+--------------------------------------------------------------------------------
+   4.  RESULTS
+--------------------------------------------------------------------------------
+
+% CGMG: starting:      [ 65, 65, 65] 
+% CGMG: starting:      [ 65, 65, 65] 
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+      1       2.3403E+02     5.3610E+00     1.8943E+01     N           7
+
+ BOND    =        0.0206  ANGLE   =        0.3620  DIHED      =        8.1071
+ VDWAALS =        2.8120  EEL     =      -80.1238  EPB        =      248.8990
+ 1-4 VDW =        5.0157  1-4 EEL =       48.9355  RESTRAINT  =        0.0000
+ ENPOLAR =        0.0000
+
+
+  Maximum number of minimization cycles reached.
+
+
+                    FINAL RESULTS
+
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+      1       2.3403E+02     5.3610E+00     1.8943E+01     N           7
+
+ BOND    =        0.0206  ANGLE   =        0.3620  DIHED      =        8.1071
+ VDWAALS =        2.8120  EEL     =      -80.1238  EPB        =      248.8990
+ 1-4 VDW =        5.0157  1-4 EEL =       48.9355  RESTRAINT  =        0.0000
+ ENPOLAR =        0.0000
+
+--------------------------------------------------------------------------------
+   5.  TIMINGS
+--------------------------------------------------------------------------------
+
+|    Read coords time           0.00 ( 0.02% of Total)
+|             PB Nonbond                 2.29 (100.0% of Nonbo)
+|          Nonbond force              2.29 (100.0% of Force)
+|       Force time                 2.29 (100.0% of Runmd)
+|    Runmd Time                 2.29 (99.86% of Total)
+|    Other                      0.00 ( 0.11% of Total)
+| Total time                 2.30 (100.0% of ALL  )
+
+| Highest rstack allocated:          0
+| Highest istack allocated:          0
+|           Job began  at 14:00:31.800  on 09/10/2008
+|           Setup done at 14:00:31.803  on 09/10/2008
+|           Run   done at 14:00:34.097  on 09/10/2008
+|     wallclock() was called      22 times

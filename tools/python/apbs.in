@@ -1,0 +1,102 @@
+read 
+    mol pqr ion.pqr                      # Read molecule 1
+end
+elec name solvated
+    mg-manual                          # Use the multigrid method
+    dime 65 65 65                      # Grid dimensions (c 2^(l+1) +1)
+                                       #   (in x, y, z)
+    nlev 4                             # Number of levels in multilevel
+                                       #   hierarchy (usually 'l' from above
+                                       #   definition)
+    grid 0.33 0.33 0.33                # Grid spacings (A)
+    # glen 100 100 100                 # You can EITHER specify the grid
+                                       # lengths OR the grid spacing
+    gcent mol 1                        # This can either be 'mol n' to center
+                                       #   on a specific molecule or (x, y, z)
+                                       #   coordinates
+    chgm spl2                             # Charge disc method
+    mol 1                              # Which molecule (1, 2, ...)
+    lpbe                               # lpbe/npbe = linear/nonlinear PBE
+    bcfl mdh                             # Boundary condition flag
+                                       #  0 => Zero
+                                       #  1 => Single DH sphere
+                                       #  2 => Multiple DH spheres
+                                       #  4 => Focusing
+    ion 1 0.000 2.0                    # Counterion declaration:
+    ion -1 0.000 2.0                   #  ion <charge> <conc (M)> <radius>
+    pdie 1.0                           # Solute dielectric
+    sdie 78.54                         # Solvent dielectric
+    chgm spl2                             # Charge disc method
+    srfm smol                             # Surface calculation method
+                                       #  0 => Mol surface for epsilon;
+                                       #       inflated VdW for kappa; no
+                                       #       smoothing
+                                       #  1 => As 0 with harmoic average
+                                       #       smoothing
+                                       #  2 => Cubic spline 
+    sdens 10.0
+    srad 1.4                           # Solvent radius
+    swin 0.3                           # Surface cubic spline window
+    temp 298.15                        # Temperature
+    gamma 0.105                        # Surface tension (in kJ/mol/A^2)
+    calcenergy total                      # Energy I/O (to stdout)
+                                       #  0 => don't write out energy
+                                       #  1 => write out total energy
+                                       #  2 => write out total energy and all
+                                       #       components
+    calcforce no                       # Atomic forces I/O (to stdout)
+                                       #  0 => don't write out forces
+                                       #  1 => write out net forces on molecule
+                                       #  2 => write out atom-level forces
+end
+elec name reference
+    mg-manual                          # Use the multigrid method
+    dime 65 65 65                      # Grid dimensions (c 2^(l+1) +1)
+                                       #   (in x, y, z)
+    nlev 4                             # Number of levels in multilevel
+                                       #   hierarchy (usually 'l' from above
+                                       #   definition)
+    grid 0.33 0.33 0.33                # Grid spacings (A)
+    # glen 100 100 100                 # You can EITHER specify the grid
+                                       # lengths OR the grid spacing
+    gcent mol 1                        # This can either be 'mol n' to center
+                                       #   on a specific molecule or (x, y, z)
+                                       #   coordinates
+    mol 1                              # Which molecule (1, 2, ...)
+    lpbe                               # lpbe/npbe = linear/nonlinear PBE
+    bcfl mdh                             # Boundary condition flag
+                                       #  0 => Zero
+                                       #  1 => Single DH sphere
+                                       #  2 => Multiple DH spheres
+                                       #  4 => Focusing
+    ion 1 0.000 2.0                    # Counterion declaration:
+    ion -1 0.000 2.0                   #  ion <charge> <conc (M)> <radius>
+    pdie 1.0                           # Solute dielectric
+    sdie 1.0                           # Solvent dielectric
+    chgm spl2                             # Charge disc method
+    sdens 10.0
+    srfm smol                             # Surface calculation method
+                                       #  0 => Mol surface for epsilon;
+                                       #       inflated VdW for kappa; no
+                                       #       smoothing
+                                       #  1 => As 0 with harmoic average
+                                       #       smoothing
+                                       #  2 => Cubic spline 
+    srad 1.4                           # Solvent radius
+    swin 0.3                           # Surface cubic spline window
+    temp 298.15                        # Temperature
+    gamma 0.105                        # Surface tension (in kJ/mol/A^2)
+    calcenergy total                      # Energy I/O (to stdout)
+                                       #  0 => don't write out energy
+                                       #  1 => write out total energy
+                                       #  2 => write out total energy and all
+                                       #       components
+    calcforce no                       # Atomic forces I/O (to stdout)
+                                       #  0 => don't write out forces
+                                       #  1 => write out net forces on molecule
+                                       #  2 => write out atom-level forces
+end
+
+print energy 1 - 2 end
+
+quit

@@ -1,0 +1,183 @@
+Index: Make.depends
+===================================================================
+RCS file: /namd/cvsroot/namd2/Make.depends,v
+retrieving revision 1.115
+diff -u -p -r1.115 Make.depends
+--- Make.depends	12 Nov 2007 19:01:41 -0000	1.115
++++ Make.depends	6 Dec 2007 19:50:19 -0000
+@@ -1437,6 +1437,7 @@ obj/ComputeMgr.o: \
+ 	src/GlobalMasterEasy.h \
+ 	src/GlobalMasterMisc.h \
+ 	src/GlobalMasterFreeEnergy.h \
++  src/GlobalMasterAPBS.h \
+ 	inc/ComputeMgr.def.h
+ 	$(CXX) $(CXXFLAGS) $(COPTO)obj/ComputeMgr.o $(COPTC) src/ComputeMgr.C
+ obj/ComputeNonbondedSelf.o: \
+@@ -2273,6 +2274,17 @@ obj/GlobalMasterServer.o: \
+ 	src/GlobalMasterServer.h \
+ 	src/Debug.h
+ 	$(CXX) $(CXXFLAGS) $(COPTO)obj/GlobalMasterServer.o $(COPTC) src/GlobalMasterServer.C
++obj/GlobalMasterAPBS.o: \
++	src/GlobalMasterAPBS.C \
++	src/NamdTypes.h \
++	src/Vector.h \
++	src/common.h \
++	src/ResizeArray.h \
++	src/ResizeArrayRaw.h \
++	src/GlobalMaster.h \
++	src/GlobalMasterAPBS.h \
++	src/Debug.h
++	$(CXX) $(CXXFLAGS) $(COPTO)obj/GlobalMasterAPBS.o $(COPTC) src/GlobalMasterAPBS.C
+ obj/GlobalMasterTest.o: \
+ 	src/GlobalMasterTest.C \
+ 	src/NamdTypes.h \
+Index: Makefile
+===================================================================
+RCS file: /namd/cvsroot/namd2/Makefile,v
+retrieving revision 1.1229
+diff -u -p -r1.1229 Makefile
+--- Makefile	7 Nov 2007 21:36:12 -0000	1.1229
++++ Makefile	6 Dec 2007 19:50:19 -0000
+@@ -118,6 +118,7 @@ OBJS = \
+         $(DSTDIR)/FreeEnergyVector.o \
+ 	$(DSTDIR)/GlobalMaster.o \
+ 	$(DSTDIR)/GlobalMasterServer.o \
++	$(DSTDIR)/GlobalMasterAPBS.o \
+ 	$(DSTDIR)/GlobalMasterTest.o \
+ 	$(DSTDIR)/GlobalMasterIMD.o \
+ 	$(DSTDIR)/GlobalMasterTcl.o \
+@@ -251,7 +252,7 @@ CHARMLIB = $(CHARM)/lib
+ LIBS = $(PLUGINLIB) $(DPMTALIBS) $(DPMELIBS) $(TCLDLL)
+ 
+ # CXX is platform dependent
+-CXXBASEFLAGS = $(COPTI)$(CHARMINC) $(COPTI)$(SRCDIR) $(COPTI)$(INCDIR) $(DPMTA) $(DPME) $(COPTI)$(PLUGININCDIR) $(TCL) $(FFT) $(CCS) $(RELEASE) $(MEMOPTDEF) $(TRACEOBJDEF)
++CXXBASEFLAGS = $(COPTI)$(CHARMINC) $(COPTI)$(SRCDIR) $(COPTI)$(INCDIR) $(DPMTA) $(DPME) $(COPTI)$(PLUGININCDIR) $(TCL) $(FFT) $(CCS) $(APBS) $(RELEASE) $(MEMOPTDEF) $(TRACEOBJDEF)
+ CXXFLAGS = $(CXXBASEFLAGS) $(CXXOPTS)
+ CXXTHREADFLAGS = $(CXXBASEFLAGS) $(CXXTHREADOPTS)
+ CXXSIMPARAMFLAGS = $(CXXBASEFLAGS) $(CXXSIMPARAMOPTS)
+@@ -291,6 +292,7 @@ namd2:	$(INCDIR) $(DSTDIR) $(OBJS) $(LIB
+ 	$(TCLLIB) \
+ 	$(FFTLIB) \
+ 	$(PLUGINLIB) \
++	$(APBSLIB) \
+ 	$(CHARMOPTS) \
+ 	-lm -o namd2
+ 
+Index: config
+===================================================================
+RCS file: /namd/cvsroot/namd2/config,v
+retrieving revision 1.42
+diff -u -p -r1.42 config
+--- config	17 Apr 2006 16:54:57 -0000	1.42
++++ config	6 Dec 2007 19:50:19 -0000
+@@ -2,7 +2,7 @@
+ goto begin
+ syntax:
+   echo ''
+-  echo 'Usage: config [debug] [tcl] [fftw] [<build_dir>/]<arch>[.comment] [suffix]'
++  echo 'Usage: config [debug] [tcl] [fftw] [apbs] [<build_dir>/]<arch>[.comment] [suffix]'
+   echo 'Environment variable NAMD_BUILD_BASE may point to scratch directory.'
+   echo ''
+   echo '<arch>: ' 
+@@ -43,6 +43,14 @@ begin:
+   endif
+ 
+   if ($#argv < 1) goto syntax
++  if ( $1 == apbs ) then
++    set use_apbs = 1
++    shift
++  else
++    set use_apbs = 0
++  endif
++
++  if ($#argv < 1) goto syntax
+   if ( $1 == plugins ) then
+     echo 'The "plugins" flag is not needed; plugins are built automatically.'
+     shift
+@@ -113,6 +121,7 @@ begin:
+    echo 'include .rootdir/arch/$(NAMD_ARCH)$(NAMD_SUBARCH).base' >> Makearch
+    if ( $use_tcl ) echo 'include .rootdir/arch/$(NAMD_ARCH)$(NAMD_SUBARCH).tcl' >> Makearch
+    if ( $use_fftw ) echo 'include .rootdir/arch/$(NAMD_ARCH)$(NAMD_SUBARCH).fftw' >> Makearch
++   if ( $use_apbs ) echo 'include .rootdir/arch/$(NAMD_ARCH)$(NAMD_SUBARCH).apbs' >> Makearch
+    if ( $use_debug ) then
+     echo 'CXXOPTS = -g' >> Makearch
+     echo 'CXXTHREADOPTS = -g' >> Makearch
+Index: src/ComputeMgr.C
+===================================================================
+RCS file: /namd/cvsroot/namd2/src/ComputeMgr.C,v
+retrieving revision 1.1073
+diff -u -p -r1.1073 ComputeMgr.C
+--- src/ComputeMgr.C	12 Nov 2007 17:31:29 -0000	1.1073
++++ src/ComputeMgr.C	6 Dec 2007 19:50:21 -0000
+@@ -71,6 +71,7 @@
+ #include "GlobalMasterEasy.h"
+ #include "GlobalMasterMisc.h"
+ #include "GlobalMasterFreeEnergy.h"
++#include "GlobalMasterAPBS.h"
+ 
+ ComputeMgr::ComputeMgr()
+ {
+@@ -616,6 +617,8 @@ ComputeMgr::createComputes(ComputeMap *m
+             masterServerObject->addClient(new GlobalMasterMisc());
+         if ( simParams->freeEnergyOn )
+             masterServerObject->addClient(new GlobalMasterFreeEnergy());
++        if ( simParams->apbsForcesOn )
++            masterServerObject->addClient(new GlobalMasterAPBS);
+     }
+ 
+     for (int i=0; i < map->nComputes; i++)
+Index: src/SimParameters.C
+===================================================================
+RCS file: /namd/cvsroot/namd2/src/SimParameters.C,v
+retrieving revision 1.1245
+diff -u -p -r1.1245 SimParameters.C
+--- src/SimParameters.C	12 Nov 2007 17:31:29 -0000	1.1245
++++ src/SimParameters.C	6 Dec 2007 19:50:21 -0000
+@@ -1065,6 +1065,13 @@ void SimParameters::config_parser_constr
+        "Configuration file for constant forces", PARSE_STRING);
+    opts.require("constantforce", "consForceScaling",
+        "Scaling factor for constant forces", &consForceScaling, 1.0);
++
++   ////  APBS solvation forces
++   opts.optionalB("main", "apbsForces", "Apply APBS solvation forces?",
++     &apbsForcesOn, FALSE);
++   opts.require("apbsForces", "apbsPQRFile", "Path to PQR file", apbsPQRFile);
++   opts.require("apbsForces", "apbsForcesConfig",
++       "Configuration file for APBS solvation forces", PARSE_MULTIPLES);
+ }
+ 
+ 
+@@ -3073,9 +3080,15 @@ void SimParameters::print_config(ParseOp
+    
+    // Global forces configuration
+ 
+-   globalForcesOn = ( tclForcesOn || freeEnergyOn || miscForcesOn ||
++   globalForcesOn = ( apbsForcesOn || tclForcesOn || freeEnergyOn || miscForcesOn ||
+                       (IMDon) || SMDOn || TMDOn);
+ 
++   if (apbsForcesOn) {
++     iout << iINFO << "APBS SOLVATION FORCES ACTIVE\n";
++     iout << iINFO << "    APBS PQR FILE: " << apbsPQRFile << "\n";
++     iout << endi;
++   }
++
+    if (tclForcesOn)
+    {
+      iout << iINFO << "TCL GLOBAL FORCES ACTIVE\n";
+Index: src/SimParameters.h
+===================================================================
+RCS file: /namd/cvsroot/namd2/src/SimParameters.h,v
+retrieving revision 1.1134
+diff -u -p -r1.1134 SimParameters.h
+--- src/SimParameters.h	12 Nov 2007 17:31:29 -0000	1.1134
++++ src/SimParameters.h	6 Dec 2007 19:50:21 -0000
+@@ -302,6 +302,9 @@ public:
+ 	Bool freeEnergyOn;		//  Doing free energy perturbation?
+ 	Bool miscForcesOn;		//  Using misc forces?
+ 
++    Bool apbsForcesOn;      // Using APBS to compute solvation forces?
++    char apbsPQRFile[128];  // path to PQR file for charges and radii.
++
+ 	Bool fixedAtomsOn;		//  Are there fixed atoms?
+ 	Bool fixedAtomsForces;		//  Calculate forces anyway?
+ 

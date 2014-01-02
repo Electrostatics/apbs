@@ -1,0 +1,78 @@
+read
+    mol pqr model_outNB.pqr
+    mol pqr model_outNpep.pqr
+    mol pqr model_outBoxB19.pqr
+end
+elec name complex
+    mg-auto
+    dime 65 97 129
+    cglen 45.3322 54.9498 82.2633
+    fglen 45.3322 52.3234 68.3902
+    cgcent mol 1
+    fgcent mol 1
+    mol 1
+    npbe
+    bcfl sdh
+    pdie 4.0
+    ion charge 1 conc IONSTR radius 2.0
+    ion charge -1 conc IONSTR radius 2.0
+    sdie 80.0
+    srfm mol
+    chgm spl2
+    sdens 10.00
+    srad 1.40
+    swin 0.30
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+elec name peptide
+    mg-auto
+    dime 65 97 129
+    cglen 45.3322 54.9498 82.2633
+    fglen 45.3322 52.3234 68.3902
+    cgcent mol 1
+    fgcent mol 1
+    mol 2
+    npbe
+    bcfl sdh
+    pdie 4.0
+    sdie 80.0
+    ion charge 1 conc IONSTR radius 2.0
+    ion charge -1 conc IONSTR radius 2.0
+    srfm mol
+    chgm spl2
+    sdens 10.00
+    srad 1.40
+    swin 0.30
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+elec name rna
+    mg-auto
+    dime 65 97 129
+    cglen 45.3322 54.9498 82.2633
+    fglen 45.3322 52.3234 68.3902
+    cgcent mol 1
+    fgcent mol 1
+    mol 3
+    npbe
+    bcfl sdh
+    pdie 4.0
+    sdie 80.0
+    ion charge 1 conc IONSTR radius 2.0
+    ion charge -1 conc IONSTR radius 2.0
+    srfm mol
+    chgm spl2
+    sdens 10.00
+    srad 1.40
+    swin 0.30
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+
+print elecEnergy complex - peptide - rna end
+
+quit

@@ -1,0 +1,15 @@
+65 65 65
+13.44 13.44 13.44
+298.15
+0. 78.0
+sdh
+6
+mole1mole2-dielx.dx
+mole1mole2-diely.dx
+mole1mole2-dielz.dx
+mole1mole2-kappa.dx
+mole1mole2.pqr
+molex.pqr
+calceneryes
+C:\Users\Marce\Documents\temp\MATLAB_PB_SOLVER_5\Input_Files
+C:\Users\Marce\Documents\temp\MATLAB_PB_SOLVER_5\mole1mole2_model

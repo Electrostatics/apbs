@@ -1,0 +1,12 @@
+#!/bin/sh
+
+export MCSH_HOME=/dev/null
+
+output=solvation.out
+
+$TESTsander -O -i solvation.in -c 2ala.prmcrd -p 2ala.prmtop -o $output
+
+$AMBERHOME/test/dacdif $output.save $output
+
+
+/bin/rm -f mdinfo restrt

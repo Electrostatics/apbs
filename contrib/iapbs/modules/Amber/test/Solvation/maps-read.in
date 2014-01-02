@@ -1,0 +1,23 @@
+APBS solvation energy example
+&cntrl
+   maxcyc=0, imin=1,
+   cut=12.0,
+   igb=6, ntb=0,
+   ntpr=1,
+ /
+&apbs
+    apbs_debug=0,
+    apbs_print=1,
+    grid=0.5, 0.5, 0.5,
+    calc_type=1,
+    cmeth=1,
+ bcfl=2,
+ srfm=1,
+ chgm=1,
+ pdie=1.0,
+ sdie=78.54,
+ srad = 1.4,
+ radiopt=3, pqr='2ala.pqr',
+ calcforce=0, calcnpenergy=1,
+ rchg=1, rkappa=1, rdiel=1,
+&end

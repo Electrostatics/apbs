@@ -1,0 +1,863 @@
+
+
+ UNIVERSITY OF HOUSTON BROWNIAN DYNAMICS  (Release 5.1.exp)
+
+   AUTHORS                 : Jeffry Madura
+                           : Malcolm Davis
+                           : Rebecca Wade
+                           : Brock Luty
+                           : Michael Gilson
+
+   date/time               : 30-May-95    17:16:34    
+
+
+ CURRENT MAXIMUM PROGRAM DIMENSIONS     
+   Maximum Number of Atoms                           :     13000
+   Maximum Grid Size                                 :        65^3 
+   Maximum Number of Subunits                        :        40
+   Maximum Entries in Atomic Database                :      1000
+   Maximum Equivalences in Atomic Database           :      1000
+   Maximum Number of Runs                            :      1000
+   Maximum Number of Reaction Sites                  :        40
+   Maximum Number of Criteria per Reaction Site      :        10
+   Maximum Number of Columns in an Atomic Database   :        16
+   Maximum Number of Diffusing Units                 :         5
+   Maximum Number of Diffusing Subunits              :        15
+   Maximum Number of Distance Constraints            :        30
+   Maximum Number of Molecules                       :        50
+   Maximum Number of Time Step Regions               :         5
+   Maximum Number of Time Steps for Correlation Func.:        11
+   Maximum Number of Bins for Dihedral Distributions :       360
+   Maximum Number of Trajectories for Analysis       :         1
+   Maximum Number of Traj. Files to be Concatenated  :        10
+
+
+Main >  !
+Main >  ! Simple ionization energy example for acetic acid. Focusing is used
+Main >  ! to get more accurate energies.
+Main >  !  AcOH(aq) ---> AcO(-)(aq) + H(+)(aq)
+Main >  ! Note that this is only the hydration part of the reaction. The "gas-
+Main >  ! phase" part would need to be included (i.e. to account for the energy
+Main >  ! of the electronic rearrangements) in order to compute an absolute pKa.
+Main >  ! A non-polar cavitation term would also be necessary.
+Main >  !
+Main >  read                                   ! read
+Read >       mol 1                             ! mol 1 (acetic acid)
+Read >       file "elec.pdb"                   ! from the file "elec.pdb"
+Read >       pdb                               ! in free-format PDB format
+Read >  end
+
+ READ MODULE
+ READ COORDINATES
+   Molecule number                                   :         1
+   Coordinate file                                   :elec.pdb            
+   File format                                       :free format PDB     
+   Atoms read                                        :         8
+
+
+Main >  
+Main >  set                                    ! set
+Set >       charge                            ! the charges
+Set >       radii                             ! and the radii of all atoms
+Set >       file "elec.dat"                   ! from the file "elec.dat"
+Set >       para mine                         ! using the parameter set "mine"
+Set >  end
+ SET MODULE
+   Setting                                           :             charges
+   Setting                                           :               radii
+   Parameter set                                     :mine                
+   Database file                                     :elec.dat            
+   Reading of database completed                     :
+   Number of entries                                 :        24
+   Number of equivalences                            :         0
+   Assignments made                                  :         8
+Main >  
+Main >  print apar mol1 end
+
+ PRINT MODULE     
+ PRINTING ATOMIC PARAMETER INFORMATION   
+     Atom    Residue       Coordinates(x,y,z)      Charge   Radii
+     1 c1   targ     1    0.000    0.000    0.000   -0.137    1.880
+     2 c2   targ     1    0.000    0.000    1.515    0.780    1.880
+     3 h3   targ     1    0.000   -1.028   -0.363    0.059    1.150
+     4 h4   targ     1    0.908    0.482   -0.363    0.059    1.150
+     5 h5   targ     1   -0.908    0.482   -0.363    0.059    1.150
+     6 o6   targ     1    0.000    0.979    2.200   -0.610    1.480
+     7 o7   targ     1    0.173   -1.247    1.975   -0.670    1.480
+     8 h8   targ     1    0.178   -1.286    2.937    0.460    1.150
+ Center of Geometry of this list of Atoms(x,y,z)
+                          0.044   -0.202    0.942
+ Total Charge of this list of Atoms
+                          0.000
+
+
+Main >  
+Main >  !
+Main >  ! Solvation energy calculation for acetic acid (coarse grid)
+Main >  !
+Main >  
+Main >  elec calc mol 1                        ! do electrostatic calculations
+Elec >   bcflag 2 solver 0                     ! boundary condition (each atom is
+Elec >                                         !  a Debye-Huckel sphere). Use the
+Elec >                                         !  diagonal scaling preconditioned
+Elec >                                         !  conjugate gradient.
+Elec >   spacing 1.00 dime 60 60 60            ! definition of the grid spacing and
+Elec >                                         !  dimensions
+Elec >   center                                ! center the grid at center
+Elec >                                         !  of mol 1
+Elec >   temp 293.0                            ! temperature in K
+Elec >   sdie 78.0                             ! solvent dielectric
+Elec >   pdie 2.0                              ! internal dielectric
+Elec >   maxits 400                            ! increase the number of iterations
+Elec >                                         !  that can be used to solve the FDPBE
+Elec >   ionstr 150.0                          ! ionic strength
+Elec >   rion 2.0                              ! ion exclusion radius
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :   -30.456  A
+                                                         -30.702  A
+                                                         -29.558  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     1.000  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   293.000  K
+   Ionic strength                         (ions #.#) :   150.000  mM
+   Debye-Huckel parameter                            :     0.129  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :         8
+   X-coordinate of the center of geometry            :     0.044    A
+   Y-coordinate of the center of geometry            :    -0.202    A
+   Z-coordinate of the center of geometry            :     0.942    A
+   Net charge of the selected atoms                  :     0.000    e
+   Effective radius of the selected atoms            :     1.880    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       400
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         0
+     - diagonal-scaling preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :       152
+   Norm of the constant vector                       :0.1734E+01
+   Norm of the residual vector                       :0.1660E-05
+   Convergence achieved                              :0.9573E-06
+Main >  
+Main >  !
+Main >  ! Now focus to get a better result (fine grid)
+Main >  !
+Main >  
+Main >  elec calc mol 1                        ! do electrostatic calculations
+Elec >   bcflag 4 solver 0                     ! focus using the coarse grid to
+Elec >                                         !  set the boundary conditions
+Elec >   spacing 0.20 dime 60 60 60            ! definition of the grid spacing and
+Elec >                                         !  dimensions
+Elec >   center                                ! center the grid at center
+Elec >                                         !  of mol 1
+Elec >   temp 293.0                            ! temperature in K
+Elec >   sdie 78.0                             ! solvent dielectric
+Elec >   pdie 2.0                              ! internal dielectric
+Elec >   maxits 400                            ! increase the number of iterations
+Elec >                                         !  that can be used to solve the FDPBE
+Elec >   ionstr 150.0                          ! ionic strength
+Elec >   rion 2.0                              ! ion exclusion radius
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :    -6.056  A
+                                                          -6.302  A
+                                                          -5.158  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.200  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         4
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   293.000  K
+   Ionic strength                         (ions #.#) :   150.000  mM
+   Debye-Huckel parameter                            :     0.129  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :         8
+   X-coordinate of the center of geometry            :     0.044    A
+   Y-coordinate of the center of geometry            :    -0.202    A
+   Z-coordinate of the center of geometry            :     0.942    A
+   Net charge of the selected atoms                  :     0.000    e
+   Effective radius of the selected atoms            :     1.880    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       400
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         0
+     - diagonal-scaling preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :       233
+   Norm of the constant vector                       :0.2120E+02
+   Norm of the residual vector                       :0.2010E-04
+   Convergence achieved                              :0.9482E-06
+Main >  
+Main >  print elec zenergy mol 1 end           ! zero out the energy accumulator
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec energy  mol 1 end           ! compute the electrostatic energy
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic energy for selected atoms           :0.808064E+03 kcal/mol
+ ASSIGNMENT
+   Set the variable:               energy             = 0.80806403296855E+03
+
+
+Main >  print elec fdcoul  mol 1 end           ! compute the coulombic (q-q/r) energy
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic finite-difference Coulombic energy  :-.147889E+03 kcal/mol
+ ASSIGNMENT
+   Set the variable:               fdcoul             = -.14788905207595E+03
+
+
+Main >                                         !   via a Green's function method and
+Main >                                         !   subtract it from the total
+Main >  print elec self    mol 1 end           ! compute the self energy and subtract
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic self energy for selected atoms      :0.961260E+03 kcal/mol
+ ASSIGNMENT
+   Set the variable:                 self             = 0.96126038181166E+03
+
+
+Main >                                         !   it from the total
+Main >  print elec tenergy mol 1 end           ! write out the total energy in kcal/mol
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Summed energy terms for selected atoms            :-.530730E+01 kcal/mol
+ ASSIGNMENT
+   Set the variable:              tenergy             = -.53072967671566E+01
+
+
+Main >  assign eacid = $tenergy end            ! save the total energy for acetic acid
+ ASSIGNMENT
+   Set the variable:                eacid             = -.53072967671566E+01
+Main >  
+Main >  print elec phizero mol 1 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phisave mol 1 end           ! compute the reaction potentials
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >                                         !  at positions of all charges
+Main >                                         !  due to unit positive charge
+Main >                                         !  at position of atom 1
+Main >  
+Main >  print elec phiwrite mol 1 end          ! print reaction potentials
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic Potential
+          Atom    Residue         X       Y       Z       Q      Potential
+PHI       1 c1   tar     1       0.000   0.000   0.000  -0.137  -.10916567E+03
+PHI       2 c2   tar     1       0.000   0.000   1.515   0.780  0.67164148E+03
+PHI       3 h3   tar     1       0.000  -1.028  -0.363   0.059  0.71124710E+02
+PHI       4 h4   tar     1       0.908   0.482  -0.363   0.059  0.10290304E+03
+PHI       5 h5   tar     1      -0.908   0.482  -0.363   0.059  0.95295975E+02
+PHI       6 o6   tar     1       0.000   0.979   2.200  -0.610  -.58757562E+03
+PHI       7 o7   tar     1       0.173  -1.247   1.975  -0.670  -.69066443E+03
+PHI       8 h8   tar     1       0.178  -1.286   2.937   0.460  0.52225128E+03
+   TOTAL PHISITE ENERGY (SUM (1/2)(Q)(PHI)):    0.808064E+03
+ ASSIGNMENT
+   Set the variable:               energy             = 0.80806396484375E+03
+
+
+Main >  
+Main >  print elec energy                      ! print electrostatic energy
+Print >        mol1  end                        !  of mol 1
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic energy for selected atoms           :0.808064E+03 kcal/mol
+ ASSIGNMENT
+   Set the variable:               energy             = 0.80806403296855E+03
+
+
+Main >  end
+ NOTE: UHBD(035) Extraneous END ignored.
+Main >  
+Main >  !
+Main >  ! Now compute the solvation energy for the acetate ion
+Main >  !
+Main >  
+Main >  edit charge -0.91 atnum 6 end          ! set charge -0.91 on atom 6
+
+ Edit:      1 charge modifications were done
+
+Main >  edit charge -0.91 atnum 7 end          ! set charge -0.91 on atom 7
+
+ Edit:      1 charge modifications were done
+
+Main >  edit charge  0.0  atnum 8 end          ! set charge  0.   on atom 8
+
+ Edit:      1 charge modifications were done
+
+Main >  
+Main >  print apar mol1 end
+
+ PRINT MODULE     
+ PRINTING ATOMIC PARAMETER INFORMATION   
+     Atom    Residue       Coordinates(x,y,z)      Charge   Radii
+     1 c1   targ     1    0.000    0.000    0.000   -0.137    1.880
+     2 c2   targ     1    0.000    0.000    1.515    0.780    1.880
+     3 h3   targ     1    0.000   -1.028   -0.363    0.059    1.150
+     4 h4   targ     1    0.908    0.482   -0.363    0.059    1.150
+     5 h5   targ     1   -0.908    0.482   -0.363    0.059    1.150
+     6 o6   targ     1    0.000    0.979    2.200   -0.910    1.480
+     7 o7   targ     1    0.173   -1.247    1.975   -0.910    1.480
+     8 h8   targ     1    0.178   -1.286    2.937    0.000    1.150
+ Center of Geometry of this list of Atoms(x,y,z)
+                          0.044   -0.202    0.942
+ Total Charge of this list of Atoms
+                         -1.000
+
+
+Main >  
+Main >  elec calc mol 1                        ! do electrostatic calculations
+Elec >   bcflag 2 solver 0                     ! boundary condition (each atom is
+Elec >                                         !  a Debye-Huckel sphere). Use the
+Elec >                                         !  diagonal scaling preconditioned
+Elec >                                         !  conjugate gradient.
+Elec >   spacing 1.00 dime 60 60 60            ! definition of the grid spacing and
+Elec >                                         !  dimensions
+Elec >   center                                ! center the grid at center
+Elec >                                         !  of mol 1
+Elec >   temp 293.0                            ! temperature in K
+Elec >   sdie 78.0                             ! solvent dielectric
+Elec >   pdie 2.0                              ! internal dielectric
+Elec >   maxits 400                            ! increase the number of iterations
+Elec >                                         !  that can be used to solve the FDPBE
+Elec >   ionstr 150.0                          ! ionic strength
+Elec >   rion 2.0                              ! ion exclusion radius
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :   -30.456  A
+                                                         -30.702  A
+                                                         -29.558  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     1.000  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   293.000  K
+   Ionic strength                         (ions #.#) :   150.000  mM
+   Debye-Huckel parameter                            :     0.129  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :         8
+   X-coordinate of the center of geometry            :     0.044    A
+   Y-coordinate of the center of geometry            :    -0.202    A
+   Z-coordinate of the center of geometry            :     0.942    A
+   Net charge of the selected atoms                  :    -1.000    e
+   Effective radius of the selected atoms            :     1.880    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       400
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         0
+     - diagonal-scaling preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :       215
+   Norm of the constant vector                       :0.2561E+01
+   Norm of the residual vector                       :0.2365E-05
+   Convergence achieved                              :0.9234E-06
+Main >  
+Main >  !
+Main >  ! Now focus to get a better result (fine grid)
+Main >  !
+Main >  
+Main >  elec calc mol 1                        ! do electrostatic calculations
+Elec >   bcflag 4 solver 0                     ! boundary condition (each atom is
+Elec >                                         !  a Debye-Huckel sphere). Use the
+Elec >                                         !  diagonal scaling preconditioned
+Elec >                                         !  conjugate gradient.
+Elec >   spacing 0.20 dime 60 60 60            ! definition of the grid spacing and
+Elec >                                         !  dimensions
+Elec >   center                                ! center the grid at center
+Elec >                                         !  of mol 1
+Elec >   temp 293.0                            ! temperature in K
+Elec >   sdie 78.0                             ! solvent dielectric
+Elec >   pdie 2.0                              ! internal dielectric
+Elec >   maxits 400                            ! increase the number of iterations
+Elec >                                         !  that can be used to solve the FDPBE
+Elec >   ionstr 150.0                          ! ionic strength
+Elec >   rion 2.0                              ! ion exclusion radius
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :    -6.056  A
+                                                          -6.302  A
+                                                          -5.158  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.200  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         4
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   293.000  K
+   Ionic strength                         (ions #.#) :   150.000  mM
+   Debye-Huckel parameter                            :     0.129  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :         8
+   X-coordinate of the center of geometry            :     0.044    A
+   Y-coordinate of the center of geometry            :    -0.202    A
+   Z-coordinate of the center of geometry            :     0.942    A
+   Net charge of the selected atoms                  :    -1.000    e
+   Effective radius of the selected atoms            :     1.880    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       400
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         0
+     - diagonal-scaling preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :       240
+   Norm of the constant vector                       :0.1107E+03
+   Norm of the residual vector                       :0.1052E-03
+   Convergence achieved                              :0.9505E-06
+Main >  
+Main >  print elec zenergy mol 1 end           ! zero out the energy accumulator
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec energy  mol 1 end           ! compute the electrostatic energy
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic energy for selected atoms           :0.113080E+04 kcal/mol
+ ASSIGNMENT
+   Set the variable:               energy             = 0.11308024980826E+04
+
+
+Main >  print elec fdcoul  mol 1 end           ! compute the coulombic (q-q/r) energy
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic finite-difference Coulombic energy  :-.130698E+03 kcal/mol
+ ASSIGNMENT
+   Set the variable:               fdcoul             = -.13069761340856E+03
+
+
+Main >                                         !   via a Green's function method and
+Main >                                         !   subtract it from the total
+Main >  print elec self    mol 1 end           ! compute the self energy and subtract
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic self energy for selected atoms      :0.130880E+04 kcal/mol
+ ASSIGNMENT
+   Set the variable:                 self             = 0.13088013862333E+04
+
+
+Main >                                         !   it from the total
+Main >  print elec tenergy mol 1 end           ! write out the total energy in kcal/mol
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Summed energy terms for selected atoms            :-.473013E+02 kcal/mol
+ ASSIGNMENT
+   Set the variable:              tenergy             = -.47301274742125E+02
+
+
+Main >  assign eacet = $tenergy end            ! save the total energy for acetate ion
+ ASSIGNMENT
+   Set the variable:                eacet             = -.47301274742125E+02
+Main >  
+Main >  print elec phizero mol 1 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phisave mol 1 end           ! compute the reaction potentials
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >                                         !  at positions of all charges
+Main >                                         !  due to unit positive charge
+Main >                                         !  at position of atom 1
+Main >  
+Main >  print elec phiwrite mol 1 end          ! print reaction potentials
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic Potential
+          Atom    Residue         X       Y       Z       Q      Potential
+PHI       1 c1   tar     1       0.000   0.000   0.000  -0.137  -.11717491E+03
+PHI       2 c2   tar     1       0.000   0.000   1.515   0.780  0.63220685E+03
+PHI       3 h3   tar     1       0.000  -1.028  -0.363   0.059  0.66995628E+02
+PHI       4 h4   tar     1       0.908   0.482  -0.363   0.059  0.99529770E+02
+PHI       5 h5   tar     1      -0.908   0.482  -0.363   0.059  0.92049637E+02
+PHI       6 o6   tar     1       0.000   0.979   2.200  -0.910  -.90432153E+03
+PHI       7 o7   tar     1       0.173  -1.247   1.975  -0.910  -.10046617E+04
+PHI       8 h8   tar     1       0.178  -1.286   2.937   0.000  -.67968056E+02
+   TOTAL PHISITE ENERGY (SUM (1/2)(Q)(PHI)):    0.113080E+04
+ ASSIGNMENT
+   Set the variable:               energy             = 0.11308024902344E+04
+
+
+Main >  
+Main >  print mol 1 elec energy end            ! print electrostatic energy
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic energy for selected atoms           :0.113080E+04 kcal/mol
+ ASSIGNMENT
+   Set the variable:               energy             = 0.11308024980826E+04
+
+
+Main >                                         !  of all atoms but 1 in the
+Main >                                         !  reaction field created by
+Main >                                         !  unit charge on atom 1
+Main >  
+Main >  !
+Main >  ! Calculate the solvation energy of a proton
+Main >  !
+Main >  
+Main >  read                                   ! read
+Read >       mol 1                             ! mol 1 (proton}
+Read >       inter                             ! interactively
+Read >       pdb                               ! in free-format PDB format
+Read >  end
+ NOTE: reed(050) Overwriting molecule 0
+
+ READ MODULE
+ READ COORDINATES
+   Molecule number                                   :         1
+   Coordinate file                                   :#standard input#    
+   File format                                       :free format PDB     
+Pdb >  ATOM      1  H   PROT    1       0.178  -1.286   2.937  1.00  0.00
+Pdb >  END
+   Atoms read                                        :         1
+
+
+Main >  
+Main >  set                                    ! set
+Set >       charge                            ! the charges
+Set >       radii                             ! and the radii of all atoms
+Set >       file "elec.dat"                   ! from the file "elec.dat"
+Set >       para mine                         ! using the parameter set "mine"
+Set >  end
+ SET MODULE
+   Setting                                           :             charges
+   Setting                                           :               radii
+   Parameter set                                     :mine                
+   Database file                                     :elec.dat            
+   Using previously read database                    :
+   Number of entries                                 :        24
+   Number of equivalences                            :         0
+   Assignments made                                  :         1
+Main >  
+Main >  print apar mol1 end
+
+ PRINT MODULE     
+ PRINTING ATOMIC PARAMETER INFORMATION   
+     Atom    Residue       Coordinates(x,y,z)      Charge   Radii
+     1 h    prot     1    0.178   -1.286    2.937    1.000    1.150
+ Center of Geometry of this list of Atoms(x,y,z)
+                          0.178   -1.286    2.937
+ Total Charge of this list of Atoms
+                          1.000
+
+
+Main >  
+Main >  !
+Main >  ! Solvation energy calculation for acetic acid
+Main >  !
+Main >  
+Main >  elec calc mol 1                        ! do electrostatic calculations
+Elec >   bcflag 2 solver 0                     ! boundary condition (each atom is
+Elec >                                         !  a Debye-Huckel sphere). Use the
+Elec >                                         !  diagonal scaling preconditioned
+Elec >                                         !  conjugate gradient.
+Elec >   spacing 1.00 dime 60 60 60            ! definition of the grid spacing and
+Elec >                                         !  dimensions
+Elec >   center                                ! center the grid at center
+Elec >                                         !  of mol 1
+Elec >   temp 293.0                            ! temperature in K
+Elec >   sdie 78.0                             ! solvent dielectric
+Elec >   pdie 2.0                              ! internal dielectric
+Elec >   maxits 400                            ! increase the number of iterations
+Elec >                                         !  that can be used to solve the FDPBE
+Elec >   ionstr 150.0                          ! ionic strength
+Elec >   rion 2.0                              ! ion exclusion radius
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :   -30.322  A
+                                                         -31.786  A
+                                                         -27.563  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     1.000  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   293.000  K
+   Ionic strength                         (ions #.#) :   150.000  mM
+   Debye-Huckel parameter                            :     0.129  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :         1
+   X-coordinate of the center of geometry            :     0.178    A
+   Y-coordinate of the center of geometry            :    -1.286    A
+   Z-coordinate of the center of geometry            :     2.937    A
+   Net charge of the selected atoms                  :     1.000    e
+   Effective radius of the selected atoms            :     1.150    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       400
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         0
+     - diagonal-scaling preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :       223
+   Norm of the constant vector                       :0.1392E+01
+   Norm of the residual vector                       :0.1365E-05
+   Convergence achieved                              :0.9813E-06
+Main >  
+Main >  !
+Main >  ! Now focus to get a better result (fine grid)
+Main >  !
+Main >  
+Main >  elec calc mol 1                        ! do electrostatic calculations
+Elec >   bcflag 4 solver 0                     ! boundary condition (each atom is
+Elec >                                         !  a Debye-Huckel sphere). Use the
+Elec >                                         !  diagonal scaling preconditioned
+Elec >                                         !  conjugate gradient.
+Elec >   spacing 0.20 dime 60 60 60            ! definition of the grid spacing and
+Elec >                                         !  dimensions
+Elec >   center                                ! center the grid at center
+Elec >                                         !  of mol 1
+Elec >   temp 293.0                            ! temperature in K
+Elec >   sdie 78.0                             ! solvent dielectric
+Elec >   pdie 2.0                              ! internal dielectric
+Elec >   maxits 400                            ! increase the number of iterations
+Elec >                                         !  that can be used to solve the FDPBE
+Elec >   ionstr 150.0                          ! ionic strength
+Elec >   rion 2.0                              ! ion exclusion radius
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :    -5.922  A
+                                                          -7.386  A
+                                                          -3.163  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.200  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         4
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   293.000  K
+   Ionic strength                         (ions #.#) :   150.000  mM
+   Debye-Huckel parameter                            :     0.129  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :         1
+   X-coordinate of the center of geometry            :     0.178    A
+   Y-coordinate of the center of geometry            :    -1.286    A
+   Z-coordinate of the center of geometry            :     2.937    A
+   Net charge of the selected atoms                  :     1.000    e
+   Effective radius of the selected atoms            :     1.150    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       400
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         0
+     - diagonal-scaling preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :       199
+   Norm of the constant vector                       :0.9570E+02
+   Norm of the residual vector                       :0.8761E-04
+   Convergence achieved                              :0.9155E-06
+Main >  
+Main >  print elec zenergy mol 1 end           ! zero out the energy accumulator
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec energy  mol 1 end           ! compute the electrostatic energy
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic energy for selected atoms           :0.398833E+03 kcal/mol
+ ASSIGNMENT
+   Set the variable:               energy             = 0.39883342793977E+03
+
+
+Main >  print elec fdcoul  mol 1 end           ! compute the coulombic (q-q/r) energy
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic finite-difference Coulombic energy  :0.000000E+00 kcal/mol
+ ASSIGNMENT
+   Set the variable:               fdcoul             = 0.00000000000000E+00
+
+
+Main >                                         !   via a Green's function method and
+Main >                                         !   subtract it from the total
+Main >  print elec self    mol 1 end           ! compute the self energy and subtract
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic self energy for selected atoms      :0.469483E+03 kcal/mol
+ ASSIGNMENT
+   Set the variable:                 self             = 0.46948288868308E+03
+
+
+Main >                                         !   it from the total
+Main >  print elec tenergy mol 1 end           ! write out the total energy in kcal/mol
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Summed energy terms for selected atoms            :-.706495E+02 kcal/mol
+ ASSIGNMENT
+   Set the variable:              tenergy             = -.70649460743308E+02
+
+
+Main >  assign eprot = $tenergy end            ! save the total energy for a proton
+ ASSIGNMENT
+   Set the variable:                eprot             = -.70649460743308E+02
+Main >  
+Main >  print elec phizero mol 1 end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >  print elec phisave mol 1 end           ! compute the reaction potentials
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+
+
+Main >                                         !  at positions of all charges
+Main >                                         !  due to unit positive charge
+Main >                                         !  at position of atom 1
+Main >  
+Main >  print elec phiwrite mol 1 end          ! print reaction potentials
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic Potential
+          Atom    Residue         X       Y       Z       Q      Potential
+PHI       1 h    pro     1       0.178  -1.286   2.937   1.000  0.79766687E+03
+   TOTAL PHISITE ENERGY (SUM (1/2)(Q)(PHI)):    0.398833E+03
+ ASSIGNMENT
+   Set the variable:               energy             = 0.39883343505859E+03
+
+
+Main >  
+Main >  print mol 1 elec energy end            ! print electrostatic energy
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic energy for selected atoms           :0.398833E+03 kcal/mol
+ ASSIGNMENT
+   Set the variable:               energy             = 0.39883342793977E+03
+
+
+Main >                                         !  of all atoms but 1 in the
+Main >                                         !  reaction field created by
+Main >                                         !  unit charge on atom 1
+Main >  
+Main >  assign etot = $eacet                   ! compute the solvation energy
+Eval >                $eprot +                 !  difference for the deprotonation
+Eval >                $eacid -                 !  reaction of acetic acid
+Eval >  end
+ ASSIGNMENT
+   Set the variable:                 etot             = -.11264343871828E+03
+Main >  
+Main >  stop
+ UHBD termination
+   date/time               : 30-May-95    17:43:22    
+   total CPU seconds       :    649.840
+
+

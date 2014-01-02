@@ -1,0 +1,222 @@
+<html> 
+	<head> 
+		<title>README for Born APBS examples</title>
+	</head>
+
+	<body>
+
+
+		<h1 align="center">README for Born APBS examples</h1>
+		<i> $Id$</i>
+
+		<p> This is the canonical electrostatics test case: Born ion.  A non-polarizable ion with a single
+		embedded point charge; has an analytical solution for the potential.  We examine the solvation free
+		energy as a function of ionic radius. </p>
+
+		<p> The shell script ./runme.sh will generate ions of several radii and calculate the solvation energies
+		(which will appear in OUTPUT-XXX, where XXX is the particular radius of interest).  Please see apbs.in
+		for details on the particular solvation energy calculations.  Analytical results are given in pmf.dat.
+		Note:  You will need to ensure that the 'apbs' binary is in your path prior to running ./runme.sh.
+		You may also need to edit the path to your Bourne-like shell in the ./runme.sh script.   </p>
+
+		<p> This example was contributed by Nathan Baker.</p>
+
+
+		<table align="center" border="1" cellpadding="3" cellspacing="1"> 
+			<tr><th>Input File</th><th>Description</th><th>APBS Version</th><th>Results (kJ/mol)</th><th>Analytical (kJ/mol)</th></tr>
+
+			<tr>
+			  <td rowspan=20><a href="apbs-mol-auto.in">apbs-mol-auto.in</a></td>
+			  <td rowspan=20>Sequential, 3 A sphere, 3-level focusing to 0.188 A, srfm mol</td>
+			  <td align=center><b>1.4</b></td>
+			  <td align=center><b>-229.7736<sup><a href="#3">3</a></sup></b></td>
+			  <td rowspan=20>-228.57</td>
+  		    </tr>
+			<tr>
+			  <td align=center>1.3</td><td align=center>-229.7735</td>
+  		    </tr>
+			<tr>
+				<td align=center>1.2.1</td><td align=center>-229.7735
+				</td>
+			</tr>
+			<tr>
+				<td align=center>1.2</td><td align=center>-229.7735
+				</td>
+			</tr>
+			<tr>
+				<td align=center>1.1.0</td><td align=center>-229.7735
+				</td>
+			</tr>
+			<tr>
+				<td align=center>1.0.0</td><td align=center>-229.7735
+				</td>
+			</tr>
+			<tr>
+				<td align=center>0.5.1</td><td align=center>-229.7735
+				</td>
+			</tr>
+			<tr>
+				<td align=center>0.5.0</td><td align=center>-229.7735
+				</td>
+			</tr>
+			<tr> <td align=center>0.4.0</td><td align=center>-229.7735<sup><a href="#1">1</a></sup></td> 
+			</tr>
+			<tr><td align=center>0.3.2</td><td align=center>-229.7248</td></tr>
+			<tr><td align=center>0.3.1</td><td align=center>-229.7248</td></tr>
+			<tr><td align=center>0.3.0</td><td align=center>-229.7248</td></tr>
+			<tr><td align=center>0.2.6</td><td align=center>-229.7248</td></tr>
+			<tr><td align=center>0.2.5</td><td align=center>-229.7248</td></tr>
+			<tr><td align=center>0.2.4</td><td align=center>-227.1859</td></tr>
+			<tr><td align=center>0.2.3</td><td align=center>-227.1589</td></tr>
+			<tr><td align=center>0.2.2</td><td align=center>-227.186</td></tr>
+			<tr><td align=center>0.2.1</td><td align=center>-227.19</td></tr>
+			<tr><td align=center>0.2.0</td><td align=center>-227.19</td></tr>
+			<tr><td align=center>0.1.8</td><td align=center>-227.19</td> </tr>
+
+			<tr>
+			  <td rowspan=9><a href="apbs-smol-auto.in">apbs-smol-auto.in</a></td>
+			  <td rowspan=9>Sequential, 3 A sphere, 3-level focusing to 0.188 A, srfm smol</td>
+			  <td align=center><B>1.4</B></td>
+			  <td align=center><strong>-229.0124</strong></td>
+			  <td rowspan=9>-228.57</td>
+		    </tr>
+			<tr>
+			  <td align=center>1.3</td><td align=center>-229.0124</td>
+		    </tr>
+			<tr>
+				<td align=center>1.2.1</td><td align=center>-229.0124
+				</td>
+			</tr>
+			<tr>
+				<td align=center>1.2</td><td align=center>-229.0124<sup><a href="#2">2</a></sup>
+				</td>
+			</tr>
+			<tr>
+				<td align=center>1.1.0</td><td align=center>-229.0123
+				</td>
+			</tr>
+			<tr>
+				<td align=center>1.0.0</td><td align=center>-229.0123
+				</td>
+			</tr>
+			<tr>
+				<td align=center>0.5.1</td><td align=center>-229.0123
+				</td>
+			</tr>
+			<tr>
+				<td align=center>0.5.0</td><td align=center>-229.0123
+				</td>
+			</tr>
+            <tr> <td align=center>0.4.0</td><td align=center>-229.0123</td> </tr>
+            
+			<tr>
+			  <td rowspan=10><a href="apbs-mol-parallel.in">apbs-mol-parallel.in</a></td>
+			  <td rowspan=10>Parallel with 4 processors, 3 A sphere, focusing to 0.103 A, srfm mol</td>
+			  <td align=center><B>1.4</B></td>
+			  <td align=center><strong>-230.4919<sup><a href="#3">3</a></sup></strong></td>
+			  <td rowspan=10>-228.57</td>
+		    </tr>
+			<tr>
+			  <td align=center>1.3</td><td align=center>-230.4918</td>
+		    </tr>
+			<tr>
+				<td align=center>1.2.1</td><td align=center>-230.4918
+				</td>
+			</tr>
+			<tr>
+				<td align=center>1.2</td><td align=center>-230.4918<sup><a href="#2">2</a></sup>
+				</td>
+			</tr>
+			<tr>
+				<td align=center>1.1.0</td><td align=center>-230.4916
+				</td>
+			</tr>
+			<tr>
+				<td align=center>1.0.0</td><td align=center>-230.4916
+				</td>
+			</tr>
+			<tr>
+				<td align=center>0.5.1</td><td align=center>-230.4916
+				</td>
+			</tr>
+			<tr>
+				<td align=center>0.5.0</td><td align=center>-230.4916
+				</td>
+			</tr>
+			<tr> <td align=center>0.4.0</td><td align=center>-230.4916</td> </tr>
+			<tr><td align=center>0.2.1</td><td align=center>-230.77</td></tr>
+
+			<tr>
+			  <td rowspan=19><a href="apbs-smol-parallel.in">apbs-smol-parallel.in</a></td>
+			  <td rowspan=19>Parallel with 4 processors, 3 A sphere, focusing to 0.103 A, srfm smol</td>
+			  <td align=center><strong>1.4</strong></td>
+			  <td align=center><strong>-229.3871</strong></td>
+			  <td rowspan=19>-228.57</td>
+  		    </tr>
+			<tr>
+			  <td align=center>1.3</td><td align=center>-229.3871</td>
+  		    </tr>
+			<tr>
+				<td align=center>1.2.1</td><td align=center>-229.3871
+				</td>
+			</tr>
+			<tr>
+				<td align=center>1.2</td><td align=center>-229.3871<sup><a href="#2">2</a></sup>
+				</td>
+			</tr>
+			<tr>
+				<td align=center>1.1.0</td><td align=center>-229.3872
+				</td>
+			</tr>
+			<tr>
+				<td align=center>1.0.0</td><td align=center>-229.3872
+				</td>
+			</tr>
+			<tr>
+				<td align=center>0.5.1</td><td align=center>-229.3872
+				</td>
+			</tr>
+			<tr>
+				<td align=center>0.5.0</td><td align=center>-229.3872
+				</td>
+			</tr>
+			<tr> <td align=center>0.4.0</td><td align=center>-229.3872<sup><a href="#1">1</a></sup></td> </tr>
+			<tr><td align=center>0.3.2</td><td align=center>-226.3529</td></tr>
+			<tr><td align=center>0.3.1</td><td align=center>-226.3529</td></tr>
+			<tr><td align=center>0.3.0</td><td align=center>-229.5849</td></tr>
+			<tr><td align=center>0.2.6</td><td align=center>-229.5849</td></tr>
+			<tr><td align=center>0.2.5</td><td align=center>-229.5849</td></tr>
+			<tr><td align=center>0.2.4</td><td align=center>-226.2276</td></tr>
+			<tr><td align=center>0.2.3</td><td align=center>-226.2276</td></tr>
+			<tr><td align=center>0.2.2</td><td align=center>-226.2276</td></tr>
+			<tr><td align=center>0.2.0</td><td align=center>-226.228</td></tr>
+			<tr><td align=center>0.1.8</td><td align=center>-226.23</td> </tr>
+		</table>
+
+		<p> </p><a name=1></a><sup>1</sup>  The discrepancy in values between versions 0.4.0 and 0.3.2 is most likely
+			due to three factors: 
+			<ul> 
+				<li> A bug fix in Vacc_molAcc which removed spurious regions of high internal dielectric
+				values
+				</li><li> A switch in the algorithm used to compute the dielectric smoothing for srfm smol.  
+				</li><li>  The addition of the Vacc sphere density (sdens keyword) as a variable and a change in the default sdens value from 3.0 to 10.0
+			</li></ul>
+
+			<p> </p><a name=2></a><sup>2</sup>  APBS 1.2 has switched the multigrid smoothing algorithm from standard Gauss-Seidel to Gauss-Seidel red/black in order to facilitate parallelization.  This switch has caused small differences in individual calculation energies which, when combined to the final answer, create larger errors (up to 0.04%).  These errors can be reduced by resetting the APBS error tolerance to 1e-9 or smaller values.  For a more detailed explanation, please see <a href="http://is.gd/45AzN">here</a>.
+			<p></p>
+
+		<p>
+		    <a name=3></a><sup>3</sup>
+		    The discrepancy in values between versions 1.3 and 1.4 is most likely due to the following factor(s):
+			<ul>
+			    <li>Translation of contrib/pmgZ library from FORTRAN to C</li>
+			    <li>Differences in numerical implementations between FORTRAN and C compilers result in small round-off discrepencies</li>
+			    <li>Small margins due to these round-off discrepencies acumulate in the computations</li>
+			</ul>
+		</p>
+			
+			Please see the ChangeLog or the <a href="http://apbs.sourceforge.net/doc">APBS documentation</a> for more information.
+		<p></p>
+                
+	</body>
+</html>

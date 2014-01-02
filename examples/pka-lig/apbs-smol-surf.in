@@ -1,0 +1,150 @@
+##########################################################################
+### PROTEIN KINASE INHIBITOR BINDING ENERGY -- MOLECULAR SURFACE
+### $Id$
+###
+### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for
+### syntax help.
+##########################################################################
+
+read 
+    mol pqr bx6_7_lig_apbs.pqr
+    mol pqr bx6_7_apo_apbs.pqr
+    mol pqr bx6_7_bin_apbs.pqr
+end
+
+# LIGAND ENERGY (FOCUSING)
+elec name lig-coarse
+    mg-manual
+    dime 97 97 97 
+    glen 70 70 70
+    gcent mol 3
+    mol 1
+    lpbe
+    bcfl sdh
+    ion charge 1 conc 0.000 radius 2.0     
+    ion charge -1 conc 0.000 radius 2.0      
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm smol
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+elec name lig-fine
+    mg-manual
+    dime 97 97 97
+    grid 0.25 0.25 0.25
+    gcent mol 1
+    mol 1
+    lpbe
+    bcfl focus
+    ion charge 1 conc 0.000 radius 2.0     
+    ion charge -1 conc 0.000 radius 2.0        
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm smol
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+
+# KINASE ENERGY (FOCUSING)
+elec name pka-coarse
+    mg-manual
+    dime 97 97 97
+    glen 70 70 70
+    gcent mol 3
+    mol 2
+    lpbe
+    bcfl sdh
+    ion charge 1 conc 0.000 radius 2.0     
+    ion charge -1 conc 0.000 radius 2.0    
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm smol
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+elec name pka-fine
+    mg-manual
+    dime 97 97 97
+    grid 0.25 0.25 0.25
+    gcent mol 1
+    mol 2
+    lpbe
+    bcfl focus
+    ion charge 1 conc 0.000 radius 2.0     
+    ion charge -1 conc 0.000 radius 2.0    
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm smol
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+
+# COMPLEX ENERGY (FOCUSING)
+elec name complex-coarse
+    mg-manual
+    dime 97 97 97
+    glen 70 70 70
+    gcent mol 3
+    mol 3
+    lpbe
+    bcfl sdh
+    ion charge 1 conc 0.000 radius 2.0
+    ion charge -1 conc 0.000 radius 2.0
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm smol
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+elec name complex-fine
+    mg-manual
+    dime 97 97 97
+    grid 0.25 0.25 0.25
+    gcent mol 1
+    mol 3
+    lpbe
+    bcfl focus
+    ion charge 1 conc 0.000 radius 2.0     
+    ion charge -1 conc 0.000 radius 2.0    
+    pdie 2.0
+    sdie 78.00
+    chgm spl0
+    srfm smol
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy total
+    calcforce no
+end
+
+# COMBINE INTO BINDING ENERGY
+print elecEnergy complex-fine - lig-fine - pka-fine end
+
+quit

@@ -1,0 +1,205 @@
+
+read 
+	mol pdb 2-methylbutane.pdb
+	mol pdb butane.pdb
+	mol pdb cyclohexane.pdb
+	mol pdb cyclopentane.pdb
+	mol pdb ethane.pdb
+	mol pdb hexane.pdb
+	mol pdb isobutane.pdb
+	mol pdb methane.pdb
+	mol pdb neopentane.pdb
+	mol pdb pentane.pdb
+	mol pdb propane.pdb
+	parm flat parm.dat
+end
+
+APOLAR name solvated-2-methylbutane
+	grid 0.3 0.3 0.3
+	mol 1
+	srfm sacc
+	swin 0.3
+	srad 0.65
+	press 0.2394
+	gamma 0.0085
+	bconc 0.033428
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce no
+END
+
+APOLAR name solvated-butane
+	grid 0.3 0.3 0.3
+	mol 2
+	srfm sacc
+	swin 0.3
+	srad 0.65
+	press 0.2394
+	gamma 0.0085
+	bconc 0.033428
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce no
+END
+
+APOLAR name solvated-cyclohexane
+	grid 0.3 0.3 0.3
+	mol 3
+	srfm sacc
+	swin 0.3
+	srad 0.65
+	press 0.2394
+	gamma 0.0085
+	bconc 0.033428
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce no
+END
+
+APOLAR name solvated-cyclopentane
+	grid 0.3 0.3 0.3
+	mol 4
+	srfm sacc
+	swin 0.3
+	srad 0.65
+	press 0.2394
+	gamma 0.0085
+	bconc 0.033428
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce no
+END
+
+APOLAR name solvated-ethane
+	grid 0.3 0.3 0.3
+	mol 5
+	srfm sacc
+	swin 0.3
+	srad 0.65
+	press 0.2394
+	gamma 0.0085
+	bconc 0.033428
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce no
+END
+
+APOLAR name solvated-hexane
+	grid 0.3 0.3 0.3
+	mol 6
+	srfm sacc
+	swin 0.3
+	srad 0.65
+	press 0.2394
+	gamma 0.0085
+	bconc 0.033428
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce no
+END
+
+APOLAR name solvated-isobutane
+	grid 0.3 0.3 0.3
+	mol 7
+	srfm sacc
+	swin 0.3
+	srad 0.65
+	press 0.2394
+	gamma 0.0085
+	bconc 0.033428
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce no
+END
+
+APOLAR name solvated-methane
+	grid 0.3 0.3 0.3
+	mol 8
+	srfm sacc
+	swin 0.3
+	srad 0.65
+	press 0.2394
+	gamma 0.0085
+	bconc 0.033428
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce no
+END
+
+APOLAR name solvated-neopentane
+	grid 0.3 0.3 0.3
+	mol 9
+	srfm sacc
+	swin 0.3
+	srad 0.65
+	press 0.2394
+	gamma 0.0085
+	bconc 0.033428
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce no
+END
+
+APOLAR name solvated-pentane
+	grid 0.3 0.3 0.3
+	mol 10
+	srfm sacc
+	swin 0.3
+	srad 0.65
+	press 0.2394
+	gamma 0.0085
+	bconc 0.033428
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce no
+END
+
+APOLAR name solvated-propane
+	grid 0.3 0.3 0.3
+	mol 11
+	srfm sacc
+	swin 0.3
+	srad 0.65
+	press 0.2394
+	gamma 0.0085
+	bconc 0.033428
+	sdens 100.0
+	dpos 0.2
+	temp 298.15
+	calcenergy total
+	calcforce no
+END
+
+print apolEnergy solvated-2-methylbutane end
+print apolEnergy solvated-butane end
+print apolEnergy solvated-cyclohexane end
+print apolEnergy solvated-cyclopentane end
+print apolEnergy solvated-ethane end
+print apolEnergy solvated-hexane end
+print apolEnergy solvated-isobutane end
+print apolEnergy solvated-methane end
+print apolEnergy solvated-neopentane end
+print apolEnergy solvated-pentane end
+print apolEnergy solvated-propane end
+
+quit

@@ -1,0 +1,291 @@
+##########################################################################
+### 1D7H/DMSO BINDING ENERGY
+### $Id$
+###
+### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for
+### syntax help.
+##########################################################################
+
+read 
+  mol pqr 1d7h-dmso-complex.pqr 
+  mol pqr dmso-min.pqr 
+  mol pqr 1d7h-min.pqr
+end
+
+# COMPLEX -- SOLVATED STATE (FOCUSING)
+elec name complex-solv-coarse
+    mg-manual
+    dime 65 65 65
+    grid 1.5 1.5 1.5
+    gcent mol 1
+    mol 1
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.010 radius 2.0
+    ion charge -1 conc 0.010 radius 2.0
+    pdie  2.0
+    sdie 78.0
+    srfm smol
+    chgm spl0
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 300
+    calcenergy total
+    calcforce no
+end
+elec name complex-solv-fine
+    mg-manual
+    dime 65 65 65
+    grid 0.225 0.225 0.225
+    gcent mol 2
+    mol 1
+    lpbe
+    bcfl focus
+    ion charge 1 conc 0.010 radius 2.0
+    ion charge -1 conc 0.010 radius 2.0
+    pdie  2.0
+    sdie 78.0
+    srfm smol
+    chgm spl0
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 300
+    calcenergy total
+    calcforce no
+end
+
+# COMPLEX -- REFERENCE STATE (FOCUSING)
+elec name complex-ref-coarse
+    mg-manual
+    dime 65 65 65
+    grid 1.5 1.5 1.5
+    gcent mol 1
+    mol 1
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.010 radius 2.0
+    ion charge -1 conc 0.010 radius 2.0
+    pdie  2.0
+    sdie  2.0
+    srfm smol
+    chgm spl0
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 300
+    calcenergy total
+    calcforce no
+end
+elec name complex-ref-fine
+    mg-manual
+    dime 65 65 65
+    grid 0.225 0.225 0.225
+    gcent mol 2
+    mol 1
+    lpbe
+    bcfl focus
+    ion charge 1 conc 0.010 radius 2.0
+    ion charge -1 conc 0.010 radius 2.0
+    pdie  2.0
+    sdie  2.0
+    srfm smol
+    chgm spl0
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 300
+    calcenergy total
+    calcforce no
+end
+
+# DMSO -- SOLVATED STATE (FOCUSING)
+elec name dmso-solv-coarse
+    mg-manual
+    dime 65 65 65
+    grid 1.5 1.5 1.5
+    gcent mol 2
+    mol 2
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.010 radius 2.0
+    ion charge -1 conc 0.010 radius 2.0
+    pdie  2.0
+    sdie 78.0
+    srfm smol
+    chgm spl0
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 300
+    calcenergy total
+    calcforce no
+end
+elec name dmso-solv-fine
+    mg-manual
+    dime 65 65 65
+    grid 0.225 0.225 0.225
+    gcent mol 2
+    mol 2
+    lpbe
+    bcfl focus
+    ion charge 1 conc 0.010 radius 2.0
+    ion charge -1 conc 0.010 radius 2.0
+    pdie  2.0
+    sdie 78.0
+    srfm smol
+    chgm spl0
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 300
+    calcenergy total
+    calcforce no
+end
+
+# DMSO -- REFERENCE STATE (FOCUSING)
+elec name dmso-ref-coarse
+    mg-manual
+    dime 65 65 65
+    grid 1.5 1.5 1.5
+    gcent mol 2
+    mol 2
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.010 radius 2.0
+    ion charge -1 conc 0.010 radius 2.0
+    pdie  2.0
+    sdie  2.0
+    srfm smol
+    chgm spl0
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 300
+    calcenergy total
+    calcforce no
+end
+elec name dmso-ref-fine
+    mg-manual
+    dime 65 65 65
+    grid 0.225 0.225 0.225
+    gcent mol 2
+    mol 2
+    lpbe
+    bcfl focus
+    ion charge 1 conc 0.010 radius 2.0
+    ion charge -1 conc 0.010 radius 2.0
+    pdie  2.0
+    sdie  2.0
+    srfm smol
+    chgm spl0
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 300
+    calcenergy total
+    calcforce no
+end
+
+# 1D7H -- SOLVATED STATE (FOCUSING)
+elec name 1d7h-solv-coarse
+    mg-manual
+    dime 65 65 65
+    grid 1.5 1.5 1.5
+    gcent mol 3
+    mol 3
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.010 radius 2.0
+    ion charge -1 conc 0.010 radius 2.0
+    pdie  2.0
+    sdie 78.0
+    srfm smol
+    chgm spl0
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 300
+    calcenergy total
+    calcforce no
+end
+elec name 1d7h-solv-fine
+    mg-manual
+    dime 65 65 65
+    grid 0.225 0.225 0.225
+    gcent mol 2
+    mol 3
+    lpbe
+    bcfl focus
+    ion charge 1 conc 0.010 radius 2.0
+    ion charge -1 conc 0.010 radius 2.0
+    pdie  2.0
+    sdie 78.0
+    srfm smol
+    chgm spl0
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 300
+    calcenergy total
+    calcforce no
+end
+
+# 1D7H -- REFERENCE STATE (FOCUSING)
+elec name 1d7h-ref-coarse
+    mg-manual
+    dime 65 65 65
+    grid 1.5 1.5 1.5
+    gcent mol 3
+    mol 3
+    lpbe
+    bcfl mdh
+    ion charge 1 conc 0.010 radius 2.0
+    ion charge -1 conc 0.010 radius 2.0
+    pdie  2.0
+    sdie  2.0
+    srfm smol
+    chgm spl0
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 300
+    calcenergy total
+    calcforce no
+end
+elec name 1d7h-ref-fine
+    mg-manual
+    dime 65 65 65
+    grid 0.225 0.225 0.225
+    gcent mol 2
+    mol 3
+    lpbe
+    bcfl focus
+    ion charge 1 conc 0.010 radius 2.0
+    ion charge -1 conc 0.010 radius 2.0
+    pdie  2.0
+    sdie  2.0
+    srfm smol
+    chgm spl0
+    srad 0.0
+    swin 0.3
+    sdens 10.0
+    temp 300
+    calcenergy total
+    calcforce no
+end
+
+# COMPLEX SOLVATION ENERGY
+print elecEnergy complex-solv-fine - complex-ref-fine end
+
+# DMSO SOLVATION ENERGY
+print elecEnergy dmso-solv-fine - dmso-ref-fine end
+
+# 1D7H SOLVATION ENERGY
+print elecEnergy 1d7h-solv-fine - 1d7h-ref-fine end
+
+# CHANGE IN SOLVATION ENERGY UPON BINDING
+print elecEnergy complex-solv-fine - complex-ref-fine - dmso-solv-fine + dmso-ref-fine - 1d7h-solv-fine + 1d7h-ref-fine end
+
+quit

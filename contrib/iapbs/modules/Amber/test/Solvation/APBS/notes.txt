@@ -1,0 +1,73 @@
+= APBS reference run =
+
+Last modified: 09/24/07 19:25:03 (rok)
+
+
+
+== Run ==
+
+../../../bin/apbs solvation-apbs.in | tee solvation-apbs.out
+
+
+== Results ==
+
+=== In solvent ===
+
+- APBS
+PRINT STATEMENTS
+
+print energy 1 (elec) end
+  Local net energy (PE 0) = 1.028311368153E+03 kJ/mol
+  Global net ELEC energy = 1.028311368153E+03 kJ/mol
+
+print APOL energy 1 (npolar) end
+  Global net APOL energy = 4.148317453106E+01 kJ/mol
+
+
+1028.311368153 / 4.184 = 245.77231552 kcal/mol
+41.48317453106 / 4.184 = 9.91471666 kcal/mol
+
+
+- iAPBS/sander (in debug directory):
+
+iAPBS: Electrostatic energy in solvent:    245.720 kcal/mol
+iAPBS: Nonpolar energy in solvent:           9.916 kcal/mol
+
+
+
+=== In vacuum ===
+
+- APBS
+print energy 1 (elec) end
+  Local net energy (PE 0) = 1.089755873935E+03 kJ/mol
+  Global net ELEC energy = 1.089755873935E+03 kJ/mol
+
+print APOL energy 1 (npolar) end
+  Global net APOL energy = 4.148317453106E+01 kJ/mol
+
+
+1089.755873935 / 4.184 = 260.45790486 kcal/mol
+
+
+- iAPBS/sander
+
+iAPBS: Electrostatic energy in vacuum:    260.395 kcal/mol
+iAPBS: Nonpolar energy in vacuum:           0.000 kcal/mol
+
+
+=== Difference (Solvation energy) ===
+
+
+- APBS
+
+1089.755873935 - 1028.311368153 = 61.444505782 kJ/mol = 14.68558933 kcal/mol
+245.77231552 - 260.45790486 = -14.68558934 kcal/mol
+
+
+- iAPBS/sander
+
+ VDWAALS =        2.8120  EEL     =      -80.1238  EPB        = -14.6754
+ ENPOLAR =        9.9161
+
+
+

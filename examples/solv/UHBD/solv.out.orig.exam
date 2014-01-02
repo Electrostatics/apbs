@@ -1,0 +1,450 @@
+
+
+ UNIVERSITY OF HOUSTON BROWNIAN DYNAMICS  (Release 5.1.exp)
+
+   AUTHORS                 : Jeffry Madura
+                           : Malcolm Davis
+                           : Rebecca Wade
+                           : Brock Luty
+                           : Michael Gilson
+
+   date/time               : 30-May-95    17:43:27    
+
+
+ CURRENT MAXIMUM PROGRAM DIMENSIONS     
+   Maximum Number of Atoms                           :     13000
+   Maximum Grid Size                                 :        65^3 
+   Maximum Number of Subunits                        :        40
+   Maximum Entries in Atomic Database                :      1000
+   Maximum Equivalences in Atomic Database           :      1000
+   Maximum Number of Runs                            :      1000
+   Maximum Number of Reaction Sites                  :        40
+   Maximum Number of Criteria per Reaction Site      :        10
+   Maximum Number of Columns in an Atomic Database   :        16
+   Maximum Number of Diffusing Units                 :         5
+   Maximum Number of Diffusing Subunits              :        15
+   Maximum Number of Distance Constraints            :        30
+   Maximum Number of Molecules                       :        50
+   Maximum Number of Time Step Regions               :         5
+   Maximum Number of Time Steps for Correlation Func.:        11
+   Maximum Number of Bins for Dihedral Distributions :       360
+   Maximum Number of Trajectories for Analysis       :         1
+   Maximum Number of Traj. Files to be Concatenated  :        10
+
+
+Main >  !
+Main >  !  Solvation Example
+Main >  !
+Main >  !  The difference in solvation energy is computed between
+Main >  !  methanol and methoxide.
+Main >  !
+Main >  !     Methanol
+Main >  !
+Main >  read                   ! read
+Read >      mol 1              ! methanol
+Read >      inter              ! from the input stream
+Read >      pdb                ! in free-format PDB format
+Read >  end
+
+ READ MODULE
+ READ COORDINATES
+   Molecule number                                   :         1
+   Coordinate file                                   :#standard input#    
+   File format                                       :free format PDB     
+Pdb >  ATOM      1  CH3 MEOH    1      0.0190  0.0000   0.6556  0.0000  0.00
+Pdb >  ATOM      2  O   MEOH    1      -.1197  0.0000   -.7372  0.0000  0.00
+Pdb >  ATOM      3  H   MEOH    1      0.7370  0.0000  -1.1390  0.0000  0.00
+Pdb >  END
+   Atoms read                                        :         3
+
+
+Main >  
+Main >  set                    ! read
+Set >      charge             ! set the charges
+Set >      radius             ! and the radii of all of the atoms
+Set >      param opls         ! using the parameter set "opls"
+Set >      file "solv.dat"    ! from the file "solv.dat"
+Set >  end
+ SET MODULE
+   Setting                                           :             charges
+   Setting                                           :               radii
+   Parameter set                                     :opls                
+   Database file                                     :solv.dat            
+   Reading of database completed                     :
+   Number of entries                                 :         7
+   Number of equivalences                            :         0
+   Assignments made                                  :         3
+Main >  
+Main >  print apar mol1 end
+
+ PRINT MODULE     
+ PRINTING ATOMIC PARAMETER INFORMATION   
+     Atom    Residue       Coordinates(x,y,z)      Charge   Radii
+     1 ch3  meoh     1    0.019    0.000    0.656    0.270    1.888
+     2 o    meoh     1   -0.120    0.000   -0.737   -0.700    1.535
+     3 h    meoh     1    0.737    0.000   -1.139    0.430    0.200
+ Center of Geometry of this list of Atoms(x,y,z)
+                          0.212    0.000   -0.407
+ Total Charge of this list of Atoms
+                          0.000
+
+
+Main >  
+Main >  elec                   ! calculate the electrostatic potential
+Elec >      mol 1              ! for methanol
+Elec >      bcfl 2             ! using boundary condition 2
+Elec >      spacing 0.25       ! grid spacing
+Elec >      dime 60 60 60      ! grid dimensions
+Elec >      sdie 78            ! solvent dielectric
+Elec >      center             ! centering the grid on the molecule
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :    -7.413  A
+                                                          -7.625  A
+                                                          -8.032  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.250  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.000  mM
+   Debye-Huckel parameter                            :     0.000  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :         3
+   X-coordinate of the center of geometry            :     0.212    A
+   Y-coordinate of the center of geometry            :     0.000    A
+   Z-coordinate of the center of geometry            :    -0.407    A
+   Net charge of the selected atoms                  :     0.000    e
+   Effective radius of the selected atoms            :     1.888    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       100
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        75
+   Norm of the constant vector                       :0.9985E+01
+   Norm of the residual vector                       :0.8817E-05
+   Convergence achieved                              :0.8830E-06
+Main >  
+Main >  print                  ! print
+Print >      elec energy        ! the electrostatic energy
+Print >      mol1               ! of the solvated system
+Print >  end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic energy for selected atoms           :0.274186E+03 kcal/mol
+ ASSIGNMENT
+   Set the variable:               energy             = 0.27418567431361E+03
+
+
+Main >  assign                 ! save
+Assign >      e1 = $energy       ! the energy in the user variable e1
+Eval >  end
+ ASSIGNMENT
+   Set the variable:                   e1             = 0.27418567431361E+03
+Main >  
+Main >  elec                   ! calculate the electrostatic potential
+Elec >      mol 1              ! for molecule 1
+Elec >      bcfl 2             ! using boundary condition 2
+Elec >      spacing 0.25       ! grid spacing
+Elec >      dime 60 60 60      ! grid dimensions
+Elec >      sdie 1             ! vacuo dielectric
+Elec >      center             ! centering the grid on the molecule
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :    -7.413  A
+                                                          -7.625  A
+                                                          -8.032  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.250  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :     1.000
+   Solvent permittivity                              :0.5728E-06 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.000  mM
+   Debye-Huckel parameter                            :     0.000  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :         3
+   X-coordinate of the center of geometry            :     0.212    A
+   Y-coordinate of the center of geometry            :     0.000    A
+   Z-coordinate of the center of geometry            :    -0.407    A
+   Net charge of the selected atoms                  :     0.000    e
+   Effective radius of the selected atoms            :     1.888    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       100
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        70
+   Norm of the constant vector                       :0.9985E+01
+   Norm of the residual vector                       :0.7078E-05
+   Convergence achieved                              :0.7088E-06
+Main >  print                  ! print
+Print >      elec energy        ! the electrostatic energy
+Print >      mol1               ! of the in vacuo system
+Print >  end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic energy for selected atoms           :0.282687E+03 kcal/mol
+ ASSIGNMENT
+   Set the variable:               energy             = 0.28268743511368E+03
+
+
+Main >  assign                 ! save
+Assign >      e2 = $energy       ! the energy in the user variable e2
+Eval >  end
+ ASSIGNMENT
+   Set the variable:                   e2             = 0.28268743511368E+03
+Main >  
+Main >  assign                 ! calculate the solvation energy
+Assign >      emeoh = $e1        ! as the solvated energy
+Eval >              $e2 -      ! minus the vacuo energy
+Eval >  end
+ ASSIGNMENT
+   Set the variable:                emeoh             = -.85017608000717E+01
+Main >  
+Main >  !
+Main >  !  Methoxide
+Main >  !
+Main >  read                   ! read
+Read >      mol 1              ! methoxide
+Read >      inter              ! from the input stream
+Read >      pdb                ! in free-format PDB format
+Read >  end
+ NOTE: reed(050) Overwriting molecule 0
+
+ READ MODULE
+ READ COORDINATES
+   Molecule number                                   :         1
+   Coordinate file                                   :#standard input#    
+   File format                                       :free format PDB     
+Pdb >  ATOM      1  CH3 MEO     1      0.0000  0.0000   0.5274  0.0000  0.00
+Pdb >  ATOM      2  O   MEO     1      0.0000  0.0000   -.7831  0.0000  0.00
+Pdb >  END
+   Atoms read                                        :         2
+
+
+Main >  
+Main >  set                    ! read
+Set >      charge             !
+Set >      radius             ! and the radii of all of the atoms
+Set >      param opls         ! using the parameter set "opls"
+Set >      file "solv.dat"    ! from the file "solv.dat"
+Set >  end
+ SET MODULE
+   Setting                                           :             charges
+   Setting                                           :               radii
+   Parameter set                                     :opls                
+   Database file                                     :solv.dat            
+   Using previously read database                    :
+   Number of entries                                 :         7
+   Number of equivalences                            :         0
+   Assignments made                                  :         2
+Main >  
+Main >  print apar mol1 end
+
+ PRINT MODULE     
+ PRINTING ATOMIC PARAMETER INFORMATION   
+     Atom    Residue       Coordinates(x,y,z)      Charge   Radii
+     1 ch3  meo      1    0.000    0.000    0.527   -0.020    1.888
+     2 o    meo      1    0.000    0.000   -0.783   -0.980    1.535
+ Center of Geometry of this list of Atoms(x,y,z)
+                          0.000    0.000   -0.128
+ Total Charge of this list of Atoms
+                         -1.000
+
+
+Main >  
+Main >  elec                   ! calculate the electrostatic potential
+Elec >      mol 1              ! for methoxide
+Elec >      bcfl 2             ! using boundary condition 2
+Elec >      spacing 0.25       ! grid spacing
+Elec >      dime 60 60 60      ! grid dimensions
+Elec >      sdie 78            ! solvent dielectric
+Elec >      center             ! centering the grid on the molecule
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :    -7.625  A
+                                                          -7.625  A
+                                                          -7.753  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.250  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :    78.000
+   Solvent permittivity                              :0.4468E-04 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.000  mM
+   Debye-Huckel parameter                            :     0.000  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :         2
+   X-coordinate of the center of geometry            :     0.000    A
+   Y-coordinate of the center of geometry            :     0.000    A
+   Z-coordinate of the center of geometry            :    -0.128    A
+   Net charge of the selected atoms                  :    -1.000    e
+   Effective radius of the selected atoms            :     1.888    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       100
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        75
+   Norm of the constant vector                       :0.1838E+03
+   Norm of the residual vector                       :0.1567E-03
+   Convergence achieved                              :0.8525E-06
+Main >  print                  ! print
+Print >      elec energy        ! the electrostatic energy
+Print >      mol 1              ! of solvated system
+Print >  end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic energy for selected atoms           :0.384789E+03 kcal/mol
+ ASSIGNMENT
+   Set the variable:               energy             = 0.38478945504183E+03
+
+
+Main >  
+Main >  assign                 ! save
+Assign >      e1 = $energy       ! the energy in the user variable e1
+Eval >  end
+ ASSIGNMENT
+   Set the variable:                   e1             = 0.38478945504183E+03
+Main >  
+Main >  elec                   ! calculate the electrostatic potential
+Elec >      mol 1              ! for methoxide
+Elec >      bcfl 2             ! using boundary condition 2
+Elec >      spacing 0.25       ! grid spacing
+Elec >      dime 60 60 60      ! grid dimensions
+Elec >      sdie 1             ! in vacuo dielectric
+Elec >      center             ! centering the grid on the molecule
+Elec >  end
+ ELECTROSTATIC MODULE
+ GRID CONSTANTS
+   Grid dimensioned to                   (same dime) :         user values
+   Grid dimensions                      (dime # # #) : 60, 60, 60
+   Grid located by   (gcen,gcor,cent,same orig,gori) :  centering on atoms
+   Grid origin                                       :    -7.625  A
+                                                          -7.625  A
+                                                          -7.753  A
+   Grid spacing set to                   (same dime) :         user values
+   Grid spacing                           (grid #.#) :     0.250  A
+   Do analytic potential calculation     (no/analyt) :         F
+ DIELECTRIC MAP DEFINITIONS
+ Use probe-accessible surface definition (newmap):         F
+   Utilize dielectric boundary smoothing (no/smooth) :         T
+ BOUNDARY CONDITION CONSTANTS
+   Boundary condition flag                  (bcfl #) :         2
+     - sum of atoms as independent DH spheres
+ ENVIRONMENTAL CONSTANTS
+   Interior dielectric constant           (pdie #.#) :     2.000
+   Interior permittivity                             :0.1146E-05 e^2ps^2/amuA^3
+   Solvent dielectric constant            (sdie #.#) :     1.000
+   Solvent permittivity                              :0.5728E-06 e^2ps^2/amuA^3
+   Temperature                            (temp #.#) :   300.000  K
+   Ionic strength                         (ions #.#) :     0.000  mM
+   Debye-Huckel parameter                            :     0.000  1/A
+ ATOM SELECTION
+   Number of atoms selected                (mol#...) :         2
+   X-coordinate of the center of geometry            :     0.000    A
+   Y-coordinate of the center of geometry            :     0.000    A
+   Z-coordinate of the center of geometry            :    -0.128    A
+   Net charge of the selected atoms                  :    -1.000    e
+   Effective radius of the selected atoms            :     1.888    A
+ ITERATION VALUES
+   Maximum iterations                       (maxi #) :       100
+   Convergence criteria                   (conv #.#) :0.1000E-05
+   Linear equation solver flag              (solv #) :         1
+     - incomplete Cholesky preconditioned conjugate gradient
+ PERFORMING SETUP AND CALCULATION
+ ITERATION SUMMARY
+   Iterations required                               :        68
+   Norm of the constant vector                       :0.1838E+03
+   Norm of the residual vector                       :0.1519E-03
+   Convergence achieved                              :0.8260E-06
+Main >  print                  ! print
+Print >      elec energy        ! the electrostatic energy
+Print >      mol 1              ! of solvated system
+Print >  end
+
+ PRINT MODULE     
+ PRINTING ELECTROSTATICS
+   Electrostatic energy for selected atoms           :0.477945E+03 kcal/mol
+ ASSIGNMENT
+   Set the variable:               energy             = 0.47794490369283E+03
+
+
+Main >  
+Main >  assign                 ! save
+Assign >      e2 = $energy       ! the energy in the user variable e2
+Eval >  end
+ ASSIGNMENT
+   Set the variable:                   e2             = 0.47794490369283E+03
+Main >  
+Main >  assign                 ! calculate the solvation energy
+Assign >      emeo = $e1         ! of methoxide as the solvated energy
+Eval >             $e2 -       ! minus the in vacuo energy
+Eval >  end
+ ASSIGNMENT
+   Set the variable:                 emeo             = -.93155448650995E+02
+Main >  
+Main >  assign                 ! calculate the difference in solvation
+Assign >      ediff = $emeo      ! energy between methanol and methoxide
+Eval >              $emeoh -
+Eval >  end
+ ASSIGNMENT
+   Set the variable:                ediff             = -.84653687850923E+02
+Main >  
+Main >  stop
+ UHBD termination
+   date/time               : 30-May-95    17:50:56    
+   total CPU seconds       :    211.970
+
+

@@ -1,0 +1,61 @@
+#!/bin/csh -f
+
+if( ! $?TESTsander ) set TESTsander = "../../exe/sander.APBS"
+
+if( ! $?DO_PARALLEL ) then
+   setenv DO_PARALLEL " "
+else
+   echo "This test not set up for parallel"
+   echo " cannot run in parallel with pbsa"
+   exit 0
+endif
+
+setenv MCSH_HOME /dev/null
+
+if ( -e mdin ) then
+   rm mdin
+endif
+
+cat > mdin <<EOF
+ test of iAPBS/sander solvation energies (based on pbsa_radi)
+ &cntrl 
+   ntx=1, irest=0,
+   imin=1, maxcyc=0,
+   ntpr=1, ntwr=100000,
+   igb=6, ntb=0,
+   ntc=1, ntf=1, tol=0.000001,
+   ntt=0, temp0=300
+ &end
+ &apbs
+    apbs_debug=0,
+    apbs_print=0,
+    grid=0.5, 0.5, 0.5,
+    calc_type=0,
+    cmeth=1,
+    bcfl=2,
+    srfm=1,
+    chgm=1,
+    pdie=1.0,
+    sdie=80.0,
+    srad = 1.4,
+    radiopt=0,
+    calcforce=0, calcnpenergy=1,
+&end
+EOF
+
+set all = "Li Na K Rb Cs F Cl IM Br I MG Ca Zn tp3 ile leu val phe trp hid hie nhe tyr ser thr cys cyx met lyn ash glh asn gln nma alabk glybk probk da dc dg dt ru arg asp cym glu hip lys dap da3p da5p danp rap ra3p ra5p ranp"
+foreach aa ($all)
+   set output = $aa.out
+
+   $DO_PARALLEL $TESTsander -O -i mdin -p ./prmtop-inpcrd/$aa.prmtop -c ./prmtop-inpcrd/$aa.inpcrd  -o $output < /dev/null || goto error
+
+   ${AMBERHOME}/test/dacdif ./out.save/$aa.out.save $output
+   /bin/rm -f restrt mdinfo mdcrd
+   goto next
+
+   error:
+   echo "  ${0}:  Program error"
+   exit(1)
+  
+   next:
+end

@@ -1,0 +1,21 @@
+read
+    mol pqr imidazole_zap.pqr        
+end
+elec name comp_solv        # Solvated complex
+    geoflow-auto
+
+    lpbe
+    bcfl mdh
+    mol 1
+
+    grid 0.23 0.25 0.27     # grid spacing                      (dcel)
+    pdie 1.5                # Solute dielectric                 (epsilon_p)
+    sdie 80.00              # Solvent dielectric                (epsilon_s)
+    press 0.008             # pressure kcal/(mol*A^3)           (pres)
+    gamma 0.0001            # surface tension kcal/(mol*A^2)    (gama)
+    bconc 0.03346           # bulk solvent density A^-3         (density)
+    vdwdisp 0               # van der wal dispersion (on/off)   (vdwdispersion)
+end
+
+quit
+

@@ -1,0 +1,7 @@
+
+APBSDIR=${APBS_PREFIX}
+APBSINCL=-I$(APBSDIR)/include 
+APBSLIB=-L$(APBSDIR)/lib -liapbs -lapbsmainroutines -lapbs -lmaloc -lblas -llapack -lvf2c -lifcore
+APBSFLAGS=-DNAMD_APBS
+APBS=$(APBSINCL) $(APBSFLAGS)
+

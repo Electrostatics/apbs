@@ -1,0 +1,7 @@
+
+APBSDIR=/Users/justin/IAPBS/APBS
+APBSINCL=-I$(APBSDIR)/include 
+APBSLIB=-L$(APBSDIR)/lib/powerpc-apple-darwin8.7.0 -liapbs -lapbs -lmaloc
+APBSFLAGS=-DNAMD_APBS
+APBS=$(APBSINCL) $(APBSFLAGS)
+

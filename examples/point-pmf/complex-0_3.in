@@ -1,0 +1,82 @@
+##########################################################################
+### POINT CHARGE POTENTIAL OF MEAN FORCE
+### $Id$
+###
+### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for
+### syntax help.
+##########################################################################
+
+read 
+    mol pqr mol0.pqr
+    mol pqr mol3.pqr
+    mol pqr complex-0_3.pqr
+end
+
+# COMPONENT 1 ENERGY
+elec name point1
+    mg-manual
+    dime 65 65 65
+    grid 0.21 0.21 0.21
+    gcent 0.0 0.0 0.0
+    mol 1
+    lpbe
+    bcfl mdh
+    pdie 78.54
+    sdie 78.54
+    chgm spl0
+    srfm spl2
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy comps
+    calcforce no 
+end
+
+# COMPONENT 2 ENERGY
+elec name point2
+    mg-manual
+    dime 65 65 65
+    grid 0.21 0.21 0.21
+    gcent 0.0 0.0 0.0
+    mol 2
+    lpbe
+    bcfl mdh
+    pdie 78.54
+    sdie 78.54
+    chgm spl0
+    srfm spl2
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy comps
+    calcforce no
+end
+
+# COMPLEX ENERGY 
+elec name complex
+    mg-manual
+    dime 65 65 65
+    grid 0.21 0.21 0.21
+    gcent 0.0 0.0 0.0
+    mol 3
+    lpbe
+    bcfl mdh
+    pdie 78.54
+    sdie 78.54
+    chgm spl0
+    srfm spl2
+    srad 1.4
+    swin 0.3
+    sdens 10.0
+    temp 298.15
+    calcenergy comps
+    calcforce no
+end
+
+# BINDING ENERGY
+print elecEnergy complex - point1 - point2 end
+
+
+quit

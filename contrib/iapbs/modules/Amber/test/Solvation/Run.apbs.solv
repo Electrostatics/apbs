@@ -1,0 +1,20 @@
+#!/bin/sh
+
+export MCSH_HOME=/dev/null
+
+output=solvation.out
+
+$AMBERHOME/bin/sander.APBS -O -i solvation.in \
+    -c 2ala.prmcrd -p 2ala.prmtop -o $output
+
+$AMBERHOME/test/dacdif $output.save $output
+
+output=solvation-auto.out
+
+$AMBERHOME/bin/sander.APBS -O -i solvation-auto.in \
+    -c 2ala.prmcrd -p 2ala.prmtop -o $output
+
+$AMBERHOME/test/dacdif $output.save $output
+
+
+/bin/rm -f mdinfo restrt

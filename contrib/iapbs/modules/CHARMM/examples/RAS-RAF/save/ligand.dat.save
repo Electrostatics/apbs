@@ -1,0 +1,29 @@
+#FRAME      EGAS       EELE       EVDW       EINT       GASA       GPB
+1           -533.21    -1475.32   -307.653   1249.76    28.965     -2421.91
+2           -560.326   -1484.72   -310.315   1234.71    28.9695    -2406.52
+#
+# MM-PBSA RESULTS FOR LIGAND (1 FRAMES)
+#
+#               MEAN         STD
+#           ============ ============
+#  EELE     -1480.02     6.6468
+#  EVDW     -308.984     1.88232
+#  EINT     1242.23      10.6384
+#  EGAS     -546.768     19.1739
+#  GASA     28.9672      3.217142E-03
+#  GPB      -2414.21     10.8788
+#
+#  G(NO_ENTROPY) = EGAS + GASA + GPB = -2932.01
+#
+# INPUT FILES
+#   TRAJECTORY: "short.dcd" (FIRST FRAME #1, SKIP 1)
+#   PSF: "complex.psf"
+#   CRD: "complex.crd"
+#
+# KEY PARAMETERS
+#   T = 300.0 K
+#   GASA: GAMMAP = 0.00542, BETAP = 0.92
+#   PBEQ: DCEL = 1.0, CONC = 0.0, IONR = 0.0
+#         EPSSOL = 80.0, EPSVAC = 1.0, EPSPROT = 1.0
+#         RSOL = 1.4
+#

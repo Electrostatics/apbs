@@ -1,0 +1,118 @@
+
+
+----------------------------------------------------------------------
+	APBS -- Adaptive Poisson-Boltzmann Solver
+	Version 0.5.1
+	
+	Nathan A. Baker (baker@biochem.wustl.edu)
+	Dept. Biochemistry and Molecular Biophysics
+	Center for Computational Biology
+	Washington University in St. Louis
+	
+	Additional contributing authors listed in the code documentation.
+	
+	Copyright (c) 2002-2007.  Washington University in St. Louis.
+	All Rights Reserved.
+	Portions Copyright (c) 1999-2002.  The Regents of the University of 
+	California.
+	Portions Copyright (c) 1995.  Michael Holst.
+	
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+	
+	Linking APBS statically or dynamically with other modules is making a
+	combined work based on APBS. Thus, the terms and conditions of the GNU
+	General Public License cover the whole combination.
+	
+	SPECIAL GPL EXCEPTION
+	In addition, as a special exception, the copyright holders of APBS
+	give you permission to combine the APBS program with free software
+	programs and libraries that are released under the GNU LGPL or with
+	code included in releases of ISIM, Ion Simulator Interface, PMV,
+	SMOL, VMD, and Vision. Such combined software may be linked with APBS and
+	redistributed together in original or modified form as mere aggregation
+	without requirement that the entire work be under the scope of the GNU
+	General Public License. This special exception permission is also extended
+	to any software listed in the SPECIAL GPL EXCEPTION clauses by the PMG,
+	FEtk, MC, or MALOC libraries.
+	
+	Note that people who make modified versions of APBS are not obligated
+	to grant this special exception for their modified versions; it is
+	their choice whether to do so. The GNU General Public License gives
+	permission to release a modified version without this exception; this
+	exception also makes it possible to release a modified version which
+	carries forward this exception.
+----------------------------------------------------------------------
+	APBS uses FETK (the Finite Element ToolKit) to solve the
+	Poisson-Boltzmann equation numerically.  FETK is a portable collection
+	of finite element modeling class libraries written in an object-oriented
+	version of C.  It is designed to solve general coupled systems of nonlinear
+	partial differential equations using adaptive finite element methods,
+	inexact Newton methods, and algebraic multilevel methods.  More information
+	about FEtk may be found at <http://www.FEtk.ORG>.
+----------------------------------------------------------------------
+Please cite your use of APBS as:
+
+	Baker NA, Sept D, Joseph S, Holst MJ, McCammon JA. Electrostatics of
+	nanosystems: application to microtubules and the ribosome. Proc.
+	Natl. Acad. Sci. USA 98, 10037-10041 2001.
+	
+
+This executable compiled on Sep 12 2007 at 10:43:13
+
+Parsing input file solvation-apbs.in...
+Parsed input file.
+Got paths for 1 molecules
+Reading PQR-format atom data from 2ala.pqr.
+  22 atoms
+  Centered at (4.112e+00, 4.824e+00, -6.205e-01)
+  Net charge -2.78e-17 e
+Preparing to run 2 PBE calculations.
+----------------------------------------
+CALCULATION #1 (elec): MULTIGRID
+  Setting up problem...
+  Using cubic spline charge discretization.
+  Grid dimensions: 33 x 33 x 33
+  Grid spacings: 0.500 x 0.500 x 0.500
+  Grid lengths: 16.000 x 16.000 x 16.000
+  Grid center: (4.112, 4.824, -0.620)
+  Multigrid levels: 4
+  Molecule ID: 1
+  Linearized traditional PBE
+  Single Debye-Huckel sphere boundary conditions
+  0 ion species (0.000 M ionic strength):
+  Solute dielectric: 2.000
+  Solvent dielectric: 78.540
+  Using spline-based surface definition;window = 0.300
+  Temperature:  298.150 K
+  Electrostatic energies will be calculated
+  All-atom solvent forces will be calculated
+----------------------------------------
+CALCULATION #2 (npolar): APOLAR
+----------------------------------------
+PRINT STATEMENTS
+
+print energy 1 (elec) end
+  Local net energy (PE 0) = 1.028311368153E+03 kJ/mol
+  Global net ELEC energy = 1.028311368153E+03 kJ/mol
+
+print APOL energy 1 (npolar) end
+  Global net APOL energy = 4.148317453106E+01 kJ/mol
+----------------------------------------
+CLEANING UP AND SHUTTING DOWN...
+Final memory usage:  8.454 MB total, 8.664 MB high water
+
+
+Thanks for using APBS!
+

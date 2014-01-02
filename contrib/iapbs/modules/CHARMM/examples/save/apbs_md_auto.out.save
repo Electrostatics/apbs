@@ -1,0 +1,616 @@
+1
+                 Chemistry at HARvard Macromolecular Mechanics
+                   (CHARMM) - Developmental Version 35b2   February 15, 2008   
+       Copyright(c) 1984-2001  President and Fellows of Harvard College
+                              All Rights Reserved
+      Current operating system: Linux-2.6.28-17-generic(x86_64)@morgan.ucsd.
+                 Created on  3/15/10 at  9:28:48 by user: rok         
+
+            Maximum number of ATOMS:     25140, and RESidues:       14000
+            Current HEAP size:         2048000, and STACK size:    500000
+
+ RDTITL> * APBS_MD.INP
+ RDTITL> * EXTERNAL FILES: TOP_ALL22_PROT.INP, PAR_ALL22_PROT.INP AND RADIUS.STR
+ RDTITL> * $ID: APBS_MD.INP,V 1.2 2005/06/20 21:40:02 ROK EXP $
+ RDTITL>  
+  
+ CHARMM>     
+  
+ CHARMM>    if ?apbs .ne. 1 then stop
+ RDCMND substituted energy or value "?APBS" to "1"
+ Comparing "1" and "1".
+ IF test evaluated as false.  Skipping command
+  
+ CHARMM>     
+  
+ CHARMM>    stream datadir.def
+ VOPEN> Attempting to open::datadir.def::
+ OPNLGU> Unit 99 opened for READONLY access to /home/rok/Sandbox-100309/iapbs/modules/CHARMM/examples/datadir.def
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * CHARMM TESTCASE DATA DIRECTORY ASSIGNMENT
+ RDTITL> * $ID: DATADIR.DEF,V 1.2 2005/05/24 04:51:09 ROK EXP $
+ RDTITL> FASTER ON
+ Parameter: IN1 <- "" <empty>
+  
+ CHARMM>    faster on
+ MISCOM> FAST option: EXPANDED (limited fast routines)
+  
+ CHARMM>    set 0 data/     ! input data directory
+ Parameter: 0 <- "DATA/"
+  
+ CHARMM>    set 9 scratch/  ! scratch directory
+ Parameter: 9 <- "SCRATCH/"
+  
+ CHARMM>    return
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+ CHARMM>     
+  
+ CHARMM>    open read card unit 11 name @0top_all22_prot.inp
+ Parameter: 0 -> "DATA/"
+ VOPEN> Attempting to open::data/top_all22_prot.inp::
+ OPNLGU> Unit 11 opened for READONLY access to /home/rok/Sandbox-100309/iapbs/modules/CHARMM/examples/data/top_all22_prot.inp
+  
+ CHARMM>    read rtf card unit 11
+ MAINIO> Residue topology file being read from unit  11.
+ TITLE> *>>>>>>>>CHARMM22 ALL-HYDROGEN TOPOLOGY FILE FOR PROTEINS <<<<<<
+ TITLE> *>>>>>>>>>>>>>>>>>>>>> AUGUST 1999 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ TITLE> *>>>>>>> DIRECT COMMENTS TO ALEXANDER D. MACKERELL JR. <<<<<<<<<
+ TITLE> *>>>>>> 410-706-7442 OR EMAIL: ALEX,MMIRIS.AB.UMD.EDU  <<<<<<<<<
+ TITLE> *
+  
+ CHARMM>    close unit 11
+ VCLOSE: Closing unit   11 with status "KEEP"
+  
+ CHARMM>     
+  
+ CHARMM>    open read card unit 11 name @0par_all22_prot.inp
+ Parameter: 0 -> "DATA/"
+ VOPEN> Attempting to open::data/par_all22_prot.inp::
+ OPNLGU> Unit 11 opened for READONLY access to /home/rok/Sandbox-100309/iapbs/modules/CHARMM/examples/data/par_all22_prot.inp
+  
+ CHARMM>    read para card unit 11
+
+          PARAMETER FILE BEING READ FROM UNIT 11
+ TITLE> *>>>> CHARMM22 ALL-HYDROGEN PARAMETER FILE FOR PROTEINS <<<<<<<<<<
+ TITLE> *>>>>>>>>>>>>>>>>>>>>>> AUGUST 1999 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ TITLE> *>>>>>>> DIRECT COMMENTS TO ALEXANDER D. MACKERELL JR. <<<<<<<<<
+ TITLE> *>>>>>> 410-706-7442 OR EMAIL: ALEX,MMIRIS.AB.UMD.EDU  <<<<<<<<<
+ TITLE> *
+ PARMIO> NONBOND, HBOND lists and IMAGE atoms cleared.
+  
+ CHARMM>    close unit 11
+ VCLOSE: Closing unit   11 with status "KEEP"
+  
+ CHARMM>     
+  
+ CHARMM>    read sequence ALA 1
+  
+ CHARMM>    generate ALAD first ACE last CT3 setup warning
+ THE PATCH 'ACE' WILL BE USED FOR THE FIRST RESIDUE
+ THE PATCH 'CT3' WILL BE USED FOR THE LAST  RESIDUE
+ ** WARNING ** BOND NOT FOUND FOR RESIDUE   1 ALA   .
+ ATOMS "C     " "+N    " WERE REQUESTED.
+ ** WARNING ** IMPROPER NOT FOUND FOR RESIDUE   1 ALA   .
+ ATOMS "N     " "-C    " "CA    " "HN    " WERE REQUESTED.
+ ** WARNING ** IMPROPER NOT FOUND FOR RESIDUE   1 ALA   .
+ ATOMS "C     " "CA    " "+N    " "O     " WERE REQUESTED.
+ GENPSF> Segment   1 has been generated. Its identifier is ALAD.
+ PSFSUM> PSF modified: NONBOND lists and IMAGE atoms cleared.
+ PSFSUM> Summary of the structure file counters :
+         Number of segments      =        1   Number of residues   =        1
+         Number of atoms         =       22   Number of groups     =        6
+         Number of bonds         =       21   Number of angles     =       36
+         Number of dihedrals     =       42   Number of impropers  =        4
+         Number of cross-terms   =        0
+         Number of HB acceptors  =        2   Number of HB donors  =        2
+         Number of NB exclusions =        0   Total charge =    0.00000
+  
+ CHARMM>     
+  
+ CHARMM>    read coor card
+          SPATIAL COORDINATES BEING READ FROM UNIT  5
+ RDTITL> * ALAD
+ RDTITL> *
+  
+ CHARMM>     
+  
+ CHARMM>    coor orient
+
+ ORIENT THE COORDINATES TO ALIGN WITH AXIS
+
+ MOMENTS
+     17.95397262     -8.67369571     19.57000165
+                     58.09459225    -46.69084467
+                                    111.17834589
+
+ Transpose of the rotation matrix
+     0.853685   -0.492562    0.169129
+     0.475503    0.869659    0.132626
+    -0.212411   -0.032800    0.976630
+ CENTER OF ATOMS BEFORE TRANSLATION     1.48591     5.53196    -4.24329
+ AXIS OF ROTATION IS  0.157009 -0.362127 -0.918810  ANGLE IS   31.79
+
+ ALL COORDINATES ORIENTED IN THE MAIN SET BASED ON SELECTED ATOMS.
+
+  
+ CHARMM>     
+  
+ CHARMM>    PBEQ
+ 
+   Calculations with the Poisson-Boltzmann Equation 
+ 
+  
+   PBEQ>    ! set optimized values for radii, necessary for solvation
+   PBEQ>    ! forces calculation
+   PBEQ>       set factor 0.939
+ Parameter: FACTOR <- "0.939"
+  
+   PBEQ>       set sw     0.4
+ Parameter: SW <- "0.4"
+  
+   PBEQ>       stream @0radius.str
+ Parameter: 0 -> "DATA/"
+ VOPEN> Attempting to open::data/radius.str::
+ OPNLGU> Unit 99 opened for READONLY access to /home/rok/Sandbox-100309/iapbs/modules/CHARMM/examples/data/radius.str
+
+                    INPUT STREAM SWITCHING TO UNIT    99
+ RDTITL> * ATOMIC RADIUS DERIVED FROM SOLVENT ELECTROSTATIC CHARGE DISTRIBUTION
+ RDTITL> * TESTED WITH FREE ENERGY PERTURBATION WITH EXPLICIT SOLVENT
+ RDTITL> * AUTHORS:  MAFALDA NINA, DMITRII BELOGV, AND BENOIT ROUX
+ RDTITL> * UNIVERSITY OF MONTREAL, JUNE 1996.
+ RDTITL> * M. NINA AND B. ROUX. ATOMIC RADII FOR CONTINUUM ELECTROSTATICS CALCULATIONS BASED ON
+ RDTITL> * MOLECULAR DYNAMICS FREE ENERGY SIMULATIONS. J. PHYS. CHEM. B 101: 5239-5248 (1997).
+ RDTITL> *
+ Parameter: IN1 <- "" <empty>
+  
+   PBEQ>     
+  
+   PBEQ>    ! UPDATES:
+   PBEQ>    ! --------
+   PBEQ>    !
+   PBEQ>    ! GLU and ASP modified December 1st, 1998 by Mafalda Nina
+   PBEQ>    !
+   PBEQ>    ! Protonated histidine HSP has been included, January 1999 by Mafalda Nina
+   PBEQ>    ! dG_elec = -68.15 kcal/mol (MD/FES) or -68.10 kcal/mol (PBEQ)
+   PBEQ>    !
+   PBEQ>    ! TEA and ions added by Benoit Roux, January 1999.
+   PBEQ>    !
+   PBEQ>    ! sodium added by Benoit Roux, November 2000
+   PBEQ>     
+  
+   PBEQ>    ! Set to zero all H radii
+   PBEQ>    scalar wmain set 0.0 sele chem H* end
+ SELRPN>     12 atoms have been selected out of     22
+  
+   PBEQ>     
+  
+   PBEQ>    ! Set heavy atoms to average default values
+   PBEQ>    scalar wmain set 2.3 sele chem C* end
+ SELRPN>      6 atoms have been selected out of     22
+  
+   PBEQ>    scalar wmain set 1.8 sele chem O* end
+ SELRPN>      2 atoms have been selected out of     22
+  
+   PBEQ>    scalar wmain set 2.3 sele chem N* end
+ SELRPN>      2 atoms have been selected out of     22
+  
+   PBEQ>    scalar wmain set 2.3 sele chem S* end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>     
+  
+   PBEQ>    !Patches CT3 N-Methylamide C-terminus
+   PBEQ>    !        ACE acetylated N-terminus (ACP for PRO)
+   PBEQ>    scalar wmain set 2.06 sele (type CAY .or. type CAT) end
+ SELRPN>      2 atoms have been selected out of     22
+  
+   PBEQ>    scalar wmain set 2.04 sele type CY end
+ SELRPN>      1 atoms have been selected out of     22
+  
+   PBEQ>    scalar wmain set 1.52 sele type OY end
+ SELRPN>      1 atoms have been selected out of     22
+  
+   PBEQ>    scalar wmain set 2.23 sele type NT end
+ SELRPN>      1 atoms have been selected out of     22
+  
+   PBEQ>    scalar wmain set 1.40 sele type OT* end ! for COO- terminus
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>     
+  
+   PBEQ>    !Backbone
+   PBEQ>    scalar wmain set 2.04 sele type C  end
+ SELRPN>      1 atoms have been selected out of     22
+  
+   PBEQ>           ! for peptide bond
+  
+   PBEQ>    scalar wmain set 1.52 sele type O  end
+ SELRPN>      1 atoms have been selected out of     22
+  
+   PBEQ>           ! for peptide bond
+  
+   PBEQ>    scalar wmain set 2.23 sele type N  end
+ SELRPN>      1 atoms have been selected out of     22
+  
+   PBEQ>           ! for peptide bond
+  
+   PBEQ>    scalar wmain set 2.86 sele type CA  end
+ SELRPN>      1 atoms have been selected out of     22
+  
+   PBEQ>           ! for all CA except GLY
+  
+   PBEQ>    scalar wmain set 2.38 sele (resnam GLY .and. type CA) end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for GLY only
+  
+   PBEQ>     
+  
+   PBEQ>    !Hydrogens
+   PBEQ>    scalar wmain set 0.00 sele type H* end
+ SELRPN>     12 atoms have been selected out of     22
+  
+   PBEQ>           ! for all hydrogens
+  
+   PBEQ>     
+  
+   PBEQ>    !Carbons
+   PBEQ>    scalar wmain set 2.67 sele type CB end
+ SELRPN>      1 atoms have been selected out of     22
+  
+   PBEQ>           ! for all residues
+  
+   PBEQ>    scalar wmain set 2.46 sele type CG* end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for ARG, GLN, ILE, LYS, MET, PHE, THR, TRP, VAL, HSP, HSD
+  
+   PBEQ>    scalar wmain set 2.77 sele resnam GLU .and. type CG end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for GLU only
+  
+   PBEQ>    scalar wmain set 2.44 sele type CD* end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for ARG, ILE, LEU, LYS
+  
+   PBEQ>    scalar wmain set 1.98 sele (resnam GLN .and. type CD) .or. (resnam ASN .and. type CG) .or. -
+   PBEQ>                               (resnam GLU .and. type CD) .or. (resnam ASP .and. type CG) end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for ASP, GLU, ASN, GLN
+  
+   PBEQ>    scalar wmain set 1.98 sele (resnam PRO .and. (type CB .or. type CG .or. type CD)) end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for PRO only
+  
+   PBEQ>    scalar wmain set 2.00 sele (resnam TYR .and. (type CE* .or. type CD* .or. -
+   PBEQ>                              type CZ)) .or. (resnam PHE .and. (type CE* .or. -
+   PBEQ>                              type CD* .or. type CZ))  end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for TYR, PHE rings
+  
+   PBEQ>    scalar wmain set 1.78 sele (resnam TRP .and. (type CE* .or. type CD* .or. -
+   PBEQ>                              type CZ* .or. type CH2)) end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for TRP ring only
+  
+   PBEQ>    scalar wmain set 2.10 sele type CE end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for MET only
+  
+   PBEQ>    scalar wmain set 2.80 sele (resnam ARG .and. type CZ) .or. (resnam LYS .and. type CE) end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for ARG, LYS
+  
+   PBEQ>    scalar wmain set 1.98 select (( resnam HSD  .or. resnam HSP) .and. type CE1) -
+   PBEQ>           .or. (( resnam HSD .or. resnam HSP)  .and. type CD2) end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for neutral HSD and protonated HSP
+  
+   PBEQ>     
+  
+   PBEQ>    !Oxygens
+   PBEQ>    scalar wmain set 1.40 sele (resnam GLU .or. resnam ASP) .and. (type OE* .or. type OD*) end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for GLU, ASP
+  
+   PBEQ>    scalar wmain set 1.42 sele (resnam ASN .or. resnam GLN) .and. (type OE* .or. type OD*) end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for ASN, GLN
+  
+   PBEQ>    scalar wmain set 1.64 sele type OG* end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for SER, THR
+  
+   PBEQ>    scalar wmain set 1.85 sele (resnam TYR .and. type OH) end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for TYR only
+  
+   PBEQ>    scalar wmain set 2.2 select resname TIP3 .and. type OH2 end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for explicit water molecules
+  
+   PBEQ>     
+  
+   PBEQ>    !Nitrogens
+   PBEQ>    scalar wmain set 1.80 sele resnam HSD  .and. (type NE2 .or. type ND1) end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for neutral HSD
+  
+   PBEQ>    scalar wmain set 2.30 sele resnam HSP  .and. (type NE2 .or. type ND1) end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for protonated HSP
+  
+   PBEQ>    scalar wmain set 2.13 sele resnam ARG .and. (type NH* .or. type NE) .or. -
+   PBEQ>                          (resnam LYS .and. type NZ) end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for ARG, LYS
+  
+   PBEQ>    scalar wmain set 2.15 sele (resnam GLN .and. type NE2) .or. (resnam ASN .and. type ND2) end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for GLN, ASN
+  
+   PBEQ>    scalar wmain set 2.40 sele resnam TRP .and. type NE1 end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for TRP
+  
+   PBEQ>     
+  
+   PBEQ>    !Sulphur
+   PBEQ>    scalar wmain set 2.00 sele type S* end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! for MET, CYS
+  
+   PBEQ>     
+  
+   PBEQ>     
+  
+   PBEQ>    !Ions
+   PBEQ>    scalar wmain set 2.035 select resname POT end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           !potassium ion K+
+  
+   PBEQ>     
+  
+   PBEQ>    scalar wmain set 2.035 select resname CLA end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           !chloride ion Cl-
+  
+   PBEQ>     
+  
+   PBEQ>    scalar wmain set 1.66 select resname SOD end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           !sodium ion Na+
+  
+   PBEQ>     
+  
+   PBEQ>    scalar wmain set 2.15 sele resnam TEA .and. type N end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>    scalar wmain set 2.30 sele ( type C1 .or. type C2 .or. type C3 .or. type C4 ) .and. resnam TEA end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>    scalar wmain set 2.30 sele ( type C5 .or. type C6 .or. type C7 .or. type C8 ) .and. resnam TEA end
+ SELRPN>      0 atoms have been selected out of     22
+  
+   PBEQ>           ! Tetramethylamonium (TEA)
+  
+   PBEQ>     
+  
+ VCLOSE: Closing unit   99 with status "KEEP"
+
+                    RETURNING TO INPUT STREAM     5
+  
+   PBEQ>       scalar wmain add  @sw
+ Parameter: SW -> "0.4"
+  
+   PBEQ>       scalar wmain mult @factor
+ Parameter: FACTOR -> "0.939"
+  
+   PBEQ>       scalar wmain set 0.0 sele type H* end
+ SELRPN>     12 atoms have been selected out of     22
+  
+   PBEQ>     
+  
+   PBEQ>    ! set APBS parameters
+   PBEQ>      APBS mgauto lpbe -
+   PBEQ>      grdx 0.5 grdy 0.5 grdz 0.5 -
+   PBEQ>      swin @sw srfm 2 -
+   PBEQ>      calcene 2 calcfor 2 debug 0 -
+   PBEQ>      sforce -
+   PBEQ>      sele all END
+ Parameter: SW -> "0.4"
+
+   PBEQ> Entering APBS module
+ SELRPN>     22 atoms have been selected out of     22
+
+   Calculation with     22 atoms
+   APBS> Molecular dimensions:   11.657   7.911   6.542
+   APBS> Grid dime not specified, calculating ...
+   APBS> Requesting dime re-calculation on the fly
+   APBS> Skiping the first APBS calculation, 
+   APBS> Initializing parameters only.
+  
+   PBEQ>    END
+  
+ CHARMM>     
+  
+ CHARMM>    skip none
+ SKIPE> The following energy terms will be computed :
+  BOND ANGL UREY DIHE IMPR VDW  ELEC HBON USER HARM CDIH CIC  CDRO NOE  SBOU
+  IMNB IMEL IMHB EWKS EWSE EXTE RXNF ST2  IMST TSM  QMEL QMVD ASP  EHAR GEO 
+  MDIP PINT PRMS PANG SSBP BK4D SHEL RESD SHAP STRB OOPL PULL POLA DMC  RGY 
+  EWEX EWQC EWUT PBEL PBNP MBDE MBEL STRS BNDB BNDT EBST MBST BBT  SST  GBEN
+  HMCM ADUM HYDR GSBP FQPO GRVD GREL SASL CMAP ELRC OLAP UMBR RREP RPHO RHBN
+  RBDO RBAC RARO PHEN VMOD CROS FCTP FCTN
+  
+ CHARMM>     
+  
+ CHARMM>    ! perform MD with APBS calculated solvation forces
+ CHARMM>    dynamics leap verlet strt nstep 20 timestep 0.001 -
+ CHARMM>    firstt 100.0 finalt 300.0 teminc 100.0 -
+ CHARMM>    twindh 10.0
+  IUNREA = -1         IUNWRI = -1          IUNOS = -1
+  IUNCRD = -1         IUNVEL = -1          KUNIT = -1
+
+ NONBOND OPTION FLAGS: 
+     ELEC     VDW      ATOMs    CDIElec  SHIFt    VATOm    VSWItch 
+     BYGRoup  NOEXtnd  NOEWald 
+ CUTNB  = 14.000 CTEXNB =999.000 CTONNB = 10.000 CTOFNB = 12.000
+ WMIN   =  1.500 WRNMXD =  0.500 E14FAC =  1.000 EPS    =  1.000
+ NBXMOD =      5
+ There are        0 atom  pairs and        0 atom  exclusions.
+ There are        0 group pairs and        0 group exclusions.
+ <MAKINB> with mode   5 found     57 exclusions and     41 interactions(1-4)
+ <MAKGRP> found     11 group exclusions.
+
+      ***** LEVEL  1 WARNING FROM <FINCYC> *****
+      ***** SMALLEST UPDATE FREQUENCY IS NOT A COMMON DENOMINATOR
+      ******************************************
+      BOMLEV (  0) IS NOT REACHED. WRNLEV IS  5
+
+            OLD    NEW
+  NSTEP      20     20
+  ILBFRQ     50     40
+   NSTEP =       20    NSAVC =       10    NSAVV =       10
+  ISCALE =        0   ISCVEL =        0   IASORS =        0
+  IASVEL =        1   ICHECW =        1   NTRFRQ =        0
+  IHTFRQ =        0   IEQFRQ =        0   NPRINT =       10
+  INBFRQ =       -1   IHBFRQ =        0   IPRFRQ =       20
+  ILBFRQ =       40   IMGFRQ =        0    ISEED =              314159
+  ISVFRQ =        0   NCYCLE =       20    NSNOS =       10
+  FIRSTT =   100.000  TEMINC =   100.000  TSTRUC =  -999.000
+  FINALT =   300.000  TWINDH =    10.000  TWINDL =   -10.000
+
+  TIME STEP =  2.04548E-02 AKMA       1.00000E-03 PS
+
+ NUMBER OF DEGREES OF FREEDOM =     60
+
+          SEED FOR RANDOM NUMBER GENERATOR IS       314159
+          GAUSSIAN OPTION                  IS            1
+          VELOCITIES ASSIGNED AT TEMPERATURE =    125.0000
+
+     DETAILS ABOUT CENTRE OF MASS
+     POSITION          :   0.10742202      -5.68936620E-02   9.99150560E-03
+     VELOCITY          :  -4.24299022E-03   2.82637112E-02   3.69396882E-02
+     ANGULAR MOMENTUM  :   -5.0804847       -2.2635072       -6.5558955    
+     KINETIC ENERGY    :   0.15724920    
+DYNA DYN: Step         Time      TOTEner        TOTKe       ENERgy  TEMPerature
+DYNA PROP:             GRMS      HFCTote        HFCKe       EHFCor        VIRKe
+DYNA INTERN:          BONDs       ANGLes       UREY-b    DIHEdrals    IMPRopers
+DYNA EXTERN:        VDWaals         ELEC       HBONds          ASP         USER
+DYNA PBEQ:             PBnp       PBelec        GBEnr         GSBP
+DYNA PRESS:            VIRE         VIRI       PRESSE       PRESSI       VOLUme
+ ----------       ---------    ---------    ---------    ---------    ---------
+DYNA>        0      0.00000     31.78575      5.95782     25.82793     99.93707
+DYNA PROP>         25.73135     31.92233      6.36755      0.13658    -70.56667
+DYNA INTERN>        5.12635     22.20114      2.56631      8.65794      3.77958
+DYNA EXTERN>        0.50935    -19.85599      0.00000      0.00000      0.00000
+DYNA PBEQ>         10.60788     -7.76464      0.00000      0.00000
+DYNA PRESS>         6.03088     41.01356      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+DYNA>       10      0.01000     31.82495     20.84850     10.97644    349.71480
+DYNA PROP>         24.32770     31.84395     21.21156      0.01901    -69.51249
+DYNA INTERN>        5.90287      9.56223      0.60150      5.54144      0.56586
+DYNA EXTERN>        2.50691    -16.68100      0.00000      0.00000      0.00000
+DYNA PBEQ>         10.68138     -7.70475      0.00000      0.00000
+DYNA PRESS>         5.54864     40.79302      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+DYNA>       20      0.02000     31.93783     15.58746     16.35037    261.46562
+DYNA PROP>         26.10589     31.94379     15.93676      0.00596    138.84494
+DYNA INTERN>        6.46803     10.40330      1.41887      8.29578      2.76996
+DYNA EXTERN>        0.12591    -15.80521      0.00000      0.00000      0.00000
+DYNA PBEQ>         10.77635     -8.10263      0.00000      0.00000
+DYNA PRESS>         6.94391    -99.50720      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+ DYNAMC> Averages for the last       20  steps:
+AVER DYN: Step         Time      TOTEner        TOTKe       ENERgy  TEMPerature
+AVER PROP:             GRMS      HFCTote        HFCKe       EHFCor        VIRKe
+AVER INTERN:          BONDs       ANGLes       UREY-b    DIHEdrals    IMPRopers
+AVER EXTERN:        VDWaals         ELEC       HBONds          ASP         USER
+AVER PBEQ:             PBnp       PBelec        GBEnr         GSBP
+AVER PRESS:            VIRE         VIRI       PRESSE       PRESSI       VOLUme
+ ----------       ---------    ---------    ---------    ---------    ---------
+AVER>       20      0.02000     31.75244     20.60194     11.15050    345.57896
+AVER PROP>         20.25777     31.84621     20.87441      0.09376    -20.04408
+AVER INTERN>        4.57100     10.04756      1.10092      6.92470      1.66783
+AVER EXTERN>        1.14154    -17.12164      0.00000      0.00000      0.00000
+AVER PBEQ>         10.68721     -7.86862      0.00000      0.00000
+AVER PRESS>         6.06979      7.29293      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+ DYNAMC> RMS fluctuations for the last       20  steps:
+FLUC>       20      0.02000      0.11609      5.54729      5.59412     93.05075
+FLUC PROP>          4.47082      0.08026      5.47680      0.09554     76.60617
+FLUC INTERN>        1.45322      3.94189      0.58179      1.05115      0.94386
+FLUC EXTERN>        0.77914      1.46998      0.00000      0.00000      0.00000
+FLUC PBEQ>          0.06002      0.19038      0.00000      0.00000
+FLUC PRESS>         0.47239     51.51638      0.00000      0.00000      0.00000
+ ----------       ---------    ---------    ---------    ---------    ---------
+
+     DRIFT/STEP (LAST-TOTAL):    1.37337528E-02   1.37337528E-02
+     E AT STEP 0            :     31.702002        31.702002    
+     CORR. COEFFICIENT      :    0.98665871       0.98665871    
+
+     DETAILS ABOUT CENTRE OF MASS
+     POSITION          :   0.10738151      -5.71336388E-02   1.00614545E-02
+     VELOCITY          :  -3.71248370E-04  -1.06312858E-03   4.44638523E-04
+     ANGULAR MOMENTUM  :  -0.34538425       7.96947887E-02  -0.23840681    
+     KINETIC ENERGY    :   1.05663045E-04
+  
+ CHARMM>     
+  
+ CHARMM>    stop
+$$$$$$  New timer profile $$$$$
+   First List                      0.07 Other:            0.00
+      dynamc                          0.00 Other:            0.00
+   Dynamics total                  0.07 Other:            0.07
+   List time                       0.00 Other:            0.00
+         Electrostatic & VDW             0.00 Other:            0.00
+      Nonbond force                   0.01 Other:            0.01
+         Bond energy                     0.00 Other:            0.00
+         Angle energy                    0.00 Other:            0.00
+         Dihedral energy                 0.00 Other:            0.00
+         Restraints energy               0.00 Other:            0.00
+      INTRNL energy                   0.01 Other:            0.01
+   Energy time                    62.41 Other:           62.39
+ Total time                     62.65 Other:            0.10
+
+                    NORMAL TERMINATION BY NORMAL STOP
+                    MAXIMUM STACK SPACE USED IS   47526
+                    STACK CURRENTLY IN USE IS         0
+                    MOST SEVERE WARNING WAS AT LEVEL  1
+                    HEAP PRINTOUT-  HEAP SIZE   2048000
+                    SPACE CURRENTLY IN USE IS         0
+                    MAXIMUM SPACE USED IS          5662
+                    FREE LIST
+            PRINHP> ADDRESS:         1 LENGTH:   2048000 NEXT:         0
+
+                    $$$$$ JOB ACCOUNTING INFORMATION $$$$$
+                     ELAPSED TIME:     1.04  MINUTES 
+                         CPU TIME:     1.04  MINUTES 

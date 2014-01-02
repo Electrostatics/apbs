@@ -1,0 +1,6 @@
+* CHARMM testcase data directory assignment
+* $Id: datadir.def,v 1.2 2005/05/24 04:51:09 rok Exp $
+faster on
+set 0 data/     ! input data directory
+set 9 scratch/  ! scratch directory
+return
