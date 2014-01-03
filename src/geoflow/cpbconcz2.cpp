@@ -271,7 +271,7 @@ GeoflowOutput geoflowSolvation(double xyzr[MAXATOMS][XYZRWIDTH], size_t natm, Ge
     double tott = 0.0;
 std::cout <<"dimensions:\t" << nx <<" "<<ny<<" "<<nz<<std::endl;
 std::cout <<"grid spacing:\t" << dx <<" "<<dy<<" "<<dz<<std::endl;
-    Mat<> phi(nx,ny,nz), phix(nx,ny,nz), phivoc(nx,ny,nz), surfu(nx,ny,nz), eps(nx,ny,nz), bg(nx,ny,nz);
+    Mat<> phi(nx,ny,nz,dx,dy,dz), phix(phi), phivoc(phi), surfu(phi), eps(phi), bg(phi);
     while ((iloop < maxstep) && (diffEnergy > crevalue)) {
         iloop++;
         double deltat = 0; //this is wrong for adi...

@@ -129,7 +129,7 @@ void pbsolver(Mat<>& eps, Mat<>& phi, Mat<>& bgf, double dcel, double tol, int i
     solver.setMaxIterations(iter);
     solver.setTolerance(tol);
 
-    phi_flat = solver.solveWithGuess(bgf.vec, phi_flat);
+    phi_flat = solver.solveWithGuess(bgf.baseInterface(), phi_flat);
 
     for(size_t i=1; i<=nx; ++i){
     for(size_t j=1; j<=ny; ++j){

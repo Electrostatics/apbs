@@ -105,26 +105,16 @@ void domainini(double xyzr[MAXATOMS][XYZRWIDTH], const size_t natm, const double
     comdata.nx = nx; comdata.ny = ny; comdata.nz = nz;
 }
 
-void volumintegration(const double* f, const int& nx, const int& ny, const int& nz, const double& dcel, double& volume){ //FIXME return volume
-    valarray<double> ff(f, nx*ny*nz);//maybe divide before sum to avoid floating pt stuff
-    ff /= 1000.0;
-    ff *= comdata.deltax*comdata.deltay*comdata.deltaz;
-    volume = ff.sum();
-}
-
-
 
 double volumeIntegration(Mat<> f, double dcel){
-    valarray<double> ff(f.data(), f.size());
-    ff /= 1000.0;
-    ff *= comdata.deltax*comdata.deltay*comdata.deltaz;
-    return ff.sum();
+    double sumf = f.baseInterface().sum();
+    return sumf/1000.0*comdata.deltax*comdata.deltay*comdata.deltaz;
 }
 
 void upwinding(double dx, double dt, int nt, Mat<>& g, Mat<>& surfu, Mat<>& phitotx){
     Mat<> surfnew(surfu);
     for(int t=0; t<nt; ++t){ 
-        for(Stencil<double> phi = surfu.stencilBegin(comdata.deltax); phi != surfu.stencilEnd(dx); ++phi){
+        for(Stencil<double> phi = surfu.stencilBegin(); phi != surfu.stencilEnd(); ++phi){
             if(g[phi.i] > 2e-2){
                 surfnew[phi.i] = min(1000.0, max(0.0,
                   *(phi.c) + dt*phi.deriv(phitotx[phi.i])
@@ -220,7 +210,7 @@ void yhsurface(double xyzr[MAXATOMS][XYZRWIDTH], double* ljepsilon, size_t natm,
         atom_r[i] = xyzr[i][3];
     }
 
-    Mat<> su(nx,ny,nz), g(nx,ny,nz);
+    Mat<> su(surfu), g(surfu);
 
     initial(xl,yl,zl, ddx, natm, atom_x,atom_y,atom_z,atom_r, g, su);
     if(iloop > 1 && igfin == 1){ su = surfu; }

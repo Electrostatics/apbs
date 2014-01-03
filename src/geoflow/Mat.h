@@ -55,41 +55,66 @@
 #ifndef MAT_H
 #define MAT_H
 
-#include <valarray>
 #include <vector>
 #include <cmath>
 #include <Eigen/Core>
 
 template<typename T> class Stencil;
 
-template<typename T=double> struct Mat;
-template<typename T> struct Mat{
+template<typename T=double> class Mat;
+template<typename T> class Mat{
     friend class Stencil<T>;
 
-    const size_t _nx,_ny,_nz;
-    size_t nx()const{return _nx;}
-    size_t ny()const{return _ny;}
-    size_t nz()const{return _nz;}
+private:    size_t _nx,_ny,_nz;
+public:     size_t nx()const{return _nx;}
+            size_t ny()const{return _ny;}
+            size_t nz()const{return _nz;}
 
+private:    double _hx,_hy,_hz;
+public:     double hx()const{return _hx;}
+            double hy()const{return _hy;}
+            double hz()const{return _hz;}
+private:
     Eigen::Matrix<T,Eigen::Dynamic,1> vec;
-    Mat(size_t nx, size_t ny, size_t nz=1, T a=0): _nx(nx), _ny(ny), _nz(nz),
-        vec(nx*ny*nz) { vec.fill(a); }
+    
+    Mat();
+
+public:
+    Mat(size_t nx, size_t ny, size_t nz=1, T a=0):
+        _nx(nx), _ny(ny), _nz(nz), _hx(1), _hy(1), _hz(1), vec(nx*ny*nz) { vec.fill(a); }
+    Mat(size_t nx, size_t ny, size_t nz, double hx, double hy, double hz, T a=0):
+        _nx(nx), _ny(ny), _nz(nz), _hx(hx), _hy(hy), _hz(hz), vec(nx*ny*nz) { vec.fill(a); }
+
+    //Mat(const Mat&) default, vec is copyable
 
     ~Mat(){};
 
-    bool operator==(const Mat<T>& rhs) const {
-        return (data() == rhs.data())
-            && (this->_nx == rhs._nx)
-            && (this->_ny == rhs._ny)
-            && (this->_nz == rhs._nz);
+    friend void swap(Mat<T> &a, Mat<T> &b) throw() {
+        using std::swap;
+        a.vec.swap(b.vec);
+        swap(a._nx, b._nx);
+        swap(a._ny, b._ny);
+        swap(a._nz, b._nz);
+        swap(a._hx, b._hx);
+        swap(a._hy, b._hy);
+        swap(a._hz, b._hz);
     }
 
-    size_t index(size_t x, size_t y, size_t z) const { return x-1 + _nx*((y-1) + _ny*(z-1)); }
+    Eigen::Matrix<T,Eigen::Dynamic,1>& baseInterface(){ return vec; }
+    const Eigen::Matrix<T,Eigen::Dynamic,1>& baseInterface() const { return vec; }
+
+    bool equalSize(const Mat<T>& rhs) const
+    { return (this->_nx == rhs._nx) && (this->_ny == rhs._ny) && (this->_nz == rhs._nz); }
+    bool equalSpacing(const Mat<T>& rhs) const
+    { return (this->_hx == rhs._hx) && (this->_hy == rhs._hy) && (this->_hz == rhs._hz); }
+    bool operator==(const Mat<T>& rhs) const
+    { return (data() == rhs.data()) && equalSize(rhs) && equalSpacing(rhs); }
+
     T& operator()(size_t x, size_t y, size_t z=1){ return vec[index(x,y,z)]; }
     T operator()(size_t x, size_t y, size_t z=1) const { return vec[index(x,y,z)]; }
-    
     T& operator[](size_t i){ return vec(i); }
     T operator[](size_t i) const { return vec(i); }
+    size_t index(size_t x, size_t y, size_t z) const { return x-1 + _nx*((y-1) + _ny*(z-1)); }
 
     T* data() {return vec.data();}
     const T* data() const {return vec.data();}
@@ -98,16 +123,18 @@ template<typename T> struct Mat{
     T* end(){return vec.data() + size();}
 
     Mat<T>& operator=(T a){ vec.fill(a); return *this; }
-    Mat<T>& operator=(Mat a){ vec.swap(a.vec); return *this; }
+    Mat<T>& operator=(Mat a){ swap(*this,a); return *this; }
 
-    Stencil<T> stencilBegin(T h) { return Stencil<T>(*this, h, 2,2,2); }
-    Stencil<T> stencilEnd(T h) { return Stencil<T>(*this, h, _nx-1,_ny-1,_nz-1); }
+    Stencil<T> stencilBegin() { return Stencil<T>(*this, 2,2,2); }
+    Stencil<T> stencilEnd() { return Stencil<T>(*this, _nx-1,_ny-1,_nz-1); }
 };
 
 template<typename T> struct Stencil: public std::iterator<std::forward_iterator_tag, T>
 {//this should be a const iterator :)
     Mat<T>& _mat;
-    const T h,halfh,h2,qrth2;
+    const T halfhx,h2x,qrth2x;
+    const T halfhy,h2y,qrth2y;
+    const T halfhz,h2z,qrth2z;
     size_t i;
     const size_t yStep, zStep;
  
@@ -117,9 +144,12 @@ template<typename T> struct Stencil: public std::iterator<std::forward_iterator_
     //Stencil() default
     //Stencil& operator=() default
 
-    Stencil(Mat<T>& mat, T _h, size_t x,size_t y,size_t z): _mat(mat), h(1.0/_h), halfh(1.0/(2*_h)), h2(1./(_h*_h)),
-        qrth2(1.0/(4*_h*_h)), i(_mat.index(x,y,z)), yStep(_mat.nx()), zStep(_mat.nx()*_mat.ny()),
-        c(_mat.data() + i)
+    Stencil(Mat<T>& mat, size_t x,size_t y,size_t z): _mat(mat),
+        halfhx(0.5/mat.hx()), h2x(1./(mat.hx()*mat.hx())), qrth2x(0.25/mat.hx()*mat.hx()),
+        halfhy(0.5/mat.hy()), h2y(1./(mat.hy()*mat.hy())), qrth2y(0.25/mat.hy()*mat.hy()),
+        halfhz(0.5/mat.hz()), h2z(1./(mat.hz()*mat.hz())), qrth2z(0.25/mat.hz()*mat.hz()),
+        i(mat.index(x,y,z)), yStep(mat.nx()), zStep(mat.nx()*mat.ny()),
+        c(mat.data() + i)
     {}
 
     bool operator==(const Stencil<T>& rhs) const { return (this->_mat == rhs._mat) && (this->c == rhs.c); }
@@ -171,28 +201,28 @@ template<typename T> struct Stencil: public std::iterator<std::forward_iterator_
     const T* ym_zp() const { return zp() - yStep; } 
     const T* yp_zm() const { return zm() + yStep; } 
 
-    T dx() const { return halfh*(*xp() - *xm()); }
-    T dy() const { return halfh*(*yp() - *ym()); }
-    T dz() const { return halfh*(*zp() - *zm()); }
+    T dx() const { return halfhx*(*xp() - *xm()); }
+    T dy() const { return halfhy*(*yp() - *ym()); }
+    T dz() const { return halfhz*(*zp() - *zm()); }
 
-    T dxx() const { return h2*(*xp() - 2.0*(*c) + *xm()); }
-    T dyy() const { return h2*(*yp() - 2.0*(*c) + *ym()); }
-    T dzz() const { return h2*(*zp() - 2.0*(*c) + *zm()); }
+    T dxx() const { return h2x*(*xp() - 2.0*(*c) + *xm()); }
+    T dyy() const { return h2y*(*yp() - 2.0*(*c) + *ym()); }
+    T dzz() const { return h2z*(*zp() - 2.0*(*c) + *zm()); }
 
-    T dxy() const { return qrth2*(*xyp() + *xym() - *xm_yp() - *xp_ym()); }
-    T dxz() const { return qrth2*(*xzp() + *xzm() - *xm_zp() - *xp_zm()); }
-    T dyz() const { return qrth2*(*yzp() + *yzm() - *ym_zp() - *yp_zm()); }
+    T dxy() const { return qrth2x*(*xyp() + *xym() - *xm_yp() - *xp_ym()); }
+    T dxz() const { return qrth2y*(*xzp() + *xzm() - *xm_zp() - *xp_zm()); }
+    T dyz() const { return qrth2z*(*yzp() + *yzm() - *ym_zp() - *yp_zm()); }
 
     T deriv(T tx) const {
-        const double dphi =
-            (1.0 + dx()*dx() + dy()*dy())*dzz()
-          + (1.0 + dx()*dx() + dz()*dz())*dyy()
-          + (1.0 + dy()*dy() + dz()*dz())*dxx()
+        double dphi =
+            ( 1.0 + dx()*dx() + dy()*dy() )*dzz()
+          + ( 1.0 + dx()*dx() + dz()*dz() )*dyy()
+          + ( 1.0 + dy()*dy() + dz()*dz() )*dxx()
           - 2.0*( dx()*dy()*dxy() + dx()*dz()*dxz() + dy()*dz()*dyz() );
 
-        const double gram = 1.0 + dx()*dx() + dy()*dy() + dz()*dz();
-        
-        return dphi/gram + sqrt(gram)*tx;
+        double gram = 1.0 + dot(dx(),dy(),dz());
+        double d = dphi/gram + sqrt(gram)*tx;
+        return d;
     }
 
 };
