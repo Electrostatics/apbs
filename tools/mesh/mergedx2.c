@@ -276,6 +276,7 @@ int main(int argc, char **argv) {
 	nx = mgrid->nx;
 	ny = mgrid->ny;
 	nz = mgrid->nz;
+	Vnm_print(1, "%s Verifying and Smoothing...\n", snam);
 	for (i=0; i<nx; i++) {
 		for (j=0; j<ny; j++) {
 			for (k=0; k<nz; k++) {
