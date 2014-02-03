@@ -15,7 +15,7 @@ VEMBED(rcsid="$Id$")
 int main(int argc, char **argv) {
 
   /*** Variables ***/
-  int u, i, j, k, nx, ny, nz;
+  size_t u, i, j, k, nx, ny, nz;
   double avg;
   double hy, hx, hzed, xmin, ymin, zmin;
   Vio *sock;
