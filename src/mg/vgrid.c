@@ -461,7 +461,8 @@ VPUBLIC int Vgrid_readGZ(Vgrid *thee, const char *fname) {
 #ifdef HAVE_ZLIB
     int i, j, k;
     int len; // Temporary counter variable for loop conditionals
-    int q, itmp, u, header, incr;
+    int q, itmp, header, incr;
+    size_t u;
     double *temp;
     double dtmp1, dtmp2, dtmp3;
     gzFile infile;
@@ -819,7 +820,8 @@ VPUBLIC void Vgrid_writeGZ(Vgrid *thee, const char *iodev, const char *iofmt,
     double xmin, ymin, zmin, hx, hy, hzed;
 
     int nx, ny, nz;
-    int icol, i, j, k, u, usepart, nxPART, nyPART, nzPART, gotit;
+    int icol, i, j, k, usepart, nxPART, nyPART, nzPART, gotit;
+    size_t u;
     double x, y, z, xminPART, yminPART, zminPART;
 
     int txyz;
@@ -1011,7 +1013,8 @@ VPUBLIC void Vgrid_writeDX(Vgrid *thee, const char *iodev, const char *iofmt,
 
     double xmin, ymin, zmin, hx, hy, hzed;
     int nx, ny, nz;
-    int icol, i, j, k, u, usepart, nxPART, nyPART, nzPART, gotit;
+    int icol, i, j, k, usepart, nxPART, nyPART, nzPART, gotit;
+    size_t u;
     double x, y, z, xminPART, yminPART, zminPART;
     Vio *sock;
     char precFormat[VMAX_BUFSIZE];
@@ -1259,7 +1262,8 @@ class field\n");
 VPUBLIC void Vgrid_writeUHBD(Vgrid *thee, const char *iodev, const char *iofmt,
   const char *thost, const char *fname, char *title, double *pvec) {
 
-    int icol, i, j, k, u, nx, ny, nz, gotit;
+    int icol, i, j, k, nx, ny, nz, gotit;
+    size_t u;
     double xmin, ymin, zmin, hzed, hy, hx;
     Vio *sock;
 
