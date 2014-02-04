@@ -177,7 +177,8 @@ VPUBLIC void Vgrid_dtor2(Vgrid *thee) {
 /////////////////////////////////////////////////////////////////////////// */
 VPUBLIC int Vgrid_value(Vgrid *thee, double pt[3], double *value) {
 
-    int nx, ny, nz, ihi, jhi, khi, ilo, jlo, klo;
+    int nx, ny, nz;
+    size_t ihi, jhi, khi, ilo, jlo, klo;
     double hx, hy, hzed, xmin, ymin, zmin, ifloat, jfloat, kfloat;
     double xmax, ymax, zmax;
     double u, dx, dy, dz;
@@ -459,10 +460,9 @@ VPUBLIC int Vgrid_gradient(Vgrid *thee, double pt[3], double grad[3]) {
 VPUBLIC int Vgrid_readGZ(Vgrid *thee, const char *fname) {
 
 #ifdef HAVE_ZLIB
-    int i, j, k;
-    int len; // Temporary counter variable for loop conditionals
-    int q, itmp, header, incr;
-    size_t u;
+    size_t i, j, k, u;
+    size_t len; // Temporary counter variable for loop conditionals
+    size_t header, incr;
     double *temp;
     double dtmp1, dtmp2, dtmp3;
     gzFile infile;
@@ -588,11 +588,7 @@ VPUBLIC int Vgrid_readDX(Vgrid *thee,
                          const char *fname
                         ) {
 
-    int i,
-        j,
-        k,
-        itmp,
-        u;
+    size_t i, j, k, itmp, u;
     double dtmp;
     char tok[VMAX_BUFSIZE];
     Vio *sock;
@@ -819,12 +815,12 @@ VPUBLIC void Vgrid_writeGZ(Vgrid *thee, const char *iodev, const char *iofmt,
 #ifdef HAVE_ZLIB
     double xmin, ymin, zmin, hx, hy, hzed;
 
-    int nx, ny, nz;
-    int icol, i, j, k, usepart, nxPART, nyPART, nzPART, gotit;
-    size_t u;
+    int nx, ny, nz, nxPART, nyPART, nzPART;
+    int usepart, gotit;
+    size_t icol, i, j, k, u;
     double x, y, z, xminPART, yminPART, zminPART;
 
-    int txyz;
+    size_t txyz;
     double txmin, tymin, tzmin;
 
     char header[8196];
@@ -1012,9 +1008,9 @@ VPUBLIC void Vgrid_writeDX(Vgrid *thee, const char *iodev, const char *iofmt,
   const char *thost, const char *fname, char *title, double *pvec) {
 
     double xmin, ymin, zmin, hx, hy, hzed;
-    int nx, ny, nz;
-    int icol, i, j, k, usepart, nxPART, nyPART, nzPART, gotit;
-    size_t u;
+    int nx, ny, nz, nxPART, nyPART, nzPART;
+    int usepart, gotit;
+    size_t icol, i, j, k, u;
     double x, y, z, xminPART, yminPART, zminPART;
     Vio *sock;
     char precFormat[VMAX_BUFSIZE];
@@ -1262,8 +1258,8 @@ class field\n");
 VPUBLIC void Vgrid_writeUHBD(Vgrid *thee, const char *iodev, const char *iofmt,
   const char *thost, const char *fname, char *title, double *pvec) {
 
-    int icol, i, j, k, nx, ny, nz, gotit;
-    size_t u;
+    size_t u, icol, i, j, k;
+    size_t gotit, nx, ny, nz;
     double xmin, ymin, zmin, hzed, hy, hx;
     Vio *sock;
 
@@ -1359,7 +1355,8 @@ will have significant overlap.\n");
 
 VPUBLIC double Vgrid_integrate(Vgrid *thee) {
 
-    int i, j, k, nx, ny, nz;
+    size_t i, j, k;
+    int nx, ny, nz;
     double sum, w;
 
     if (thee == VNULL) {
@@ -1396,7 +1393,8 @@ VPUBLIC double Vgrid_integrate(Vgrid *thee) {
 
 VPUBLIC double Vgrid_normL1(Vgrid *thee) {
 
-    int i, j, k, nx, ny, nz;
+    size_t i, j, k;
+    int nx, ny, nz;
     double sum;
 
     if (thee == VNULL) {
@@ -1425,7 +1423,8 @@ VPUBLIC double Vgrid_normL1(Vgrid *thee) {
 
 VPUBLIC double Vgrid_normL2(Vgrid *thee) {
 
-    int i, j, k, nx, ny, nz;
+    size_t i, j, k;
+    int nx, ny, nz;
     double sum;
 
     if (thee == VNULL) {
@@ -1454,7 +1453,8 @@ VPUBLIC double Vgrid_normL2(Vgrid *thee) {
 
 VPUBLIC double Vgrid_seminormH1(Vgrid *thee) {
 
-    int i, j, k, d, nx, ny, nz;
+    size_t i, j, k;
+    int nx, ny, nz, d;
     double pt[3], grad[3], sum, hx, hy, hzed, xmin, ymin, zmin;
 
     if (thee == VNULL) {
@@ -1511,7 +1511,8 @@ VPUBLIC double Vgrid_normH1(Vgrid *thee) {
 
 VPUBLIC double Vgrid_normLinf(Vgrid *thee) {
 
-    int i, j, k, nx, ny, nz, gotval;
+    size_t i, j, k;
+    int nx, ny, nz, gotval;
     double sum, val;
 
     if (thee == VNULL) {
