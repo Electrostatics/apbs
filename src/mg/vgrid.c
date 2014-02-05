@@ -746,7 +746,7 @@ VPUBLIC int Vgrid_readDX(Vgrid *thee,
     VJMPERR1(!strcmp(tok, "items"));
     /* Get # */
     VJMPERR2(1 == Vio_scanf(sock, "%s", tok));
-    VJMPERR1(1 == sscanf(tok, "%d", &itmp));
+    VJMPERR1(1 == sscanf(tok, "%lu", &itmp));
     VJMPERR1(((thee->nx)*(thee->ny)*(thee->nz)) == itmp);
     /* Get "data" */
     VJMPERR2(1 == Vio_scanf(sock, "%s", tok));
@@ -953,7 +953,7 @@ VPUBLIC void Vgrid_writeGZ(Vgrid *thee, const char *iodev, const char *iofmt,
             "delta 0.000000e+00 %12.6e 0.000000e+00\n"		\
             "delta 0.000000e+00 0.000000e+00 %12.6e\n"		\
             "object 2 class gridconnections counts %i %i %i\n"\
-            "object 3 class array type double rank 0 items %i data follows\n",
+            "object 3 class array type double rank 0 items %lu data follows\n",
             PACKAGE_STRING,title,nx,ny,nz,txmin,tymin,tzmin,
             hx,hy,hzed,nx,ny,nz,txyz);
     gzwrite(outfile, header, strlen(header)*sizeof(char));
@@ -1158,7 +1158,7 @@ VPUBLIC void Vgrid_writeDX(Vgrid *thee, const char *iodev, const char *iofmt,
           nxPART, nyPART, nzPART);
 
         /* Write off the DX data */
-        Vio_printf(sock, "object 3 class array type double rank 0 items %d \
+        Vio_printf(sock, "object 3 class array type double rank 0 items %lu \
 data follows\n", (nxPART*nyPART*nzPART));
         icol = 0;
         for (i=0; i<nx; i++) {
@@ -1219,7 +1219,7 @@ class field\n");
           nx, ny, nz);
 
         /* Write off the DX data */
-        Vio_printf(sock, "object 3 class array type double rank 0 items %d \
+        Vio_printf(sock, "object 3 class array type double rank 0 items %lu \
 data follows\n", (nx*ny*nz));
         icol = 0;
         for (i=0; i<nx; i++) {
