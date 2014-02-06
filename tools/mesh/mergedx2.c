@@ -312,7 +312,7 @@ int main(int argc, char **argv) {
 /////////////////////////////////////////////////////////////////////////// */
 VPUBLIC int Vgrid_value2(Vgrid *thee, double pt[3], double *value) {
 
-	int nx, ny, nz, ihi, jhi, khi, ilo, jlo, klo;
+	size_t nx, ny, nz, ihi, jhi, khi, ilo, jlo, klo;
 	double hx, hy, hzed, xmin, ymin, zmin, ifloat, jfloat, kfloat;
 	double u, dx, dy, dz;
 
