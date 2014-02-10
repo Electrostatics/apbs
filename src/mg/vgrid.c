@@ -747,7 +747,8 @@ VPUBLIC int Vgrid_readDX(Vgrid *thee,
     /* Get # */
     VJMPERR2(1 == Vio_scanf(sock, "%s", tok));
     VJMPERR1(1 == sscanf(tok, "%lu", &itmp));
-    VJMPERR1(((thee->nx)*(thee->ny)*(thee->nz)) == itmp);
+    u = (size_t)thee->nx * thee->ny * thee->nz;
+    VJMPERR1(u == itmp);
     /* Get "data" */
     VJMPERR2(1 == Vio_scanf(sock, "%s", tok));
     VJMPERR1(!strcmp(tok, "data"));
@@ -759,8 +760,7 @@ VPUBLIC int Vgrid_readDX(Vgrid *thee,
     Vnm_print(0, "Vgrid_readDX:  allocating %d x %d x %d doubles for storage\n",
       thee->nx, thee->ny, thee->nz);
     thee->data = VNULL;
-    thee->data = (double*)Vmem_malloc(thee->mem, (thee->nx)*(thee->ny)*(thee->nz),
-      sizeof(double));
+    thee->data = (double*)Vmem_malloc(thee->mem, u, sizeof(double));
     if (thee->data == VNULL) {
         Vnm_print(2, "Vgrid_readDX:  Unable to allocate space for data!\n");
         return 0;

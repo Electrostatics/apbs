@@ -334,16 +334,15 @@ VPUBLIC int Vgrid_value2(Vgrid *thee, double pt[3], double *value) {
 	ifloat = (pt[0] - xmin)/hx;
 	jfloat = (pt[1] - ymin)/hy;
 	kfloat = (pt[2] - zmin)/hzed;
-	ihi = (int)ceil(ifloat);
-	jhi = (int)ceil(jfloat);
-	khi = (int)ceil(kfloat);
-	ilo = (int)floor(ifloat);
-	jlo = (int)floor(jfloat);
-	klo = (int)floor(kfloat);
+	ihi = (size_t)ceil(ifloat);
+	jhi = (size_t)ceil(jfloat);
+	khi = (size_t)ceil(kfloat);
+	ilo = (size_t)(floor(ifloat) < 0 ? 0 : floor(ifloat));
+	jlo = (size_t)(floor(jfloat) < 0 ? 0 : floor(jfloat));
+	klo = (size_t)(floor(kfloat) < 0 ? 0 : floor(kfloat));
 
 	/* If the point is outside the mesh, push it to the mesh */
-	if ( ilo < 0 ) {
-		ilo = 0;
+	if ( ilo == 0 ) {
 		ihi = ilo + 1;
 		ifloat = (double)(ilo);
 	} else if ( ihi >= nx ) {
@@ -351,8 +350,7 @@ VPUBLIC int Vgrid_value2(Vgrid *thee, double pt[3], double *value) {
 		ilo = ihi - 1;
 		ifloat = (double)(ihi);
 	}
-	if ( jlo < 0 ) {
-		jlo = 0;
+	if ( jlo == 0 ) {
 		jhi = jlo + 1;
 		jfloat = (double)(jlo);
 	} else if ( jhi >= ny ) {
@@ -360,8 +358,7 @@ VPUBLIC int Vgrid_value2(Vgrid *thee, double pt[3], double *value) {
 		jlo = jhi - 1;
 		jfloat = (double)(jhi);
 	}
-	if ( klo < 0 ) {
-		klo = 0;
+	if ( klo == 0 ) {
 		khi = klo + 1;
 		kfloat = (double)(klo);
 	} else if ( khi >= nz ) {
