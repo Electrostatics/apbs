@@ -547,7 +547,7 @@ VPUBLIC void Vprtstp(int iok, int iters,
 
 
 
-VPUBLIC void Vpackmg(int *iparm, double *rparm, int *nrwk, int *niwk,
+VPUBLIC void Vpackmg(int *iparm, double *rparm, size_t *nrwk, int *niwk,
         int *nx, int *ny, int *nz, int *nlev, int *nu1, int *nu2, int *mgkey,
         int *itmax, int *istop, int *ipcon, int *nonlin, int *mgsmoo, int *mgprol,
         int *mgcoar, int *mgsolv, int *mgdisc, int *iinfo, double *errtol,
