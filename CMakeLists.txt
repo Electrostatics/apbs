@@ -178,6 +178,7 @@ endif()
 
 option(ENABLE_BEM "Boundary element method using TABIPB" ON)
 if(ENABLE_BEM)
+    add_definitions(-DENABLE_BEM)
     set(TABI tabipb)
     set(TABI_PATH ${CONTRIB_PATH}/tabipb)
     ExternalProject_add(
@@ -210,7 +211,7 @@ if(ENABLE_BEM)
     get_filename_component(LIBGFORTRANPATH ${LIBGFORTRANPATH} PATH)
     find_path(LIBGFORTRAN_PATH ${LIBGFORTRAN_NAME} PATH ${LIBGFORTRANPATH})
     list(APPEND APBS_LIBS "-L${APBS_ROOT}/${LIBRARY_INSTALL_PATH} -L${LIBGFORTRAN_PATH} -lgfortran -ltabipb" )
-endif()
+endif() # ENABLE_BEM
 
 find_file( # this should be find path...
     FETK_PATH

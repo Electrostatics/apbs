@@ -4768,7 +4768,7 @@ VPUBLIC int forceAPOL(Vacc *acc,
 }
 
 
-
+#ifdef ENABLE_BEM
 /**
  * Initialize a boundary element calculation.
  */
@@ -4926,7 +4926,7 @@ VPUBLIC int writematBEM(int rank, NOsh *nosh, PBEparm *pbeparm) {
     return 1;
 }
 
-
+#endif
 
 /**
  * Initialize a geometric flow calculation.
