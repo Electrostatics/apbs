@@ -284,9 +284,10 @@ VPUBLIC int Vpmg_ctor2(Vpmg *thee, Vpmgp *pmgp, Vpbe *pbe, int focusFlag,
     }
 
     /* Allocate partition vector storage */
+    size_t size = (thee->pmgp->nx)*(thee->pmgp->ny)*(thee->pmgp->nz);
     thee->pvec = (double *)Vmem_malloc(
         thee->vmem,
-        (thee->pmgp->nx)*(thee->pmgp->ny)*(thee->pmgp->nz),
+        size,
         sizeof(double)
         );
 
