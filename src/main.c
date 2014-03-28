@@ -90,7 +90,9 @@ int main(
 
     MGparm *mgparm = VNULL;
     FEMparm *feparm = VNULL;
+#ifdef ENABLE_BEM
     BEMparm *bemparm = VNULL;
+#endif
     GEOFLOWparm *geoflowparm = VNULL;
     PBEparm *pbeparm = VNULL;
     APOLparm *apolparm = VNULL;
@@ -640,7 +642,7 @@ int main(
                     VJMPERR1(0);
                 }
                 break;
-
+#ifdef ENABLE_BEM
  		/* Boundary Element (tabi) */
             case NCT_BEM:
                 /* What is this?  This seems like a very awkward way to find
@@ -703,7 +705,7 @@ int main(
                 fflush(stderr);
 
                 break;
-
+#endif
  		/* geometric flow */
             case NCT_GEOFLOW:
                 /* What is this?  This seems like a very awkward way to find

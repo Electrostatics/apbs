@@ -695,6 +695,7 @@ VEXTERNC void killMeshes(
 
 VEXTERNC void printMGPARM(MGparm *mgparm, double realCenter[3]);
 
+#ifdef ENABLE_BEM
 /**
  * @brief  Initialize an BEM calculation
  * @ingroup  Frontend
@@ -800,7 +801,7 @@ VEXTERNC int writedataBEM(int rank, NOsh *nosh, PBEparm *pbeparm);
  * @param pbem  BEM object
  * @return  1 if successful, 0 otherwise */
 VEXTERNC int writematBEM(int rank, NOsh *nosh, PBEparm *pbeparm);
-
+#endif
 
 /**
  * @brief  Initialize an GEOFLOW calculation
