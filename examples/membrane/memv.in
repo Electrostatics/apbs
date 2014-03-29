@@ -1,0 +1,34 @@
+read
+mol pqr "pot.pqr"
+end
+
+elec name foo
+mg-manual
+dime 33 33 33
+glen 300 300 300
+lpbe
+pdie 5
+sdie 80
+bcfl mem
+ion 1.0 0.1 2.0
+ion -1.0 0.1 2.0
+gcent 0 0 0
+mol 1
+chgm spl2
+srfm mol
+srad 1.4
+swin 0.3
+sdens 10.0
+temp 298.15
+calcenergy comps
+calcforce no
+zmem -10
+lmem 20
+mdie 2.0
+memv -2.0
+end
+
+print elecEnergy foo
+end
+
+quit

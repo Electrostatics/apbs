@@ -456,8 +456,8 @@ function\n", thee->maxIonRadius);
     thee->membraneDiel = membraneDiel;
     thee->V = V;
 
-    //    if (V != VNULL) thee->param2Flag = 1;
-    //    else thee->param2Flag = 0;
+       if (V != 0.0) thee->param2Flag = 1;
+       else thee->param2Flag = 0;
 
     /*-----------------------------------------------------------*/
 
