@@ -283,7 +283,7 @@ VPUBLIC void Vpmgp_size(
     thee->n_rpc = 100*(thee->nlev+1);
 
     /* Resulting total required for real storage */
-    thee->nrwk = num_narr*thee->narr + (num_nf + num_nf_oper)*thee->nf + (num_narrc + num_narrc_oper)*thee->narrc + n_band + thee->n_rpc;
+    thee->nrwk = num_narr*thee->narr + (size_t)(num_nf + num_nf_oper)*thee->nf + (size_t)(num_narrc + num_narrc_oper)*thee->narrc + n_band + thee->n_rpc;
 
     /* Integer storage parameters */
     thee->n_iz = 50*(thee->nlev+1);

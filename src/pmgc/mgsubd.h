@@ -280,7 +280,7 @@ VEXTERNC void Vprtstp(
 VEXTERNC void Vpackmg(
         int *iparm,
         double *rparm,
-        int *nrwk,
+        size_t *nrwk,
         int *niwk,
         int *nx,
         int *ny,
