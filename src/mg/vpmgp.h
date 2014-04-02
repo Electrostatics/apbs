@@ -103,7 +103,7 @@ struct sVpmgp {
     int n_iz;  /**< Integer storage parameter (index max) */
     int n_ipc;  /**< Integer info work array required storage */
 
-    int nrwk;  /**< Real work storage */
+    size_t nrwk;  /**< Real work storage */
     int niwk;  /**< Integer work storage */
     int narr;  /**< Array work storage */
     int ipkey;  /**< Toggles nonlinearity (set by nonlin)
