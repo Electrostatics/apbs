@@ -4,7 +4,6 @@
  *  @author  Robert Konecny
  *  @brief   Header file for the main iAPBS driver
  *
- *  @version $Id: apbs_driver.h 389 2010-03-29 20:18:15Z rok $
  *
  */
 

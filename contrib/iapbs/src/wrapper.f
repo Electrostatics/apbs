@@ -2,7 +2,6 @@
 c
 c apbs interface
 c
-c $Id: wrapper.f 556 2012-01-10 03:03:33Z rok $
 c
 c simple reference Fortran code
 c this shows how to call iapbs library from a fortran application
@@ -12,7 +11,7 @@ c
       implicit none
       integer rc, apbsdrv, natom, i, j, loop
       character*80 rcsid, finput, pqr
-      data rcsid /'$Id: wrapper.f 556 2012-01-10 03:03:33Z rok $'/
+      data rcsid /'$Id: wrapper.f rok $'/
 
 c      integer MAXAIM
 c      parameter (MAXAIM = 150000)

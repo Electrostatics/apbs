@@ -10,8 +10,6 @@
  *  @author Justin Gullingsrud and Robert Konecny
  *  @brief NAMD/APBS module header file
  *
- *  $Revision: 265 $
- *  $Id: GlobalMasterAPBS.h 265 2009-05-05 04:21:00Z rok $
  *
  */
 

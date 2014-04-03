@@ -1,4 +1,3 @@
-! $Id: apbs.f90 554 2012-01-10 02:45:26Z rok $
 !
 ! This is iAPBS/sander module for performing APBS calculations in sander.
 !

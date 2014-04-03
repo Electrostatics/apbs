@@ -1,4 +1,3 @@
-! $Id: apbs_vars.f90 549 2011-12-08 21:21:18Z rok $
 !
 #include "../include/dprec.fh"
 
@@ -20,7 +19,7 @@ use file_io_dat, only : MAX_FN_LEN
 ! max number of counterions
   INTEGER, PARAMETER :: MAXION = 10
 ! static dimensions (for now) rokFIXME
-  INTEGER, PARAMETER :: APBSNATOMS = 10000
+  INTEGER, PARAMETER :: APBSNATOMS = 500000
 
 !-----------------------------------------------------------------------
 !     int ispara;            : 1 => is a parallel calculation,
