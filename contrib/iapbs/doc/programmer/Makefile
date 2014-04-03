@@ -1,5 +1,4 @@
 #
-# $Id: Makefile,v 1.2 2005/05/24 04:48:53 rok Exp $
 #
 
 include ../../etc/iapbs-version.mk

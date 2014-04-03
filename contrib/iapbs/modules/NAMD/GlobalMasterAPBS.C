@@ -11,8 +11,6 @@
  *  @brief NAMD/APBS module
  *  @note Energy is returned in kcal/mol, forces in  kcal/(mol/A).
  *
- *  $Revision: 555 $
- *  $Id: GlobalMasterAPBS.C 555 2012-01-10 02:51:36Z rok $
  *
  */
 

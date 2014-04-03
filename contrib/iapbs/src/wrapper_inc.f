@@ -1,8 +1,3 @@
-c
-c $Id: wrapper_inc.f 554 2012-01-10 02:45:26Z rok $
-c
-
-
 c-----------------------------------------------------------------------
 c
 c                 iAPBS variables definition
@@ -20,7 +15,7 @@ c      INTEGER(kind=4) NPROC,MPIINFO4,MPICOMM4,ME4,MPISELF,MPIERRS(1)
 c      INTEGER(kind=4) ME,NP,MPIDP,MEROOT,IONE,IERR
 
       integer :: MAXION, NATOMS
-      parameter (MAXION = 10, NATOMS = 1000)
+      parameter (MAXION = 10, NATOMS = 50000)
 
 c-----------------------------------------------------------------------
 c     int ispara;          /**< 1 => is a parallel calculation,

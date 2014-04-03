@@ -5,8 +5,6 @@
  *  @brief  The main iAPBS driver code
  *  @note   Energy is returned in kJ/mol, forces in  kJ/(mol/A).
  *
- *  $Revision: 556 $
- *  $Id: apbs_driver.c 556 2012-01-10 03:03:33Z rok $
  *
  */
   
@@ -26,7 +24,7 @@
 */
 #define MAX_BUF_SIZE 4096
 
-VEMBED(rcsid="$Id: apbs_driver.c 556 2012-01-10 03:03:33Z rok $")
+VEMBED(rcsid="$Id: apbs_driver.c rok $")
 
 /**
  * @brief  Wrapper iAPBS function

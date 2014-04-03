@@ -1,7 +1,6 @@
-CHARMM Element source/misc/apbs.src $Revision: 554 $
+CHARMM Element source/misc/apbs.src
       SUBROUTINE APBS
 c
-c $Id: apbs.f 554 2012-01-10 02:45:26Z rok $
 c
 c APBS module for CHARMM/APBS integration
 c
@@ -72,7 +71,7 @@ c local variables
       double precision apbsgrid_meta(13), apbsgrid(3*NATOM)
 
 c      character*80 rcsid
-c      data rcsid /'$Id: apbs.f 554 2012-01-10 02:45:26Z rok $'/
+c      data rcsid /'$Id: apbs.f rok $'/
 c-----------------------------------------------------------------
       INTEGER ISLCT, lstpbi, ntpbi
 C Local variables
@@ -1069,4 +1068,4 @@ c endif section for napbs/icall comparison
       RETURN
       END
 
-c $Id: apbs.f 554 2012-01-10 02:45:26Z rok $
+c $Id: apbs.f rok $

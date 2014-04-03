@@ -1,7 +1,6 @@
-CHARMM Element source/fcm/apbs.fcm $Revision: 266 $
+CHARMM Element source/fcm/apbs.fcm
 ##IF APBS (apbs_fcm)
 c
-c $Id: apbs_fcm.f 266 2009-05-05 04:47:57Z rok $
 c
 
 
