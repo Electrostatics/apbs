@@ -81,7 +81,7 @@ void usage(){
 int main(int argc, char **argv) {
 
 	/* *************** VARIABLES ******************* */
-	size_t i, j, k;
+	size_t i, j, k, mem_size;
 	int spec,warn;
 	int nx, ny, nz, count, numfnams;
 
@@ -215,7 +215,7 @@ int main(int argc, char **argv) {
 
 	if(spec) return 0;
 
-	size_t mem_size = (size_t)mgrid->nx * mgrid->ny * mgrid->nz;
+	mem_size = (size_t)mgrid->nx * mgrid->ny * mgrid->nz;
 	mgrid->data = (double *) Vmem_malloc(mgrid->mem, mem_size, sizeof(double));
 	mgrid->ctordata = 1;
 

@@ -281,7 +281,12 @@ std::cout <<"grid spacing:\t" << dx <<" "<<dy<<" "<<dz<<std::endl;
         if (ipath == 0) /* will always be true, but this is how
                   * it was in the original F90 code.  
                   * TODO: rewrite this to remove the ipath variable (?) */ {
-            tott = fmax(tottf - iloop + 1, 1.0);
+			double totnow = tottf - iloop + 1;
+			if (totnow > 1.0) {
+				tott = totnow;
+			} else {
+				tott = 1.0;
+			}
         } else {
             if (iloop == 1) {
                 tott = tottf;
@@ -338,9 +343,15 @@ std::cout <<"grid spacing:\t" << dx <<" "<<dy<<" "<<dz<<std::endl;
     double nonpolarSolvation = sumpot*gama;
     double totalSolvation = nonpolarSolvation + elec;
 
-    return (GeoflowOutput) {
-        area, volume, attint, sumpot, totalSolvation, nonpolarSolvation, elec
-    };
+	GeoflowOutput gfOut;
+	gfOut.area = area;
+	gfOut.volume = volume;
+	gfOut.attint = attint;
+	gfOut.sumpot = sumpot;
+	gfOut.totalSolvation = totalSolvation;
+	gfOut.nonpolarSolvation = nonpolarSolvation;
+	gfOut.elecSolvation = elec;
+	return gfOut;
 }
 
 void
@@ -358,34 +369,34 @@ processAtomsFile(std::string fileName, int ffmodel, int radexp, double extvalue,
         size_t natm = loadData(f, imord, ffmodel, radexp, expv, xyzr, pqr, ljepsilon);
 
        double dcel3[3] = {0.25,0.25,0.25}; 
-        GeoflowInput gfin = (GeoflowInput){
-            dcel3,
-            ffmodel,
-           	extvalue,
-           	pqr,
-           	maxstep,
-           	crevalue,
-           	iadi,
-           	tottf,
-           	ljepsilon,
-           	alpha,
-           	igfin,
-           	epsilons,
-           	epsilonp,
-            0,//idascl
-           	tol,
-           	iterf,
-           	tpb,
-           	itert,
-           	pres,
-           	gama,
-           	tauval,
-           	prob,
-           	vdwdispersion,
-           	sigmas,
-           	density,
-           	epsilonw};
-        GeoflowOutput gf = geoflowSolvation(xyzr, natm, gfin);
+       GeoflowInput gfin;
+	   gfin.dcel = dcel3;
+	   gfin.ffmodel = ffmodel;
+	   gfin.extvalue = extvalue;
+	   gfin.pqr = pqr;
+	   gfin.maxstep = maxstep;
+	   gfin.crevalue = crevalue;
+	   gfin.iadi = iadi;
+	   gfin.tottf = tottf;
+	   gfin.ljepsilon = ljepsilon;
+	   gfin.alpha = alpha;
+	   gfin.igfin = igfin;
+	   gfin.epsilons = epsilons;
+	   gfin.epsilonp = epsilonp;
+	   gfin.idacsl = 0;
+	   gfin.tol = tol;
+	   gfin.iterf = iterf;
+	   gfin.tpb = tpb;
+	   gfin.itert = itert;
+	   gfin.pres = pres;
+	   gfin.gama = gama;
+	   gfin.tauval = tauval;
+	   gfin.prob = prob;
+	   gfin.vdwdispersion = vdwdispersion;
+	   gfin.sigmas = sigmas;
+	   gfin.density = density;
+	   gfin.epsilonw = epsilonw;
+       GeoflowOutput gf = geoflowSolvation(xyzr, natm, gfin);
 
         std::cout << "totalSolv:\t" << gf.totalSolvation << "\t";
         std::cout << "nonpolar: " << gf.nonpolarSolvation << "\t";

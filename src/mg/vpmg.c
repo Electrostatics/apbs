@@ -156,6 +156,7 @@ VPUBLIC int Vpmg_ctor2(Vpmg *thee, Vpmgp *pmgp, Vpbe *pbe, int focusFlag,
     int i, j, nion;
     double ionConc[MAXION], ionQ[MAXION], ionRadii[MAXION], zkappa2, zks2;
     double ionstr, partMin[3], partMax[3];
+	size_t size;
 
     /* Get the parameters */
     VASSERT(pmgp != VNULL);
@@ -284,7 +285,7 @@ VPUBLIC int Vpmg_ctor2(Vpmg *thee, Vpmgp *pmgp, Vpbe *pbe, int focusFlag,
     }
 
     /* Allocate partition vector storage */
-    size_t size = (thee->pmgp->nx)*(thee->pmgp->ny)*(thee->pmgp->nz);
+    size = (thee->pmgp->nx)*(thee->pmgp->ny)*(thee->pmgp->nz);
     thee->pvec = (double *)Vmem_malloc(
         thee->vmem,
         size,
@@ -897,7 +898,7 @@ VPUBLIC int Vpmg_fillArray(Vpmg *thee, double *vec, Vdata_Type type,
     Vatom *atoms = VNULL;
     Valist *alist = VNULL;
     double position[3], hx, hy, hzed, xmin, ymin, zmin;
-    double grad[3], eps, epsp, epss, zmagic;
+    double grad[3], eps, epsp, epss, zmagic, u;
     int i, j, k, l, nx, ny, nz, ichop;
 
     pbe = thee->pbe;
@@ -1091,7 +1092,7 @@ VPUBLIC int Vpmg_fillArray(Vpmg *thee, double *vec, Vdata_Type type,
                         position[1] = j*hy + ymin;
                         position[2] = k*hzed + zmin;
                         vec[IJK(i,j,k)] = 0.0;
-                        double u = thee->u[IJK(i,j,k)];
+                        u = thee->u[IJK(i,j,k)];
                         if ( VABS(Vacc_ivdwAcc(acc,
                                 position, pbe->maxIonRadius) - 1.0) < VSMALL) {
                             for (l=0; l<pbe->numIon; l++) {
@@ -1117,7 +1118,7 @@ VPUBLIC int Vpmg_fillArray(Vpmg *thee, double *vec, Vdata_Type type,
                 position[1] = j*hy + ymin;
                 position[2] = k*hzed + zmin;
                 vec[IJK(i,j,k)] = 0.0;
-                double u = thee->u[IJK(i,j,k)];
+                u = thee->u[IJK(i,j,k)];
                 if ( VABS(Vacc_ivdwAcc(acc,
                                 position, pbe->maxIonRadius) - 1.0) < VSMALL) {
                     for (l=0; l<pbe->numIon; l++) {

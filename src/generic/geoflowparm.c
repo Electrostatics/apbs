@@ -167,11 +167,12 @@ Vrc_Codes parseNonNeg(double* tf, double def, int* set, char* name, Vio* sock){
 VPRIVATE Vrc_Codes GEOFLOWparm_parseVDW(GEOFLOWparm *thee, Vio *sock){
     const char* name = "vdw";
     char tok[VMAX_BUFSIZE];
+	int tf;
     if(Vio_scanf(sock, "%s", tok) == 0) {
         return FUBAR(name);
     }
 
-    int tf;
+
     if (sscanf(tok, "%u", &tf) == 0){
         Vnm_print(2, "NOsh:  Read non-unsigned int (%s) while parsing %s keyword!\n", tok, name);
         return VRC_WARNING;
