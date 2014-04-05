@@ -4960,29 +4960,35 @@ VPUBLIC void killGEOFLOW(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC]
 }
 
 VPUBLIC int solveGEOFLOW(Valist* molecules[NOSH_MAXMOL], NOsh *nosh, PBEparm *pbeparm, APOLparm *apolparm, GEOFLOWparm *parm, GEOFLOWparm_CalcType type) {
+	int natm, m, a, i;
+    double xyzr[MAXATOMS][XYZRWIDTH];
+    double pqr[MAXATOMS];
+	double *pos;
+	Vatom *atom;
+	GeoflowInput gfin;
+	GeoflowOutput gf;
+
     if (nosh != VNULL) {
         if (nosh->bogus) return 1;
     }
 
     Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
     
-    int natm = 0;
-    for(int m=0; m < nosh->nmol; ++m){
+    natm = 0;
+    for (m=0; m < nosh->nmol; ++m){
         natm += Valist_getNumberAtoms(molecules[m]);
     }
 
-//    double *xyzr, *pqr;
-//    xyzr = (double*) malloc(natm*4 * sizeof(double));
-//    pqr = (double*) malloc(natm * sizeof(double));
-    double xyzr[MAXATOMS][XYZRWIDTH];
-    double pqr[MAXATOMS];
+	/* double *xyzr, *pqr;
+	xyzr = (double*) malloc(natm*4 * sizeof(double));
+    pqr = (double*) malloc(natm * sizeof(double)); */
 
-    Vatom *atom = VNULL;
-    for(int m=0; m < nosh->nmol; ++m){
-    for(int a=0; a < Valist_getNumberAtoms(molecules[m]); ++a){
+    atom = VNULL;
+    for(m=0; m < nosh->nmol; ++m){
+    for(a=0; a < Valist_getNumberAtoms(molecules[m]); ++a){
         atom = Valist_getAtom(molecules[m], a);
-        int i = m*(nosh->nmol) + a;
-        double *pos = Vatom_getPosition(atom);
+        i = m*(nosh->nmol) + a;
+        pos = Vatom_getPosition(atom);
         xyzr[i][0] = pos[0];
         xyzr[i][1] = pos[1];
         xyzr[i][2] = pos[2];
@@ -4990,35 +4996,33 @@ VPUBLIC int solveGEOFLOW(Valist* molecules[NOSH_MAXMOL], NOsh *nosh, PBEparm *pb
         pqr[i] = Vatom_getCharge(atom);
     }}
 
-    GeoflowInput gfin = (GeoflowInput){
-         apolparm->grid,     // dcel
-         1,        // ffmodel
-         1.90,     // extvalue
-         pqr,           
-         20,       // MAXSTEP
-         0.01,     // CREVALUE
-         0,        // iadi
-         3.5,      // TOTTF
-         NULL,     // ljepsilon, unused for ffmodel == 1, which is all for now
-         0.50,     // ALPHA
-         1,        // igfin,
-         pbeparm->sdie,    // EPSILONS
-         pbeparm->pdie,     // EPSILONP
-         0,        // idacsl
-         1e-5,     // TOL
-         0,        // iterf
-         0.0,      // tpb
-         0,        // itert
-         apolparm->press,     // pres
-         apolparm->gamma,     // gama
-         1.4,     // tauval unused???
-         0.0,                // prob
-         parm->vdw,        // vdwdispersion
-         1.5828,            // sigmas
-         apolparm->bconc,  // density
-         0.1554          // epsilonw
-    };
-    GeoflowOutput gf =  geoflowSolvation(xyzr, natm, gfin);
+	gfin.dcel = apolparm->grid;
+	gfin.ffmodel = 1;
+	gfin.extvalue = 1.90;
+	gfin.pqr = pqr;
+	gfin.maxstep = 20;
+	gfin.crevalue = 0.01;
+	gfin.iadi = 0;
+	gfin.tottf = 3.5;
+	gfin.ljepsilon = NULL;
+	gfin.alpha = 0.50;
+	gfin.igfin = 1;
+	gfin.epsilons = pbeparm->sdie;
+	gfin.epsilonp = pbeparm->pdie;
+	gfin.idacsl = 0;
+	gfin.tol = 1.0e-5;
+	gfin.iterf = 0;
+	gfin.tpb = 0.0;
+	gfin.itert = 0;
+	gfin.pres = apolparm->press;
+	gfin.gama = apolparm->gamma;
+	gfin.tauval = 1.4;
+	gfin.prob = 0.0;
+	gfin.vdwdispersion = parm->vdw;
+	gfin.sigmas = 1.5828;
+	gfin.density = apolparm->bconc;
+	gfin.epsilonw = 0.1554;
+    gf =  geoflowSolvation(xyzr, natm, gfin);
 
     Vnm_tprint( 1,"  Global net energy = %1.12E\n", gf.totalSolvation);
     Vnm_tprint( 1,"  Global net ELEC energy = %1.12E\n", gf.elecSolvation);
