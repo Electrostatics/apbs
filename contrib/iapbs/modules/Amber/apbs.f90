@@ -426,7 +426,7 @@ CONTAINS
     END IF
 
 !   WRITE(6,*) 'Number of grid points for grid-based discretization:', dime
-   WRITE(6,'(a, 3i6)') 'Grid dimension:', dime(1), dime(2), dime(3)
+   WRITE(6,'(a, 3i4)') 'Grid dimension:', dime(1), dime(2), dime(3)
    IF (cglen(1) > 0.) THEN
       WRITE(6,'(a, 3f8.3, a)') 'Coarse grid lengths:', &
            cglen(1), cglen(2), cglen(3), ' A'
