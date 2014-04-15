@@ -185,7 +185,7 @@ CONTAINS
     _REAL_, INTENT(in) :: x(3*natom), cg(natom), radii(natom)
 
     ! local variables
-    INTEGER :: i, j, dummyi, ios, numline=0
+    INTEGER :: i, j, dummyi, ios, numline=0, error
     CHARACTER :: dummyc
     CHARACTER (len = 128) string
     _REAL_ :: dummyr,  maxx, minx, maxy, miny, maxz, minz
@@ -194,6 +194,12 @@ CONTAINS
 
     WRITE(6, '(a)') 'iAPBS: Initializing APBS interface'
 
+    ALLOCATE(pbradii(natom), pbcg(natom), stat=error)
+    IF (error .NE. 0) THEN
+       WRITE(6, '(a)') 'iAPBS: pbradii/pbcg memory allocation failed!'
+       WRITE(6, '(a)') 'iAPBS: Exiting ...'
+       CALL mexit(6,1)
+    ENDIF
 
 ! possible additions:
 ! - call pb_aaradi() (from sa_driver.f)
@@ -282,7 +288,7 @@ CONTAINS
     IF (apbs_print > 1) THEN
        WRITE(6, '(a)') 'iAPBS: natom, x, y, z, PB charge, PB radius'
        DO i = 1, natom
-          WRITE(6, '(i4, 5f8.3)') i, cx(i), cy(i), cz(i), pbcg(i), pbradii(i)
+          WRITE(6, '(i6, 5f8.3)') i, cx(i), cy(i), cz(i), pbcg(i), pbradii(i)
        END DO
        WRITE(6,'()')
     END IF
@@ -338,7 +344,7 @@ CONTAINS
        WRITE(6, '(a)') 'iAPBS: Grid values: '
        WRITE(6, '(a, 3f8.3)') 'iAPBS: fglen: ', fglen(1), fglen(2), fglen(3)
        WRITE(6, '(a, 3f8.3)') 'iAPBS: cglen: ', cglen(1), cglen(2), cglen(3)
-       WRITE(6, '(a, 3i4)')   'iAPBS: dime: ', dime(1), dime(2), dime(3)
+       WRITE(6, '(a, 3i6)')   'iAPBS: dime: ', dime(1), dime(2), dime(3)
        WRITE(6, '(a, 3f8.3)') 'iAPBS: grid: ', grid(1), grid(2), grid(3)
        
        WRITE(6, '(a, f10.3)') 'iAPBS: Required memory (in MB): ', &
@@ -420,7 +426,7 @@ CONTAINS
     END IF
 
 !   WRITE(6,*) 'Number of grid points for grid-based discretization:', dime
-   WRITE(6,'(a, 3i4)') 'Grid dimension:', dime(1), dime(2), dime(3)
+   WRITE(6,'(a, 3i6)') 'Grid dimension:', dime(1), dime(2), dime(3)
    IF (cglen(1) > 0.) THEN
       WRITE(6,'(a, 3f8.3, a)') 'Coarse grid lengths:', &
            cglen(1), cglen(2), cglen(3), ' A'
@@ -597,7 +603,7 @@ CONTAINS
     IF (apbs_debug > 5) THEN
        WRITE(6,  '(a)') 'iAPBS: unpacked coordinates, charge and radius:'
        DO i = 1, natom
-          WRITE(6, '(i4, 5f8.3)') i, cx(i), cy(i), cz(i), &
+          WRITE(6, '(i6, 5f8.3)') i, cx(i), cy(i), cz(i), &
                pbcg(i), pbradii(i)
        END DO
     END IF
@@ -648,7 +654,7 @@ CONTAINS
           WRITE(6, '(a)') 'iAPBS: New grid values: '
           WRITE(6, '(a, 3f8.3)') 'fglen: ', fglen(1), fglen(2), fglen(3)
           WRITE(6, '(a, 3f8.3)') 'cglen: ', cglen(1), cglen(2), cglen(3)
-          WRITE(6, '(a, 3i4)')    'dime: ', dime(1), dime(2), dime(3)
+          WRITE(6, '(a, 3i6)')    'dime: ', dime(1), dime(2), dime(3)
           WRITE(6, '(a, 3f8.3)')  'grid: ', grid(1), grid(2), grid(3)
           WRITE(6, '(a, f10.3)') 'Required memory (in MB): ', &
                dime(1)*dime(2)*dime(3)*200.0/1024/1024
@@ -725,7 +731,7 @@ CONTAINS
     _REAL_, INTENT(out) :: eelt, enpol
 
     ! local variables
-    INTEGER :: i, j, rc, apbsdrv, ncalc(1), iparam12
+    INTEGER :: i, j, rc, apbsdrv, ncalc(1), iparam12, error
     LOGICAL :: skip, do_apbs_update
     CHARACTER (len=128) :: dxname, dxn, command
     _REAL_ :: cx(natom), cy(natom), cz(natom)
@@ -755,6 +761,25 @@ CONTAINS
     _REAL_ :: vacdbx(natom), vacdby(natom), vacdbz(natom)
 
     _REAL_ :: apbsgrid_meta(13), apbsgrid(3*natom)
+
+
+    IF ( .NOT. ALLOCATED(solvfrcx) .OR. .NOT. ALLOCATED(solvfrcy) .OR. .NOT. ALLOCATED(solvfrcz)) THEN
+       ALLOCATE(solvfrcx(natom), solvfrcy(natom), solvfrcz(natom), stat=error)
+       IF (error .NE. 0) THEN
+          WRITE(6, '(a)') 'iAPBS: pbradii/pbcg memory allocation failed!'
+          WRITE(6, '(a)') 'iAPBS: Exiting ...'
+          CALL mexit(6,1)
+       ENDIF
+    ENDIF
+
+    IF ( .NOT. ALLOCATED(savedx) .OR. .NOT. ALLOCATED(savedy) .OR. .NOT. ALLOCATED(savedz)) THEN
+       ALLOCATE(savedx(natom), savedy(natom), savedz(natom), stat=error)
+       IF (error .NE. 0) THEN
+          WRITE(6, '(a)') 'iAPBS: pbradii/pbcg memory allocation failed!'
+          WRITE(6, '(a)') 'iAPBS: Exiting ...'
+          CALL mexit(6,1)
+       ENDIF
+    ENDIF
 
 
     !    eelt = 0.d0; enpol = 0.d0 rokFIXME??
@@ -818,7 +843,7 @@ CONTAINS
     IF (apbs_debug > 5) THEN
        WRITE(6,  '(a)') 'iAPBS: unpacked coordinates, charge and radius:'
        DO i = 1, natom
-          WRITE(6, '(i4, 5f8.3)') i, cx(i), cy(i), cz(i), &
+          WRITE(6, '(i6, 5f8.3)') i, cx(i), cy(i), cz(i), &
                pbcg(i), pbradii(i)
        END DO
     END IF
@@ -869,7 +894,7 @@ CONTAINS
           WRITE(6, '(a)') 'iAPBS: New grid values: '
           WRITE(6, '(a, 3f8.3)') 'fglen: ', fglen(1), fglen(2), fglen(3)
           WRITE(6, '(a, 3f8.3)') 'cglen: ', cglen(1), cglen(2), cglen(3)
-          WRITE(6, '(a, 3i4)')    'dime: ', dime(1), dime(2), dime(3)
+          WRITE(6, '(a, 3i6)')    'dime: ', dime(1), dime(2), dime(3)
           WRITE(6, '(a, 3f8.3)')  'grid: ', grid(1), grid(2), grid(3)
           WRITE(6, '(a, f10.3)') 'Required memory (in MB): ', &
                dime(1)*dime(2)*dime(3)*200.0/1024/1024
@@ -1067,39 +1092,39 @@ CONTAINS
        IF (apbs_debug > 6) THEN
           DO i = 1, natom
              j = 3*(i-1)
-             WRITE(6, '(a, 4x, i4, 3f8.3)') "iAPBS: TotalForces:", &
+             WRITE(6, '(a, 4x, i6, 3f8.3)') "iAPBS: TotalForces:", &
                   i, f(j+1), f(j+2), f(j+3)
           END DO
           DO i = 1, natom
-             WRITE(6,'(a, 2x, i4, 3f8.3)') "iAPBS: SolventForces:", &
+             WRITE(6,'(a, 2x, i6, 3f8.3)') "iAPBS: SolventForces:", &
                   i, solvdx(i), solvdy(i) , solvdz(i)
           END DO
           DO i = 1, natom
-             WRITE(6,'(a, 3x, i4, 3f8.3)') "iAPBS: VacuumForces:", &
+             WRITE(6,'(a, 3x, i6, 3f8.3)') "iAPBS: VacuumForces:", &
                   i, vacdx(i), vacdy(i), vacdz(i)
           END DO
           DO i = 1, natom
-             WRITE(6,'(a, 5x, i4, 3f8.3)') "iAPBS: SolvForces:", &
+             WRITE(6,'(a, 5x, i6, 3f8.3)') "iAPBS: SolvForces:", &
                   i, solvdx(i) - vacdx(i), solvdy(i) - vacdy(i), &
                   solvdz(i) - vacdz(i)
           END DO
           DO i = 1, natom
-             WRITE(6,'(a, 7x, i4, 3f8.3)') "iAPBS: qfForces:", &
+             WRITE(6,'(a, 7x, i6, 3f8.3)') "iAPBS: qfForces:", &
                   i, solvqfx(i) - vacqfx(i), &
                   solvqfy(i) - vacqfy(i), solvqfz(i) - vacqfz(i)
           END DO
           DO i = 1, natom
-             WRITE(6,'(a, 7x, i4, 3f8.3)') "iAPBS: ibForces:", &
+             WRITE(6,'(a, 7x, i6, 3f8.3)') "iAPBS: ibForces:", &
                   i, solvibx(i) - vacibx(i), &
                   solviby(i) - vaciby(i), solvibz(i) - vacibz(i)
           END DO
           DO i = 1, natom
-             WRITE(6,'(a, 7x, i4, 3f8.3)') "iAPBS: npForces:", &
+             WRITE(6,'(a, 7x, i6, 3f8.3)') "iAPBS: npForces:", &
                   i, solvnpx(i) - vacnpx(i), &
                   solvnpy(i) - vacnpy(i), solvnpz(i) - vacnpz(i)
           END DO
           DO i = 1, natom
-             WRITE(6,'(a, 7x, i4, 3f8.3)') "iAPBS: dbForces:", &
+             WRITE(6,'(a, 7x, i6, 3f8.3)') "iAPBS: dbForces:", &
                   i, solvdbx(i) - vacdbx(i), &
                   solvdby(i) - vacdby(i), solvdbz(i) - vacdbz(i)
           END DO
@@ -1161,7 +1186,7 @@ CONTAINS
           ! where # is the MD frame
           !
           ! this is OS specific (using /bin/mv)
-          WRITE (dxn, '(i8)') napbs
+          WRITE (dxn, '(i6)') napbs
           dxn = adjustl(dxn)
           dxname = 'iapbs-pot.'// trim(dxn) //'.dx'
           dxname = adjustl(dxname)

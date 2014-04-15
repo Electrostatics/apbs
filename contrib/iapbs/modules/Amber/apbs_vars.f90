@@ -19,7 +19,8 @@ use file_io_dat, only : MAX_FN_LEN
 ! max number of counterions
   INTEGER, PARAMETER :: MAXION = 10
 ! static dimensions (for now) rokFIXME
-  INTEGER, PARAMETER :: APBSNATOMS = 500000
+!  INTEGER, PARAMETER :: APBSNATOMS = 3000000
+
 
 !-----------------------------------------------------------------------
 !     int ispara;            : 1 => is a parallel calculation,
@@ -142,20 +143,30 @@ use file_io_dat, only : MAX_FN_LEN
 
 !-----------------------------------------------------------------------
 ! internal PB radii and charges
-  _REAL_ :: pbradii(APBSNATOMS)    ! PB radii
-  _REAL_ :: pbcg(APBSNATOMS)       ! PB charges
+!  _REAL_ :: pbradii(APBSNATOMS)    ! PB radii
+!  _REAL_ :: pbcg(APBSNATOMS)       ! PB charges
+
+  _REAL_, ALLOCATABLE :: pbradii(:)
+  _REAL_, ALLOCATABLE :: pbcg(:)
 
 !-----------------------------------------------------------------------
 ! solvation energy and forces saved for use later
   _REAL_ :: senelec, sennp
-  _REAL_ :: solvfrcx(APBSNATOMS)
-  _REAL_ :: solvfrcy(APBSNATOMS)
-  _REAL_ :: solvfrcz(APBSNATOMS)
+!  _REAL_ :: solvfrcx(APBSNATOMS)
+!  _REAL_ :: solvfrcy(APBSNATOMS)
+!  _REAL_ :: solvfrcz(APBSNATOMS)
+  _REAL_, ALLOCATABLE :: solvfrcx(:)
+  _REAL_, ALLOCATABLE :: solvfrcy(:)
+  _REAL_, ALLOCATABLE :: solvfrcz(:)
 
   _REAL_ :: geom_upd_limit, evdw_upd_limit, saveevdw
-  _REAL_ :: savedx(APBSNATOMS)
-  _REAL_ :: savedy(APBSNATOMS)
-  _REAL_ :: savedz(APBSNATOMS)
+!  _REAL_ :: savedx(APBSNATOMS)
+!  _REAL_ :: savedy(APBSNATOMS)
+!  _REAL_ :: savedz(APBSNATOMS)
+  _REAL_, ALLOCATABLE :: savedx(:)
+  _REAL_, ALLOCATABLE :: savedy(:)
+  _REAL_, ALLOCATABLE :: savedz(:)
+
 
 !-----------------------------------------------------------------------
 ! some integer variables
