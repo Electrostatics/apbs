@@ -83,8 +83,6 @@ struct LJ{
 };
 extern LJ lj;
 
-double dot(double x, double y, double z);
-
 void domainini(double xyzr[MAXATOMS][XYZRWIDTH], const size_t natm, const double extvalue);
 
 void chargedist(double xyzr[MAXATOMS][XYZRWIDTH], double* chratm, Mat<>& charget, Mat<>& corlocqt, Mat<size_t>& loc_qt, size_t iatm);

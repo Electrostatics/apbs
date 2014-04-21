@@ -59,6 +59,12 @@
 #include <cmath>
 #include <Eigen/Core>
 
+// The following is from modules.h, which includes this file, Mat.h.  We need
+// the declaration here because we use it below in the deriv method.  If we
+// don't declare it, clang and gcc > 4.4.7-4 will complain about not being able
+// to resolve the function.
+double dot(double x, double y, double z);
+
 template<typename T> class Stencil;
 
 template<typename T=double> class Mat;
