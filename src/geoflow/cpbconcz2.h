@@ -52,26 +52,30 @@
 ///
 /// @endverbatim
 
-#ifndef __CPBCONCZ_H_
-#define __CPBCONCZ_H_
+#pragma once
 
-#define MAXATOMS 15000  /* From the original f90 code; need to keep this
-             * constant since the f90 routines that we call from here   
-             *              * depend on it. */                                         
-#define XYZRWIDTH 4     // 4: 0-2 => pos,3 => radius
+// From the original f90 code; need to keep this
+// constant since the f90 routines that we call from here
+// depend on it.
+#define MAXATOMS 15000
 
-typedef struct _GeoflowOutput{
-    double area,
-        volume,
-        attint,
-        sumpot,
-        totalSolvation,
-        nonpolarSolvation,
-        elecSolvation;
+// Four because: 0-2 => pos, 3 => radius
+#define XYZRWIDTH 4
+
+typedef struct _GeoflowOutput
+{
+	double area,
+		volume,
+		attint,
+		sumpot,
+		totalSolvation,
+		nonpolarSolvation,
+		elecSolvation;
 } GeoflowOutput;
 
-typedef struct _GeoflowInput{
-    double* dcel;
+typedef struct _GeoflowInput
+{
+	double* dcel;
 	int ffmodel;
 	double extvalue;
 	double* pqr;
@@ -89,7 +93,7 @@ typedef struct _GeoflowInput{
 	int iterf;
 	double tpb;
 	int itert;
-    double pres;
+	double pres;
 	double gama;
 	double tauval;
 	double prob;
@@ -102,7 +106,6 @@ typedef struct _GeoflowInput{
 #ifdef __cplusplus
 extern "C"
 #endif
-GeoflowOutput geoflowSolvation(double xyzr[MAXATOMS][XYZRWIDTH], size_t natm, GeoflowInput gfin);
-
-#endif
+GeoflowOutput geoflowSolvation(double xyzr[MAXATOMS][XYZRWIDTH], size_t natm,
+		GeoflowInput gfin);
 

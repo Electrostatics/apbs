@@ -52,48 +52,49 @@
 ///
 /// @endverbatim
 
-#ifndef __MODULES_H
-#define __MODULES_H
+# pragma once
 
 #include <vector>
-#include "Mat.h"
-#include "cpbconcz2.h"
 
-struct Comdata{
-    char fname[100];
-    size_t nx, ny, nz;
-    double xleft, xright,
-           yleft, yright,
-           zleft, zright,
-    
-           deltax, deltay, deltaz,
-    
-           dcel,
-           pi;
-    std::vector<double> xc, yc, zc;
+#include "cpbconcz2.h"
+#include "Mat.h"
+
+struct Comdata
+{
+	char fname[100];
+	size_t nx, ny, nz;
+	double xleft, xright,
+		yleft, yright,
+		zleft, zright,
+		deltax, deltay, deltaz,
+		dcel, pi;
+	std::vector<double> xc, yc, zc;
 };
 extern Comdata comdata;
 
-struct LJ{
-    double tauval, prob, vdwdispersion,
-           sigmas, roro, conms,
-           density, epsilonw;
-    int ffmodel;
-    static const int iosetar = 1, iosetaa = 1, iwca = 1;
+struct LJ
+{
+	double tauval, prob, vdwdispersion, sigmas, roro, conms, density, epsilonw;
+	int ffmodel;
+	static const int iosetar = 1, iosetaa = 1, iwca = 1;
 };
 extern LJ lj;
 
-void domainini(double xyzr[MAXATOMS][XYZRWIDTH], const size_t natm, const double extvalue);
+void domainini(double xyzr[MAXATOMS][XYZRWIDTH], const size_t natm,
+		const double extvalue);
 
-void chargedist(double xyzr[MAXATOMS][XYZRWIDTH], double* chratm, Mat<>& charget, Mat<>& corlocqt, Mat<size_t>& loc_qt, size_t iatm);
+void chargedist(double xyzr[MAXATOMS][XYZRWIDTH], double* chratm,
+		Mat<>& charget, Mat<>& corlocqt, Mat<size_t>& loc_qt, size_t iatm);
 
-void yhsurface(double xyzr[MAXATOMS][XYZRWIDTH], double* ljepsilon, size_t natm, double tott,
-    double deltat, Mat<>& phix, Mat<>& surfu, int i, double& area, double& vol, double& attint,
-    double alpha, int iadi, int igfin);
+void yhsurface(double xyzr[MAXATOMS][XYZRWIDTH], double* ljepsilon, size_t natm,
+		double tott, double deltat, Mat<>& phix, Mat<>& surfu, int i,
+		double& area, double& vol, double& attint, double alpha, int iadi,
+		int igfin);
 
-void seteqb(Mat<>& bg, double xyzr[MAXATOMS][XYZRWIDTH], double* pqr, Mat<>& charget, Mat<>& corlocqt, double epsilonsp);
+void seteqb(Mat<>& bg, double xyzr[MAXATOMS][XYZRWIDTH], double* pqr,
+		Mat<>& charget, Mat<>& corlocqt, double epsilonsp);
 
-void pbsolver(Mat<>& eps, Mat<>& phi, Mat<>& bg, double dcel, double tol, int iter);
+void pbsolver(Mat<>& eps, Mat<>& phi, Mat<>& bg, double tol, int iter);
 
 double xvalue(size_t i);
 double yvalue(size_t i);
@@ -102,6 +103,3 @@ double zvalue(size_t i);
 size_t inverx(double x);
 size_t invery(double y);
 size_t inverz(double z);
-
-#endif
-
