@@ -115,8 +115,8 @@ int main()
 	int ffmodel = 1;
 	pbconcz2(
 		// 17,		// nmol
-		0.03,		// pres_i
-		0.08,		// gama_i
+		0.008,		// pres_i
+		0.0001,		// gama_i
 		1,			// npiter
 		1,			// ngiter
 		1.40,		// tauval
@@ -136,7 +136,7 @@ int main()
 		0.25,		// DCEL
 		20,			// MAXSTEP
 		80.00,		// EPSILONS
-		3.00,		// EPSILONP
+		1.5,		// EPSILONP
 		1,			// RADEXP
 		0.01,		// CREVALUE
 		// 0,		// idacsl
