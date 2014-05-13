@@ -1,5 +1,5 @@
 read
-    mol pqr imidazole_zap.pqr        
+    mol pqr imidazole_zap.pqr
 end
 elec name comp_solv        # Solvated complex
     geoflow-auto
@@ -8,7 +8,7 @@ elec name comp_solv        # Solvated complex
     bcfl mdh
     mol 1
 
-    grid 0.23 0.25 0.27     # grid spacing                      (dcel)
+    grid 0.25 0.25 0.25     # grid spacing                      (dcel)
     pdie 1.5                # Solute dielectric                 (epsilon_p)
     sdie 80.00              # Solvent dielectric                (epsilon_s)
     press 0.008             # pressure kcal/(mol*A^3)           (pres)
