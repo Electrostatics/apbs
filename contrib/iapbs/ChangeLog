@@ -1,10 +1,18 @@
 #######################################################################
 #
 #
-#  iAPBS Release 3.2.0 ChangleLog
+#  iAPBS Release 3.3.0 ChangleLog
 #
 #
 #######################################################################
+----------------------------------------------------------------------
+
+Release 3.3.0 May 27, 2014
+
+- Switched to dynamic memory allocation in the Amber module.
+
+- Updated the Amber module to work with Amber14.
+
 ----------------------------------------------------------------------
 
 Release 3.2.0 September 3, 2013
