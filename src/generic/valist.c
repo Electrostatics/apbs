@@ -701,7 +701,7 @@ atom = %s, residue = %s\n", atomName, resName);
         //if the line doesn't start with ATOM or HETATM, then throw it away
         else {
             //if we didn't see ATOM or HETATM then skip to the next line
-            while (Vio_getc(sock) != '\n');
+            while(Vio_scanf(sock, "%c", &c) == 1 && c != '\n');
         }
     } /* while we haven't run out of tokens */
 
