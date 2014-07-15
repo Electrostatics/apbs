@@ -616,7 +616,6 @@ VPUBLIC Vrc_Codes Valist_readPQR(Valist *thee, Vparam *params, Vio *sock) {
     char tok[VMAX_BUFSIZE];
     char atomName[VMAX_ARGLEN], resName[VMAX_ARGLEN];
     char chs[VMAX_BUFSIZE];
-    char c, *ch;
 
     int use_params = 0;
     int nlist, natoms, serial, resSeq;
@@ -625,7 +624,6 @@ VPUBLIC Vrc_Codes Valist_readPQR(Valist *thee, Vparam *params, Vio *sock) {
     double pos[3];
 
     epsilon = 0.0;
-    c = 'a';
 
     if (thee == VNULL) {
         Vnm_print(2, "Valist_readPQR:  Got NULL pointer when reading PQR file!\n");
@@ -698,10 +696,15 @@ atom = %s, residue = %s\n", atomName, resName);
             Vatom_setAtomName(nextAtom, atomName);
 
         } /* if ATOM or HETATM */
-        //if the line doesn't start with ATOM or HETATM, then throw it away
         else {
-            //if we didn't see ATOM or HETATM then skip to the next line
-            while(Vio_scanf(sock, "%c", &c) == 1 && c != '\n');
+            /*
+             * nop
+             * Note that if we find a line that starts with something that's not
+             * ATOM or HETATM we'll just keep parsing strings until we find one
+             * of the acceptable keywords.
+             * Extraordinary measures are not necessary, and only add  to the
+             * befuddlement.
+             */
         }
     } /* while we haven't run out of tokens */
 
