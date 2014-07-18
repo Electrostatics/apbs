@@ -25,7 +25,7 @@
  *
  *  Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2010-2012 Battelle Memorial Institute. Developed at the
+ * Copyright (c) 2010-2014 Battelle Memorial Institute. Developed at the
  * Pacific Northwest National Laboratory, operated by Battelle Memorial
  * Institute, Pacific Northwest Division for the U.S. Department of Energy.
  *
@@ -161,7 +161,7 @@ int main(
     \n\
     Additional contributing authors listed in the code documentation.\n\
     \n\
-    Copyright (c) 2010-2012 Battelle Memorial Institute. Developed at the Pacific\n\
+    Copyright (c) 2010-2014 Battelle Memorial Institute. Developed at the Pacific\n\
     Northwest National Laboratory, operated by Battelle Memorial Institute, Pacific\n\
     Northwest Division for the U.S. Department of Energy.\n\
     \n\
