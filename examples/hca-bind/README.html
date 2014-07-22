@@ -4,7 +4,6 @@
 	</head>
 	<body>
 		<h1 align="center">README for hca-bind APBS examples</h1>
-		<i> $Id$</i>
 
 		<p> The example input files in this directory calculate the binding of a small molecule (acetazolamide)
 		to a medium-sized protein (human carbonic anhydrase).</p>
@@ -14,13 +13,16 @@
 
 		<table align="center" border="1" cellpadding="3" cellspacing="1">
 			<tr><th>Input File</th><th>Description</th><th>APBS Version</th><th>Results (kJ/mol)</th><th>UHBD (kJ/mol)</th></tr>
-			
+
 			<tr>
-			  <td rowspan=9><a href="apbs-mol.in">apbs-mol.in</a></td>
-			  <td rowspan=9>2-level focusing to 0.225 A, VdW surface, srfm mol</td>
-			  <td align=center><strong>1.4</strong></td>
-			  <td align=center><strong>-51.4648<sup><a href="#5">5</a></sup></strong></td>
-			  <td rowspan=9>-70.00</td>
+			  <td rowspan=10><a href="apbs-mol.in">apbs-mol.in</a></td>
+			  <td rowspan=10>2-level focusing to 0.225 A, VdW surface, srfm mol</td>
+			  <td align=center><strong>1.4.1-binary</strong></td>
+			  <td align=center><strong>-52.4648<sup><a href="#6">6</a></sup></strong></td>
+			  <td rowspan=10>-70.00</td>
+  		    </tr>
+			<tr>
+			  <td align=center>1.4</td><td align=center>-51.4648<sup><a href="#5">5</a></sup></td>
   		    </tr>
 			<tr>
 			  <td align=center>1.3</td><td align=center>-52.4647</td>
@@ -44,13 +46,13 @@
 				<td align=center>0.5.0</td><td align=center>-52.1062<sup><a href="#2">2</a></sup></td>
 			</tr>
             <tr> <td align=center>0.4.0</td><td align=center>-52.4414</td> </tr>
-            
+
 			<tr>
-			  <td rowspan=20><a href="apbs-smol.in">apbs-smol.in</a></td>
-			  <td rowspan=20>2-level focusing to 0.225 A, VdW surface, srfm smol</td>
-			  <td align=center><strong>1.4</strong></td>
+			  <td rowspan=21><a href="apbs-smol.in">apbs-smol.in</a></td>
+			  <td rowspan=21>2-level focusing to 0.225 A, VdW surface, srfm smol</td>
+			  <td align=center><strong>1.4.1-binary</strong></td>
 			  <td align=center><strong>-54.0598</strong></td>
-			  <td rowspan=20>-70.00</td>
+			  <td rowspan=21>-70.00</td>
 		    </tr>
 			<tr>
 			  <td align=center>1.3</td><td align=center>-54.0598</td>
@@ -96,7 +98,7 @@
 				<li> The addition of the Vacc sphere density (sdens keyword) as a variable and a change
 				in the default sdens value from 3.0 to 10.0  </li>
 			</ul>
-			
+
 			<p> <a name=2></a><sup>2</sup>  The discrepancy in values between versions 0.5.0 and 0.4.0 is most likely due to the following factor(s):
 			<ul>
 				<li> A change in the autofocusing routine for APBS</li>
@@ -121,11 +123,15 @@
 			        <li>Small margins due to these round-off discrepencies acumulate in the computations</li>
 			    </ul>
 		    </p>
-			
+			<p>
+			    <a name=6></a><sup>6</sup>
+			    The discrepancy in the result between versions 1.4 and 1.4.1-binary is most likely due to a reporting error.
+			</p>
+
 			Please see the ChangeLog or the <a href="http://apbs.sourceforge.net/doc">APBS documentation</a> for more information.
 		<p></p>
-		
-		
-		
+
+
+
 	</body>
 </html>
