@@ -1,11 +1,10 @@
-<html> 
+<html>
 	<head>
 		<title>APBS ion pmf test case</title>
 	</head>
 
 	<body>
 		<h1 align="center"> APBS ion pmf test case </h1>
-		<i> $Id$</i>
 
 		<p> This is the two-ion test case for force evaluation from the Im et al. <i>Comput.  Phys. Commun.</i>
 		<b>111</b>, 59--75 (1998) paper.  The output of these run(s) are solvation energies for ion pairs
@@ -36,7 +35,7 @@
 		<p>
 		Here are the force results visually estimated from the Im et al paper
 		(see above) with forces in kJ/mol/&Aring; with one ion fixed at x =
-		-3.0 &Aring;.  
+		-3.0 &Aring;.
 		</p><table border="1">
 			<tr>
 				<th>Mol 1 location</th>
@@ -129,6 +128,36 @@
 				<td>0</td><td>0</td>
 			</tr>
 		</table>
+
+    <p> Here are the results from APBS 1.4.1-binary:
+    </p><pre>
+x = 1.000
+
+polarforces
+  qf  0  8.398642197665E+01  -1.324563987321E-05  -1.613435751204E-05
+  ib  0  0.000000000000E+00  0.000000000000E+00  0.000000000000E+00
+  db  0  6.148357059184E+00  -2.667517427189E-05  -5.378919673813E-05
+  tot 0  9.013477903583E+01  -3.992081414510E-05  -6.992355425017E-05
+  qf  1  -8.466423642736E+01  -1.836748529478E-05  -3.062224653038E-05
+  ib  1  0.000000000000E+00  0.000000000000E+00  0.000000000000E+00
+  db  1  2.882739230548E+00  -3.149946357422E-05  -6.291495504390E-05
+  tot 1  -8.178149719681E+01  -4.986694886900E-05  -9.353720157428E-05
+  tot all 8.353281839026E+00  -8.978776301409E-05  -1.634607558245E-04
+
+apolarforces
+  sasa  0  -1.099776974333E+01  0.000000000000E+00  0.000000000000E+00
+  sav   0  0.000000000000E+00  0.000000000000E+00  0.000000000000E+00
+  wca   0  -5.826577086437E-01  -2.766670515801E-05  -2.766670515838E-05
+  tot   0  -1.158042745197E+01  -2.766670515801E-05  -2.766670515838E-05
+  sasa  1  1.111862435589E+01  0.000000000000E+00  0.000000000000E+00
+  sav   1  0.000000000000E+00  0.000000000000E+00  0.000000000000E+00
+  wca   1  5.826560767576E-01  -2.767485007143E-05  -2.767485007183E-05
+  tot   1  1.170128043265E+01  -2.767485007143E-05  -2.767485007183E-05
+  tot all  1.208529806779E-01  -5.534155522944E-05  -5.534155523021E-05
+
+  Global net ELEC energy = -1.125191605614E+03 kJ/mol
+  Global net APOL energy = -1.365308087297E+01 kJ/mol
+</pre>
 
 		<p> Here are the results from APBS 1.4:
 		</p><pre>
