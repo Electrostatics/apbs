@@ -112,7 +112,7 @@ endif()
 # Determine Machine Epsilon values                                             #
 ################################################################################
 
-OPTION(CHECK_EPSILON "" YES)
+OPTION(CHECK_EPSILON "Compute machine epsilon values" YES)
 if(CHECK_EPSILON)
     message(STATUS "Computing machine epsilon values")
     try_run(
