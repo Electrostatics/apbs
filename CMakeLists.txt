@@ -293,7 +293,7 @@ option(ENABLE_FETK "Enable the finite element solver" OFF)
 
 if(ENABLE_FETK)
     message(STATUS "Checking for fetk components")
-    set(FETK_ENALBED 1)
+    set(FETK_ENABLED 1)
 
     list(APPEND APBS_LIBS "-lstdc++")
     list(APPEND APBS_LIBS "-L${FETK_PATH}/lib")
