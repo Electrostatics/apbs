@@ -1,0 +1,183 @@
+diff -rupN ../namd2.orig/config ./config
+--- ../namd2.orig/config	2014-11-11 09:05:38.000000000 -0800
++++ ./config	2014-11-18 10:28:59.677439347 -0800
+@@ -30,6 +30,7 @@ syntax:
+   echo '  --arch-suffix <suffix for NAMD platform printed at startup>'
+   echo '  (the following are experimental features)'
+   echo '  --without-memopt (default)  --with-memopt'
++  echo '  --without-apbs (default)  --with-apbs'
+   echo '  --without-cuda (default)  --with-cuda'
+   echo '      (do NOT use CUDA-enabled Charm++, NAMD does not need it)'
+   echo '  --without-mic (default)  --with-mic'
+@@ -125,6 +126,7 @@ begin:
+   set use_memopt = 0
+   set use_mic = 0
+   set use_spec = 0
++  set use_apbs = 0
+ 
+   if ($#argv < 1) then
+     set PRINT_ARCH_LIST
+@@ -149,6 +151,14 @@ begin:
+   endif
+ 
+   if ($#argv < 1) goto syntax
++  if ( $1 == apbs ) then
++    set use_apbs = 1
++    shift
++  else
++    set use_apbs = 0
++  endif
++
++  if ($#argv < 1) goto syntax
+   if ( $1 == plugins ) then
+     echo 'The "plugins" flag is not needed; plugins are built automatically.'
+     shift
+@@ -296,6 +306,13 @@ begin:
+         set use_spec = 1
+       breaksw
+ 
++      case --with-apbs:
++        set use_apbs = 1
++      breaksw
++      case --without-apbs:
++        set use_apbs = 0
++      breaksw
++
+       case --charm-base:
+         shift
+         if ( ! -d $1 ) then
+@@ -494,6 +511,8 @@ begin:
+   if ( $CHARM_ARCH =~ *-smp* ) set threaded = 1
+   if ( $CHARM_ARCH =~ *multicore-* ) set threaded = 1
+ 
++  if ( $use_apbs ) echo 'include .rootdir/arch/$(NAMD_ARCH).apbs' >> Make.config
++
+   if ( $use_tcl ) then
+     if ( $?TCL_PREFIX ) then
+       echo "TCLDIR = $TCL_PREFIX" >> Make.config
+diff -rupN ../namd2.orig/Make.depends ./Make.depends
+--- ../namd2.orig/Make.depends	2014-11-15 08:30:50.000000000 -0800
++++ ./Make.depends	2014-11-18 10:28:59.681439424 -0800
+@@ -2208,6 +2208,7 @@ obj/ComputeMgr.o: \
+ 	src/GlobalMasterEasy.h \
+ 	src/GlobalMasterMisc.h \
+ 	src/GlobalMasterFreeEnergy.h \
++	src/GlobalMasterAPBS.h \
+ 	src/GlobalMasterColvars.h \
+ 	src/colvarmodule.h \
+ 	src/colvartypes.h \
+@@ -3716,6 +3717,17 @@ obj/GlobalMasterServer.o: \
+ 	src/MStream.h \
+ 	src/Debug.h
+ 	$(CXX) $(CXXFLAGS) $(COPTO)obj/GlobalMasterServer.o $(COPTC) src/GlobalMasterServer.C
++obj/GlobalMasterAPBS.o: \
++	src/GlobalMasterAPBS.C \
++	src/NamdTypes.h \
++	src/Vector.h \
++	src/common.h \
++	src/ResizeArray.h \
++	src/ResizeArrayRaw.h \
++	src/GlobalMaster.h \
++	src/GlobalMasterAPBS.h \
++	src/Debug.h
++	$(CXX) $(CXXFLAGS) $(COPTO)obj/GlobalMasterAPBS.o $(COPTC) src/GlobalMasterAPBS.C
+ obj/GlobalMasterTest.o: \
+ 	src/GlobalMasterTest.C \
+ 	src/NamdTypes.h \
+diff -rupN ../namd2.orig/Makefile ./Makefile
+--- ../namd2.orig/Makefile	2014-11-15 08:46:41.000000000 -0800
++++ ./Makefile	2014-11-18 10:32:53.820970572 -0800
+@@ -189,6 +189,7 @@ OBJS = \
+         $(DSTDIR)/FreeEnergyVector.o \
+ 	$(DSTDIR)/GlobalMaster.o \
+ 	$(DSTDIR)/GlobalMasterServer.o \
++	$(DSTDIR)/GlobalMasterAPBS.o \
+ 	$(DSTDIR)/GlobalMasterTest.o \
+ 	$(DSTDIR)/GlobalMasterIMD.o \
+ 	$(DSTDIR)/GlobalMasterTcl.o \
+@@ -403,7 +404,7 @@ CHARM_MODULES = -module NeighborLB -modu
+ LIBS = $(CUDAOBJS) $(PLUGINLIB) $(DPMTALIBS) $(DPMELIBS) $(FMMLIBS) $(TCLDLL)
+ 
+ # CXX is platform dependent
+-CXXBASEFLAGS = $(COPTI)$(CHARMINC) $(COPTI)$(SRCDIR) $(COPTI)$(INCDIR) $(DPMTA) $(DPME) $(FMM) $(COPTI)$(PLUGININCDIR) $(COPTD)STATIC_PLUGIN $(TCL) $(FFT) $(CUDA) $(MIC) $(MEMOPT) $(CCS) $(RELEASE) $(EXTRADEFINES) $(TRACEOBJDEF) $(EXTRAINCS) $(MSA)
++CXXBASEFLAGS = $(COPTI)$(CHARMINC) $(COPTI)$(SRCDIR) $(COPTI)$(INCDIR) $(DPMTA) $(DPME) $(FMM) $(COPTI)$(PLUGININCDIR) $(COPTD)STATIC_PLUGIN $(TCL) $(FFT) $(CUDA) $(MIC) $(MEMOPT) $(CCS) $(APBS) $(RELEASE) $(EXTRADEFINES) $(TRACEOBJDEF) $(EXTRAINCS) $(MSA)
+ CXXFLAGS = $(CXXBASEFLAGS) $(CXXOPTS) $(CXXMICOPTS)
+ CXXTHREADFLAGS = $(CXXBASEFLAGS) $(CXXTHREADOPTS) $(CXXMICOPTS)
+ CXXSIMPARAMFLAGS = $(CXXBASEFLAGS) $(CXXSIMPARAMOPTS) $(CXXMICOPTS)
+@@ -446,6 +447,7 @@ namd2:	$(MKINCDIR) $(MKDSTDIR) $(OBJS) $
+ 	$(TCLLIB) \
+ 	$(FFTLIB) \
+ 	$(PLUGINLIB) \
++	$(APBSLIB) \
+ 	$(CHARMOPTS) \
+ 	$(EXTRALINKLIBS) \
+ 	-lm -o namd2
+diff -rupN ../namd2.orig/src/ComputeMgr.C ./src/ComputeMgr.C
+--- ../namd2.orig/src/ComputeMgr.C	2013-12-27 11:59:49.000000000 -0800
++++ ./src/ComputeMgr.C	2014-11-18 10:28:59.681439424 -0800
+@@ -88,6 +88,9 @@
+ #include "GlobalMasterEasy.h"
+ #include "GlobalMasterMisc.h"
+ #include "GlobalMasterFreeEnergy.h"
++#ifdef NAMD_APBS
++#include "GlobalMasterAPBS.h"
++#endif NAMD_APBS
+ #include "GlobalMasterColvars.h"
+ 
+ #include "ComputeNonbondedMICKernel.h"
+@@ -863,6 +866,10 @@ ComputeMgr::createComputes(ComputeMap *m
+             masterServerObject->addClient(new GlobalMasterFreeEnergy());
+ 		if ( simParams->colvarsOn )
+ 			masterServerObject->addClient(new GlobalMasterColvars());
++#ifdef NAMD_APBS
++	if ( simParams->apbsForcesOn )
++	    masterServerObject->addClient(new GlobalMasterAPBS);
++#endif NAMD_APBS
+ 
+     }
+ 
+diff -rupN ../namd2.orig/src/SimParameters.C ./src/SimParameters.C
+--- ../namd2.orig/src/SimParameters.C	2014-09-05 13:15:44.000000000 -0700
++++ ./src/SimParameters.C	2014-11-18 10:28:59.685439492 -0800
+@@ -1606,6 +1606,13 @@ void SimParameters::config_parser_constr
+        "Configuration file for constant forces", PARSE_STRING);
+    opts.require("constantforce", "consForceScaling",
+        "Scaling factor for constant forces", &consForceScaling, 1.0);
++
++    ////  APBS solvation forces
++    opts.optionalB("main", "apbsForces", "Apply APBS solvation forces?",
++      &apbsForcesOn, FALSE);
++    opts.require("apbsForces", "apbsPQRFile", "Path to PQR file", apbsPQRFile);
++    opts.require("apbsForces", "apbsForcesConfig",
++        "Configuration file for APBS solvation forces", PARSE_MULTIPLES);
+  
+     //// Collective variables
+     opts.optionalB("main", "colvars", "Is the colvars module enabled?",
+@@ -4577,8 +4584,13 @@ if ( openatomOn )
+    // Global forces configuration
+ 
+    globalForcesOn = ( tclForcesOn || freeEnergyOn || miscForcesOn ||
+-                      (IMDon && ! IMDignore) || SMDOn || TMDOn || colvarsOn || symmetryOn );
++                      (IMDon && ! IMDignore) || SMDOn || TMDOn || colvarsOn || symmetryOn || apbsForcesOn );
+ 
++   if (apbsForcesOn) {
++     iout << iINFO << "APBS SOLVATION FORCES ACTIVE\n";
++     iout << iINFO << "    APBS PQR FILE: " << apbsPQRFile << "\n";
++     iout << endi;
++   }
+ 
+    if (tclForcesOn)
+    {
+diff -rupN ../namd2.orig/src/SimParameters.h ./src/SimParameters.h
+--- ../namd2.orig/src/SimParameters.h	2014-05-09 14:39:06.000000000 -0700
++++ ./src/SimParameters.h	2014-11-18 10:28:59.685439492 -0800
+@@ -468,6 +468,9 @@ public:
+ 	Bool miscForcesOn;		//  Using misc forces?
+ 	Bool colvarsOn;         //  Using the colvars module?
+ 
++    Bool apbsForcesOn;      // Using APBS to compute solvation forces?
++    char apbsPQRFile[128];  // path to PQR file for charges and radii.
++
+ 	Bool fixedAtomsOn;		//  Are there fixed atoms?
+ 	Bool fixedAtomsForces;		//  Calculate forces anyway?
+ 
