@@ -54,6 +54,7 @@ OPTION (BUILD_SHARED_LIBS "Build shared libraries." OFF)
 message(STATUS "Setting project paths")
 
 set(CMAKE_C_FLAGS -std=c99)
+set(CMAKE_CXX_FLAGS -fpermissive)
 
 set(APBS_ROOT ${PROJECT_SOURCE_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${APBS_ROOT}/bin)
@@ -195,8 +196,13 @@ if(ENABLE_BEM)
     endif()
     
     install(
-        FILES ${LIBRARY_OUTPUT_PATH}/${TABI_LIBRARY_BASENAME} ${LIBRARY_OUTPUT_PATH}/*.mod
+        FILES ${LIBRARY_OUTPUT_PATH}/${TABI_LIBRARY_BASENAME}
         DESTINATION ${LIBRARY_INSTALL_PATH}
+    )
+    install(
+        DIRECTORY ${LIBRARY_OUTPUT_PATH}
+        DESTINATION ${CMAKE_INSTALL_PREFIX}
+        FILES_MATCHING PATTERN "*.mod"
     )
     set(TABI_LIBRARY ${APBS_ROOT}/${LIBRARY_INSTALL_PATH}/${TABI_LIBRARY_BASENAME})
     
@@ -210,7 +216,7 @@ if(ENABLE_BEM)
     endif()
     get_filename_component(LIBGFORTRANPATH ${LIBGFORTRANPATH} PATH)
     find_path(LIBGFORTRAN_PATH ${LIBGFORTRAN_NAME} PATH ${LIBGFORTRANPATH})
-    list(APPEND APBS_LIBS "-L${APBS_ROOT}/${LIBRARY_INSTALL_PATH} -L${LIBGFORTRAN_PATH} -lgfortran -ltabipb" )
+    list(APPEND APBS_LIBS "-L${APBS_ROOT}/${LIBRARY_INSTALL_PATH} -L${LIBGFORTRAN_PATH} -lgfortran -ltabipb -lstdc++" )
 endif() # ENABLE_BEM
 
 find_file( # this should be find path...
