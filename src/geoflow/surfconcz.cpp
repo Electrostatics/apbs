@@ -53,6 +53,7 @@
 /// @endverbatim
 
 #include <cmath>
+#include <algorithm>
 #include <iostream>
 #include <valarray>
 
@@ -119,8 +120,8 @@ void upwinding(double dt, int nt, Mat<>& g, Mat<>& su,
 		for (Stencil<double> phi = su.stencilBegin();
 				phi != su.stencilEnd(); ++phi) {
 			if (g[phi.i] > 2e-2) {
-				surfnew[phi.i] = fmin(1000.0,
-						fmax(0.0, *(phi.c) + dt * phi.deriv(phitotx[phi.i])));
+				surfnew[phi.i] = std::min(1000.0,
+						std::max(0.0, *(phi.c) + dt * phi.deriv(phitotx[phi.i])));
 			}
 		}
 		su = surfnew;
