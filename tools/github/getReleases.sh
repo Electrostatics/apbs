@@ -1,4 +1,4 @@
-#!/bin/csh -xv
+#!/bin/bash
 
 # get the release ids and names
 curl -i https://api.github.com/repos/Electrostatics/apbs-pdb2pqr/releases -H "Accept:application/vnd.github.manifold-preview+json"
