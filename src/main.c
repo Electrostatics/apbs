@@ -712,6 +712,7 @@ int main(
 
  		/* geometric flow */
             case NCT_GEOFLOW:
+#ifdef ENABLE_GEOFLOW
                 /* What is this?  This seems like a very awkward way to find
                 the right ELEC statement... */
                 for (k=0; k<nosh->nelec; k++) {
@@ -772,6 +773,10 @@ int main(
                 fflush(stdout);
                 fflush(stderr);
                 break;
+#else /* ifdef ENABLE_GEOFLOW*/
+                    Vnm_print(2, "Error!  APBS not compiled with GEOFLOW!\n");
+                exit(2);
+#endif
                 
             default:
                 Vnm_tprint(2, "  Unknown calculation type (%d)!\n", nosh->calc[i]->calctype);
