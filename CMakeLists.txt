@@ -219,6 +219,12 @@ if(ENABLE_BEM)
     list(APPEND APBS_LIBS "-L${APBS_ROOT}/${LIBRARY_INSTALL_PATH} -L${LIBGFORTRAN_PATH} -lgfortran -ltabipb -lstdc++" )
 endif() # ENABLE_BEM
 
+option(ENABLE_GEOFLOW "geoflow method" ON)
+if(ENABLE_GEOFLOW)
+    add_definitions(-DENABLE_GEOFLOW)
+endif()
+
+
 find_file( # this should be find path...
     FETK_PATH
     NAMES fetk
