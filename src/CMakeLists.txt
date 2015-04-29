@@ -46,7 +46,10 @@ endmacro()
 add_subdirectory(generic)
 add_subdirectory(pmgc)
 add_subdirectory(mg)
-add_subdirectory(geoflow)
+
+if(ENABLE_GEOFLOW)
+    add_subdirectory(geoflow)
+endif()
 
 if(ENABLE_FETK)
    add_subdirectory(fem)

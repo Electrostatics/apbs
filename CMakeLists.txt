@@ -219,10 +219,6 @@ if(ENABLE_BEM)
     list(APPEND APBS_LIBS "-L${APBS_ROOT}/${LIBRARY_INSTALL_PATH} -L${LIBGFORTRAN_PATH} -lgfortran -ltabipb -lstdc++" )
 endif() # ENABLE_BEM
 
-option(ENABLE_GEOFLOW "geoflow method" ON)
-if(ENABLE_GEOFLOW)
-    add_definitions(-DENABLE_GEOFLOW)
-endif()
 
 
 find_file( # this should be find path...
@@ -681,4 +677,25 @@ if(NOT WIN32)
         install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/mpe
                 DESTINATION ${EXECUTABLE_INSTALL_PATH})
     endif()
+endif()
+
+################################################################################
+# Optionally download and build geoflow 
+################################################################################
+
+option(ENABLE_GEOFLOW "geoflow method" OFF)
+if(ENABLE_GEOFLOW)
+    add_definitions(-DENABLE_GEOFLOW)
+endif()
+
+option(BUILD_GEOFLOW "Download and build geoflow" OFF)
+if(BUILD_GEOFLOW)
+    ExternalProject_Add(
+        #GIT_REPOSITORY "https://github.com/Electrostatics/geoflow_c.git"
+        geoflow_c
+        URL "https://github.com/Electrostatics/geoflow_c/archive/master.tar.gz"
+        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${APBS_ROOT}
+                -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+                -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+    )
 endif()
