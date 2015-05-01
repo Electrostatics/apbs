@@ -47,10 +47,6 @@ add_subdirectory(generic)
 add_subdirectory(pmgc)
 add_subdirectory(mg)
 
-if(ENABLE_GEOFLOW)
-    add_subdirectory(geoflow)
-endif()
-
 if(ENABLE_FETK)
    add_subdirectory(fem)
 endif(ENABLE_FETK)

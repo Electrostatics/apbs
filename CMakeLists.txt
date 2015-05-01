@@ -680,22 +680,13 @@ if(NOT WIN32)
 endif()
 
 ################################################################################
-# Optionally download and build geoflow 
+# Optionally build geoflow (git submodule)
 ################################################################################
 
 option(ENABLE_GEOFLOW "geoflow method" OFF)
 if(ENABLE_GEOFLOW)
     add_definitions(-DENABLE_GEOFLOW)
+    add_subdirectory(${APBS_ROOT}/externals/geoflow_c/src/)
+    #include_directories(${APBS_ROOT}/externals/geoflow_c/src/)
 endif()
 
-option(BUILD_GEOFLOW "Download and build geoflow" OFF)
-if(BUILD_GEOFLOW)
-    ExternalProject_Add(
-        #GIT_REPOSITORY "https://github.com/Electrostatics/geoflow_c.git"
-        geoflow_c
-        URL "https://github.com/Electrostatics/geoflow_c/archive/master.tar.gz"
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${APBS_ROOT}
-                -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-                -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-    )
-endif()
