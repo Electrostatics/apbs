@@ -52,7 +52,11 @@
  */
 
 #include "routines.h"
-#include "geoflow/cpbconcz2.h"
+
+#ifdef ENABLE_GEOFLOW
+  #include "cpbconcz2.h"
+#endif
+
 VEMBED(rcsid="$Id$")
 
 VPUBLIC void startVio() { Vio_start(); }
@@ -4928,6 +4932,9 @@ VPUBLIC int writematBEM(int rank, NOsh *nosh, PBEparm *pbeparm) {
 
 #endif
 
+
+#ifdef ENABLE_GEOFLOW
+
 /**
  * Initialize a geometric flow calculation.
  */
@@ -5121,3 +5128,4 @@ VPUBLIC int writematGEOFLOW(int rank, NOsh *nosh, PBEparm *pbeparm) {
     return 1;
 }
 
+#endif
