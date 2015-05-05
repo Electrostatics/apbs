@@ -94,7 +94,11 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}")
 list(APPEND CMAKE_INCLUDE_PATH /usr/include)
 list(APPEND CMAKE_INCLUDE_PATH /usr/local/include)
 
-set(APBS_LIBS "-L${APBS_ROOT}/lib") # -lapbs_geoflow")
+set(APBS_LIBS "-L${APBS_ROOT}/lib")
+if(ENABLE_GEOFLOW)
+  list(APPEND APBS_LIBS "-lapbs_geoflow")
+endif()
+
 
 ################################################################################
 # Enable ansi pedantic compiling                                               #
@@ -689,6 +693,5 @@ if(ENABLE_GEOFLOW)
     add_definitions(-DENABLE_GEOFLOW)
     add_subdirectory(${APBS_ROOT}/externals/geoflow_c/src/)
     include_directories(${APBS_ROOT}/externals/geoflow_c/src/)
-    list(APPEND APBS_LIBS -lapbs_geoflow)
 endif()
 
