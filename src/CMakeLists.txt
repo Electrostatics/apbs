@@ -80,5 +80,6 @@ if(ENABLE_GEOFLOW)
     MESSAGE( "Building GEOFLOW src" )
     add_definitions(-DENABLE_GEOFLOW)
     include_directories(${APBS_ROOT}/externals/geoflow_c/src/)
+    list(APPEND APBS_LIBS "-lapbs_geoflow")
 endif()
 
