@@ -75,3 +75,10 @@ INSTALL(FILES apbs.h routines.h DESTINATION ${HEADER_INSTALL_PATH})
 INSTALL(TARGETS apbs DESTINATION ${EXECUTABLE_INSTALL_PATH})
 
 message(STATUS ${CMAKE_C_FLAGS})
+
+if(ENABLE_GEOFLOW)
+    MESSAGE( "Building GEOFLOW src" )
+    add_definitions(-DENABLE_GEOFLOW)
+    include_directories(${APBS_ROOT}/externals/geoflow_c/src/)
+endif()
+

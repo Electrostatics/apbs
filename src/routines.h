@@ -71,6 +71,10 @@
 #    include "mcx/mcx.h"
 #endif
 
+#ifdef ENABLE_GEOFLOW
+  #include "cpbconcz2.h"
+#endif
+
 /**
  * @brief  Return code for APBS during failure
  * @ingroup  Frontend */
