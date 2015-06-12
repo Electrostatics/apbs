@@ -95,9 +95,8 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}")
 list(APPEND CMAKE_INCLUDE_PATH /usr/include)
 list(APPEND CMAKE_INCLUDE_PATH /usr/local/include)
 
-#set(APBS_LIBS "-L${APBS_ROOT}/lib")
 if(ENABLE_GEOFLOW)
-  list(APPEND APBS_LIBS "-lapbs_geoflow")
+  list(APPEND APBS_LIBS "apbs_geoflow")
 endif()
 
 
@@ -193,13 +192,13 @@ if(ENABLE_BEM)
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${APBS_BUILD}
             -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
     )
-    
+
     if(BUILD_SHARED_LIBS)
         set(TABI_LIBRARY_BASENAME ${CMAKE_SHARED_LIBRARY_PREFIX}${TABI}${CMAKE_SHARED_LIBRARY_SUFFIX})
     else()
         set(TABI_LIBRARY_BASENAME ${CMAKE_STATIC_LIBRARY_PREFIX}${TABI}${CMAKE_STATIC_LIBRARY_SUFFIX})
     endif()
-    
+
     install(
         FILES ${LIBRARY_OUTPUT_PATH}/${TABI_LIBRARY_BASENAME}
         DESTINATION ${LIBRARY_INSTALL_PATH}
@@ -210,7 +209,7 @@ if(ENABLE_BEM)
         FILES_MATCHING PATTERN "*.mod"
     )
     set(TABI_LIBRARY ${LIBRARY_OUTPUT_PATH}/${TABI_LIBRARY_BASENAME})
-    
+
     set(LIBGFORTRAN_NAME ${CMAKE_SHARED_LIBRARY_PREFIX}gfortran${CMAKE_SHARED_LIBRARY_SUFFIX})
     execute_process(COMMAND gfortran --print-file-name ${LIBGFORTRAN_NAME} 
                     OUTPUT_VARIABLE LIBGFORTRANPATH
@@ -310,7 +309,7 @@ if(ENABLE_FETK)
     list(APPEND APBS_LIBS "-L${FETK_PATH}/lib")
     list(APPEND APBS_LIBS -lamd -lpunc -lmc -lgamer -lsuperlu -lumfpack
 -lblas -lvf2c -ltetgen -ltriangle -lg2c -lreadline )
-    
+
     SET(HAVE_MC_H YES)
 endif()
 
@@ -617,13 +616,13 @@ install(
 )
 
 if(BUILD_DOC)
-	install(
-		DIRECTORY ${APBS_BUILD}/doc/programmer
-		DESTINATION ${SHARE_INSTALL_PATH}/doc
-		PATTERN "Doxyfile" EXCLUDE
-		PATTERN "latex" EXCLUDE
-		PATTERN "mainpage.h" EXCLUDE
-	)
+    install(
+        DIRECTORY ${APBS_BUILD}/doc/programmer
+        DESTINATION ${SHARE_INSTALL_PATH}/doc
+        PATTERN "Doxyfile" EXCLUDE
+        PATTERN "latex" EXCLUDE
+        PATTERN "mainpage.h" EXCLUDE
+    )
 endif()
 
 install(
@@ -709,6 +708,6 @@ option(ENABLE_GEOFLOW "geoflow method" OFF)
 if(ENABLE_GEOFLOW)
     MESSAGE( "Building GEOFLOW" )
     add_definitions(-DENABLE_GEOFLOW)
-    include_directories(${APBS_BUILD}/externals/geoflow_c/src/)
+    include_directories(${APBS_ROOT}/externals/geoflow_c/src/)
 endif()
 

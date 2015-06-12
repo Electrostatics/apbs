@@ -78,11 +78,9 @@ message(STATUS ${CMAKE_C_FLAGS})
 
 if(ENABLE_GEOFLOW)
     MESSAGE( "Building GEOFLOW src" )
+    add_subdirectory(${APBS_ROOT}/externals/geoflow_c/src/
+            ${APBS_BUILD}/externals/geoflow_c/src/)
     add_definitions(-DENABLE_GEOFLOW)
-    add_subdirectory(${APBS_ROOT}/externals/geoflow_c/src/ 
-                     ${APBS_BUILD}/externals/geoflow_c/src/ )
-    include_directories(${APBS_ROOT}/externals/geoflow_c/src/ 
-                        ${APBS_ROOT}/include/ )
-    list(APPEND APBS_LIBS "-lapbs_geoflow")
+    include_directories(${APBS_ROOT}/externals/geoflow_c/src/)
 endif()
 
