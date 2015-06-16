@@ -573,7 +573,7 @@ message("libs: " ${APBS_LIBS})
 # Build APBS sources                                                           #
 ################################################################################
 
-include_directories(${APBS_ROOT}/src ${APBS_BUILD}/src)
+include_directories(${APBS_ROOT}/src ${APBS_BUILD}/src ${APBS_ROOT}/include)
 add_subdirectory(src)
 
 
