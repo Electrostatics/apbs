@@ -1125,6 +1125,9 @@ VPRIVATE int PBEparm_parseWRITE(PBEparm *thee, Vio *sock) {
     VJMPERR1(Vio_scanf(sock, "%s", tok) == 1);
     if (Vstring_strcasecmp(tok, "dx") == 0) {
         writefmt = VDF_DX;
+    }
+    else if(Vstring_strcasecmp(tok, "dxbin") == 0){
+    	writefmt = VDF_DXBIN;
     } else if (Vstring_strcasecmp(tok, "uhbd") == 0) {
         writefmt = VDF_UHBD;
     } else if (Vstring_strcasecmp(tok, "avs") == 0) {

@@ -125,7 +125,7 @@ typedef struct sVgrid Vgrid;
      *  @param   thee  Vgrid object
      *  @return  The memory used by this structure and its contents in bytes
      */
-#   define Vgrid_memChk(thee) (Vmem_bytes((thee)->vmem))
+#define Vgrid_memChk(thee) (Vmem_bytes((thee)->vmem))
 
 #endif /* if !defined(VINLINE_VPMG) */
 
@@ -298,6 +298,39 @@ VEXTERNC void Vgrid_writeDX(Vgrid *thee, const char *iodev,
  */
 VEXTERNC int Vgrid_readDX(Vgrid *thee, const char *iodev, const char *iofmt,
   const char *thost, const char *fname);
+
+/** @brief  Write out the binary data in OpenDX grid format
+ * @ingroup Vgrid
+ * @author  Nathan Baker
+ * @param   thee   Grid object
+ * @param   iodev  Output device type (FILE/BUFF/UNIX/INET)
+ * @param   iofmt  Output device format (ASCII/XDR)
+ * @param   thost  Output hostname (for sockets)
+ * @param   fname  Output FILE/BUFF/UNIX/INET name
+ * @param   title  Title to be inserted in grid file
+ * @param   pvec   Partition weight (
+ *                 if 1: point in current partition,
+ *                 if 0 point not in current partition
+ *                 if > 0 && < 1 point on/near boundary )
+ */
+VEXTERNC void Vgrid_writeDXBIN(Vgrid *thee, const char *iodev,
+  const char *iofmt,  const char *thost, const char *fname, char *title,
+  double *pvec);
+
+
+/** @brief   Read in binary data in OpenDX grid format
+ *  @note    All dimension information is given in order: z, y, x
+ *  @ingroup Vgrid
+ *  @author  Juan Brandi
+ *  @param   thee   Vgrid object
+ *  @param   iodev  Input device type (FILE/BUFF/UNIX/INET)
+ *  @param   iofmt  Input device format (ASCII/XDR)
+ *  @param   thost  Input hostname (for sockets)
+ *  @param   fname  Input FILE/BUFF/UNIX/INET name
+ *  @returns 1 if sucessful, 0 otherwise
+ */
+VEXTERNC int Vgrid_readDXBIN(Vgrid *thee, const char *iodev, const char *iofmt,
+   const char *thost, const char *fname);
 
 /**
  * @brief  Get the integral of the data

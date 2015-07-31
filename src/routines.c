@@ -251,36 +251,20 @@ VPUBLIC void killMolecules(NOsh *nosh, Valist *alist[NOSH_MAXMOL]) {
  * Loads dielectric map path data into NOsh object
  * @return 1 on success, 0 on error
  */
-VPUBLIC int loadDielMaps(NOsh *nosh,
-                         Vgrid *dielXMap[NOSH_MAXMOL],
-                         Vgrid *dielYMap[NOSH_MAXMOL],
-                         Vgrid *dielZMap[NOSH_MAXMOL]
-                        ) {
+VPUBLIC int loadDielMaps(NOsh *nosh,Vgrid *dielXMap[NOSH_MAXMOL], Vgrid *dielYMap[NOSH_MAXMOL],Vgrid *dielZMap[NOSH_MAXMOL]){
 
-    int i,
-        ii,
-        nx,
-        ny,
-        nz;
-    double sum,
-           hx,
-           hy,
-           hzed,
-           xmin,
-           ymin,
-           zmin;
+    int i,ii,nx,ny,nz;
+    double sum,hx,hy,hzed,xmin,ymin,zmin;
 
     // Check to be sure we have dieletric map paths; if not, return.
     if (nosh->ndiel > 0)
-        Vnm_tprint( 1, "Got paths for %d dielectric map sets\n",
-                    nosh->ndiel);
+        Vnm_tprint( 1, "Got paths for %d dielectric map sets\n",nosh->ndiel);
     else
         return 1;
 
     // For each dielectric map path, read the data and calculate needed values.
     for (i=0; i<nosh->ndiel; i++) {
-        Vnm_tprint( 1, "Reading x-shifted dielectric map data from \
-%s:\n", nosh->dielXpath[i]);
+        Vnm_tprint( 1, "Reading x-shifted dielectric map data from %s:\n", nosh->dielXpath[i]);
         dielXMap[i] = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
 
         // Determine the format and read data if the format is valid.
@@ -318,6 +302,42 @@ VPUBLIC int loadDielMaps(NOsh *nosh,
                     sum = sum*hx*hy*hzed;
                 Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
                 break;
+
+            //DX binary file (.dxbin)
+            case VDF_DXBIN:
+            	//TODO: add this method and maybe change the if stmt.
+            	if (Vgrid_readDXBIN(dielXMap[i], "FILE", "ASC", VNULL,
+            	                                 nosh->dielXpath[i]) != 1) {
+            	                    Vnm_tprint( 2, "Fatal error while reading from %s\n",
+            	                                nosh->dielXpath[i]);
+            	                    return 0;
+            	}
+
+            	// Set grid sizes
+				nx = dielXMap[i]->nx;
+				ny = dielXMap[i]->ny;
+				nz = dielXMap[i]->nz;
+
+				// Set spacings
+				hx = dielXMap[i]->hx;
+				hy = dielXMap[i]->hy;
+				hzed = dielXMap[i]->hzed;
+
+				// Set minimum lower corner
+				xmin = dielXMap[i]->xmin;
+				ymin = dielXMap[i]->ymin;
+				zmin = dielXMap[i]->zmin;
+				Vnm_tprint(1, "  %d x %d x %d grid\n", nx, ny, nz);
+				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", hx, hy, hzed);
+				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+						   xmin, ymin, zmin);
+				sum = 0;
+				for (ii=0; ii<(nx*ny*nz); ii++)
+					sum += (dielXMap[i]->data[ii]);
+					sum = sum*hx*hy*hzed;
+				Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
+				break;
+
             // Binary file (GZip)
             case VDF_GZ:
                 if (Vgrid_readGZ(dielXMap[i], nosh->dielXpath[i]) != 1) {
@@ -406,6 +426,40 @@ VPUBLIC int loadDielMaps(NOsh *nosh,
                     sum = sum*hx*hy*hzed;
                 Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
                 break;
+            //DX Binary file (.dxbin)
+			case VDF_DXBIN:
+				//TODO: add this funct/method and maybe change the if stmt.
+				if (Vgrid_readDXBIN(dielYMap[i], "FILE", "ASC", VNULL,
+								 nosh->dielYpath[i]) != 1) {
+					Vnm_tprint( 2, "Fatal error while reading from %s\n",
+								nosh->dielYpath[i]);
+					return 0;
+				}
+
+				// Read grid
+				nx = dielYMap[i]->nx;
+				ny = dielYMap[i]->ny;
+				nz = dielYMap[i]->nz;
+
+				// Read spacings
+				hx = dielYMap[i]->hx;
+				hy = dielYMap[i]->hy;
+				hzed = dielYMap[i]->hzed;
+
+				// Read minimum lower corner
+				xmin = dielYMap[i]->xmin;
+				ymin = dielYMap[i]->ymin;
+				zmin = dielYMap[i]->zmin;
+				Vnm_tprint(1, "  %d x %d x %d grid\n", nx, ny, nz);
+				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", hx, hy, hzed);
+				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+						   xmin, ymin, zmin);
+				sum = 0;
+				for (ii=0; ii<(nx*ny*nz); ii++)
+					sum += (dielYMap[i]->data[ii]);
+					sum = sum*hx*hy*hzed;
+				Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
+				break;
             // Binary file (GZip) format
             case VDF_GZ:
                 if (Vgrid_readGZ(dielYMap[i], nosh->dielYpath[i]) != 1) {
@@ -496,6 +550,41 @@ VPUBLIC int loadDielMaps(NOsh *nosh,
                     sum = sum*hx*hy*hzed;
                 Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
                 break;
+            //OpenDX Binary format (.dxbin)
+            case VDF_DXBIN:
+            	//TODO: add this funct/method and maybe change the if stmt.
+				if (Vgrid_readDXBIN(dielZMap[i], "FILE", "ASC", VNULL,
+								 nosh->dielZpath[i]) != 1) {
+					Vnm_tprint( 2, "Fatal error while reading from %s\n",
+								nosh->dielZpath[i]);
+					return 0;
+				}
+
+				// Read grid
+				nx = dielZMap[i]->nx;
+				ny = dielZMap[i]->ny;
+				nz = dielZMap[i]->nz;
+
+				// Read spacings
+				hx = dielZMap[i]->hx;
+				hy = dielZMap[i]->hy;
+				hzed = dielZMap[i]->hzed;
+
+				// Read minimum lower corner
+				xmin = dielZMap[i]->xmin;
+				ymin = dielZMap[i]->ymin;
+				zmin = dielZMap[i]->zmin;
+				Vnm_tprint(1, "  %d x %d x %d grid\n",
+						   nx, ny, nz);
+				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
+						   hx, hy, hzed);
+				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+						   xmin, ymin, zmin);
+				sum = 0;
+				for (ii=0; ii<(nx*ny*nz); ii++) sum += (dielZMap[i]->data[ii]);
+					sum = sum*hx*hy*hzed;
+				Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
+				break;
             // Binary file (GZip) format
             case VDF_GZ:
                 if (Vgrid_readGZ(dielZMap[i], nosh->dielZpath[i]) != 1) {
@@ -620,6 +709,31 @@ VPUBLIC int loadKappaMaps(NOsh *nosh,
                     sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
                 Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
                 break;
+                // OpenDX Binary (.dxbin) format
+				case VDF_DXBIN:
+					//TODO: write method and possible change if stmt.
+					if (Vgrid_readDXBIN(map[i], "FILE", "ASC", VNULL,
+									 nosh->kappapath[i]) != 1) {
+						Vnm_tprint( 2, "Fatal error while reading from %s\n",
+									nosh->kappapath[i]);
+						return 0;
+					}
+					Vnm_tprint(1, "  %d x %d x %d grid\n",
+							   map[i]->nx, map[i]->ny, map[i]->nz);
+					Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
+							   map[i]->hx, map[i]->hy, map[i]->hzed);
+					Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+							   map[i]->xmin, map[i]->ymin, map[i]->zmin);
+					sum = 0;
+					for (ii = 0, len = map[i]->nx * map[i]->ny * map[i]->nz;
+						 ii < len;
+						 ii++
+						) {
+						sum += (map[i]->data[ii]);
+					}
+						sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
+					Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
+					break;
             // UHBD format
             case VDF_UHBD:
                 Vnm_tprint( 2, "UHBD input not supported yet!\n");
@@ -811,6 +925,27 @@ VPUBLIC int loadChargeMaps(NOsh *nosh,
                     sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
                 Vnm_tprint(1, "  Charge map integral = %3.2e e\n", sum);
                 break;
+            case VDF_DXBIN:
+            	//TODO: write Vgrid_readDXBIN and possibly change if stmt.
+				if (Vgrid_readDXBIN(map[i], "FILE", "ASC", VNULL,
+								 nosh->chargepath[i]) != 1) {
+					Vnm_tprint( 2, "Fatal error while reading from %s\n",
+								nosh->chargepath[i]);
+					return 0;
+				}
+				Vnm_tprint(1, "  %d x %d x %d grid\n",
+						   map[i]->nx, map[i]->ny, map[i]->nz);
+				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
+						   map[i]->hx, map[i]->hy, map[i]->hzed);
+				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+						   map[i]->xmin, map[i]->ymin, map[i]->zmin);
+				sum = 0;
+				for (ii=0,len=map[i]->nx*map[i]->ny*map[i]->nz; ii<len; ii++) {
+					sum += (map[i]->data[ii]);
+				}
+					sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
+				Vnm_tprint(1, "  Charge map integral = %3.2e e\n", sum);
+				break;
             case VDF_UHBD:
                 Vnm_tprint( 2, "UHBD input not supported yet!\n");
                 return 0;
@@ -1018,6 +1153,9 @@ to ");
             case VDF_DX:
                 Vnm_tprint(1, "%s.%s\n", pbeparm->writestem[i], "dx");
                 break;
+            case VDF_DXBIN:
+				Vnm_tprint(1, "%s.%s\n", pbeparm->writestem[i], "dxbin");
+				break;
             case VDF_GZ:
                 Vnm_tprint(1, "%s.%s\n", pbeparm->writestem[i], "dx.gz");
                 break;
@@ -2530,6 +2668,17 @@ VPUBLIC int writedataMG(int rank,
                 Vgrid_dtor(&grid);
                 break;
 
+            case VDF_DXBIN:
+				sprintf(outpath, "%s.%s", writestem, "dxbin");
+				Vnm_tprint(1, "%s\n", outpath);
+				grid = Vgrid_ctor(nx, ny, nz, hx, hy, hzed, xmin, ymin, zmin,
+								  pmg->rwork);
+				//TODO: write Vgrid_writeDXBIN method
+				Vgrid_writeDXBIN(grid, "FILE", "ASC", VNULL, outpath, title,
+							  pmg->pvec);
+				Vgrid_dtor(&grid);
+				break;
+
             case VDF_AVS:
                 sprintf(outpath, "%s.%s", writestem, "ucd");
                 Vnm_tprint(1, "%s\n", outpath);
@@ -3670,6 +3819,9 @@ VPUBLIC Vrc_Codes initFE(int icalc, /**< Index in pb, fetk to initialize (calcul
             case VDF_DX:
                 Vnm_tprint(2, "DX finite element mesh input not supported yet!\n");
                 return VRC_FAILURE;
+            case VDF_DXBIN:
+				Vnm_tprint(2, "DXBIN finite element mesh input not supported yet!\n");
+				return VRC_FAILURE;
             case VDF_UHBD:
                 Vnm_tprint( 2, "UHBD finite element mesh input not supported!\n");
                 return VRC_FAILURE;
@@ -4283,6 +4435,13 @@ VPUBLIC int writedataFE(int rank, /**< Rank of processor (for parallel runs) */
                 Vfetk_write(fetk, "FILE", "ASC", VNULL, outpath, vec, VDF_DX);
                 break;
 
+            case VDF_DXBIN:
+            	//TODO: probably change some or all of below.
+				sprintf(outpath, "%s.%s", writestem, "dxbin");
+				Vnm_tprint(1, "%s\n", outpath);
+				Vfetk_write(fetk, "FILE", "ASC", VNULL, outpath, vec, VDF_DXBIN);
+				break;
+
             case VDF_AVS:
                 sprintf(outpath, "%s.%s", writestem, "ucd");
                 Vnm_tprint(1, "%s\n", outpath);
@@ -4777,7 +4936,7 @@ VPUBLIC int forceAPOL(Vacc *acc,
  * Initialize a boundary element calculation.
  */
 VPUBLIC int initBEM(int icalc,
-                   NOsh *nosh, 
+                   NOsh *nosh,
                    BEMparm *bemparm,
                    PBEparm *pbeparm,
                    Vpbe *pbe[NOSH_MAXCALC]
@@ -4939,7 +5098,7 @@ VPUBLIC int writematBEM(int rank, NOsh *nosh, PBEparm *pbeparm) {
  * Initialize a geometric flow calculation.
  */
 VPUBLIC int initGEOFLOW(int icalc,
-                   NOsh *nosh, 
+                   NOsh *nosh,
                    GEOFLOWparm *bemparm,
                    PBEparm *pbeparm,
                    Vpbe *pbe[NOSH_MAXCALC]
@@ -4980,7 +5139,7 @@ VPUBLIC int solveGEOFLOW(Valist* molecules[NOSH_MAXMOL], NOsh *nosh, PBEparm *pb
     }
 
     Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
-    
+
     natm = 0;
     for (m=0; m < nosh->nmol; ++m){
         natm += Valist_getNumberAtoms(molecules[m]);
