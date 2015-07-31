@@ -687,7 +687,10 @@ VPRIVATE int NOsh_parseREAD_DIEL(NOsh *thee, Vio *sock) {
     VJMPERR1(Vio_scanf(sock, "%s", tok) == 1);
     if (Vstring_strcasecmp(tok, "dx") == 0) {
         dielfmt = VDF_DX;
-    } else if (Vstring_strcasecmp(tok, "gz") == 0) {
+    //added VDF_BIN to take binary files.
+    } else if (Vstring_strcasecmp(tok, "dxbin") == 0){
+    	dielfmt = VDF_DXBIN;
+    }else if (Vstring_strcasecmp(tok, "gz") == 0) {
         dielfmt = VDF_GZ;
     } else {
         Vnm_print(2, "NOsh_parseREAD:  Ignoring undefined format \
@@ -740,7 +743,10 @@ VPRIVATE int NOsh_parseREAD_KAPPA(NOsh *thee, Vio *sock) {
         kappafmt = VDF_DX;
     } else if (Vstring_strcasecmp(tok, "gz") == 0) {
         kappafmt = VDF_GZ;
+    } else if (Vstring_strcasecmp(tok,"dxbin") == 0) {
+    	kappafmt = VDF_DXBIN;
     } else {
+
         Vnm_print(2, "NOsh_parseREAD:  Ignoring undefined format \
                   %s!\n", tok);
         return VRC_FAILURE;
@@ -783,6 +789,8 @@ VPRIVATE int NOsh_parseREAD_POTENTIAL(NOsh *thee, Vio *sock) {
         potfmt = VDF_DX;
     } else if (Vstring_strcasecmp(tok, "gz") == 0) {
         potfmt = VDF_GZ;
+    } else if(Vstring_strcasecmp(tok, "dxbin") == 0){
+    	potfmt = VDF_DXBIN;
     } else {
         Vnm_print(2, "NOsh_parseREAD:  Ignoring undefined format \
                   %s!\n", tok);
@@ -824,7 +832,10 @@ VPRIVATE int NOsh_parseREAD_CHARGE(NOsh *thee, Vio *sock) {
     VJMPERR1(Vio_scanf(sock, "%s", tok) == 1);
     if (Vstring_strcasecmp(tok, "dx") == 0) {
         chargefmt = VDF_DX;
-    } else if (Vstring_strcasecmp(tok, "gz") == 0) {
+    }
+    else if(Vstring_strcasecmp(tok, "dxbin") == 0){
+    	chargefmt = VDF_DXBIN;
+    }else if (Vstring_strcasecmp(tok, "gz") == 0) {
         chargefmt = VDF_GZ;
     } else {
         Vnm_print(2, "NOsh_parseREAD:  Ignoring undefined format \
@@ -2744,7 +2755,7 @@ VPUBLIC int NOsh_parseGEOFLOW(
             rc = 1;
             break;
         }
-        
+
         if (Vstring_strcasecmp(tok, "ion") == 0) {
             Vnm_print(2, "parseGEOFLOW: WARNING! ion not implemented for geometric flow!\n");
         }
@@ -2773,7 +2784,7 @@ VPUBLIC int NOsh_parseGEOFLOW(
             }
         }
     }
-    
+
     pbeparm->setsrfm=1;
     pbeparm->srad=0.0;
     pbeparm->setsrad=1;
@@ -2792,4 +2803,3 @@ VPUBLIC int NOsh_parseGEOFLOW(
 
     return 1;
 }
-

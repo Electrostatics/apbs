@@ -55,6 +55,7 @@
  */
 
 #include "vgrid.h"
+#include <stdio.h>
 
 VEMBED(rcsid="$Id$")
 
@@ -799,10 +800,207 @@ VPUBLIC int Vgrid_readDX(Vgrid *thee,
     Vnm_print(2, "Vgrid_readDX:  I/O problem with input file <%s>\n",
       fname);
     return 0;
-
-
-
 }
+
+/**
+ * Load grid from an input dx binary file.
+ * @author Juan Brandi
+ */
+VPUBLIC int Vgrid_readDXBIN(Vgrid *thee, const char *iodev, const char *iofmt,
+                         const char *thost, const char *fname) {
+
+	size_t i, j, k, itmp, u;
+	double dtmp, dtmp2;
+	char tok[VMAX_BUFSIZE];
+	int isBinary = 0;
+	//Vio *sock;
+
+	/* Check to see if the existing data is null and, if not, clear it out */
+	if (thee->data != VNULL) {
+		Vnm_print(1, "Vgrid_readDXBIN: destroying existing data!\n");
+	Vmem_free(thee->mem, (thee->nx*thee->ny*thee->nz), sizeof(double),
+		  (void **)&(thee->data)); }
+	thee->readdata = 1;
+	thee->ctordata = 0;
+
+	/*Opend file fd for binary reading*/
+	FILE *fd = fopen(fname,"rb");
+	if(fd == NULL){
+		printf("Vgrid_readDXBIN: Problem opening file %s\n",fname);
+		fclose(fd);
+		return 0;
+	}
+
+	    /* Set up the virtual socket */
+//	    sock = Vio_ctor(iodev,iofmt,thost,fname,"r");
+//	    if (sock == VNULL) {
+//	        Vnm_print(2, "Vgrid_readDX: Problem opening virtual socket %s\n",
+//	          fname);
+//	        return 0;
+//	    }
+//	    if (Vio_accept(sock, 0) < 0) {
+//	        Vnm_print(2, "Vgrid_readDX: Problem accepting virtual socket %s\n",
+//	          fname);
+//	        return 0;
+//	    }
+//
+//	    Vio_setWhiteChars(sock, MCwhiteChars);
+//	    Vio_setCommChars(sock, MCcommChars);
+
+	//skip comments
+	do{
+		fgets(tok, VMAX_BUFSIZE, fd);
+	}
+	while(tok[0]=='#');
+
+	//get counts
+	if(sscanf(tok,"object 1 class gridpositions counts %i %i %i\n",&(thee->nx),&(thee->ny),&(thee->nz))!= 3){
+		printf("Vgrid_readDXBIN: Failed to read dimensions.\n");
+		fclose(fd);
+		return 0;
+	}
+	printf("Vgrid_readDXBIN: Grid dimensions %d x %d x %d grid\n",thee->nx, thee->ny, thee->nz);
+
+	    /* Read in the DX regular positions */
+
+		/* Get "object" */
+//	    VJMPERR2(1 == Vio_scanf(sock, "%s", tok));
+//	    VJMPERR1(!strcmp(tok, "object"));
+//	    /* Get "1" */
+//	    VJMPERR2(1 == Vio_scanf(sock, "%d", &itmp));
+//	    /* Get "class" */
+//	    VJMPERR2(1 == Vio_scanf(sock, "%s", tok));
+//	    VJMPERR1(!strcmp(tok, "class"));
+//	    /* Get "gridpositions" */
+//	    VJMPERR2(1 == Vio_scanf(sock, "%s", tok));
+//	    VJMPERR1(!strcmp(tok, "gridpositions"));
+//	    /* Get "counts" */
+//	    VJMPERR2(1 == Vio_scanf(sock, "%s", tok));
+//	    VJMPERR1(!strcmp(tok, "counts"));
+//	    /* Get nx */
+//	    VJMPERR2(1 == Vio_scanf(sock, "%s", tok));
+//	    VJMPERR1(1 == sscanf(tok, "%d", &(thee->nx)));
+//	    /* Get ny */
+//	    VJMPERR2(1 == Vio_scanf(sock, "%s", tok));
+//	    VJMPERR1(1 == sscanf(tok, "%d", &(thee->ny)));
+//	    /* Get nz */
+//	    VJMPERR2(1 == Vio_scanf(sock, "%s", tok));
+//	    VJMPERR1(1 == sscanf(tok, "%d", &(thee->nz)));
+//	    Vnm_print(0, "Vgrid_readDX:  Grid dimensions %d x %d x %d grid\n",
+//	     thee->nx, thee->ny, thee->nz);
+
+	if(fgets(tok,VMAX_BUFSIZE, fd) == NULL){
+		printf("Vgrid_readDXBIN: unexpected end of file.\n");
+		fclose(fd);
+		return 0;
+	}
+	if(sscanf(tok,"origin %lf %lf %lf",&(thee->xmin),&(thee->ymin),&(thee->zmin))!=3){
+		printf("Vgrid_readDXBIN: Failed to read origin cell data.\n");
+		fclose(fd);
+		return 0;
+	}
+	printf("Vgrid_readDXBIN: Grid origin = (%g %g %g)\n",thee->xmin, thee->ymin, thee->zmin);
+
+	//get Delta x
+	if(fgets(tok,VMAX_BUFSIZE, fd) == NULL){
+		printf("Vgrid_readDXBIN: unexpected end of file.\n");
+		fclose(fd);
+		return 0;
+	}
+	if(sscanf(tok,"delta %lf %lf %lf",&(thee->hx),&dtmp,&dtmp2)!=3){
+		printf("Vgrid_readDXBIN: Failed to read delta x data.\n");
+		fclose(fd);
+		return 0;
+	}
+	//get Delta y
+	if(fgets(tok,VMAX_BUFSIZE, fd) == NULL){
+		printf("Vgrid_readDXBIN: Unexpected end of file\n");
+		fclose(fd);
+		return 0;
+	}
+	if(sscanf(tok,"delta %lf %lf %lf",&dtmp,&(thee->hy),&dtmp2)!=3){
+		printf("Vgrid_readDXBIN: Failed to read delta y data.\n");
+		fclose(fd);
+		return 0;
+	}
+	//get Delta z
+	if(fgets(tok,VMAX_BUFSIZE, fd) == NULL){
+		printf("Vgrid_readDXBIN: Unexpected end of file.\n");
+		fclose(fd);
+		return 0;
+	}
+	if(sscanf(tok,"delta %lf %lf %lf",&dtmp,&dtmp2,&(thee->hzed))!=3){
+		printf("Vgrid_readDXBIN: Failed to read delta z data.\n");
+		fclose(fd);
+		return 0;
+	}
+	printf("Vgrid_readDXBIN: Grid spacings = (%g, %g, %g)\n",thee->hx, thee->hy, thee->hzed);
+
+	//skip a line
+	if(fgets(tok,VMAX_BUFSIZE, fd) == NULL){
+		printf("Vgrid_readDXBIN: Unexpected end of file.\n");
+		fclose(fd);
+		return 0;
+	}
+
+	//scan the buffer for the word binary
+	if(fgets(tok,VMAX_BUFSIZE, fd) == NULL){
+		printf("Vgrid_readDXBIN: Unexpected end of file.\n");
+		fclose(fd);
+		return 0;
+	}
+	if(strstr(tok,"binary")){
+		isBinary = 1;
+	}
+	else{
+		printf("Vgrid_readDXBIN: Binary tag not found. Will continue to try to read binary data.");
+	}
+
+	u = (size_t)thee->nx * thee->ny * thee->nz;
+	int tot = thee->nx * thee->ny * thee->nz;
+
+	/*Allocate space for the data*/
+	printf("Vgrid_readDXBIN: allocating %d x %d x %d doubled for storage\n", thee->nx, thee->ny, thee->nz);
+	thee->data = NULL;
+	thee->data = (double *)malloc(tot*sizeof(double));
+
+	if(thee->data == NULL){
+		printf("Vgrid_readDXBIN: Unable to allocate space for data!\n");
+		fclose(fd);
+		return 0;
+	}
+
+	int counter = 0, r;
+
+	for (i=0; i<thee->nx; i++) {
+		for (j=0; j<thee->ny; j++) {
+			for (k=0; k<thee->nz; k++) {
+				u = k*(thee->nx)*(thee->ny)+j*(thee->nx)+i;
+				r = fread(&dtmp,sizeof(double),1,fd);
+				(thee->data)[u] = dtmp;
+				if(r!= 1){
+					printf("Vgrid_readDXBIN: Failed to read doubles.\n");
+					return 0;
+				}
+				counter++;
+			}
+		}
+	}
+
+	if(counter!=tot){
+		printf("Vgrid_readDXBIN: Read double = %d not equal to items = %d\n",counter, tot);
+	}
+
+	/* calculate grid maxima */
+	thee->xmax = thee->xmin + (thee->nx-1)*thee->hx;
+	thee->ymax = thee->ymin + (thee->ny-1)*thee->hy;
+	thee->zmax = thee->zmin + (thee->nz-1)*thee->hzed;
+
+	fclose(fd);
+
+	return 1;
+}
+
 
 /* ///////////////////////////////////////////////////////////////////////////
  // Routine:  Vgrid_writeGZ
@@ -1250,6 +1448,241 @@ class field\n");
     Vio_connectFree(sock);
     Vio_dtor(&sock);
 }
+
+/* ///////////////////////////////////////////////////////////////////////////
+// Routine:  Vgrid_writeDXBIN
+//
+// Author:   Juan Brandi
+/////////////////////////////////////////////////////////////////////////// */
+VPUBLIC void Vgrid_writeDXBIN(Vgrid *thee, const char *iodev, const char *iofmt,
+  const char *thost, const char *fname, char *title, double *pvec){
+
+	double xmin, ymin, zmin, hx, hy, hzed;
+	int nx, ny, nz, nxPART, nyPART, nzPART;
+	int usepart, gotit;
+	size_t icol, i, j, k, u;
+	double x, y, z, xminPART, yminPART, zminPART;
+	//Vio *sock;
+	char precFormat[VMAX_BUFSIZE];
+
+	if (thee == VNULL) {
+		Vnm_print(2, "Vgrid_writeDXBIN:  Error -- got VNULL thee!\n");
+			VASSERT(0);
+		}
+		if (!(thee->ctordata || thee->readdata)) {
+			Vnm_print(2, "Vgrid_writeDXBIN:  Error -- no data available!\n");
+			VASSERT(0);
+		}
+
+
+		hx = thee->hx;
+		hy = thee->hy;
+		hzed = thee->hzed;
+		nx = thee->nx;
+		ny = thee->ny;
+		nz = thee->nz;
+		xmin = thee->xmin;
+		ymin = thee->ymin;
+		zmin = thee->zmin;
+
+		if (pvec == VNULL) usepart = 0;
+		else usepart = 1;
+
+		/*will not use vio methods to try to avoid using malloc.*/
+		FILE *fd = fopen(fname,"wb");
+
+		//check to se if the file was created/open successfully.
+		if(fd == NULL){
+			printf("Vgrid_writeDXBIN: Problem opening file %s for writing.\n", fname);
+			return;
+		}
+
+		printf("Vgrid_writeDXBIN: Writing to file...\n");
+
+		if (usepart) {
+			/* Get the lower corner and number of grid points for the local
+			 * partition */
+			xminPART = VLARGE;
+			yminPART = VLARGE;
+			zminPART = VLARGE;
+			nxPART = 0;
+			nyPART = 0;
+			nzPART = 0;
+			/* First, search for the lower corner */
+			for (k=0; k<nz; k++) {
+				z = k*hzed + zmin;
+				for (j=0; j<ny; j++) {
+					y = j*hy + ymin;
+					for (i=0; i<nx; i++) {
+						x = i*hx + xmin;
+						if (pvec[IJK(i,j,k)] > 0.0) {
+							if (x < xminPART) xminPART = x;
+							if (y < yminPART) yminPART = y;
+							if (z < zminPART) zminPART = z;
+						}
+					}
+				}
+			}
+			/* Now search for the number of grid points in the z direction */
+			for (k=0; k<nz; k++) {
+				gotit = 0;
+				for (j=0; j<ny; j++) {
+					for (i=0; i<nx; i++) {
+						if (pvec[IJK(i,j,k)] > 0.0) {
+							gotit = 1;
+							break;
+						}
+					}
+					if (gotit) break;
+				}
+				if (gotit) nzPART++;
+			}
+			/* Now search for the number of grid points in the y direction */
+			for (j=0; j<ny; j++) {
+				gotit = 0;
+				for (k=0; k<nz; k++) {
+					for (i=0; i<nx; i++) {
+						if (pvec[IJK(i,j,k)] > 0.0) {
+							gotit = 1;
+							break;
+						}
+					}
+					if (gotit) break;
+				}
+				if (gotit) nyPART++;
+			}
+			/* Now search for the number of grid points in the x direction */
+			for (i=0; i<nx; i++) {
+				gotit = 0;
+				for (k=0; k<nz; k++) {
+					for (j=0; j<ny; j++) {
+						if (pvec[IJK(i,j,k)] > 0.0) {
+							gotit = 1;
+							break;
+						}
+					}
+					if (gotit) break;
+				}
+				if (gotit) nxPART++;
+			}
+
+			if ((nxPART != nx) || (nyPART != ny) || (nzPART != nz)) {
+				Vnm_print(0, "Vgrid_writeDXBIN:  printing only subset of domain\n");
+			}
+
+			/* Write title (we're in XDR and "wb") */
+			//Vnm_print(0, "Vgrid_writeDXBIN:  Writing comments for dxbin format.\n");
+			printf("Vgrid_writeDXBIN: Writing comments for dxbin format\n");
+			fprintf(fd, "# Data from %s\n",PACKAGE_STRING);
+			fprintf(fd, "# \n");
+			fprintf(fd, "# %s\n",title);
+			fprintf(fd, "# \n");
+
+			/* Write off the DX regular positions */
+			fprintf(fd, "object 1 class gridpositions counts %d %d %d\n",nxPART, nyPART, nzPART);
+
+			sprintf(precFormat, Vprecision, xminPART, yminPART, zminPART);
+			fprintf(fd, "origin %s\n",precFormat);
+
+			sprintf(precFormat, Vprecision, hx, 0.0, 0.0);
+			fprintf(fd, "delta %s\n",precFormat);
+
+			sprintf(precFormat, Vprecision, 0.0, hy, 0.0);
+			fprintf(fd, "delta %s\n", precFormat);
+
+			sprintf(precFormat, Vprecision, 0.0, 0.0, hzed);
+			fprintf(fd, "delta %s\n", precFormat);
+
+			/* Write off the DX regular connections */
+			fprintf(fd, "object 2 class gridconnections counts %d %d %d\n", nxPART, nyPART, nzPART);
+
+			/* Write off the DX data */
+			fprintf(fd, "object 3 class array type double rank 0 items %lu binary data follows\n",(nxPART*nyPART*nzPART));
+
+			icol = 0;
+			for (i=0; i<nx; i++) {
+				for (j=0; j<ny; j++) {
+					for (k=0; k<nz; k++) {
+						u = k*(nx)*(ny)+j*(nx)+i;
+						if (pvec[u] > 0.0) {
+							fwrite(&(thee->data)[u],sizeof(double),1,fd);
+							icol++;
+							/*don't need the column formating to write binary doubles.*/
+							if (icol == 3) {
+								icol = 0;
+							}
+						}
+					}
+				}
+			}
+
+			fprintf(fd,"\n");
+
+			/* Create the field */
+			fprintf(fd, "attribute \"dep\" string \"positions\"\n");
+			fprintf(fd, "object \"regular positions regular connections\" class field\n");
+			fprintf(fd, "component \"positions\" value 1\n");
+			fprintf(fd, "component \"connections\" value 2\n");
+			fprintf(fd, "component \"data\" value 3\n");
+
+			fclose(fd);
+
+		} else {
+			/*write dx format title*/
+			printf("Vgrid_writeDXBIN: Writing comments for %s format.\n",iofmt);
+			fprintf(fd,"# Data from %s\n", PACKAGE_STRING);
+			fprintf(fd,"# \n");
+			fprintf(fd, "# %s\n", title);
+			fprintf(fd, "# \n");
+
+			/* Write off the DX regular positions */
+			fprintf(fd, "object 1 class gridpositions counts %d %d %d\n", nx, ny, nz);
+
+			sprintf(precFormat, Vprecision, xmin, ymin, zmin);
+			fprintf(fd, "origin %s\n", precFormat);
+
+			sprintf(precFormat, Vprecision, hx, 0.0, 0.0);
+			fprintf(fd, "delta %s\n", precFormat);
+
+			sprintf(precFormat, Vprecision, 0.0, hy, 0.0);
+			fprintf(fd, "delta %s\n", precFormat);
+
+			sprintf(precFormat, Vprecision, 0.0, 0.0, hzed);
+			fprintf(fd, "delta %s\n", precFormat);
+
+			/* Write off the DX regular connections */
+			fprintf(fd, "object 2 class gridconnections counts %d %d %d\n", nx, ny, nz);
+
+			/* Write off the DX data */
+			fprintf(fd, "object 3 class array type double rank 0 items %lu binary data follows\n", (nx*ny*nz));
+
+			icol = 0;
+			for (i=0; i<nx; i++) {
+				for (j=0; j<ny; j++) {
+					for (k=0; k<nz; k++) {
+						u = k*(nx)*(ny)+j*(nx)+i;
+						fwrite(&(thee->data)[u],sizeof(double),1,fd);
+						icol++;
+						if (icol == 3) {
+							icol = 0;
+						}
+					}
+				}
+			}
+
+			fprintf(fd, "\n");
+
+			/* Create the field */
+			fprintf(fd, "attribute \"dep\" string \"positions\"\n");
+			fprintf(fd, "object \"regular positions regular connections\" class field\n");
+			fprintf(fd, "component \"positions\" value 1\n");
+			fprintf(fd, "component \"connections\" value 2\n");
+			fprintf(fd, "component \"data\" value 3\n");
+
+			fclose(fd);
+		}
+}
+
 
 /* ///////////////////////////////////////////////////////////////////////////
 // Routine:  Vgrid_writeUHBD

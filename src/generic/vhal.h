@@ -314,7 +314,8 @@ enum eVdata_Format {
     VDF_AVS=2,  /**< AVS UCD format */
     VDF_MCSF=3,  /**< FEtk MC Simplex Format (MCSF) */
     VDF_GZ=4,    /**< Binary file (GZip) */
-    VDF_FLAT=5  /**< Write flat file */
+    VDF_FLAT=5,  /**< Write flat file */
+	VDF_DXBIN=6 /**< OpendDX (Data Explorer) binary format */
 };
 
 /** @typedef Vdata_Format
