@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     This driver program (like its UHBD counterpart) does simple arithmetic\n\
     with Cartesian grid data.  It is invoked as:\n\n\
       dx-math <path>\n\n\
-    where <path> is the path is the path to a file with operations specified\n\
+    where <path> is the path to a file with operations specified\n\
     in a stack-based (RPN) manner.  For example, a command file which adds\n\
     grid1 and grid2, multiplies the result by 5.3, adds grid4, subtracts\n\
     99.3 from the whole thing, and writes the result on grid5 would have the\n\
