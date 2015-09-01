@@ -582,7 +582,7 @@ add_subdirectory(src)
 # Build APBS documentation                                                     #
 ################################################################################
 
-option(BUILD_DOC "Build/Rebuild documentation using doxygen" OFF)
+option(BUILD_DOC "Build/Rebuild documentation using doxygen" ON)
 
 if(BUILD_DOC)
     message(STATUS "Building documentation enabled")
