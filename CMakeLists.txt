@@ -181,7 +181,7 @@ if(NOT HAVE_SRAND_FUNC)
     message(FATAL_ERROR "Required srand function not found")
 endif()
 
-option(ENABLE_BEM "Boundary element method using TABIPB" ON)
+option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
 if(ENABLE_BEM)
     add_definitions(-DENABLE_BEM)
     set(TABI tabipb)
