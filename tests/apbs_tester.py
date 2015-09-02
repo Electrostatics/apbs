@@ -60,7 +60,11 @@ def process_serial( binary, input_file ):
     
     # Construct the system command and make the call
     command = [ binary, input_file ]
-    subprocess.call( command, stdout = output_file )
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in proc.stdout:
+        sys.stdout.write(line)
+        output_file.write(line)
+    proc.wait()
     
     # Look for the results in the output file
     output_file = open( output_name, 'r' )
@@ -290,10 +294,4 @@ def main():
 # If this file is executed as a script, call the main function
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
 
