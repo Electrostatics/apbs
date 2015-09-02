@@ -71,6 +71,9 @@ set(SHARE_INSTALL_PATH share/apbs)
 find_file(CONTRIB_PATH "contrib" PATHS "${APBS_ROOT}"
     DOC "The path to contributed modules for apbs"
     )
+find_file(EXTERNALS_PATH "externals" PATHS "${APBS_ROOT}"
+	DOC "The path to the external git submodules"
+	)
 
 set(SYS_LIBPATHS /usr/lib64)
 #list(APPEND SYS_LIBPATHS /usr/lib64)
@@ -228,7 +231,7 @@ endif() # ENABLE_BEM
 find_file( # this should be find path...
     FETK_PATH
     NAMES fetk
-    PATHS ${SYS_LIBPATHS} /data/work/source . ..
+	PATHS ${SYS_LIBPATHS} ${EXTERNALS_PATH} . ..
     DOC "Use an external fetk library")
 
 if(FETK_PATH)
@@ -708,6 +711,6 @@ option(ENABLE_GEOFLOW "geoflow method" OFF)
 if(ENABLE_GEOFLOW)
     MESSAGE( "Building GEOFLOW" )
     add_definitions(-DENABLE_GEOFLOW)
-    include_directories(${APBS_ROOT}/externals/geoflow_c/src/)
+	include_directories(${EXTERNALS_PATH}/geoflow_c/src/)
 endif()
 
