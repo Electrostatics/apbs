@@ -59,7 +59,7 @@ message(STATUS "${APBS_LIBS} ${APBS_INTERNAL_LIBS}")
 message(STATUS " ")
 
 target_link_libraries(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
- 
+
 configure_file(
     ${APBS_ROOT}/src/.config/apbscfg.h.in
     ${APBS_BUILD}/src/apbscfg.h
