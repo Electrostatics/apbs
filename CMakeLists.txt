@@ -234,8 +234,11 @@ endif() # ENABLE_BEM
 ################################################################################
 if(NOT ENABLE_FETK)
 	# We'll use autotools to build MALOC if FETK is enabled.
-	add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
-	list(APPEND APBS_LIBS -L${EXTERNALS_PATH}/fetk/maloc/lib -lmaloc )
+	set(MALOC_ROOT ${EXTERNALS_PATH}/fetk/maloc)
+	add_subdirectory(${MALOC_ROOT})
+	include_directories(${MALOC_ROOT}/src/base ${MALOC_ROOT}/src/vsys
+		${MALOC_ROOT}/src/vsh ${MALOC_ROOT}/src/psh)
+	list(APPEND APBS_LIBS -L${EXTERNALS_PATH}/fetk/maloc/lib -lmaloc)
 endif()
 
 ##############################################################################
@@ -638,14 +641,6 @@ if(NOT "${APBS_ROOT}" STREQUAL "${APBS_BUILD}")
         DESTINATION ${SHARE_INSTALL_PATH}/tools
     )
 endif()
-
-#if(NOT HAVE_MALOC_H)
-#    message(STATUS "Installing maloc headers")
-#    install(
-#        DIRECTORY ${APBS_BUILD}/include/maloc
-#        DESTINATION ${HEADER_INSTALL_PATH}/..
-#    )
-#endif()
 
 ################################################################################
 # Optionally build iAPBS interface                                             #
