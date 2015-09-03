@@ -226,66 +226,75 @@ if(ENABLE_BEM)
     list(APPEND APBS_LIBS "-L${LIBRARY_OUTPUT_PATH} -L${LIBGFORTRAN_PATH} -lgfortran -ltabipb -lstdc++" )
 endif() # ENABLE_BEM
 
+################################################################################
+# Deal with MALOC                                                              #
+# Note that we depend exclusively on the MALOC that is in our external FETK    #
+# repository.  Also note, that in order for this to work on Windows, we've had #
+# to add CMake support to MALOC, and that FETK has no such support, in general.#
+################################################################################
+add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
 
 
-find_file( # this should be find path...
-    FETK_PATH
-    NAMES fetk
-	PATHS ${SYS_LIBPATHS} ${EXTERNALS_PATH} . ..
-    DOC "Use an external fetk library")
-
-if(FETK_PATH)
-    include_directories(${FETK_PATH}/include)
-    message(STATUS "Found fetk: ${FETK_PATH}")
-else()
-    message(WARNING "Did not find fetk")
-endif()
-
-
+#find_file( # this should be find path...
+#    FETK_PATH
+#    NAMES fetk
+#	PATHS ${SYS_LIBPATHS} ${EXTERNALS_PATH} . ..
+#    DOC "Use an external fetk library")
+#
+#if(FETK_PATH)
+#    include_directories(${FETK_PATH}/include)
+#    message(STATUS "Found fetk: ${FETK_PATH}")
+#else()
+#    message(WARNING "Did not find fetk")
+#endif()
+#
+#
 find_library(MALOC_LIBRARY  "maloc"
-    PATHS ${FETK_PATH}/lib ${CONTRIB_PATH}
+	PATHS ${EXTERNALS_PATH}/fetk/maloc/lib
     DOC   "The fetk/maloc library"
 )
-if(MALOC_LIBRARY)
-    message(STATUS "External maloc library was found: ${MALOC_LIBRARY}")
-else()
-    message(WARNING "External maloc library was not found.")
-endif()
-
-if(MALOC_LIBRARY AND ENABLE_FETK)
-    include_directories(${FETK_PATH}/include/maloc)
-    SET(HAVE_MALOC_H YES)
-else()
-    CHECK_INCLUDE_FILES(maloc/maloc.h HAVE_MALOC_H)
-endif()
-
-if(HAVE_MALOC_H)
-    message(STATUS "External maloc headers found")
-else()
-    message(WARNING "External maloc headers not found.")
-endif()
-
-if(NOT (HAVE_MALOC_H AND MALOC_LIBRARY))
-    message(STATUS "Using internal contributed maloc library")
-    ExternalProject_add(
-        "maloc"
-        URL file://${CONTRIB_PATH}/maloc.tar.gz
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${APBS_BUILD}
-            -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-    )
-include_directories(${APBS_BUILD}/include)
-    if(BUILD_SHARED_LIBS)
-        set(MALOC_LIBRARY_BASENAME ${CMAKE_SHARED_LIBRARY_PREFIX}maloc${CMAKE_SHARED_LIBRARY_SUFFIX})
-    else()
-        set(MALOC_LIBRARY_BASENAME ${CMAKE_STATIC_LIBRARY_PREFIX}maloc${CMAKE_STATIC_LIBRARY_SUFFIX})
-    endif()
-    install(
-        FILES ${LIBRARY_OUTPUT_PATH}/${MALOC_LIBRARY_BASENAME}
-        DESTINATION ${LIBRARY_INSTALL_PATH}
-    )
-    set(MALOC_LIBRARY ${LIBRARY_OUTPUT_PATH}/${MALOC_LIBRARY_BASENAME})
-endif()
 list(APPEND APBS_LIBS ${MALOC_LIBRARY})
+
+#if(MALOC_LIBRARY)
+#    message(STATUS "External maloc library was found: ${MALOC_LIBRARY}")
+#else()
+#    message(WARNING "External maloc library was not found.")
+#endif()
+#
+#if(MALOC_LIBRARY AND ENABLE_FETK)
+#    include_directories(${FETK_PATH}/include/maloc)
+#    SET(HAVE_MALOC_H YES)
+#else()
+#    CHECK_INCLUDE_FILES(maloc/maloc.h HAVE_MALOC_H)
+#endif()
+#
+#if(HAVE_MALOC_H)
+#    message(STATUS "External maloc headers found")
+#else()
+#    message(WARNING "External maloc headers not found.")
+#endif()
+#
+#if(NOT (HAVE_MALOC_H AND MALOC_LIBRARY))
+#    message(STATUS "Using internal contributed maloc library")
+#    ExternalProject_add(
+#        "maloc"
+#        URL file://${CONTRIB_PATH}/maloc.tar.gz
+#        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${APBS_BUILD}
+#            -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+#    )
+#include_directories(${APBS_BUILD}/include)
+#    if(BUILD_SHARED_LIBS)
+#        set(MALOC_LIBRARY_BASENAME ${CMAKE_SHARED_LIBRARY_PREFIX}maloc${CMAKE_SHARED_LIBRARY_SUFFIX})
+#    else()
+#        set(MALOC_LIBRARY_BASENAME ${CMAKE_STATIC_LIBRARY_PREFIX}maloc${CMAKE_STATIC_LIBRARY_SUFFIX})
+#    endif()
+#    install(
+#        FILES ${LIBRARY_OUTPUT_PATH}/${MALOC_LIBRARY_BASENAME}
+#        DESTINATION ${LIBRARY_INSTALL_PATH}
+#    )
+#    set(MALOC_LIBRARY ${LIBRARY_OUTPUT_PATH}/${MALOC_LIBRARY_BASENAME})
+#endif()
+#list(APPEND APBS_LIBS ${MALOC_LIBRARY})
 
 ##############################################################################
 ##
@@ -654,13 +663,13 @@ if(NOT "${APBS_ROOT}" STREQUAL "${APBS_BUILD}")
     )
 endif()
 
-if(NOT HAVE_MALOC_H)
-    message(STATUS "Installing maloc headers")
-    install(
-        DIRECTORY ${APBS_BUILD}/include/maloc
-        DESTINATION ${HEADER_INSTALL_PATH}/..
-    )
-endif()
+#if(NOT HAVE_MALOC_H)
+#    message(STATUS "Installing maloc headers")
+#    install(
+#        DIRECTORY ${APBS_BUILD}/include/maloc
+#        DESTINATION ${HEADER_INSTALL_PATH}/..
+#    )
+#endif()
 
 ################################################################################
 # Optionally build iAPBS interface                                             #
