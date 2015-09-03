@@ -232,69 +232,16 @@ endif() # ENABLE_BEM
 # repository.  Also note, that in order for this to work on Windows, we've had #
 # to add CMake support to MALOC, and that FETK has no such support, in general.#
 ################################################################################
-add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
+if(NOT ENABLE_FETK)
+	# We'll use autotools to build MALOC if FETK is enabled.
+	add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
 
-
-#find_file( # this should be find path...
-#    FETK_PATH
-#    NAMES fetk
-#	PATHS ${SYS_LIBPATHS} ${EXTERNALS_PATH} . ..
-#    DOC "Use an external fetk library")
-#
-#if(FETK_PATH)
-#    include_directories(${FETK_PATH}/include)
-#    message(STATUS "Found fetk: ${FETK_PATH}")
-#else()
-#    message(WARNING "Did not find fetk")
-#endif()
-#
-#
-find_library(MALOC_LIBRARY  "maloc"
-	PATHS ${EXTERNALS_PATH}/fetk/maloc/lib
-    DOC   "The fetk/maloc library"
-)
-list(APPEND APBS_LIBS ${MALOC_LIBRARY})
-
-#if(MALOC_LIBRARY)
-#    message(STATUS "External maloc library was found: ${MALOC_LIBRARY}")
-#else()
-#    message(WARNING "External maloc library was not found.")
-#endif()
-#
-#if(MALOC_LIBRARY AND ENABLE_FETK)
-#    include_directories(${FETK_PATH}/include/maloc)
-#    SET(HAVE_MALOC_H YES)
-#else()
-#    CHECK_INCLUDE_FILES(maloc/maloc.h HAVE_MALOC_H)
-#endif()
-#
-#if(HAVE_MALOC_H)
-#    message(STATUS "External maloc headers found")
-#else()
-#    message(WARNING "External maloc headers not found.")
-#endif()
-#
-#if(NOT (HAVE_MALOC_H AND MALOC_LIBRARY))
-#    message(STATUS "Using internal contributed maloc library")
-#    ExternalProject_add(
-#        "maloc"
-#        URL file://${CONTRIB_PATH}/maloc.tar.gz
-#        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${APBS_BUILD}
-#            -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-#    )
-#include_directories(${APBS_BUILD}/include)
-#    if(BUILD_SHARED_LIBS)
-#        set(MALOC_LIBRARY_BASENAME ${CMAKE_SHARED_LIBRARY_PREFIX}maloc${CMAKE_SHARED_LIBRARY_SUFFIX})
-#    else()
-#        set(MALOC_LIBRARY_BASENAME ${CMAKE_STATIC_LIBRARY_PREFIX}maloc${CMAKE_STATIC_LIBRARY_SUFFIX})
-#    endif()
-#    install(
-#        FILES ${LIBRARY_OUTPUT_PATH}/${MALOC_LIBRARY_BASENAME}
-#        DESTINATION ${LIBRARY_INSTALL_PATH}
-#    )
-#    set(MALOC_LIBRARY ${LIBRARY_OUTPUT_PATH}/${MALOC_LIBRARY_BASENAME})
-#endif()
-#list(APPEND APBS_LIBS ${MALOC_LIBRARY})
+	find_library(MALOC_LIBRARY  "maloc"
+		PATHS ${EXTERNALS_PATH}/fetk/maloc/lib
+    	DOC   "The fetk/maloc library"
+	)
+	list(APPEND APBS_LIBS ${MALOC_LIBRARY})
+endif()
 
 ##############################################################################
 ##
@@ -314,15 +261,49 @@ endif()
 option(ENABLE_FETK "Enable the finite element solver" OFF)
 
 if(ENABLE_FETK)
-    message(STATUS "Checking for fetk components")
-    set(FETK_ENALBED 1)
+	if(WIN32)
+		message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
+	else()
+		message(STATUS "Building FETK components.")
+		ExternalProject_Add(maloc
+			PREFIX fetk
+			SOURCE_DIR ${EXTERNALS_PATH}/fetk/maloc/src
+			CONFIGURE_COMMAND ${EXTERNALS_PATH}/fetk/maloc/configure --prefix=<INSTALL_DIR>
+			BUILD_COMMAND ${MAKE})
 
-    list(APPEND APBS_LIBS "-lstdc++")
-    list(APPEND APBS_LIBS "-L${FETK_PATH}/lib")
-    list(APPEND APBS_LIBS -lamd -lpunc -lmc -lgamer -lsuperlu -lumfpack
--lblas -lvf2c -ltetgen -ltriangle -lg2c -lreadline )
+		ExternalProject_Add(punc
+			PREFIX fetk
+			DEPENDS maloc
+			SOURCE_DIR ${EXTERNALS_PATH}/fetk/punc/src
+			CONFIGURE_COMMAND FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure --prefix=<INSTALL_DIR>
+			BUILD_COMMAND ${MAKE})
 
-    SET(HAVE_MC_H YES)
+		ExternalProject_Add(gamer
+			PREFIX fetk
+			DEPENDS maloc
+			SOURCE_DIR ${EXTERNALS_PATH}/fetk/gamer/src
+			CONFIGURE_COMMAND FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure --prefix=<INSTALL_DIR>
+			BUILD_COMMAND ${MAKE})
+
+		ExternalProject_Add(mc
+			PREFIX fetk
+			DEPENDS maloc punc
+			SOURCE_DIR ${EXTERNALS_PATH}/fetk/mc/src
+			CONFIGURE_COMMAND FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure --prefix=<INSTALL_DIR>
+			BUILD_COMMAND ${MAKE})
+
+	    set(FETK_ENALBED 1)
+	
+		ExternalProject_Get_Property(maloc install_dir)
+		include_directories(${install_dir}/include)
+
+	    list(APPEND APBS_LIBS "-lstdc++")
+		list(APPEND APBS_LIBS "-L${install_dir}/lib")
+	    list(APPEND APBS_LIBS -lmaloc -lamd -lpunc -lmc -lgamer -lsuperlu -lumfpack
+	-lblas -lvf2c -ltetgen -ltriangle -lreadline )
+	
+	    SET(HAVE_MC_H YES)
+	endif()
 endif()
 
 
