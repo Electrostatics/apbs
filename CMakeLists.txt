@@ -298,7 +298,7 @@ if(ENABLE_FETK)
 	    list(APPEND APBS_LIBS "-lstdc++")
 		list(APPEND APBS_LIBS "-L${install_dir}/lib")
 	    list(APPEND APBS_LIBS -lmaloc -lamd -lpunc -lmc -lgamer -lsuperlu -lumfpack
-	-lblas -lvf2c -ltetgen -ltriangle -lreadline )
+	-lblas -lvf2c -ltetgen -ltriangle -lreadline -ltermcap)
 	
 	    SET(HAVE_MC_H YES)
 	endif()
