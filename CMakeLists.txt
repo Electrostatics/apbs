@@ -235,12 +235,7 @@ endif() # ENABLE_BEM
 if(NOT ENABLE_FETK)
 	# We'll use autotools to build MALOC if FETK is enabled.
 	add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
-
-	find_library(MALOC_LIBRARY  "maloc"
-		PATHS ${EXTERNALS_PATH}/fetk/maloc/lib
-    	DOC   "The fetk/maloc library"
-	)
-	list(APPEND APBS_LIBS ${MALOC_LIBRARY})
+	list(APPEND APBS_LIBS -L${EXTERNALS_PATH}/fetk/maloc/lib -lmaloc )
 endif()
 
 ##############################################################################
