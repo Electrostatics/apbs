@@ -39,7 +39,7 @@ include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(ExternalProject)
 
-set(APBS_VERSION "1.4")
+set(APBS_VERSION "1.4.1")
 set(PACKAGE_STRING ${APBS_VERSION})
 set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
 
@@ -289,7 +289,7 @@ if(ENABLE_FETK)
 			CONFIGURE_COMMAND FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure --prefix=<INSTALL_DIR>
 			BUILD_COMMAND ${MAKE})
 
-	    set(FETK_ENALBED 1)
+		set(FETK_ENABLED 1)
 	
 		ExternalProject_Get_Property(maloc install_dir)
 		include_directories(${install_dir}/include)
@@ -299,7 +299,9 @@ if(ENABLE_FETK)
 	    list(APPEND APBS_LIBS -lmaloc -lamd -lpunc -lmc -lgamer -lsuperlu -lumfpack
 	-lblas -lvf2c -ltetgen -ltriangle -lreadline -ltermcap)
 	
-	    SET(HAVE_MC_H YES)
+	    SET(HAVE_MC_H 1)
+		SET(HAVE_PUNC_H 1)
+		SET(HAVE_BIOM_H 1)
 	endif()
 endif()
 
