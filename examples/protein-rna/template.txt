@@ -25,6 +25,8 @@ elec name complex
     temp 298.15
     calcenergy total
     calcforce no
+    write qdens dx qdens-complex-IONSTR  
+    write ndens dx ndens-complex-IONSTR
 end
 elec name peptide
     mg-auto
@@ -48,6 +50,8 @@ elec name peptide
     temp 298.15
     calcenergy total
     calcforce no
+    write qdens dx qdens-pep-IONSTR  
+    write ndens dx ndens-pep-IONSTR
 end
 elec name rna
     mg-auto
@@ -71,6 +75,8 @@ elec name rna
     temp 298.15
     calcenergy total
     calcforce no
+    write qdens dx qdens-rna-IONSTR  
+    write ndens dx ndens-rna-IONSTR
 end
 
 print elecEnergy complex - peptide - rna end
