@@ -7,7 +7,7 @@
 
 echo $1
 echo $2
-if [ "$TRAVIS_OS_NAME" = "linux"] && [ "$FETK" = "ON" ]; then
+if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$FETK" = "ON" ]; then
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$1/../fetk/lib
 fi
 PATH=$PATH:$1 python apbs_tester.py -c $2
