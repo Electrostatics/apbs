@@ -565,7 +565,8 @@ message("libs: " ${APBS_LIBS})
 # Build APBS sources                                                           #
 ################################################################################
 
-include_directories(${APBS_ROOT}/src ${APBS_BUILD}/src ${APBS_ROOT}/include)
+include_directories(${APBS_ROOT}/src ${APBS_BUILD}/src)
+#include_directories(${APBS_ROOT}/src ${APBS_BUILD}/src ${APBS_ROOT}/include)
 add_subdirectory(src)
 
 
@@ -690,7 +691,7 @@ endif()
 
 option(ENABLE_GEOFLOW "geoflow method" OFF)
 if(ENABLE_GEOFLOW)
-    MESSAGE( "Building GEOFLOW" )
+    #MESSAGE( "Building GEOFLOW" )
     add_definitions(-DENABLE_GEOFLOW)
 	include_directories(${EXTERNALS_PATH}/geoflow_c/src/)
 endif()
