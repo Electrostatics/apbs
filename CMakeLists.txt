@@ -97,9 +97,6 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}")
 list(APPEND CMAKE_INCLUDE_PATH /usr/include)
 list(APPEND CMAKE_INCLUDE_PATH /usr/local/include)
 
-if(ENABLE_GEOFLOW)
-  list(APPEND APBS_LIBS "apbs_geoflow")
-endif()
 
 
 ################################################################################
@@ -691,8 +688,14 @@ endif()
 
 option(ENABLE_GEOFLOW "geoflow method" OFF)
 if(ENABLE_GEOFLOW)
-    #MESSAGE( "Building GEOFLOW" )
-    add_definitions(-DENABLE_GEOFLOW)
-	include_directories(${EXTERNALS_PATH}/geoflow_c/src/)
+	message(STATUS "Building GEOFLOW" )
+	ExternalProject_Add(
+		geoflow
+		SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
+		BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
+		INSTALL_COMMAND ""
+	)
+	add_definitions(-DENABLE_GEOFLOW)
+	include_directories(${EXTERNALS_PATH}/geoflow_c/src)
 endif()
 
