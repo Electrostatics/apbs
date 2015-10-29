@@ -72,7 +72,8 @@
 #endif
 
 #ifdef ENABLE_GEOFLOW
-  #include "cpbconcz2.h"
+  //rem#include "cpbconcz2.h"
+  #include "GeometricFlowWrap.h"
 #endif
 
 /**
@@ -810,36 +811,35 @@ VEXTERNC int writematBEM(int rank, NOsh *nosh, PBEparm *pbeparm);
 #ifdef ENABLE_GEOFLOW
 /**
  * @brief  Initialize an GEOFLOW calculation
- * @ingroup  Frontend
- * @author  Andrew Stevens
  * @return  1 if succesful, 0 otherwise */
-VEXTERNC int initGEOFLOW (
-                    int icalc,  /**< Index of calculation in pbem/pmbem arrays */
-                    NOsh *nosh,  /**< Object with parsed input file parameters */
-                    GEOFLOWparm *bemparm,  /**< Object with GEOFLOW -specific parameters */
-                    PBEparm *pbeparm,  /**< Object with generic PBE parameters  */
-                    Vpbe *pbe[NOSH_MAXCALC]  /**< Array of Vpbe objects (one for each calc) */
-                    );
+VEXTERNC int initGeometricFlow ();
+//remVEXTERNC int initGEOFLOW (
+//rem                   int icalc,  /**< Index of calculation in pbem/pmbem arrays */
+//rem                    NOsh *nosh,  /**< Object with parsed input file parameters */
+//rem                    GEOFLOWparm *bemparm,  /**< Object with GEOFLOW -specific parameters */
+//rem                    PBEparm *pbeparm,  /**< Object with generic PBE parameters  */
+//rem                    Vpbe *pbe[NOSH_MAXCALC]  /**< Array of Vpbe objects (one for each calc) */
+//rem                    );
 
 /**
  * @brief  Kill structures initialized during an GEOFLOW  calculation
  * @ingroup  Frontend
- * @author  Andrew Stevens
  */
-VEXTERNC void killGEOFLOW (
-                     NOsh *nosh,  /** Object with parsed input file parameters */
-                     Vpbe *pbe[NOSH_MAXCALC]  /** Array of Vpbe objects for each calc */
-);
+//VEXTERNC void killGeometricFlow ();
+//VEXTERNC void killGEOFLOW (
+//                     NOsh *nosh,  /** Object with parsed input file parameters */
+//                     Vpbe *pbe[NOSH_MAXCALC]  /** Array of Vpbe objects for each calc */
+//);
 
 /**
  * @brief  Solve the PBE with GEOFLOW  
  * @ingroup  Frontend
- * @author  Andrew Stevens 
  * @param nosh  Object with parsed input file parameters
  * @param pbem  GEOFLOW objects for this calculation
  * @param type  Type of GEOFLOW calculation
  * @return  1 if successful, 0 otherwise */
-VEXTERNC int solveGEOFLOW(Valist* molecules[NOSH_MAXMOL], NOsh *nosh, PBEparm *pbeparm, APOLparm *apolparm, GEOFLOWparm *parm, GEOFLOWparm_CalcType type);
+VEXTERNC int solveGeometricFlow();
+//VEXTERNC int solveGEOFLOW(Valist* molecules[NOSH_MAXMOL], NOsh *nosh, PBEparm *pbeparm, APOLparm *apolparm, GEOFLOWparm *parm, GEOFLOWparm_CalcType type);
 
 /**
  * @brief  Set GEOFLOW partitions for calculating observables and performing I/O
@@ -848,7 +848,7 @@ VEXTERNC int solveGEOFLOW(Valist* molecules[NOSH_MAXMOL], NOsh *nosh, PBEparm *p
  * @param nosh  Object with parsed input file parameters
  * @param bemparm  GEOFLOW parameters from input file
  * @return  1 if successful, 0 otherwise */
-VEXTERNC int setPartGEOFLOW(NOsh *nosh, GEOFLOWparm *parm);
+//VEXTERNC int setPartGEOFLOW(NOsh *nosh, GEOFLOWparm *parm);
 
 /**
  * @brief  Calculate electrostatic energies from GEOFLOW  solution
@@ -862,9 +862,9 @@ VEXTERNC int setPartGEOFLOW(NOsh *nosh, GEOFLOWparm *parm);
  * @param qmEnergy  Set to mobile ion energy (in kT)
  * @param dielEnergy  Set to polarization energy (in kT)
  * @return  1 if successful, 0 otherwise */
-VEXTERNC int energyGEOFLOW(NOsh* nosh, int icalc, 
-  int *nenergy, double *totEnergy, double *qfEnergy, double *qmEnergy,
-  double *dielEnergy);
+//VEXTERNC int energyGEOFLOW(NOsh* nosh, int icalc, 
+//  int *nenergy, double *totEnergy, double *qfEnergy, double *qmEnergy,
+//  double *dielEnergy);
 
 /**
  * @brief  Calculate forces from GEOFLOW solution
@@ -877,14 +877,14 @@ VEXTERNC int energyGEOFLOW(NOsh* nosh, int icalc,
  * @param  atomForce  List of atom forces
  * @param  alist  List of atom lists
  * @return  1 if successful, 0 otherwise */
-VEXTERNC int forceGEOFLOW(NOsh *nosh, PBEparm *pbeparm,  GEOFLOWparm *parm,
-  int *nforce, AtomForce **atomForce, Valist *alist[NOSH_MAXMOL]);
+//VEXTERNC int forceGEOFLOW(NOsh *nosh, PBEparm *pbeparm,  GEOFLOWparm *parm,
+//  int *nforce, AtomForce **atomForce, Valist *alist[NOSH_MAXMOL]);
 
 /**
  * @brief  Print out GEOFLOW-specific params loaded from input
  * @ingroup  Frontend
  * @author  Andrew Stevens */
-VEXTERNC void printGEOFLOWPARM(GEOFLOWparm *parm);
+//VEXTERNC void printGEOFLOWPARM(GEOFLOWparm *parm);
 
 /**
  * @brief  Write out observables from GEOFLOW calculation to file
@@ -894,7 +894,7 @@ VEXTERNC void printGEOFLOWPARM(GEOFLOWparm *parm);
  * @param  nosh  Parameters from input file
  * @param  pbeparm  Generic PBE parameters
  * @return  1 if successful, 0 otherwise */
-VEXTERNC int writedataGEOFLOW(int rank, NOsh *nosh, PBEparm *pbeparm);
+//VEXTERNC int writedataGEOFLOW(int rank, NOsh *nosh, PBEparm *pbeparm);
 
 /**
  * @brief  Write out operator matrix from GEOFLOW calculation to file
@@ -904,6 +904,6 @@ VEXTERNC int writedataGEOFLOW(int rank, NOsh *nosh, PBEparm *pbeparm);
  * @param  nosh  Parameters from input file
  * @param  pbeparm  Generic PBE parameters
  * @return  1 if successful, 0 otherwise */
-VEXTERNC int writematGEOFLOW(int rank, NOsh *nosh, PBEparm *pbeparm);
+//VEXTERNC int writematGEOFLOW(int rank, NOsh *nosh, PBEparm *pbeparm);
 
 #endif

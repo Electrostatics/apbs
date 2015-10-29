@@ -54,7 +54,7 @@
 #include "routines.h"
 
 #ifdef ENABLE_GEOFLOW
-  #include "cpbconcz2.h"
+  //rem#include "cpbconcz2.h"
 #endif
 
 VEMBED(rcsid="$Id$")
@@ -5097,12 +5097,15 @@ VPUBLIC int writematBEM(int rank, NOsh *nosh, PBEparm *pbeparm) {
 /**
  * Initialize a geometric flow calculation.
  */
-VPUBLIC int initGEOFLOW(int icalc,
+VPUBLIC int initGeometricFlow()
+/*VPUBLIC int initGEOFLOW()
+   int icalc,
                    NOsh *nosh,
                    GEOFLOWparm *bemparm,
                    PBEparm *pbeparm,
                    Vpbe *pbe[NOSH_MAXCALC]
-                  ) {
+                  ) */
+{
 
     Vnm_tstart(APBS_TIMER_SETUP, "Setup timer");
 
@@ -5113,8 +5116,8 @@ VPUBLIC int initGEOFLOW(int icalc,
 
 }
 
-VPUBLIC void killGEOFLOW(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC]
-                    ) {
+//VPUBLIC void killGEOFLOW(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC]
+/*VPUBLIC void killGeometricFlow() {
 
         int i;
 
@@ -5124,7 +5127,38 @@ VPUBLIC void killGEOFLOW(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC]
 
 
 }
+*/
 
+VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL], 
+                                NOsh *nosh, 
+                                PBEparm *pbeparm, 
+                                APOLparm *apolparm, 
+                                GEOFLOWparm *parm )
+{
+   struct GeometricFlowInput geoflowIn = 
+      getGeometricFlowParams();
+
+   /*
+   // change any of the parameters you want...
+   geoflowIn.m_boundaryCondition = MDH;
+   geoflowIn.m_vdwdispersion = parm->vdw;
+   geoflowIn.m_gamma =  apolparm->gamma; 
+   geoflowIn.m_grid = apolparm->grid[0];
+   geoflowIn.m_etolSolvation = .01 ;
+   geoflowIn.m_tol = 1.0e-5;
+   
+   //
+   // TODO:  how do we want to share atom information???
+   //
+
+   struct GeometricFlowOutput geoflowOut = 
+      runGeometricFlowWrap( geoflowIn );
+
+      */
+   return 1;
+
+}
+/*
 VPUBLIC int solveGEOFLOW(Valist* molecules[NOSH_MAXMOL], NOsh *nosh, PBEparm *pbeparm, APOLparm *apolparm, GEOFLOWparm *parm, GEOFLOWparm_CalcType type) {
 	int natm, m, a, i;
     double xyzr[MAXATOMS][XYZRWIDTH];
@@ -5145,9 +5179,9 @@ VPUBLIC int solveGEOFLOW(Valist* molecules[NOSH_MAXMOL], NOsh *nosh, PBEparm *pb
         natm += Valist_getNumberAtoms(molecules[m]);
     }
 
-	/* double *xyzr, *pqr;
-	xyzr = (double*) malloc(natm*4 * sizeof(double));
-    pqr = (double*) malloc(natm * sizeof(double)); */
+	//double *xyzr, *pqr;
+	//xyzr = (double*) malloc(natm*4 * sizeof(double));
+   // pqr = (double*) malloc(natm * sizeof(double));
 
     atom = VNULL;
     for(m=0; m < nosh->nmol; ++m){
@@ -5199,7 +5233,8 @@ VPUBLIC int solveGEOFLOW(Valist* molecules[NOSH_MAXMOL], NOsh *nosh, PBEparm *pb
     return 1;
 
 }
-
+*/
+/*
 VPUBLIC int setPartGEOFLOW(NOsh *nosh,
                       GEOFLOWparm *GEOFLOWparm
                      ) {
@@ -5213,7 +5248,9 @@ VPUBLIC int setPartGEOFLOW(NOsh *nosh,
     return 1;
 
 }
+*/
 
+/*
 VPUBLIC int energyGEOFLOW(NOsh *nosh,
                      int icalc,
                      int *nenergy,
@@ -5239,7 +5276,9 @@ VPUBLIC int energyGEOFLOW(NOsh *nosh,
 
     return 1;
 }
+*/
 
+/*
 VPUBLIC int forceGEOFLOW(
                     NOsh *nosh,
                     PBEparm *pbeparm,
@@ -5265,12 +5304,13 @@ VPUBLIC int forceGEOFLOW(
 
     return 1;
 }
+*/
 
-VPUBLIC void printGEOFLOWPARM(GEOFLOWparm *parm) {
+//VPUBLIC void printGEOFLOWPARM(GEOFLOWparm *parm) {
+//
+//}
 
-}
-
-
+/*
 VPUBLIC int writedataGEOFLOW(int rank,
                         NOsh *nosh,
                         PBEparm *pbeparm
@@ -5278,13 +5318,15 @@ VPUBLIC int writedataGEOFLOW(int rank,
 
     return 1;
 }
+*/
 
-
+/*
 VPUBLIC int writematGEOFLOW(int rank, NOsh *nosh, PBEparm *pbeparm) {
 
 
     if (nosh->bogus) return 1;
     return 1;
 }
+*/
 
 #endif
