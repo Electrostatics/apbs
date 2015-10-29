@@ -247,10 +247,6 @@ if(NOT WIN32)
     list(APPEND APBS_LIBS -lm)
 endif()
 
-if(ENABLE_GEOFLOW)
-    list(APPEND APBS_LIBS -L${APBS_BUILD}/geoflow-prefix/src/geoflow-build/lib -lGeometricFlowLib)
-    #list(APPEND APBS_LIBS ${GEOFLOW_LIBRARY})  # should work
-endif()
 
 ################################################################################
 # Handle the finite element solver dependencies                                #
@@ -304,6 +300,27 @@ if(ENABLE_FETK)
 		SET(HAVE_PUNC_H 1)
 		SET(HAVE_BIOM_H 1)
 	endif()
+endif()
+
+
+################################################################################
+# Optionally build geoflow (git submodule)
+################################################################################
+
+option(ENABLE_GEOFLOW "geoflow method" OFF)
+if(ENABLE_GEOFLOW)
+	message(STATUS "Building GEOFLOW" )
+	ExternalProject_Add(
+		geoflow
+		SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
+		BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
+		INSTALL_COMMAND ""
+	)
+	ExternalProject_Get_Property(geoflow binary_dir)
+	list(APPEND APBS_LIBS "-lstdc++" "-L${binary_dir}/lib" "-lGeometricFlowLib")
+	include_directories(${EXTERNALS_PATH}/geoflow_c/src)
+
+	add_definitions(-DENABLE_GEOFLOW)
 endif()
 
 
@@ -362,7 +379,7 @@ endif()
 
 
 ################################################################################
-# Enable inline functions conditionally dependant on debug mode                #
+# Enable inline functions conditionally dependent on debug mode                #
 ################################################################################
 
 
@@ -559,7 +576,6 @@ if(NOT CYGWIN AND NOT MINGW AND WIN32)
     ADD_DEFINITIONS("/D _CRT_SECURE_NO_WARNINGS")
 endif()
 
-message("libs: " ${APBS_LIBS})
 
 
 ################################################################################
@@ -686,20 +702,4 @@ if(NOT WIN32)
     endif()
 endif()
 
-################################################################################
-# Optionally build geoflow (git submodule)
-################################################################################
-
-option(ENABLE_GEOFLOW "geoflow method" OFF)
-if(ENABLE_GEOFLOW)
-	message(STATUS "Building GEOFLOW" )
-	ExternalProject_Add(
-		geoflow
-		SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-		BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
-		INSTALL_COMMAND ""
-	)
-	add_definitions(-DENABLE_GEOFLOW)
-	include_directories(${EXTERNALS_PATH}/geoflow_c/src)
-endif()
 
