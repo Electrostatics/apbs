@@ -60,10 +60,6 @@ message(STATUS " ")
 
 target_link_libraries(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
 
-if(ENABLE_GEOFLOW)
-	list(APPEND APBS_LIBS -L${EXTERNALS_PATH}/geoflow_c/lib -lGeometricFlowLib)
-endif()
-
 configure_file(
     ${APBS_ROOT}/src/.config/apbscfg.h.in
     ${APBS_BUILD}/src/apbscfg.h
@@ -79,13 +75,4 @@ INSTALL(FILES apbs.h routines.h DESTINATION ${HEADER_INSTALL_PATH})
 INSTALL(TARGETS apbs DESTINATION ${EXECUTABLE_INSTALL_PATH})
 
 message(STATUS ${CMAKE_C_FLAGS})
-
-if(ENABLE_GEOFLOW)
-    #MESSAGE( "Building GEOFLOW src" )
-    add_subdirectory(${APBS_ROOT}/externals/geoflow_c/
-            ${APBS_BUILD}/externals/geoflow_c/)
-    # commenting this out for now, until the geoflow library builds
-    add_definitions(-DENABLE_GEOFLOW)
-    include_directories(${APBS_ROOT}/externals/geoflow_c/src)
-endif()
 
