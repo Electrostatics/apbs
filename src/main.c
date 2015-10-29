@@ -734,42 +734,45 @@ int main(
                 /* Set up problem */
                 Vnm_tprint( 1, "  Setting up problem...\n");
 
-                if (!initGEOFLOW(i,nosh, geoflowparm, pbeparm, pbe)) {
+                
+                //if (!initGEOFLOW(i,nosh, geoflowparm, pbeparm, pbe)) {
+                if (!initGeometricFlow()) {
                     Vnm_tprint( 2, "Error setting up GEOFLOW calculation!\n");
                     VJMPERR1(0);
                 }
 
                 /* Print problem parameters */
-                printGEOFLOWPARM(geoflowparm);
-                printPBEPARM(pbeparm);
+//                printGEOFLOWPARM(geoflowparm);
+//                printPBEPARM(pbeparm);
 
                 /* Solve PDE */
-                if (solveGEOFLOW(alist, nosh, pbeparm, apolparm, geoflowparm, geoflowparm->type) != 1) {
+                //if (solveGEOFLOW(alist, nosh, pbeparm, apolparm, geoflowparm, geoflowparm->type) != 1) {
+                if (solveGeometricFlow(alist, nosh, pbeparm, apolparm, geoflowparm, geoflowparm->type) != 1) {
                     Vnm_tprint(2, "Error solving PDE!\n");
                     VJMPERR1(0);
                 }
 
                 /* Write out energies */
-                energyGEOFLOW(nosh, i,
+/*                energyGEOFLOW(nosh, i,
                         &(nenergy[i]), &(totEnergy[i]), &(qfEnergy[i]),
                         &(qmEnergy[i]), &(dielEnergy[i]));
-
+*/
                 /* Write out forces */
-                forceGEOFLOW(nosh, pbeparm, geoflowparm, &(nforce[i]),
+/*                forceGEOFLOW(nosh, pbeparm, geoflowparm, &(nforce[i]),
                         &(atomForce[i]), alist);
-
+*/
                 /* Write out data folks might want */
-                writedataGEOFLOW(rank, nosh, pbeparm);
+//                writedataGEOFLOW(rank, nosh, pbeparm);
 
                 /* Write matrix */
-                writematGEOFLOW(rank, nosh, pbeparm);
+//                writematGEOFLOW(rank, nosh, pbeparm);
 
                 /* If needed, cache atom energies */
-                nenergy[i] = 0;
+/*                nenergy[i] = 0;
                 if ((pbeparm->calcenergy == PCE_COMPS) && (outputformat != OUTPUT_NULL)){
                     storeAtomEnergy(pmg[i], i, &(atomEnergy[i]), &(nenergy[i]));
                 }
-
+*/
                 fflush(stdout);
                 fflush(stderr);
                 break;

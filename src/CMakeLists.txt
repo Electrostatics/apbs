@@ -60,6 +60,10 @@ message(STATUS " ")
 
 target_link_libraries(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
 
+if(ENABLE_GEOFLOW)
+	list(APPEND APBS_LIBS -L${EXTERNALS_PATH}/geoflow_c/lib -lGeometricFlowLib)
+endif()
+
 configure_file(
     ${APBS_ROOT}/src/.config/apbscfg.h.in
     ${APBS_BUILD}/src/apbscfg.h
@@ -81,7 +85,7 @@ if(ENABLE_GEOFLOW)
     add_subdirectory(${APBS_ROOT}/externals/geoflow_c/
             ${APBS_BUILD}/externals/geoflow_c/)
     # commenting this out for now, until the geoflow library builds
-    #add_definitions(-DENABLE_GEOFLOW)
-    include_directories(${APBS_ROOT}/externals/geoflow_c/)
+    add_definitions(-DENABLE_GEOFLOW)
+    include_directories(${APBS_ROOT}/externals/geoflow_c/src)
 endif()
 

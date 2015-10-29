@@ -247,6 +247,10 @@ if(NOT WIN32)
     list(APPEND APBS_LIBS -lm)
 endif()
 
+if(ENABLE_GEOFLOW)
+    list(APPEND APBS_LIBS -L${APBS_BUILD}/geoflow-prefix/src/geoflow-build/lib -lGeometricFlowLib)
+    #list(APPEND APBS_LIBS ${GEOFLOW_LIBRARY})  # should work
+endif()
 
 ################################################################################
 # Handle the finite element solver dependencies                                #
