@@ -122,8 +122,8 @@ int main(
     char *input_path = VNULL,
          *output_path = VNULL;
     int i,
-        rank,
-        size,
+        rank,   // proc id
+        size,   // total num of procs
         k;
     size_t bytesTotal,
            highWater;
