@@ -9,14 +9,16 @@
 Header files:
 -----------------------
 */ 
-     
+
+%module apbslib
+
 %{
 #define APBS_SWIG 1
 #include "maloc/maloc.h"
 #include "apbscfg.h" 
 #include "routines.h"
-#include "apbs/valist.h"
-#include "apbs/vatom.h"
+#include "generic/valist.h"
+#include "generic/vatom.h"
 %} 
 
 /* 
