@@ -411,11 +411,6 @@ if(ENABLE_PYTHON)
 
     message(STATUS "Looking for python components")
 
-    if(NOT CMAKE_COMPILER_IS_GNUCC)
-        message(FATAL_ERROR "Python wrappers require GNU compilers")
-    endif()
-
-
     find_package(PythonInterp)
     if(NOT PYTHON_EXECUTABLE)
         message(FATAL_ERROR "Couldn't find python interpreter")
