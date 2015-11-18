@@ -12,6 +12,9 @@ SWIG_ADD_MODULE(apbslib python apbslib.i)
 SWIG_LINK_LIBRARIES(apbslib ${APBS_LIBS} ${APBS_INTERNAL_LIBS}
     ${PYTHON_LIBRARIES})
 
-FILE(COPY ${CMAKE_CURRENT_BINARY_DIR}/apbslib.py
-          ${LIBRARY_OUTPUT_PATH}/_apbslib.so
-     DESTINATION ${CMAKE_SOURCE_DIR}/../pdb2pqr/pdb2pka)
+add_custom_command(TARGET _apbslib POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E
+        copy ${CMAKE_CURRENT_BINARY_DIR}/apbslib.py ${CMAKE_SOURCE_DIR}/../pdb2pqr/pdb2pka
+    COMMAND ${CMAKE_COMMAND} -E
+        copy ${LIBRARY_OUTPUT_PATH}/_apbslib.so ${CMAKE_SOURCE_DIR}/../pdb2pqr/pdb2pka
+)
