@@ -81,9 +81,10 @@ set(SYS_LIBPATHS /usr/lib64)
 # Debian/Ubuntu hack for                                                       #
 # https://github.com/Electrostatics/apbs-pdb2pqr/issues/364                    #
 ################################################################################
-if(EXISTS "/etc/debian_version")
-  set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed)
-endif(EXISTS "/etc/debian_version")
+if(EXISTS "/etc/debian_version" AND
+	"${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed")
+endif()
 
 
 ################################################################################
