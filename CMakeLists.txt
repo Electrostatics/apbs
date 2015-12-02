@@ -77,6 +77,14 @@ find_file(EXTERNALS_PATH "externals" PATHS "${APBS_ROOT}"
 set(SYS_LIBPATHS /usr/lib64)
 #list(APPEND SYS_LIBPATHS /usr/lib64)
 
+################################################################################
+# Debian/Ubuntu hack for                                                       #
+# https://github.com/Electrostatics/apbs-pdb2pqr/issues/364                    #
+################################################################################
+if(EXISTS "/etc/debian_version" AND
+	"${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed")
+endif()
 
 
 ################################################################################
@@ -401,67 +409,11 @@ endif()
 
 
 ################################################################################
-# Configure Python Wrappers                                                    #
+# Configure Python                                                             #
+# Buidling the Python goodness happens in the tool/python directory.           #
 ################################################################################
 
-option(ENABLE_PYTHON "Enable python wrappers" OFF)
-option(MAX_MEMORY "Set the maximum memory (in MB) to be used for a job" OFF)
-
-if(ENABLE_PYTHON)
-
-    message(STATUS "Looking for python components")
-
-    if(NOT CMAKE_COMPILER_IS_GNUCC)
-        message(FATAL_ERROR "Python wrappers require GNU compilers")
-    endif()
-
-
-    find_package(PythonInterp)
-    if(NOT PYTHON_EXECUTABLE)
-        message(FATAL_ERROR "Couldn't find python interpreter")
-    endif()
-
-    find_package(PythonLibs)
-    if(NOT PYTHON_LIBRARY)
-        message(FATAL_ERROR "Couldn't find python libraries")
-    endif()
-
-    # TODO: Handle special flags for Python linking on different platforms
-    # TODO: Handle special flags for Python linking with intel compiler
-    # ${PYTHON_LFLAGS} perhaps?
-
-    set(MODULE_PROBE_PY "")
-    list(APPEND MODULE_PROBE_PY "from sys import stdout")
-    list(APPEND MODULE_PROBE_PY "from distutils.sysconfig import get_python_lib")
-    list(APPEND MODULE_PROBE_PY "stdout.write( get_python_lib() )")
-    execute_process(
-        COMMAND ${PYTHON_EXECUTABLE} -c "${MODULE_PROBE_PY}"
-        ERROR_QUIET
-        OUTPUT_VARIABLE PYTHON_MODULES
-    )
-
-    if(NOT PYTHON_MODULES)
-        message(FATAL_ERROR "Coudln't determine location of python modules")
-    endif()
-
-    if(NOT MAX_MEMORY)
-        set(MAX_MEMORY "-1")
-    endif()
-
-
-    # TODO:  these can't e right...
-    set(SERVICEURL "http://kryptonite.nbcr.net/opal2/services/apbs_1.3")
-    set(PARALLELSERVICEURL "http://oolite.calit2.optiputer.net/opal2/services/apbs-parallel-1.3")
-
-
-
-    configure_file(
-        ${APBS_ROOT}/src/.config/ApbsClient.py.in
-        ${EXECUTABLE_OUTPUT_PATH}/ApbsClient.py
-    )
-
-endif()
-
+option(ENABLE_PYTHON "Enable python support" OFF)
 
 
 ################################################################################
