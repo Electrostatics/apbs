@@ -6,9 +6,11 @@ Header files:
 -----------------------
 */ 
 
+%module apbslib
+
 %{
 #include "routines.h"
-#include "apbs/vgrid.h"
+#include "mg/vgrid.h"
 %}
 
 #define VEXTERNC extern
