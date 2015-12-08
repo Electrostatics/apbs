@@ -736,10 +736,10 @@ int main(
 
                 
                 //if (!initGEOFLOW(i,nosh, geoflowparm, pbeparm, pbe)) {
-                if (!initGeometricFlow()) {
-                    Vnm_tprint( 2, "Error setting up GEOFLOW calculation!\n");
-                    VJMPERR1(0);
-                }
+                //if (!initGeometricFlow()) {
+                //    Vnm_tprint( 2, "Error setting up GEOFLOW calculation!\n");
+                //    VJMPERR1(0);
+                //}
 
                 /* Print problem parameters */
 //                printGEOFLOWPARM(geoflowparm);
@@ -747,8 +747,8 @@ int main(
 
                 /* Solve PDE */
                 //if (solveGEOFLOW(alist, nosh, pbeparm, apolparm, geoflowparm, geoflowparm->type) != 1) {
-                if (solveGeometricFlow(alist, nosh, pbeparm, apolparm, geoflowparm, geoflowparm->type) != 1) {
-                    Vnm_tprint(2, "Error solving PDE!\n");
+                if (solveGeometricFlow(alist, nosh, pbeparm, apolparm, geoflowparm) != 1) {
+                    Vnm_tprint(2, "Error solving GEOFLOW!\n");
                     VJMPERR1(0);
                 }
 

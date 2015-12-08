@@ -812,7 +812,7 @@ VEXTERNC int writematBEM(int rank, NOsh *nosh, PBEparm *pbeparm);
 /**
  * @brief  Initialize an GEOFLOW calculation
  * @return  1 if succesful, 0 otherwise */
-VEXTERNC int initGeometricFlow ();
+//VEXTERNC int initGeometricFlow ();
 //remVEXTERNC int initGEOFLOW (
 //rem                   int icalc,  /**< Index of calculation in pbem/pmbem arrays */
 //rem                    NOsh *nosh,  /**< Object with parsed input file parameters */
@@ -838,7 +838,13 @@ VEXTERNC int initGeometricFlow ();
  * @param pbem  GEOFLOW objects for this calculation
  * @param type  Type of GEOFLOW calculation
  * @return  1 if successful, 0 otherwise */
-VEXTERNC int solveGeometricFlow();
+VEXTERNC int solveGeometricFlow(
+      Valist* molecules[NOSH_MAXMOL], 
+                                NOsh *nosh, 
+                                PBEparm *pbeparm, 
+                                APOLparm *apolparm, 
+                                GEOFLOWparm *parm 
+);
 //VEXTERNC int solveGEOFLOW(Valist* molecules[NOSH_MAXMOL], NOsh *nosh, PBEparm *pbeparm, APOLparm *apolparm, GEOFLOWparm *parm, GEOFLOWparm_CalcType type);
 
 /**

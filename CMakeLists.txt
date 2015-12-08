@@ -321,6 +321,8 @@ if(ENABLE_GEOFLOW)
 	include_directories(${EXTERNALS_PATH}/geoflow_c/src)
 
 	add_definitions(-DENABLE_GEOFLOW)
+	add_definitions(-DGEOFLOW_APBS)
+	set(GEOFLOW_APBS 1)
 endif()
 
 
