@@ -310,6 +310,7 @@ endif()
 option(ENABLE_GEOFLOW "geoflow method" OFF)
 if(ENABLE_GEOFLOW)
 	message(STATUS "Building GEOFLOW" )
+	set(GEOFLOW_APBS 1)
 	ExternalProject_Add(
 		geoflow
 		SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
@@ -319,10 +320,6 @@ if(ENABLE_GEOFLOW)
 	ExternalProject_Get_Property(geoflow binary_dir)
 	list(APPEND APBS_LIBS "-lstdc++" "-L${binary_dir}/lib" "-lGeometricFlowLib")
 	include_directories(${EXTERNALS_PATH}/geoflow_c/src)
-
-	add_definitions(-DENABLE_GEOFLOW)
-	add_definitions(-DGEOFLOW_APBS)
-	set(GEOFLOW_APBS 1)
 endif()
 
 
