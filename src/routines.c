@@ -53,10 +53,6 @@
 
 #include "routines.h"
 
-#ifdef ENABLE_GEOFLOW
-  //rem#include "cpbconcz2.h"
-#endif
-
 VEMBED(rcsid="$Id$")
 
 VPUBLIC void startVio() { Vio_start(); }
@@ -5097,7 +5093,7 @@ VPUBLIC int writematBEM(int rank, NOsh *nosh, PBEparm *pbeparm) {
 /**
  * Initialize a geometric flow calculation.
  */
-VPUBLIC int initGeometricFlow()
+//VPUBLIC int initGeometricFlow()
 /*VPUBLIC int initGEOFLOW()
    int icalc,
                    NOsh *nosh,
@@ -5105,16 +5101,18 @@ VPUBLIC int initGeometricFlow()
                    PBEparm *pbeparm,
                    Vpbe *pbe[NOSH_MAXCALC]
                   ) */
-{
-
-    Vnm_tstart(APBS_TIMER_SETUP, "Setup timer");
-
-    /* Setup time statistics */
-    Vnm_tstop(APBS_TIMER_SETUP, "Setup timer");
-
-    return 1;
-
-}
+//{
+//
+//    Vnm_tstart(APBS_TIMER_SETUP, "Setup timer");
+//
+//    struct GeometricFlowInput geoflowIn = getGeometricFlowParams();
+//
+//    /* Setup time statistics */
+//    Vnm_tstop(APBS_TIMER_SETUP, "Setup timer");
+//
+//    return 1;
+//
+//}
 
 //VPUBLIC void killGEOFLOW(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC]
 /*VPUBLIC void killGeometricFlow() {
@@ -5135,10 +5133,10 @@ VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
                                 APOLparm *apolparm, 
                                 GEOFLOWparm *parm )
 {
-   struct GeometricFlowInput geoflowIn = 
-      getGeometricFlowParams();
+   printf("solveGeometricFlow!!!\n");
 
-   /*
+   struct GeometricFlowInput geoflowIn = getGeometricFlowParams();
+
    // change any of the parameters you want...
    geoflowIn.m_boundaryCondition = MDH;
    geoflowIn.m_vdwdispersion = parm->vdw;
@@ -5146,15 +5144,51 @@ VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
    geoflowIn.m_grid = apolparm->grid[0];
    geoflowIn.m_etolSolvation = .01 ;
    geoflowIn.m_tol = 1.0e-5;
-   
+  
+   printf("num mols: %i", nosh->nmol);
+   struct GeometricFlowOutput geoflowOut = 
+      runGeometricFlowWrapAPBS( geoflowIn, molecules[0] );
    //
-   // TODO:  how do we want to share atom information???
+   // get the atom information into something we can pass into geoflow
    //
+   /*
+   int natm=0, m, a, i;
+   double xyzr[MAXATOMS][XYZRWIDTH];  // 15000, 4
+   double pqr[MAXATOMS];
+   double *pos;
+   Vatom *atom;
+   for(m=0; m < nosh->nmol; ++m)
+   {
+      for(a=0; a < Valist_getNumberAtoms(molecules[m]); ++a)
+      {
+         atom = Valist_getAtom(molecules[m], a);
+         i = m*(nosh->nmol) + a;
+         pos = Vatom_getPosition(atom);
+         xyzr[i][0] = pos[0];
+         xyzr[i][1] = pos[1];
+         xyzr[i][2] = pos[2];
+         xyzr[i][3] = Vatom_getRadius(atom);
+         pqr[i] = Vatom_getCharge(atom);
+         natm++;
+      }
+   }
+   printf("done");
+
+   int natoms = Valist_getNumberAtoms(molecules[m])
+   double* xyzr = (double*)malloc(4*natoms*sizeof(double));
+   int i
+    for (i=0; i < natoms; i++) {
+        atom = Valist_getAtom(alist, i);
+        atomRadius = Vatom_getRadius(atom);
+        x = Vatom_getPosition(atom)[0];
+        y = Vatom_getPosition(atom)[1];
+        z = Vatom_getPosition(atom)[2];
+        xyzr[
 
    struct GeometricFlowOutput geoflowOut = 
-      runGeometricFlowWrap( geoflowIn );
-
+      runGeometricFlowWrap( geoflowIn, xyzr, pqr, natom );
       */
+
    return 1;
 
 }
