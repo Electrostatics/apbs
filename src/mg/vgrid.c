@@ -1597,7 +1597,7 @@ VPUBLIC void Vgrid_writeDXBIN(Vgrid *thee, const char *iodev, const char *iofmt,
 			fprintf(fd, "object 2 class gridconnections counts %d %d %d\n", nxPART, nyPART, nzPART);
 
 			/* Write off the DX data */
-			fprintf(fd, "object 3 class array type double rank 0 items %lu binary data follows\n",(nxPART*nyPART*nzPART));
+			fprintf(fd, "object 3 class array type double rank 0 items %d binary data follows\n",(nxPART*nyPART*nzPART));
 
 			icol = 0;
 			for (i=0; i<nx; i++) {
@@ -1654,7 +1654,7 @@ VPUBLIC void Vgrid_writeDXBIN(Vgrid *thee, const char *iodev, const char *iofmt,
 			fprintf(fd, "object 2 class gridconnections counts %d %d %d\n", nx, ny, nz);
 
 			/* Write off the DX data */
-			fprintf(fd, "object 3 class array type double rank 0 items %lu binary data follows\n", (nx*ny*nz));
+			fprintf(fd, "object 3 class array type double rank 0 items %d binary data follows\n", (nx*ny*nz));
 
 			icol = 0;
 			for (i=0; i<nx; i++) {
