@@ -9,7 +9,7 @@
 
 #define IJK(i,j,k)  (((k)*(nx)*(ny))+((j)*(nx))+(i))
 #define INTERVAL(x,a,b) (((x) >= (a)) && ((x) <= (b)))
-#define MAX_INPUT 512
+#define MAX_INPUT_2 512
 #define MAX_INPUT_PATH 1024
 
 VEMBED(rcsid="$Id$")
@@ -21,7 +21,7 @@ VPRIVATE int Char_parseARGV(int argc, char **argv,
   double *res1, double *res2, double *res3, 
   double *xmin, double *ymin, double *zmin,
   double *xmax, double *ymax, double *zmax,
-  int *spec, char *outname, char fnams[MAX_INPUT][MAX_INPUT_PATH], int *numfnams);
+  int *spec, char *outname, char fnams[MAX_INPUT_2][MAX_INPUT_PATH], int *numfnams);
 
 VPRIVATE char *MCwhiteChars = " =,;\t\n";
 VPRIVATE char *MCcommChars  = "#%";
@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
 	double xminb, yminb, zminb;
 	double xmaxb, ymaxb, zmaxb;
 
-	char fnams[MAX_INPUT][MAX_INPUT_PATH];
+	char fnams[MAX_INPUT_2][MAX_INPUT_PATH];
 	short *carray = VNULL;
 
 	char *snam = "# main:  ";
@@ -538,7 +538,7 @@ VPRIVATE int Char_parseARGV(int argc, char **argv,
   double *res1, double *res2, double *res3, 
   double *xmin, double *ymin, double *zmin, 
   double *xmax, double *ymax, double *zmax, 
-  int* spec, char *outname, char fnams[MAX_INPUT][MAX_INPUT_PATH], int *numfnams)
+  int* spec, char *outname, char fnams[MAX_INPUT_2][MAX_INPUT_PATH], int *numfnams)
 {
 	int i;
 	i = 1;
