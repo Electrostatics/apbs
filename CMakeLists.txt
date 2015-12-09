@@ -309,15 +309,16 @@ endif()
 
 option(ENABLE_GEOFLOW "geoflow method" OFF)
 if(ENABLE_GEOFLOW)
-	message(STATUS "Building GEOFLOW" )
-	set(GEOFLOW_APBS 1)
+	message(STATUS "Building GEOFLOW")
 	ExternalProject_Add(
 		geoflow
 		SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
+		CMAKE_ARGS -DGEOFLOW_APBS=ON
 		BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
 		INSTALL_COMMAND ""
 	)
 	ExternalProject_Get_Property(geoflow binary_dir)
+	add_definitions(-DENABLE_GEOFLOW)
 	list(APPEND APBS_LIBS "-lstdc++" "-L${binary_dir}/lib" "-lGeometricFlowLib")
 	include_directories(${EXTERNALS_PATH}/geoflow_c/src)
 endif()
