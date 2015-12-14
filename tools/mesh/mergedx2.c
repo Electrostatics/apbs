@@ -368,8 +368,11 @@ VPUBLIC int Vgrid_value2(Vgrid *thee, double pt[3], double *value) {
 	}
 
 	/* See if we're on the mesh */
-	if ((ihi<nx) && (jhi<ny) && (khi<nz) &&
-		(ilo>=0) && (jlo>=0) && (klo>=0)) {
+	/*seems that we don't need to check the values including and after ilo>=0 since they are of type size_t
+	 * and always positive and is generating warnings when building with clang. (by Juan Brandi).
+	 */
+	if ((ihi<nx) && (jhi<ny) && (khi<nz) /*&&
+		(ilo>=0) && (jlo>=0) && (klo>=0)*/) {
 		dx = ifloat - (double)(ilo);
 		dy = jfloat - (double)(jlo);
 		dz = kfloat - (double)(klo);
