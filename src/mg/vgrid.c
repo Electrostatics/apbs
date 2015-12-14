@@ -226,8 +226,9 @@ VPUBLIC int Vgrid_value(Vgrid *thee, double pt[3], double *value) {
     if (VABS(pt[2] - zmax) < Vcompare) khi = nz-1;
 
     /* See if we're on the mesh */
-    if ((ihi<nx) && (jhi<ny) && (khi<nz) &&
-        (ilo>=0) && (jlo>=0) && (klo>=0)) {
+    /*the condions starting with ilo>=0 seem unnecessary since they are of type size_t*/
+    if ((ihi<nx) && (jhi<ny) && (khi<nz) /*&&
+        (ilo>=0) && (jlo>=0) && (klo>=0)*/) {
 
         dx = ifloat - (double)(ilo);
         dy = jfloat - (double)(jlo);
