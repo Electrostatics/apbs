@@ -260,6 +260,32 @@ endif()
 
 
 ################################################################################
+# Handle conditional building with MPI Support                                 #
+# There may be a better way, but for now this comes before FETK because FETK   #
+# depends on having the libraries located.    	    	   		       #
+################################################################################
+
+option(ENABLE_MPI "Enable MPI parallelism" OFF)
+
+if(ENABLE_MPI)
+    if(NOT ENABLE_DEBUG)
+        message(STATUS "Checking for MPI")
+        find_package(MPI)
+        if(MPI_FOUND)
+            message(STATUS "MPI support enabled")
+	    set(HAVE_MPI_H 1)
+            include_directories(${MPI_C_INCLUDE_PATH})
+            list(APPEND APBS_LIBS ${MPI_C_LIBRARIES})
+        else()
+            message(WARNING "MPI was not found; disabling")
+        endif()
+    else()
+        message(WARNING "MPI may not be enabled in debugging mode")
+    endif()
+endif()
+
+
+################################################################################
 # Handle the finite element solver dependencies                                #
 ################################################################################
 
@@ -270,31 +296,48 @@ if(ENABLE_FETK)
 		message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
 	else()
 		message(STATUS "Building FETK components.")
+		set(CONFIG_OPTS --prefix=<INSTALL_DIR>)
+				
+		set(MPI_ENV "")
+		if(HAVE_MPI_H)
+		    list(APPEND CONFIG_OPTS --enable-mpi)
+
+		    # MALOC just cares about libmpi
+		    foreach(LIB_PATH ${MPI_C_LIBRARIES})
+		        get_filename_component(LIB ${LIB_PATH} NAME_WE)
+		        if(LIB STREQUAL "libmpi")
+		            get_filename_component(MPI_LIB_DIR ${LIB_PATH} DIRECTORY)
+		    	 endif()
+		    endforeach()
+
+		    set(MPI_ENV "FETK_MPI_INCLUDE=${MPI_C_INCLUDE_PATH}" "FETK_MPI_LIBRARY=${MPI_LIB_DIR}")
+		endif()
+		    
 		ExternalProject_Add(maloc
 			PREFIX fetk
 			SOURCE_DIR ${EXTERNALS_PATH}/fetk/maloc/src
-			CONFIGURE_COMMAND ${EXTERNALS_PATH}/fetk/maloc/configure --prefix=<INSTALL_DIR>
+			CONFIGURE_COMMAND ${MPI_ENV} ${EXTERNALS_PATH}/fetk/maloc/configure ${CONFIG_OPTS}
 			BUILD_COMMAND ${MAKE})
 
 		ExternalProject_Add(punc
 			PREFIX fetk
 			DEPENDS maloc
 			SOURCE_DIR ${EXTERNALS_PATH}/fetk/punc/src
-			CONFIGURE_COMMAND FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure --prefix=<INSTALL_DIR>
+			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure ${CONFIG_OPTS}
 			BUILD_COMMAND ${MAKE})
 
 		ExternalProject_Add(gamer
 			PREFIX fetk
 			DEPENDS maloc
 			SOURCE_DIR ${EXTERNALS_PATH}/fetk/gamer/src
-			CONFIGURE_COMMAND FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure --prefix=<INSTALL_DIR>
+			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure ${CONFIG_OPTS}
 			BUILD_COMMAND ${MAKE})
 
 		ExternalProject_Add(mc
 			PREFIX fetk
 			DEPENDS maloc punc
 			SOURCE_DIR ${EXTERNALS_PATH}/fetk/mc/src
-			CONFIGURE_COMMAND FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure --prefix=<INSTALL_DIR>
+			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure ${CONFIG_OPTS}
 			BUILD_COMMAND ${MAKE})
 
 		set(FETK_ENABLED 1)
@@ -435,30 +478,6 @@ if(ENABLE_OPENMP)
         endif()
     else()
         message(WARNING "OpenMP may not be enabled in debugging mode")
-    endif()
-endif()
-
-
-
-################################################################################
-# Handle conditional building with MPI Support                                 #
-################################################################################
-
-option(ENABLE_MPI "Enable MPI parallelism" OFF)
-
-if(ENABLE_MPI)
-    if(NOT ENABLE_DEBUG)
-        message(STATUS "Checking for MPI")
-        find_package(MPI)
-        if(MPI_FOUND)
-            message(STATUS "MPI support enabled")
-            include_directories(${MPI_INCLUDE_PATH})
-            list(APPEND APBS_LIBS ${MPI_LIBRARIES})
-        else()
-            message(WARNING "MPI was not found; disabling")
-        endif()
-    else()
-        message(WARNING "MPI may not be enabled in debugging mode")
     endif()
 endif()
 
