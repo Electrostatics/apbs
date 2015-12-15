@@ -5099,7 +5099,12 @@ VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
                                 APOLparm *apolparm, 
                                 GEOFLOWparm *parm )
 {
-   printf("solveGeometricFlow!!!\n");
+   //printf("solveGeometricFlow!!!\n");
+   if (nosh != VNULL) {
+      if (nosh->bogus) return 1;
+   }
+
+   Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
 
    struct GeometricFlowInput geoflowIn = getGeometricFlowParams();
 
@@ -5114,6 +5119,12 @@ VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
    printf("num mols: %i\n", nosh->nmol);
    struct GeometricFlowOutput geoflowOut = 
       runGeometricFlowWrapAPBS( geoflowIn, molecules[0] );
+
+   Vnm_tprint( 1,"  Global net energy = %1.12E\n", geoflowOut.m_totalSolvation);
+   Vnm_tprint( 1,"  Global net ELEC energy = %1.12E\n", geoflowOut.m_elecSolvation);
+   Vnm_tprint( 1,"  Global net APOL energy = %1.12E\n", geoflowOut.m_nonpolarSolvation);
+
+   Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
 
    return 1;
 
