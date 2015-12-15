@@ -575,7 +575,7 @@ typedef enum eVdata_Format Vdata_Format;
 
 
 /** OS specific flags and etcetera */
-#if !defined(WIN32) || defined(__MINGW32__)
+#if !defined(_WIN32) || defined(__MINGW32__)
 #define PRINT_FUNC __PRETTY_FUNCTION__
 #define OS_SEP_STR "/"
 #define OS_SEP_CHAR '/'
