@@ -67,6 +67,9 @@ set(HEADER_INSTALL_PATH include/apbs)
 set(EXECUTABLE_INSTALL_PATH bin)
 set(SHARE_INSTALL_PATH share/apbs)
 
+set(APBS_LIBS)
+set(APBS_LIB_DIRS)
+
 find_file(CONTRIB_PATH "contrib" PATHS "${APBS_ROOT}"
     DOC "The path to contributed modules for apbs"
     )
@@ -230,7 +233,8 @@ if(ENABLE_BEM)
     endif()
     get_filename_component(LIBGFORTRANPATH ${LIBGFORTRANPATH} PATH)
     find_path(LIBGFORTRAN_PATH ${LIBGFORTRAN_NAME} PATH ${LIBGFORTRANPATH})
-    list(APPEND APBS_LIBS "-L${LIBRARY_OUTPUT_PATH} -L${LIBGFORTRAN_PATH} -lgfortran -ltabipb -lstdc++" )
+    list(APPEND APBS_LIB_DIRS ${LIBRARY_OUTPUT_PATH} ${LIBGFORTRAN_PATH})
+    list(APPEND APBS_LIBS "gfortran tabipb stdc++" )
 endif() # ENABLE_BEM
 
 ################################################################################
@@ -245,7 +249,8 @@ if(NOT ENABLE_FETK)
 	add_subdirectory(${MALOC_ROOT})
 	include_directories(${MALOC_ROOT}/src/base ${MALOC_ROOT}/src/vsys
 		${MALOC_ROOT}/src/vsh ${MALOC_ROOT}/src/psh)
-	list(APPEND APBS_LIBS -L${EXTERNALS_PATH}/fetk/maloc/lib -lmaloc)
+	list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
+	list(APPEND APBS_LIBS maloc)
 endif()
 
 ##############################################################################
@@ -255,7 +260,7 @@ endif()
 
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
-    list(APPEND APBS_LIBS -lm)
+    list(APPEND APBS_LIBS m)
 endif()
 
 
@@ -345,10 +350,10 @@ if(ENABLE_FETK)
 		ExternalProject_Get_Property(maloc install_dir)
 		include_directories(${install_dir}/include)
 
-	    list(APPEND APBS_LIBS "-lstdc++")
-		list(APPEND APBS_LIBS "-L${install_dir}/lib")
-	    list(APPEND APBS_LIBS -lmaloc -lamd -lpunc -lmc -lgamer -lsuperlu -lumfpack
-	-lblas -lvf2c -ltetgen -ltriangle -lreadline -ltermcap)
+	    list(APPEND APBS_LIBS "stdc++")
+	    list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
+	    list(APPEND APBS_LIBS maloc amd punc mc gamer superlu umfpack
+	blas vf2c tetgen triangle readline termcap)
 	
 	    SET(HAVE_MC_H 1)
 		SET(HAVE_PUNC_H 1)
@@ -463,7 +468,7 @@ option(ENABLE_PYTHON "Enable python support" OFF)
 # Handle conditional building with OpenMP                                      #
 ################################################################################
 
-option(ENABLE_OPENMP "Enable OpenMP parallelism" ON)
+option(ENABLE_OPENMP "Enable OpenMP parallelism" OFF)
 
 if(ENABLE_OPENMP)
     if(NOT ENABLE_DEBUG)
