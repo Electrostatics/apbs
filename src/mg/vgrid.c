@@ -66,7 +66,7 @@ VEMBED(rcsid="$Id$")
 #endif
 #define IJK(i,j,k)  (((k)*(nx)*(ny))+((j)*(nx))+(i))
 
-#ifdef _WIN32
+#if defined(_WIN32) && (_MSC_VER < 1800)
 #include <float.h>
 int isnan(double d)
 {
