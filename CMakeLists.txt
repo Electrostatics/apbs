@@ -318,36 +318,36 @@ if(ENABLE_FETK)
 		    set(MPI_ENV "FETK_MPI_INCLUDE=${MPI_C_INCLUDE_PATH}" "FETK_MPI_LIBRARY=${MPI_LIB_DIR}")
 		endif()
 		    
-		ExternalProject_Add(maloc
+		ExternalProject_Add(fetk-maloc
 			PREFIX fetk
 			SOURCE_DIR ${EXTERNALS_PATH}/fetk/maloc/src
 			CONFIGURE_COMMAND ${MPI_ENV} ${EXTERNALS_PATH}/fetk/maloc/configure ${CONFIG_OPTS}
 			BUILD_COMMAND ${MAKE})
 
-		ExternalProject_Add(punc
+		ExternalProject_Add(fetk-punc
 			PREFIX fetk
-			DEPENDS maloc
+			DEPENDS fetk-maloc
 			SOURCE_DIR ${EXTERNALS_PATH}/fetk/punc/src
 			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure ${CONFIG_OPTS}
 			BUILD_COMMAND ${MAKE})
 
-		ExternalProject_Add(gamer
+		ExternalProject_Add(fetk-gamer
 			PREFIX fetk
-			DEPENDS maloc
+			DEPENDS fetk-maloc
 			SOURCE_DIR ${EXTERNALS_PATH}/fetk/gamer/src
 			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure ${CONFIG_OPTS}
 			BUILD_COMMAND ${MAKE})
 
-		ExternalProject_Add(mc
+		ExternalProject_Add(fetk-mc
 			PREFIX fetk
-			DEPENDS maloc punc
+			DEPENDS fetk-maloc fetk-punc
 			SOURCE_DIR ${EXTERNALS_PATH}/fetk/mc/src
 			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure ${CONFIG_OPTS}
 			BUILD_COMMAND ${MAKE})
 
 		set(FETK_ENABLED 1)
 	
-		ExternalProject_Get_Property(maloc install_dir)
+		ExternalProject_Get_Property(fetk-maloc install_dir)
 		include_directories(${install_dir}/include)
 
 	    list(APPEND APBS_LIBS "stdc++")
@@ -534,7 +534,6 @@ if(NOT CYGWIN AND NOT MINGW AND WIN32)
     ADD_DEFINITIONS("/D _CRT_SECURE_NO_WARNINGS")
 endif()
 
-message("libs: " ${APBS_LIBS})
 
 
 ################################################################################
