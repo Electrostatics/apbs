@@ -1,3 +1,4 @@
+
 cmake_minimum_required (VERSION 2.8)
 
 ################################################################################
@@ -540,6 +541,7 @@ endif()
 # Build APBS sources                                                           #
 ################################################################################
 
+link_directories(${APBS_LIB_DIRS})
 include_directories(${APBS_ROOT}/src ${APBS_BUILD}/src ${APBS_ROOT}/include)
 add_subdirectory(src)
 
