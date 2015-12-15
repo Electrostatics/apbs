@@ -61,7 +61,6 @@ message(STATUS " ")
 message(STATUS "${APBS_LIBS} ${APBS_INTERNAL_LIBS}")
 message(STATUS " ")
 
-link_directories(${APBS_LIB_DIRS})
 target_link_libraries(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
 
 configure_file(
