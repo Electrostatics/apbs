@@ -151,6 +151,14 @@ VEXTERNC void     BEMparm_dtor2(BEMparm *thee);
  */
 VEXTERNC Vrc_Codes      BEMparm_check(BEMparm *thee);
 
+/**
+ * @brief Copy object info into thee
+ * @author Nathan Baker
+ * @param thee destination object
+ * @param parm source object
+ */
+VEXTERNC void BEMparm_copy(BEMparm *thee, BEMparm *parm);
+
 /** @brief   Parse an MG keyword from an input file
  *  @ingroup BEMparm
  *  @author  Nathan Baker and Todd Dolinsky

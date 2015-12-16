@@ -3047,6 +3047,17 @@ VPRIVATE void bcCalcOrig(Vpmg *thee) {
                         sdhquadrupole[6] += 1.5*(traced[6]);
                         sdhquadrupole[7] += 1.5*(traced[7]);
                         sdhquadrupole[8] += 1.5*(traced[8] - qave);
+                        /*Added the else to kill a warning when building with clang*/
+#else
+                    case VCM_PERMANENT:
+                    	Vnm_print(2, "BcCalcOrig: Need to build with Tinker enabled!\n");
+                    	VASSERT(0);
+                    case VCM_INDUCED:
+                    	Vnm_print(2, "BcCalcOrig: Need to build with Tinker enabled!\n");
+                    	VASSERT(0);
+                    case VCM_NLINDUCED:
+                    	Vnm_print(2, "BcCalcOrig: Need to build with Tinker enabled!\n");
+                    	VASSERT(0);
 #endif /* if defined(WITH_TINKER) */
                 }
             }
@@ -3091,6 +3102,17 @@ VPRIVATE void bcCalcOrig(Vpmg *thee) {
 
                     case VCM_NLINDUCED:
                         dipole = Vatom_getNLInducedDipole(atom);
+/*added this to kill a warning when building with clang (by Juan Brandi).*/
+#else
+                    case VCM_PERMANENT:
+                    	Vnm_print(2, "BcCalcOrig: Need to build with Tinker enabled!\n");
+                    	VASSERT(0);
+                    case VCM_INDUCED:
+                    	Vnm_print(2, "BcCalcOrig: Need to build with Tinker enabled!\n");
+                    	VASSERT(0);
+                    case VCM_NLINDUCED:
+                    	Vnm_print(2, "BcCalcOrig: Need to build with Tinker enabled!\n");
+                    	VASSERT(0);
 #endif
                 }
                 bcfl1(size, position, charge, xkappa, pre1,
@@ -3778,6 +3800,17 @@ VPRIVATE void bcfl_sdh(Vpmg *thee){
                 sdhquadrupole[6] += 1.5*(traced[6]);
                 sdhquadrupole[7] += 1.5*(traced[7]);
                 sdhquadrupole[8] += 1.5*(traced[8] - qave);
+/*added this to kill a warning when building with clang (by Juan Brandi)*/
+#else
+                    case VCM_PERMANENT:
+                    	Vnm_print(2, "BcCalcOrig: Need to build with Tinker enabled!\n");
+                    	VASSERT(0);
+                    case VCM_INDUCED:
+                    	Vnm_print(2, "BcCalcOrig: Need to build with Tinker enabled!\n");
+                    	VASSERT(0);
+                    case VCM_NLINDUCED:
+                    	Vnm_print(2, "BcCalcOrig: Need to build with Tinker enabled!\n");
+                    	VASSERT(0);
 #endif /* if defined(WITH_TINKER) */
         }
     }

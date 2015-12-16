@@ -6,7 +6,7 @@ The example input files in this directory calculate the binding energes of a lig
 This example was contributed by Chung Wong.
 
 Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
--|-|-|-|-
+---|---|---|---|---
 [apbs-mol-vdw.in](apbs-mol-vdw.in)|2-level focusing to 0.250 A spacing, VdW surface, srfm mol|**1.4.1-binary**|**8.0835**|8.876
 |||1.4|8.0835
 |||1.3|8.0835

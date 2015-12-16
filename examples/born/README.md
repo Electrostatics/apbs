@@ -8,7 +8,7 @@ Please see apbs.in for details on the particular solvation energy calculations. 
 This example was contributed by Nathan Baker.
 
 Input File|Description|APBS Version|Results (kJ/mol)|Analytical (kJ/mol)
--|-|-|-|-
+---|---|---|---|---
 [apbs-mol-auto.in](apbs-mol-auto.in)|Sequential, 3 A sphere, 3-level focusing to 0.188 A, srfm mol|**1.4.1-binary**|**-229.7736**|-230.62
 |||1.4|-229.7736<sup>[3](#3)</sup>
 |||1.3|-229.7735
