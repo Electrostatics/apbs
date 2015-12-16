@@ -464,6 +464,10 @@ endif()
 
 option(ENABLE_PYTHON "Enable python support" OFF)
 
+If(ENABLE_PYTHON AND UNIX AND NOT APPLE AND NOT BUILD_SHARED_LIBS)
+    message(FATAL_ERROR "In order to build the APBS Python shared library, BUILD_SHARED_LIBS must be enabled.")
+endif()
+
 
 ################################################################################
 # Handle conditional building with OpenMP                                      #
