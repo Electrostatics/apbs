@@ -11,7 +11,7 @@ In order to calculate solvation energy upon binding you will need to take the re
 This example was contributed by Jung-Hsin Lin.
 
 Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
--|-|-|-|-
+---|---|---|---|---
 [1d7h-dmso/apbs-mol.in](1d7h-dmso/apbs-mol.in)|1d7h-dmso, 2-level focusing to 0.225 A, VdW surface, srfm mol|**1.4.1-binary**|**15.0081**|19.097
 |||1.4|15.0081<sup>[4](#4)</sup>
 |||1.3|15.0077
