@@ -66,7 +66,7 @@ VEMBED(rcsid="$Id$")
 #endif
 #define IJK(i,j,k)  (((k)*(nx)*(ny))+((j)*(nx))+(i))
 
-#ifdef _WIN32
+#if defined(_WIN32) && (_MSC_VER < 1800)
 #include <float.h>
 int isnan(double d)
 {
@@ -226,8 +226,9 @@ VPUBLIC int Vgrid_value(Vgrid *thee, double pt[3], double *value) {
     if (VABS(pt[2] - zmax) < Vcompare) khi = nz-1;
 
     /* See if we're on the mesh */
-    if ((ihi<nx) && (jhi<ny) && (khi<nz) &&
-        (ilo>=0) && (jlo>=0) && (klo>=0)) {
+    /*the condions starting with ilo>=0 seem unnecessary since they are of type size_t*/
+    if ((ihi<nx) && (jhi<ny) && (khi<nz) /*&&
+        (ilo>=0) && (jlo>=0) && (klo>=0)*/) {
 
         dx = ifloat - (double)(ilo);
         dy = jfloat - (double)(jlo);
@@ -1597,7 +1598,7 @@ VPUBLIC void Vgrid_writeDXBIN(Vgrid *thee, const char *iodev, const char *iofmt,
 			fprintf(fd, "object 2 class gridconnections counts %d %d %d\n", nxPART, nyPART, nzPART);
 
 			/* Write off the DX data */
-			fprintf(fd, "object 3 class array type double rank 0 items %lu binary data follows\n",(nxPART*nyPART*nzPART));
+			fprintf(fd, "object 3 class array type double rank 0 items %d binary data follows\n",(nxPART*nyPART*nzPART));
 
 			icol = 0;
 			for (i=0; i<nx; i++) {
@@ -1654,7 +1655,7 @@ VPUBLIC void Vgrid_writeDXBIN(Vgrid *thee, const char *iodev, const char *iofmt,
 			fprintf(fd, "object 2 class gridconnections counts %d %d %d\n", nx, ny, nz);
 
 			/* Write off the DX data */
-			fprintf(fd, "object 3 class array type double rank 0 items %lu binary data follows\n", (nx*ny*nz));
+			fprintf(fd, "object 3 class array type double rank 0 items %d binary data follows\n", (nx*ny*nz));
 
 			icol = 0;
 			for (i=0; i<nx; i++) {

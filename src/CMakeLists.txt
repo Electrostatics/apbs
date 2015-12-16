@@ -51,6 +51,9 @@ if(ENABLE_FETK)
    add_subdirectory(fem)
 endif(ENABLE_FETK)
 
+add_items(SOURCES routines.c)
+add_sublibrary(routines)
+
 message(STATUS ${EXTERNAL_HEADERS})
 
 add_executable(apbs main.c apbs.h routines.c routines.h)

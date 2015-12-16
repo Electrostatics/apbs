@@ -6,7 +6,7 @@ The example input files in this directory calculate the energy of placing an ion
 This example was contributed by Dave Sept.
 
 Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
--|-|-|-|-
+---|---|---|---|---|
 [apbs-mol-pdiel2.in](apbs-mol-pdiel2.in)|0.53 A resolution, pdie 2, srfm mol|**1.4.1-binary**|**15.5916**|23.58
 |||1.4|15.5916
 |||1.3|15.5916<sup>[3](#3)</sup>

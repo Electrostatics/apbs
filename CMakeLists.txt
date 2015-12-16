@@ -1,3 +1,4 @@
+
 cmake_minimum_required (VERSION 2.8)
 
 ################################################################################
@@ -53,7 +54,7 @@ OPTION (BUILD_SHARED_LIBS "Build shared libraries." OFF)
 
 message(STATUS "Setting project paths")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fpermissive")
 
 set(APBS_ROOT ${PROJECT_SOURCE_DIR})
 set(APBS_BUILD ${PROJECT_BINARY_DIR})
@@ -67,6 +68,9 @@ set(HEADER_INSTALL_PATH include/apbs)
 set(EXECUTABLE_INSTALL_PATH bin)
 set(SHARE_INSTALL_PATH share/apbs)
 
+set(APBS_LIBS)
+set(APBS_LIB_DIRS)
+
 find_file(CONTRIB_PATH "contrib" PATHS "${APBS_ROOT}"
     DOC "The path to contributed modules for apbs"
     )
@@ -77,6 +81,14 @@ find_file(EXTERNALS_PATH "externals" PATHS "${APBS_ROOT}"
 set(SYS_LIBPATHS /usr/lib64)
 #list(APPEND SYS_LIBPATHS /usr/lib64)
 
+################################################################################
+# Debian/Ubuntu hack for                                                       #
+# https://github.com/Electrostatics/apbs-pdb2pqr/issues/364                    #
+################################################################################
+if(EXISTS "/etc/debian_version" AND
+	"${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed")
+endif()
 
 
 ################################################################################
@@ -219,7 +231,8 @@ if(ENABLE_BEM)
     endif()
     get_filename_component(LIBGFORTRANPATH ${LIBGFORTRANPATH} PATH)
     find_path(LIBGFORTRAN_PATH ${LIBGFORTRAN_NAME} PATH ${LIBGFORTRANPATH})
-    list(APPEND APBS_LIBS "-L${LIBRARY_OUTPUT_PATH} -L${LIBGFORTRAN_PATH} -lgfortran -ltabipb -lstdc++" )
+    list(APPEND APBS_LIB_DIRS ${LIBRARY_OUTPUT_PATH} ${LIBGFORTRAN_PATH})
+    list(APPEND APBS_LIBS "gfortran tabipb stdc++" )
 endif() # ENABLE_BEM
 
 ################################################################################
@@ -234,7 +247,8 @@ if(NOT ENABLE_FETK)
 	add_subdirectory(${MALOC_ROOT})
 	include_directories(${MALOC_ROOT}/src/base ${MALOC_ROOT}/src/vsys
 		${MALOC_ROOT}/src/vsh ${MALOC_ROOT}/src/psh)
-	list(APPEND APBS_LIBS -L${EXTERNALS_PATH}/fetk/maloc/lib -lmaloc)
+	list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
+	list(APPEND APBS_LIBS maloc)
 endif()
 
 ##############################################################################
@@ -244,7 +258,33 @@ endif()
 
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
-    list(APPEND APBS_LIBS -lm)
+    list(APPEND APBS_LIBS m)
+endif()
+
+
+################################################################################
+# Handle conditional building with MPI Support                                 #
+# There may be a better way, but for now this comes before FETK because FETK   #
+# depends on having the libraries located.    	    	   		       #
+################################################################################
+
+option(ENABLE_MPI "Enable MPI parallelism" OFF)
+
+if(ENABLE_MPI)
+    if(NOT ENABLE_DEBUG)
+        message(STATUS "Checking for MPI")
+        find_package(MPI)
+        if(MPI_FOUND)
+            message(STATUS "MPI support enabled")
+	    set(HAVE_MPI_H 1)
+            include_directories(${MPI_C_INCLUDE_PATH})
+            list(APPEND APBS_LIBS ${MPI_C_LIBRARIES})
+        else()
+            message(WARNING "MPI was not found; disabling")
+        endif()
+    else()
+        message(WARNING "MPI may not be enabled in debugging mode")
+    endif()
 endif()
 
 
@@ -259,42 +299,59 @@ if(ENABLE_FETK)
 		message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
 	else()
 		message(STATUS "Building FETK components.")
-		ExternalProject_Add(maloc
+		set(CONFIG_OPTS --prefix=<INSTALL_DIR>)
+				
+		set(MPI_ENV "")
+		if(HAVE_MPI_H)
+		    list(APPEND CONFIG_OPTS --enable-mpi)
+
+		    # MALOC just cares about libmpi
+		    foreach(LIB_PATH ${MPI_C_LIBRARIES})
+		        get_filename_component(LIB ${LIB_PATH} NAME_WE)
+		        if(LIB STREQUAL "libmpi")
+		            get_filename_component(MPI_LIB_DIR ${LIB_PATH} DIRECTORY)
+		    	 endif()
+		    endforeach()
+
+		    set(MPI_ENV "FETK_MPI_INCLUDE=${MPI_C_INCLUDE_PATH}" "FETK_MPI_LIBRARY=${MPI_LIB_DIR}")
+		endif()
+		    
+		ExternalProject_Add(fetk-maloc
 			PREFIX fetk
 			SOURCE_DIR ${EXTERNALS_PATH}/fetk/maloc/src
-			CONFIGURE_COMMAND ${EXTERNALS_PATH}/fetk/maloc/configure --prefix=<INSTALL_DIR>
+			CONFIGURE_COMMAND ${MPI_ENV} ${EXTERNALS_PATH}/fetk/maloc/configure ${CONFIG_OPTS}
 			BUILD_COMMAND ${MAKE})
 
-		ExternalProject_Add(punc
+		ExternalProject_Add(fetk-punc
 			PREFIX fetk
-			DEPENDS maloc
+			DEPENDS fetk-maloc
 			SOURCE_DIR ${EXTERNALS_PATH}/fetk/punc/src
-			CONFIGURE_COMMAND FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure --prefix=<INSTALL_DIR>
+			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure ${CONFIG_OPTS}
 			BUILD_COMMAND ${MAKE})
 
-		ExternalProject_Add(gamer
+		ExternalProject_Add(fetk-gamer
 			PREFIX fetk
-			DEPENDS maloc
+			DEPENDS fetk-maloc
 			SOURCE_DIR ${EXTERNALS_PATH}/fetk/gamer/src
-			CONFIGURE_COMMAND FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure --prefix=<INSTALL_DIR>
+			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure ${CONFIG_OPTS}
 			BUILD_COMMAND ${MAKE})
 
-		ExternalProject_Add(mc
+		ExternalProject_Add(fetk-mc
 			PREFIX fetk
-			DEPENDS maloc punc
+			DEPENDS fetk-maloc fetk-punc
 			SOURCE_DIR ${EXTERNALS_PATH}/fetk/mc/src
-			CONFIGURE_COMMAND FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure --prefix=<INSTALL_DIR>
+			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure ${CONFIG_OPTS}
 			BUILD_COMMAND ${MAKE})
 
 		set(FETK_ENABLED 1)
 	
-		ExternalProject_Get_Property(maloc install_dir)
+		ExternalProject_Get_Property(fetk-maloc install_dir)
 		include_directories(${install_dir}/include)
 
-	    list(APPEND APBS_LIBS "-lstdc++")
-		list(APPEND APBS_LIBS "-L${install_dir}/lib")
-	    list(APPEND APBS_LIBS -lmaloc -lamd -lpunc -lmc -lgamer -lsuperlu -lumfpack
-	-lblas -lvf2c -ltetgen -ltriangle -lreadline -ltermcap)
+	    list(APPEND APBS_LIBS "stdc++")
+	    list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
+	    list(APPEND APBS_LIBS maloc amd punc mc gamer superlu umfpack
+	blas vf2c tetgen triangle readline termcap)
 	
 	    SET(HAVE_MC_H 1)
 		SET(HAVE_PUNC_H 1)
@@ -420,74 +477,22 @@ endif()
 
 
 ################################################################################
-# Configure Python Wrappers                                                    #
+# Configure Python                                                             #
+# Buidling the Python goodness happens in the tool/python directory.           #
 ################################################################################
 
-option(ENABLE_PYTHON "Enable python wrappers" OFF)
-option(MAX_MEMORY "Set the maximum memory (in MB) to be used for a job" OFF)
+option(ENABLE_PYTHON "Enable python support" OFF)
 
-if(ENABLE_PYTHON)
-
-    message(STATUS "Looking for python components")
-
-    if(NOT CMAKE_COMPILER_IS_GNUCC)
-        message(FATAL_ERROR "Python wrappers require GNU compilers")
-    endif()
-
-
-    find_package(PythonInterp)
-    if(NOT PYTHON_EXECUTABLE)
-        message(FATAL_ERROR "Couldn't find python interpreter")
-    endif()
-
-    find_package(PythonLibs)
-    if(NOT PYTHON_LIBRARY)
-        message(FATAL_ERROR "Couldn't find python libraries")
-    endif()
-
-    # TODO: Handle special flags for Python linking on different platforms
-    # TODO: Handle special flags for Python linking with intel compiler
-    # ${PYTHON_LFLAGS} perhaps?
-
-    set(MODULE_PROBE_PY "")
-    list(APPEND MODULE_PROBE_PY "from sys import stdout")
-    list(APPEND MODULE_PROBE_PY "from distutils.sysconfig import get_python_lib")
-    list(APPEND MODULE_PROBE_PY "stdout.write( get_python_lib() )")
-    execute_process(
-        COMMAND ${PYTHON_EXECUTABLE} -c "${MODULE_PROBE_PY}"
-        ERROR_QUIET
-        OUTPUT_VARIABLE PYTHON_MODULES
-    )
-
-    if(NOT PYTHON_MODULES)
-        message(FATAL_ERROR "Coudln't determine location of python modules")
-    endif()
-
-    if(NOT MAX_MEMORY)
-        set(MAX_MEMORY "-1")
-    endif()
-
-
-    # TODO:  these can't e right...
-    set(SERVICEURL "http://kryptonite.nbcr.net/opal2/services/apbs_1.3")
-    set(PARALLELSERVICEURL "http://oolite.calit2.optiputer.net/opal2/services/apbs-parallel-1.3")
-
-
-
-    configure_file(
-        ${APBS_ROOT}/src/.config/ApbsClient.py.in
-        ${EXECUTABLE_OUTPUT_PATH}/ApbsClient.py
-    )
-
+If(ENABLE_PYTHON AND UNIX AND NOT APPLE AND NOT BUILD_SHARED_LIBS)
+    message(FATAL_ERROR "In order to build the APBS Python shared library, BUILD_SHARED_LIBS must be enabled.")
 endif()
-
 
 
 ################################################################################
 # Handle conditional building with OpenMP                                      #
 ################################################################################
 
-option(ENABLE_OPENMP "Enable OpenMP parallelism" ON)
+option(ENABLE_OPENMP "Enable OpenMP parallelism" OFF)
 
 if(ENABLE_OPENMP)
     if(NOT ENABLE_DEBUG)
@@ -502,30 +507,6 @@ if(ENABLE_OPENMP)
         endif()
     else()
         message(WARNING "OpenMP may not be enabled in debugging mode")
-    endif()
-endif()
-
-
-
-################################################################################
-# Handle conditional building with MPI Support                                 #
-################################################################################
-
-option(ENABLE_MPI "Enable MPI parallelism" OFF)
-
-if(ENABLE_MPI)
-    if(NOT ENABLE_DEBUG)
-        message(STATUS "Checking for MPI")
-        find_package(MPI)
-        if(MPI_FOUND)
-            message(STATUS "MPI support enabled")
-            include_directories(${MPI_INCLUDE_PATH})
-            list(APPEND APBS_LIBS ${MPI_LIBRARIES})
-        else()
-            message(WARNING "MPI was not found; disabling")
-        endif()
-    else()
-        message(WARNING "MPI may not be enabled in debugging mode")
     endif()
 endif()
 
@@ -583,8 +564,8 @@ endif()
 # Build APBS sources                                                           #
 ################################################################################
 
-include_directories(${APBS_ROOT}/src ${APBS_BUILD}/src)
-#include_directories(${APBS_ROOT}/src ${APBS_BUILD}/src ${APBS_ROOT}/include)
+link_directories(${APBS_LIB_DIRS})
+include_directories(${APBS_ROOT}/src ${APBS_BUILD}/src ${APBS_ROOT}/include)
 add_subdirectory(src)
 
 
