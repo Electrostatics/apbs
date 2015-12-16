@@ -54,7 +54,7 @@ OPTION (BUILD_SHARED_LIBS "Build shared libraries." OFF)
 
 message(STATUS "Setting project paths")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pg -fpermissive")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fpermissive")
 
 set(APBS_ROOT ${PROJECT_SOURCE_DIR})
 set(APBS_BUILD ${PROJECT_BINARY_DIR})
