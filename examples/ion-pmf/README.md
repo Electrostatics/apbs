@@ -7,22 +7,18 @@ To run this test case, simply type `./runme.sh`, making sure that the apbs binar
 
 Here's the output you can look for (all forces in kJ/mol/Å):
 
- sasa   
-Solvent-accessible surface area force (scaled by the surface tension,    gamma). **NOTE THAT THIS FORCE HAS CHANGED!** We're now using SASA forces instead of the spline-surface square gradient forces used in previous examples (and by Im et al).
+sasa - Solvent-accessible surface area force (scaled by the surface tension,    gamma). **NOTE THAT THIS FORCE HAS CHANGED!** We're now using SASA forces instead of the spline-surface square gradient forces used in previous examples (and by Im et al).
 
- qf   
-Reaction field force
+qf - Reaction field force
 
- db   
-Dielectric boundary force
+db - Dielectric boundary force
 
- ib   
-Ionic boundary force (osmotic pressure)
+ib - Ionic boundary force (osmotic pressure)
 
 Here are the force results visually estimated from the Im et al paper (see above) with forces in kJ/mol/Å with one ion fixed at x = -3.0 Å.
 
 Mol 1 location|QF||DB||IB||
--|-|-|-|-|-|-
+---|---|---|---|---|---|---
 ||Mol 0|Mol 1|Mol 0|Mol 1|Mol 0|Mol 1
 -3.00|0.0E+00|0.0E+00|0.0E+00|0.0E+00|0|0
 -2.50|8.4E+00|-1.3E+01|1.1E+02|-1.1E+02|0|0
