@@ -115,7 +115,7 @@ APBS Version|Alkane|SASA (Å<sup>2</sup>)|SASA energy (kJ/mol)|SAV (Å<sup>3</su
 ||propane|170.391|182.703|1.44832|43.739|-33.4629|1.192358496286E+01
 
 APBS Version|Alkane|SASA (Å<sup>2</sup>)|SASA energy (kJ/mol)|SAV (Å<sup>3</sup>)|SAV energy (kJ/mol)|WCA energy (kJ/mol)|Total nonpolar solvation energy (kJ/mol)
----|---|---|--|--|--|--|--
+---|---|---|---|---|---|---|---
 0.5.0|2-methylbutane|214.202|1.82072|253.906|60.7852|-48.3035|1.430239579640E+01
 ||butane|193.855|1.64777|218.119|52.2176|-41.6443|1.222110127537E+01
 ||cyclohexane|221.799|1.88529|267.165|63.9593|-52.4787|1.336586748209E+01
