@@ -4,7 +4,7 @@ README for ionize APBS examples
 The example input files in this directory calculate electrostatic contributions to the ionization energy of acetic acid.
 
 Input File|Description|APBS Version|Results (kJ/mol)||||UHBD (kJ/mol)||||
----|---|---|---|---|---|---|---|---|---|---
+---|---|---|---|---
 ||||Acetic Acid|Acetate|Proton|Ionization Energy|Acetic Acid|Acetate|Proton|Ionization Energy
 [apbs-mol.in](apbs-mol.in)|3-level focusing to 0.094 A, srfm mol|**1.4.1-binary**|**-22.6788**|**-199.7463**|**-297.4598**|**-474.5273**|-22.22|-198.04|-295.79|-471.61
 |||1.4|-22.6788|-199.7463|-297.4598|-474.5273
