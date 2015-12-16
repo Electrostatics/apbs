@@ -6,7 +6,7 @@ The example input files in this directory calculate the binding of a small molec
 The UHBD calculations where performed using a van der Waals surface definition for the dielectric coefficient. This is simulated in the APBS input files by setting srad to 0.0.
 
 Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
--|-|-|-|-
+---|---|---|---|---
 [apbs-mol.in](apbs-mol.in)|2-level focusing to 0.225 A, VdW surface, srfm mol|**1.4.1-binary**|**-52.4648<sup>[6](#6)</sup>**|-70.00
 |||1.4|-51.4648<sup>[5](#5)</sup>
 |||1.3|-52.4647
