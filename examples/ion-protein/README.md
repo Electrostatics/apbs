@@ -8,11 +8,11 @@ This example was contributed by Dave Sept.
 Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 ---|---|---|---|---|
 [apbs-mol-pdiel2.in](apbs-mol-pdiel2.in)|0.53 A resolution, pdie 2, srfm mol|**1.4.1-binary**|**15.5916**|23.58
-|---|---|1.4|15.5916
-|---|---|1.3|15.5916<sup>[3](#3)</sup>
-|---|---|1.2.1|15.5819
-|---|---|1.2|15.5819
-|---|---|1.1.0|15.5819<sup>[2](#2)</sup>
+|||1.4|15.5916
+|||1.3|15.5916<sup>[3](#3)</sup>
+|||1.2.1|15.5819
+|||1.2|15.5819
+|||1.1.0|15.5819<sup>[2](#2)</sup>
 |||1.0.0|15.5916
 |||0.5.1|15.5916
 |||0.5.0|15.5916
