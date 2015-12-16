@@ -31,7 +31,6 @@ Input File|Description|APBS Version|Results (kJ/mol)|Analytical (kJ/mol)
 |||0.2.0|-227.19
 |||0.1.8|-227.19
 [apbs-smol-auto.in](apbs-smol-auto.in)|Sequential, 3 A sphere, 3-level focusing to 0.188 A, srfm smol|**1.4.1-binary**|**-229.0124**|-230.62
----|---|---|---|---
 |||1.4|-229.0124
 |||1.3|-229.0124
 |||1.2.1|-229.0124
@@ -42,7 +41,6 @@ Input File|Description|APBS Version|Results (kJ/mol)|Analytical (kJ/mol)
 |||0.5.0|-229.0123
 |||0.4.0|-229.0123
 [apbs-mol-parallel.in](apbs-mol-parallel.in)|Parallel with 4 processors, 3 A sphere, focusing to 0.103 A, srfm mol|**1.4.1-binary**|**-230.4918<sup>[4](#4)</sup>**|-230.62
----|---|---|---|---
 |||1.4|-230.4919<sup>[3](#3)</sup>
 |||1.3|-230.4918
 |||1.2.1|-230.4918
@@ -54,7 +52,6 @@ Input File|Description|APBS Version|Results (kJ/mol)|Analytical (kJ/mol)
 |||0.4.0|-230.4916
 |||0.2.1|-230.77
 [apbs-smol-parallel.in](apbs-smol-parallel.in)|Parallel with 4 processors, 3 A sphere, focusing to 0.103 A, srfm smol|**1.4.1-binary**|**-229.3871**|-230.62
----|---|---|---|---
 |||1.4|-229.3871
 |||1.3|-229.3871
 |||1.2.1|-229.3871
