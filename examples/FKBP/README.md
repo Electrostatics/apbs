@@ -1,8 +1,6 @@
 README for FKBP APBS examples
 =============================
 
-*\$Id\$*
-
 The example input files in this directory simulate the binding of various (small) ligands to FKBP. Analogous to HCA binding case (except it works).
 
 In order to calculate solvation energy upon binding you will need to take the results from these input files and subtract from them the results obtained from the `coulomb` utility found at `apbs/tools/manip/coulomb`. The values returned from this utility are:
