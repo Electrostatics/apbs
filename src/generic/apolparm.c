@@ -621,15 +621,7 @@ VPUBLIC Vrc_Codes APOLparm_parseToken(APOLparm *thee, char tok[VMAX_BUFSIZE],
         return APOLparm_parseCALCENERGY(thee, sock);
     } else if (Vstring_strcasecmp(tok, "calcforce") == 0) {
         return APOLparm_parseCALCFORCE(thee, sock);
-    } //else {
-//        Vnm_print(2, "parseAPOL:  Unrecognized keyword (%s)!\n", tok);
-//        return VRC_WARNING;
-//    }
-
-    /*I don't know why this is commented out but is generating a warning when building with clan
-     * instead I will return a  VRC_WARNING. (by Juan Brandi)
-     */
-//    return VRC_FAILURE;
+    }
 
     return VRC_FAILURE;
 
