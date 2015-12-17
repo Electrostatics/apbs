@@ -626,12 +626,12 @@ VPUBLIC Vrc_Codes APOLparm_parseToken(APOLparm *thee, char tok[VMAX_BUFSIZE],
 //        return VRC_WARNING;
 //    }
 
-    /*I don't know why this is commented out but is generating a warning when building with clan
+    /*I don't know why this is commented out but is generating a warning when building with clang
      * instead I will return a  VRC_WARNING. (by Juan Brandi)
      */
 //    return VRC_FAILURE;
 
     //return VRC_WARNING;
-    //return VRC_FAILURE;
+    return VRC_FAILURE;
 
 }
