@@ -631,6 +631,6 @@ VPUBLIC Vrc_Codes APOLparm_parseToken(APOLparm *thee, char tok[VMAX_BUFSIZE],
      */
 //    return VRC_FAILURE;
 
-    return VRC_WARNING;
+    return VRC_FAILURE;
 
 }
