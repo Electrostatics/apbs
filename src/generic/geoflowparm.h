@@ -163,8 +163,20 @@ VEXTERNC Vrc_Codes      GEOFLOWparm_check(GEOFLOWparm *thee);
  */
 VEXTERNC Vrc_Codes      GEOFLOWparm_parseToken(GEOFLOWparm *thee, char tok[VMAX_BUFSIZE],
                     Vio *sock);
+/**
+ * @brief copy GEOFLOWparm object int thee.
+ * @ingroup GEOFLOWparm
+ * @author
+ * @param thee GEOFLOWparm object to be copied into
+ * @param parm GEOFLOWparm object.
+ */
+VEXTERNC void GEOFLOWparm_copy(GEOFLOWparm *thee, GEOFLOWparm *parm);
 
 VPRIVATE Vrc_Codes GEOFLOWparm_parseVDW(GEOFLOWparm *thee, Vio *sock);
+
+VPRIVATE Vrc_Codes GEOFLOWparm_parseETOL(GEOFLOWparm *thee, Vio *sock);
+
+
 
 #endif
 
