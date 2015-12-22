@@ -186,6 +186,31 @@ VPRIVATE Vrc_Codes GEOFLOWparm_parseVDW(GEOFLOWparm *thee, Vio *sock){
     return VRC_SUCCESS;
 }
 
+VPRIVATE Vrc_Codes GEOFLOWparm_parseETOL(GEOFLOWparm *thee, Vio *sock){
+
+	char tok[VMAX_BUFSIZE];
+	double tf;
+
+	VJMPERR1(Vio_scanf(sock, "%s", tok) == 1);
+	if(sscanf(tok, "%lf", &tf) == 0){
+		Vnm_print(2, "NOsh: Read non-float (%s) while parsing etol keyword!\n", tok);
+		return VRC_WARNING;
+	} else if(tf <= 0.0) {
+		Vnm_print(2,"parseGEOFLOW: etol must be greater than 0!\n");
+		return VRC_WARNING;
+	} else {
+		thee->etol = tf;
+	}
+
+	return VRC_SUCCESS;
+
+
+	VERROR1:
+		Vnm_print(2, "parseGEOFLOW: ran out of tokens!\n");
+		return VRC_WARNING;
+
+}
+
 VPUBLIC Vrc_Codes GEOFLOWparm_parseToken(GEOFLOWparm *thee, char tok[VMAX_BUFSIZE],
   Vio *sock) {
 
@@ -210,7 +235,9 @@ VPUBLIC Vrc_Codes GEOFLOWparm_parseToken(GEOFLOWparm *thee, char tok[VMAX_BUFSIZ
 //    } else
     if (Vstring_strcasecmp(tok, "vdwdisp") == 0) {
         return GEOFLOWparm_parseVDW(thee, sock);
-    } else {
+    } else if(Vstring_strcasecmp(tok, "etol") == 0){
+    	return GEOFLOWparm_parseETOL(thee, sock);
+    }else {
         Vnm_print(2, "parseGEOFLOW:  Unrecognized keyword (%s)!\n", tok);
         return VRC_WARNING;
     }

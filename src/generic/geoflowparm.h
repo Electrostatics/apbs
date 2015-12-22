@@ -109,6 +109,7 @@ typedef struct sGEOFLOWparm {
 //    int setpres;
 //   int setgama;
     int setvdw;
+    double etol; /**< user defined error tolerance */
 
 } GEOFLOWparm;
 
