@@ -5123,7 +5123,7 @@ VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
    geoflowIn.m_etolSolvation = .01 ;  // to be added
 
    // debug
-   printGeometricFlowStruct( geoflowIn );
+   //printGeometricFlowStruct( geoflowIn );
   
    printf("num mols: %i\n", nosh->nmol);
    struct GeometricFlowOutput geoflowOut = 
