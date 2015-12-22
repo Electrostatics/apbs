@@ -84,9 +84,6 @@ VPUBLIC Vrc_Codes GEOFLOWparm_ctor2(GEOFLOWparm *thee, GEOFLOWparm_CalcType type
     thee->type = type;
     thee->vdw = 0;
     thee->etol = 1.0e-6;
-//    thee->dcel = 0.25;
-//    thee->pres = 0.008;
-//    thee->gama = 0.0001;
 
     return VRC_SUCCESS;
 }
@@ -135,9 +132,6 @@ VPUBLIC void GEOFLOWparm_copy(GEOFLOWparm *thee, GEOFLOWparm *parm) {
 
     thee->vdw = parm->vdw;
     thee->etol = parm->etol;
-//    thee->dcel = parm->dcel;
-//    thee->pres = parm->pres;
-//    thee->gama = parm->gama;
 }
 
 Vrc_Codes FUBAR(const char* name){
@@ -228,14 +222,6 @@ VPUBLIC Vrc_Codes GEOFLOWparm_parseToken(GEOFLOWparm *thee, char tok[VMAX_BUFSIZ
 
     Vnm_print(0, "GEOFLOWparm_parseToken:  trying %s...\n", tok);
 
-
-//    if (Vstring_strcasecmp(tok, "press") == 0) {
-//        return parseNonNeg(&(thee->pres), 0.008, &(thee->setpres), "pres", sock);
-//    } else if (Vstring_strcasecmp(tok, "gamma") == 0) {
-//        return parseNonNeg(&(thee->gama), 0.0001, &(thee->setgama), "gama", sock);
-//    } else if (Vstring_strcasecmp(tok, "grid") == 0) {
-//        return parseNonNeg(&(thee->dcel), 0.25, &(thee->setdcel), "dcel", sock);
-//    } else
     if (Vstring_strcasecmp(tok, "vdwdisp") == 0) {
         return GEOFLOWparm_parseVDW(thee, sock);
     } else if(Vstring_strcasecmp(tok, "etol") == 0){
