@@ -83,6 +83,7 @@ VPUBLIC Vrc_Codes GEOFLOWparm_ctor2(GEOFLOWparm *thee, GEOFLOWparm_CalcType type
     thee->parsed = 0;
     thee->type = type;
     thee->vdw = 0;
+    thee->etol = 1.0e-6;
 //    thee->dcel = 0.25;
 //    thee->pres = 0.008;
 //    thee->gama = 0.0001;
@@ -133,6 +134,7 @@ VPUBLIC void GEOFLOWparm_copy(GEOFLOWparm *thee, GEOFLOWparm *parm) {
     thee->parsed = parm->parsed;
 
     thee->vdw = parm->vdw;
+    thee->etol = parm->etol;
 //    thee->dcel = parm->dcel;
 //    thee->pres = parm->pres;
 //    thee->gama = parm->gama;
