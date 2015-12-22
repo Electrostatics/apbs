@@ -509,6 +509,7 @@ VPUBLIC int NOsh_parseInput(
         sections is allowed.
         */
         if (Vstring_strcasecmp(tok, "read") == 0) {
+           printf("read\n");
             Vnm_print(0, "NOsh: Parsing READ section\n");
             if (!NOsh_parseREAD(thee, sock)) return 0;
             Vnm_print(0, "NOsh: Done parsing READ section \
