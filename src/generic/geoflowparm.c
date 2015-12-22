@@ -133,6 +133,7 @@ VPUBLIC void GEOFLOWparm_copy(GEOFLOWparm *thee, GEOFLOWparm *parm) {
     thee->parsed = parm->parsed;
 
     thee->vdw = parm->vdw;
+    thee->etol = parm->etol;
 //    thee->dcel = parm->dcel;
 //    thee->pres = parm->pres;
 //    thee->gama = parm->gama;
@@ -202,6 +203,7 @@ VPRIVATE Vrc_Codes GEOFLOWparm_parseETOL(GEOFLOWparm *thee, Vio *sock){
 		thee->etol = tf;
 	}
 
+
 	return VRC_SUCCESS;
 
 
@@ -241,6 +243,7 @@ VPUBLIC Vrc_Codes GEOFLOWparm_parseToken(GEOFLOWparm *thee, char tok[VMAX_BUFSIZ
         Vnm_print(2, "parseGEOFLOW:  Unrecognized keyword (%s)!\n", tok);
         return VRC_WARNING;
     }
+
 
     return VRC_FAILURE;
 }
