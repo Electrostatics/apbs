@@ -5109,21 +5109,21 @@ VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
    struct GeometricFlowInput geoflowIn = getGeometricFlowParams();
 
    // change any of the parameters you want...
-   geoflowIn.m_boundaryCondition = MDH;  // should be: pbeparm->bcfl
-   geoflowIn.m_grid = apolparm->grid[0];
+   geoflowIn.m_boundaryCondition = (int) pbeparm->bcfl ;
+   geoflowIn.m_grid[0] = apolparm->grid[0];
+   geoflowIn.m_grid[1] = apolparm->grid[1];
+   geoflowIn.m_grid[2] = apolparm->grid[2];
    geoflowIn.m_gamma =  apolparm->gamma; 
    geoflowIn.m_pdie = pbeparm->pdie ;
    geoflowIn.m_sdie = pbeparm->sdie ;
    geoflowIn.m_press = apolparm->press ;
    geoflowIn.m_tol = parm->etol;
-   printf("etol TEST: %lf\n", parm->etol);
    geoflowIn.m_bconc = apolparm->bconc ;
    geoflowIn.m_vdwdispersion = parm->vdw;
-   printf("vdw TEST: %i\n", parm->vdw);
-   geoflowIn.m_etolSolvation = .01 ;  // to be added
+   geoflowIn.m_etolSolvation = .01 ;  // to be added?
 
    // debug
-   //printGeometricFlowStruct( geoflowIn );
+   printGeometricFlowStruct( geoflowIn );
   
    printf("num mols: %i\n", nosh->nmol);
    struct GeometricFlowOutput geoflowOut = 
