@@ -434,6 +434,9 @@ VPUBLIC int NOsh_calc_copy(
         PBEparm_copy(thee->pbeparm, source->pbeparm);
     if (source->apolparm != VNULL)
         APOLparm_copy(thee->apolparm, source->apolparm);
+    /*I think here is where the the geoflow changes get lost*/
+    if(source->geoflowparm != VNULL)
+    	GEOFLOWparm_copy(thee->geoflowparm, source->geoflowparm);
 
     return 1;
 
