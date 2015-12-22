@@ -2766,6 +2766,10 @@ VPUBLIC int NOsh_parseGEOFLOW(
 
         /* Pass the token through a series of parsers */
         rc = PBEparm_parseToken(pbeparm, tok, sock);
+//       /*currently the only bc handle by geoflow is mdh so we check here if mdh was read*/
+//        if(pbeparm->bcfl == BCFL_MDH){
+//        	Vnm_print(2, "NOsh_parseGEOFLOW: ");
+//        }
         if (rc == -1) {
             Vnm_print(0, "NOsh_parseGEOFLOW:  parsePBE error!\n");
             break;
