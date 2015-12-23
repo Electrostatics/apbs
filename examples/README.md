@@ -23,4 +23,4 @@ Tests will either pass, pass with rounding error (within 10<sup>-9</sup> of the 
 | Coulomb's law (point-pmf) | [point-pmf/README.md](point-pmf/README.md) | Nathan Baker | See how well we do reproducing Coulomb's law. |
 | Methanol solvation (solv) | [solv/README.md](solv/README.md) | UHBD | Calculate the solvation energies of methanol and methoxide. | 
 | Protein-RNA interactions (protein-rna) | [protein-rna/README.md](protein-rna/README.md) | David Draper | Calculate the salt dependence of protein interactions with box B RNA hairpin. |
-
+| Geometric flow solvation model | [geoflow/README.md](geoflow/README.md) | Elizabeth Jurrus | Calculate the dielectric interface profile across the solute-solvent boundary in a thermodynamically sef-consistent fashion. |
