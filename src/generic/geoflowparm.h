@@ -75,9 +75,10 @@
  * @ingroup GEOFLOWparm
  */
 enum eGEOFLOWparm_CalcType {
-    GFCT_MANUAL=0,  /**< GEOFLOW-manual */
+    //other methods disabled for now only auto currently implemented.
+	//GFCT_MANUAL=0,  /**< GEOFLOW-manual */
     GFCT_AUTO=1,  /**< GEOFLOW-auto */
-    GFCT_NONE=2 /**< not defined */
+    //GFCT_NONE=2 /**< not defined */
 };
 
 /**

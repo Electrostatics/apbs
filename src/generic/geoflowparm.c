@@ -115,7 +115,8 @@ VPUBLIC Vrc_Codes GEOFLOWparm_check(GEOFLOWparm *thee) {
 
 
     /* Check type settings */
-    if ((thee->type != GFCT_MANUAL)&& (thee->type != GFCT_AUTO)&& (thee->type != GFCT_NONE)) {
+    //if ((thee->type != GFCT_MANUAL)&& (thee->type != GFCT_AUTO)&& (thee->type != GFCT_NONE)) {
+    if(thee->type != GFCT_AUTO) {
          Vnm_print(2,"GEOFLOWparm_check: type not set");
          rc = VRC_FAILURE;
     }
