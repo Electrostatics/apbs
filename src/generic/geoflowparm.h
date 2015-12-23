@@ -100,14 +100,7 @@ typedef struct sGEOFLOWparm {
     int parsed;  /**< Has this structure been filled? (0 = no, 1 = yes) */
 
     /* *** GENERIC PARAMETERS *** */
-//    double dcel;
-//    double pres;
-//    double gama;
     int vdw;
-    
-//    int setdcel;
-//    int setpres;
-//   int setgama;
     int setvdw;
     double etol; /**< user defined error tolerance */
 
