@@ -128,7 +128,7 @@ endif()
 # Determine Machine Epsilon values                                             #
 ################################################################################
 
-OPTION(CHECK_EPSILON "" YES)
+OPTION(CHECK_EPSILON "Compute machine epsilon values" YES)
 if(CHECK_EPSILON)
     message(STATUS "Computing machine epsilon values")
     try_run(
@@ -295,6 +295,7 @@ endif()
 option(ENABLE_FETK "Enable the finite element solver" OFF)
 
 if(ENABLE_FETK)
+
 	if(WIN32)
 		message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
 	else()
