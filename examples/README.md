@@ -20,7 +20,11 @@ Tests will either pass, pass with rounding error (within 10<sup>-9</sup> of the 
 | Ion-ion PMF (ion-pmf) | [ion-pmf/README.md](ion-pmf/README.md) | Nathan Baker | Calculate solvation energies and solvation force components for ion pairs. |
 | Ion-protein interaction energies (ion-protein) | [ion-protein/README.md](ion-protein/README.md) | Dave Sept | Calculate polar energy of placing an ion near a macromolecule. |
 | PKA-balanol binding (pka-lig) | [pka-lig/README.md](pka-lig/README.md) | Chung Wong | Calculate binding energies of a ligand to protein kinase A. |
+| PKA-balanol binding (pka-lig)/UHDB | [pka-lig/UHDB/readme.md](pka-lig/UHDB/readme.md)| Chun Wong | Shows the calculations done using molecular surface based and van der Waals dielectric definitions. |
 | Coulomb's law (point-pmf) | [point-pmf/README.md](point-pmf/README.md) | Nathan Baker | See how well we do reproducing Coulomb's law. |
 | Methanol solvation (solv) | [solv/README.md](solv/README.md) | UHBD | Calculate the solvation energies of methanol and methoxide. | 
 | Protein-RNA interactions (protein-rna) | [protein-rna/README.md](protein-rna/README.md) | David Draper | Calculate the salt dependence of protein interactions with box B RNA hairpin. |
 | Geometric flow solvation model | [geoflow/README.md](geoflow/README.md) | Elizabeth Jurrus | Calculate the dielectric interface profile across the solute-solvent boundary in a thermodynamically sef-consistent fashion. |
+| Ion Binding to DNA Duplexes Using SMPBE| [smpbe/readme.md](smpbe/reamdme.md) | | Calculate PBE taking into account the finite ion size. |
+| Focusing Membrane Boundary Condition| [membrane/readme.md](membrane/readme.md) | | Solve the PBE with a single atom using focusing membrane boundary conditions. |
+| NMR Structure of the RNA binding Domain | [bem/readme.md](bem/readme.md) | | Calculate the solvation complex using the boundary element method as is implemented in APBS. |
