@@ -28,3 +28,5 @@ Tests will either pass, pass with rounding error (within 10<sup>-9</sup> of the 
 | Ion Binding to DNA Duplexes Using SMPBE| [smpbe/readme.md](smpbe/reamdme.md) | | Calculate PBE taking into account the finite ion size. |
 | Focusing Membrane Boundary Condition| [membrane/readme.md](membrane/readme.md) | | Solve the PBE with a single atom using focusing membrane boundary conditions. |
 | NMR Structure of the RNA binding Domain | [bem/readme.md](bem/readme.md) | | Calculate the solvation complex using the boundary element method as is implemented in APBS. |
+| Born Ion | [opal/README.md](opal/README.md) | Nathan Baker | The Born ion is a canonical electrostatic's test case for which there is an analytical solution. This example examines the solvation free energy. |
+| Miscellaneous | [misc/README.md](misc/README.md) | | A collection of pqr files of molecules that have interesting potentials. |
