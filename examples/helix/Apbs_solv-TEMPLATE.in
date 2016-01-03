@@ -1,0 +1,222 @@
+#############################################################################
+### TM SOLVATION ENERGY
+### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for 
+### input file sytax.
+#############################################################################
+# READ IN MOLECULES
+read
+# Read molecule 1
+	mol pqr TM.pqr 
+# Read maps
+	diel dx dielx_Lm.dx diely_Lm.dx dielz_Lm.dx
+	diel dx dielx_Mm.dx diely_Mm.dx dielz_Mm.dx
+	diel dx dielx_Sm.dx diely_Sm.dx dielz_Sm.dx
+
+	kappa dx kappa_Lm.dx
+	kappa dx kappa_Mm.dx
+	kappa dx kappa_Sm.dx
+
+	charge dx charge_Lm.dx
+	charge dx charge_Mm.dx
+	charge dx charge_Sm.dx
+end
+
+# FOCUSED POTENTIAL FOR SOLVATED1 STATE
+elec name solvated1
+	mg-manual
+	dime DIME DIME DIME
+	nlev 4
+	glen GLEN_L GLEN_L GLEN_L
+	gcent mol 1
+	mol 1
+	lpbe
+	bcfl zero
+	ion
+	charge 1
+	conc 0.100
+	radius 2.0
+	ion
+	charge -1
+	conc 0.100
+	radius 2.0
+	pdie PDIE
+	sdie SDIE 
+	chgm spl2
+	srfm mol
+	srad 1.4
+	swin 0.3
+	sdens 10.0
+	temp 298.15
+	calcenergy total
+	calcforce no
+	write pot dx pot_L
+end
+
+# FOCUSED POTENTIAL FOR SOLVATED2 STATE
+elec name solvated2
+	mg-manual
+	dime DIME DIME DIME
+	nlev 4
+	glen GLEN_M GLEN_M GLEN_M
+	gcent mol 1
+	mol 1
+	lpbe
+	bcfl focus
+	ion
+	charge 1
+	conc 0.100
+	radius 2.0
+	ion
+	charge -1
+	conc 0.100
+	radius 2.0
+	pdie PDIE
+	sdie SDIE
+	chgm spl2
+	srfm mol
+	srad 1.4
+	swin 0.3
+	sdens 10.0
+	temp 298.15
+	calcenergy total
+	calcforce no
+	write pot dx pot_M
+end
+
+# FOCUSED POTENTIAL FOR SOLVATED3 STATE
+elec name solvated3
+	mg-manual
+	dime DIME DIME DIME
+	nlev 4
+	glen GLEN_S GLEN_S GLEN_S
+	gcent mol 1
+	mol 1
+	lpbe
+	bcfl focus
+	ion
+	charge 1
+	conc 0.100
+	radius 2.0
+	ion
+	charge -1
+	conc 0.100
+	radius 2.0
+	pdie PDIE
+	sdie SDIE
+	chgm spl2
+	srfm mol
+	srad 1.4
+	swin 0.3
+	sdens 10.0
+	temp 298.15
+	calcenergy total
+	calcforce no
+	write pot dx pot_S
+end
+
+# CALCULATE POTENTIAL FOR REFERENCE1 STATE
+elec name reference1
+	mg-manual
+	dime DIME DIME DIME
+	nlev 4
+	glen GLEN_L GLEN_L GLEN_L
+	gcent mol 1
+	mol 1
+	lpbe
+	bcfl zero
+	ion
+	charge 1
+	conc 0.100
+	radius 2.0
+	ion
+	charge -1
+	conc 0.100
+	radius 2.0
+	pdie PDIE
+	sdie SDIE
+	chgm spl2
+	srfm mol
+	srad 1.4
+	swin 0.3
+	sdens 10.0
+	temp 298.15
+	calcenergy total
+	calcforce no
+	usemap diel 1 
+	usemap kappa 1
+	usemap charge 1 
+end
+
+# CALCULATE POTENTIAL FOR REFERENCE2 STATE
+elec name reference2
+	mg-manual
+	dime DIME DIME DIME
+	nlev 4
+	glen GLEN_M GLEN_M GLEN_M
+	gcent mol 1
+	mol 1
+	lpbe
+	bcfl focus
+	ion
+	charge 1
+	conc 0.100
+	radius 2.0
+	ion
+	charge -1
+	conc 0.100
+	radius 2.0
+	pdie PDIE
+	sdie SDIE
+	chgm spl2
+	srfm mol
+	srad 1.4
+	swin 0.3
+	sdens 10.0
+	temp 298.15
+	calcenergy total
+	calcforce no
+	usemap diel 2
+	usemap kappa 2
+	usemap charge 2
+end
+
+# CALCULATE POTENTIAL FOR REFERENCE3 STATE
+elec name reference3
+	mg-manual
+	dime DIME DIME DIME
+	nlev 4
+	glen GLEN_S GLEN_S GLEN_S
+	gcent mol 1
+	mol 1
+	lpbe
+	bcfl focus
+	ion
+	charge 1
+	conc 0.100
+	radius 2.0
+	ion
+	charge -1
+	conc 0.100
+	radius 2.0
+	pdie PDIE
+	sdie SDIE
+	chgm spl2
+	srfm mol
+	srad 1.4
+	swin 0.3
+	sdens 10.0
+	temp 298.15
+	calcenergy comps
+#	calcenergy total
+	calcforce no
+	usemap diel 3
+	usemap kappa 3
+	usemap charge 3
+end
+
+print elecEnergy reference3 - solvated3 end
+#print apolForce solvated - asdf2 end
+#print apolEnergy solvated + asdf2 end
+
+# SO LONG
+quit

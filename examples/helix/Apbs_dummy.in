@@ -1,0 +1,120 @@
+#############################################################################
+### TM SOLVATION ENERGY
+### : apbs.in 998 2006-11-28 21:24:40Z sobolevnrm $
+###
+### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for 
+### input file sytax.
+#############################################################################
+# READ IN MOLECULES
+read
+# Read molecule 1
+	mol pqr TM.pqr 
+end
+
+# FOCUSED POTENTIAL FOR SOLVATED1 STATE
+elec name solvated1
+	mg-dummy
+	dime 97 97 97 
+	nlev 4
+	glen 300 300 300 
+	gcent mol 1
+	mol 1
+	lpbe
+	bcfl zero
+	ion  
+	charge 1  
+	conc 0.100 
+	radius 2.0 
+	ion  
+	charge -1  
+	conc 0.100 
+	radius 2.0
+	pdie 10.0
+	sdie 80.0 
+	chgm spl2
+	srfm mol
+	srad 1.4
+	swin 0.3
+	sdens 10.0
+	temp 298.15
+	calcenergy total
+	calcforce no
+	write dielx dx dielx_L		   # spatially dependent diel. constant
+	write diely dx diely_L		   # out using the Conoly/Molecular surfac
+	write dielz dx dielz_L
+	write kappa dx kappa_L		   # write out the kappa map
+	write charge dx charge_L		 # write out the charge map
+end
+
+# FOCUSED POTENTIAL FOR SOLVATED2 STATE
+elec name solvated2
+	mg-dummy
+	dime 97 97 97 
+	nlev 4
+	glen 200 200 200 
+	gcent mol 1
+	mol 1
+	lpbe
+	bcfl focus
+	ion 
+	charge 1  
+	conc 0.100 
+	radius 2.0
+	ion
+	charge -1
+	conc 0.100
+	radius 2.0
+	pdie 10.0
+	sdie 80.0
+	chgm spl2
+	srfm mol
+	srad 1.4
+	swin 0.3
+	sdens 10.0
+	temp 298.15
+	calcenergy total
+	calcforce no
+	write dielx dx dielx_M			# spatially dependent diel. constant
+	write diely dx diely_M			# out using the Conoly/Molecular surfac
+	write dielz dx dielz_M
+	write kappa dx kappa_M			# write out the kappa map
+	write charge dx charge_M		  # write out the charge map
+end
+
+# FOCUSED POTENTIAL FOR SOLVATED3 STATE
+elec name solvated3
+	mg-dummy
+	dime 97 97 97
+	nlev 4
+	glen 100 100 100
+	gcent mol 1
+	mol 1
+	lpbe
+	bcfl focus
+	ion
+	charge 1
+	conc 0.100
+	radius 2.0
+	ion
+	charge -1
+	conc 0.100
+	radius 2.0
+	pdie 10.0
+	sdie 80.0 
+	chgm spl2
+	srfm mol
+	srad 1.4
+	swin 0.3
+	sdens 10.0
+	temp 298.15
+	calcenergy total
+	calcforce no
+	write dielx dx dielx_S			# spatially dependent diel. constant
+	write diely dx diely_S			# out using the Conoly/Molecular surfac
+	write dielz dx dielz_S
+	write kappa dx kappa_S			# write out the kappa map
+	write charge dx charge_S		  # write out the charge map
+end
+
+# SO LONG
+quit
