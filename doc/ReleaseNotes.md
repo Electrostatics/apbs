@@ -1,7 +1,7 @@
 Dearest APBS users,
 
 We are pleased to announce the latest release of APBS 1.4.2.  This latest
-version of APBS includes several notable features and bug fixures.  This
+version of APBS includes several notable features and bug fixes.  This
 release includes a major rewrite of the geometric flow code for
 easier modification and testing. We are also packaging the code to run
 the Poisson-Boltzmann Semi-Analytical Method (Yap et al.) with APBS in an
