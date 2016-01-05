@@ -4,25 +4,40 @@ APBS 1.4.2 CHANGELOG
 These are notes for APBS version 1.4.2.
 ---------------------------------------
 
-* Binary releases may be found on SourceForge.
+* Binary releases may be found on
+ [GitHub](https://github.com/Electrostatics/apbs-pdb2pqr/releases) and
+ on [SourceForge](http://sourceforge.net/projects/apbs/files/apbs/).
 
 ###New Features
-* PB-SAM?
-* Geometric Flow speed improvements (#235)
+* Poisson-Boltzmann Semi-Analytical Method (PB-SAM) packaged and built with APBS
+* New Geometric flow API and improvements in speed (#235)
 * Support for BinaryDX file format (#216)
+* SOR solver added for mg-auto input file option
 * DXMath improvements (#168, #216)
+* Test suite improvements
+  * APBS build in Travis-CI
+  * Geometric Flow tests added
+  * Protein RNA tests enabled (#149)
+  * Intermetiate result testing (#64)
+* Example READMEs onverted to markdown and updated with latest results
+  
 
-##Generally New and Different
-* Geometric Flow has been moved to it's own [repository](https://github.com/Electrostatics/geoflow_c)
-* FETk has been (cloned)[https://github.com/Electrostatics/FETK] so that we have could effect updates
+###Bug Fixes
+* Geometric Flow boundary indexing bug fixed
+* Build fixes:
+  * Out of source CMake builds are again working
+  * python library build fixes
+  * Libc builds again for centos
+  * Pull requests merged
+* Removed irrelevant warning messages (#378)
 
-###APBS Defect Fixes
-* Geometric Flow bugs fixed...
+##Notes
+The following packages are treated as submodules in APBS:
+* Geometric Flow has been moved to it's own [repository](https://github.com/Electrostatics/geoflow_c).
+* FETk has been [cloned](https://github.com/Electrostatics/FETK) so that we have could effect updates.
+* PB-SAM lives [here](https://github.com/Electrostatics/PB-SAM).
+Added chat feature for users:
+* https://gitter.im/Electrostatics/help
 
-###Build System Changes
-* Out of source builds are again working, as Kitware intended
-
-###Test Suite changes
-* Geometric Flow tests added
-* Protein RNA tests enabled (#149)
-* Intermetiate result testing (#64)
+###Known Bugs
+* ?
