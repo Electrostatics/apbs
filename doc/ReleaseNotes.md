@@ -14,7 +14,7 @@ errors
 from the Fortran to C conversion.
 
 A full change log can be found
-(here)[https://github.com/Electrostatics/apbs-pdb2pqr/blob/master/apbs/doc/ChangeLog.md].
+[here](https://github.com/Electrostatics/apbs-pdb2pqr/blob/master/apbs/doc/ChangeLog.md).
 
 We thank you for your continued support of APBS.
 
