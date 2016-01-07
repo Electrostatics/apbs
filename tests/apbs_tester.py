@@ -238,6 +238,12 @@ def main():
         '-l', '--log_file', dest='log_file', type='string', default='test.log',
         help="Save the test log to FILE.", metavar="FILE"
         )
+
+    parser.add_option('-b', '--benchmark',
+                      action='store_const', const=1, dest='benchmark',
+                      help="Perform benchmarking."
+    )
+
     
     # Parse the command line and extract option values
     ( options, args ) = parser.parse_args()
