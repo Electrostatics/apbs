@@ -12,4 +12,4 @@ force-field parameters.
 More information can be found here in [Chen et al.](http://www.ncbi.nlm.nih.gov/pubmed/20938489) and [Thomas et
 al](http://www.ncbi.nlm.nih.gov/pubmed/23212974).
 
-The parameters used in the input files (imidozol and glycerol) came from Thomas et al.
+The parameters used in the input files (imidazol and glycerol) came from Thomas et al.
