@@ -6,7 +6,7 @@ Provides utility for testing apbs against examples and known results
 
 import sys, os, re, datetime, subprocess, operator
 from optparse import OptionParser
-from ConfigParser import ConfigParser
+from ConfigParser import ConfigParser, NoOptionError
 
 # The inputgen utility needs to be accessible, so we add its path
 sys.path.insert( 0, "../tools/manip" )
@@ -115,7 +115,7 @@ def process_parallel( binary, input_file, procs, logger ):
 
 
 
-def run_test( binary, test_files, test_name, test_directory, logger, ocd ):
+def run_test( binary, test_files, test_name, test_directory, setup, logger, ocd ):
     """
     Runs a given test from the test cases file
     """
@@ -130,6 +130,10 @@ def run_test( binary, test_files, test_name, test_directory, logger, ocd ):
 
     # Change the current working directory to the test directory
     os.chdir( test_directory )
+
+    # Run the setup, if any
+    if setup:
+        subprocess.call(setup.split())
 
     for ( base_name, expected_results ) in test_files:
 
@@ -234,6 +238,12 @@ def main():
         '-l', '--log_file', dest='log_file', type='string', default='test.log',
         help="Save the test log to FILE.", metavar="FILE"
         )
+
+    parser.add_option('-b', '--benchmark',
+                      action='store_const', const=1, dest='benchmark',
+                      help="Perform benchmarking."
+    )
+
     
     # Parse the command line and extract option values
     ( options, args ) = parser.parse_args()
@@ -281,13 +291,21 @@ def main():
             print "  " + test_name + " section not found in " + options.test_config
             print "  skipping..."
             continue
-            
-        # As each test runs, remove the value so it can't be run twice
+
+        # Grab the test directory
         test_directory = config.get( test_name, 'input_dir' )
         config.remove_option( test_name, 'input_dir' )
         
+        # Check if there is a setup step.
+        test_setup = None
+        try:
+            test_setup = config.get(test_name, 'setup')
+            config.remove_option(test_name, 'setup')
+        except NoOptionError:
+            pass
+
         # Run the test!
-        run_test( binary, config.items( test_name ), test_name, test_directory, logger, options.ocd )
+        run_test( binary, config.items( test_name ), test_name, test_directory, test_setup, logger, options.ocd )
 
 
 

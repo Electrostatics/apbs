@@ -1,5 +1,4 @@
-
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 2.8.7)
 
 ################################################################################
 # TODO:  Add licensing and authorship information
@@ -40,7 +39,7 @@ include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(ExternalProject)
 
-set(APBS_VERSION "1.4.1")
+set(APBS_VERSION "1.4.2")
 set(PACKAGE_STRING ${APBS_VERSION})
 set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
 
