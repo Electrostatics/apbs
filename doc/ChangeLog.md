@@ -41,3 +41,4 @@ Added chat feature for users:
 
 ###Known Bugs
 * Travis CI Linux builds are breaking because Geometric Flow relies on C++11 and Travis boxen have an old GCC that doth not support C++11.
+* BEM is not building currently
