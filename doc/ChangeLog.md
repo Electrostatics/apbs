@@ -40,4 +40,4 @@ Added chat feature for users:
 * https://gitter.im/Electrostatics/help
 
 ###Known Bugs
-* ?
+* Travis CI Linux builds are breaking because Geometric Flow relies on C++11 and Travis boxen have an old GCC that doth not support C++11.
