@@ -23,11 +23,13 @@ These are notes for APBS version 1.4.2.
   
 
 ###Bug Fixes
+* OpenMPI (mg-para) functionality restored (#190)
+* Fixed parsing PQR files that contained records other than _ATOM_ and _HETATM_ (#77, #214)
 * Geometric Flow boundary indexing bug fixed
 * Build fixes:
   * Out of source CMake builds are again working
-  * python library build fixes
-  * Libc builds again for centos
+  * Python library may be built (#372)
+  * CentOS 5 binary builds for glibc compatibility
   * Pull requests merged
 * Removed irrelevant warning messages (#378)
 
@@ -36,8 +38,8 @@ The following packages are treated as submodules in APBS:
 * Geometric Flow has been moved to it's own [repository](https://github.com/Electrostatics/geoflow_c).
 * FETk has been [cloned](https://github.com/Electrostatics/FETK) so that we have could effect updates.
 * PB-SAM lives [here](https://github.com/Electrostatics/PB-SAM).
-Added chat feature for users:
-* https://gitter.im/Electrostatics/help
+* Added chat feature for users: https://gitter.im/Electrostatics/help
 
 ###Known Bugs
-* ?
+* Travis CI Linux builds are breaking because Geometric Flow relies on C++11 and Travis boxen have an old GCC that doth not support C++11.
+* BEM does not currently build
