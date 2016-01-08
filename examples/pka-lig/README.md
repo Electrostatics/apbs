@@ -7,7 +7,8 @@ This example was contributed by Chung Wong.
 
 Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 ---|---|---|---|---
-[apbs-mol-vdw.in](apbs-mol-vdw.in)|2-level focusing to 0.250 A spacing, VdW surface, srfm mol|**1.4.1-binary**|**8.0835**|8.876
+[apbs-mol-vdw.in](apbs-mol-vdw.in)|2-level focusing to 0.250 A spacing, VdW surface, srfm mol|**1.4.2-binary**|**8.08352**|8.876
+|||1.4.1|8.0835
 |||1.4|8.0835
 |||1.3|8.0835
 |||1.2.1|8.0835
@@ -17,7 +18,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.5.1|8.0858<sup>[3](#3)</sup>
 |||0.5.0|8.0640
 ||||0.4.0|8.0640
-[apbs-smol-vdw.in](apbs-smol-vdw.in)|2-level focusing to 0.250 A spacing, VdW surface, srfm smol|**1.4.1-binary**|**20.9630**|8.876
+[apbs-smol-vdw.in](apbs-smol-vdw.in)|2-level focusing to 0.250 A spacing, VdW surface, srfm smol|**1.4.2-binary**|**20.9630**|8.876
+|||1.4.1|20.9630
 |||1.4|20.9630
 |||1.3|20.9630
 |||1.2.1|20.9630
@@ -38,7 +40,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.2.1|6.647
 |||0.2.0|6.647
 |||0.1.8|6.65
-[apbs-mol-surf.in](apbs-mol-surf.in)|2-level focusing to 0.250 A spacing, molecular surface, srfm mol|**1.4.1-binary**|**119.2608**|86.50
+[apbs-mol-surf.in](apbs-mol-surf.in)|2-level focusing to 0.250 A spacing, molecular surface, srfm mol|**1.4.2-binary**|**119.2610**|86.50
+|||1.4.1|119.2608
 |||1.4|119.2608
 |||1.3|119.2608
 |||1.2.1|119.2608
@@ -48,7 +51,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.5.1|119.2607<sup>[3](#3)</sup>
 |||0.5.0|119.2347
 |||0.4.0|119.2347
-[apbs-smol-surf.in](apbs-smol-surf.in)|2-level focusing to 0.250 A spacing, molecular surface, srfm smol|**1.4.1-binary**|**108.8773**|86.50
+[apbs-smol-surf.in](apbs-smol-surf.in)|2-level focusing to 0.250 A spacing, molecular surface, srfm smol|**1.4.2-binary**|**108.8770**|86.50
+|||1.4.1|108.8773
 |||1.4|108.8773<sup>[5](#5)</sup>
 |||1.3|108.8748
 |||1.2.1|108.8748
