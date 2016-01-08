@@ -1,0 +1,8 @@
+#!/usr/bin/osascript
+on run
+	set currentDir to POSIX path of (path to me) as text
+	tell application "Terminal"
+		do script "PATH=$PATH:`dirname " & (quoted form of POSIX path of currentDir) & "`"
+		activate
+	end tell
+end run
