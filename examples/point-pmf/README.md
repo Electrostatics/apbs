@@ -10,7 +10,8 @@ This example was contributed by Nathan Baker.
 Input File|Description|APBS Version|Results (kJ/mol)||||Analytical (kJ/mol)||||
 ---|---|---|---|---|---|---|---|---|---|---
 ||||1 A Dist|2 A Dist|3 A Dist|4 A Dist|1 A Dist|2 A Dist|3 A Dist|4 A Dist
-[apbs.in](apbs.in)|Focusing to 0.21 A, srfm spl2|**1.4.1-binary**|**18.3082**|**8.9067**|**5.9096**|**4.4301**|17.686|8.843|5.89533|4.4215
+[apbs.in](apbs.in)|Focusing to 0.21 A, srfm spl2|**1.4.2-binary**|**18.3082**|**8.90669**|**5.9096**|**4.43014**|17.686|8.843|5.89533|4.4215
+|||1.4.1|18.3082|8.9067|5.9096|4.4301
 |||1.4|18.3082|8.9067|5.9096|4.4301
 |||1.3|18.3082|8.9067|5.9096|4.4301
 |||1.2.1|18.3082|8.9067|5.9096|4.4301
