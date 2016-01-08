@@ -7,7 +7,8 @@ This example was contributed by Dave Sept.
 
 Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 ---|---|---|---|---|
-[apbs-mol-pdiel2.in](apbs-mol-pdiel2.in)|0.53 A resolution, pdie 2, srfm mol|**1.4.1-binary**|**15.5916**|23.58
+[apbs-mol-pdiel2.in](apbs-mol-pdiel2.in)|0.53 A resolution, pdie 2, srfm mol|**1.4.2-binary**|**15.5916**|23.58
+|||1.4.1|15.5916
 |||1.4|15.5916
 |||1.3|15.5916<sup>[3](#3)</sup>
 |||1.2.1|15.5819
@@ -17,7 +18,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.5.1|15.5916
 |||0.5.0|15.5916
 |||0.4.0|15.5916
-[apbs-smol-pdiel2.in](apbs-smol-pdiel2.in)|0.53 A resolution, pdie 2, srfm smol|**1.4.1-binary**|**23.5554**|23.58
+[apbs-smol-pdiel2.in](apbs-smol-pdiel2.in)|0.53 A resolution, pdie 2, srfm smol|**1.4.2-binary**|**23.5554**|23.58
+|||1.4.1|23.5554
 |||1.4|23.5554
 |||1.3|23.5554<sup>[3](#3)</sup>
 |||1.2.1|23.5458
@@ -38,7 +40,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.2.1|21.453
 |||0.2.0|21.453
 |||0.1.8|21.45
-[apbs-mol-pdiel12.in](apbs-mol-pdiel12.in)|0.53 A resolution, pdie 12, srfm mol|**1.4.1-binary**|**18.0272**|23.58
+[apbs-mol-pdiel12.in](apbs-mol-pdiel12.in)|0.53 A resolution, pdie 12, srfm mol|**1.4.2-binary**|**18.0272**|23.58
+|||1.4.1|18.0272
 |||1.4|18.0272
 |||1.3|18.0272<sup>[3](#3)</sup>
 |||1.2.1|18.0176
@@ -48,7 +51,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.5.1|18.0272
 |||0.5.0|18.0272
 |||0.4.0|18.0272
-[apbs-smol-pdiel12.in](apbs-smol-pdiel12.in)|0.53 A resolution, pdie 12, srfm smol|**1.4.1-binary**|**19.2825**|23.58
+[apbs-smol-pdiel12.in](apbs-smol-pdiel12.in)|0.53 A resolution, pdie 12, srfm smol|**1.4.2-binary**|**19.2825**|23.58
+|||1.4.1|19.2825
 |||1.4|19.2825
 |||1.3|19.2825<sup>[3](#3)</sup>
 |||1.2.1|19.2728

@@ -9,7 +9,8 @@ This example was contributed by Nathan Baker.
 
 Input File|Description|APBS Version|Results (kJ/mol)|Analytical (kJ/mol)
 ---|---|---|---|---
-[apbs-mol-auto.in](apbs-mol-auto.in)|Sequential, 3 A sphere, 3-level focusing to 0.188 A, srfm mol|**1.4.1-binary**|**-229.7736**|-230.62
+[apbs-mol-auto.in](apbs-mol-auto.in)|Sequential, 3 A sphere, 3-level focusing to 0.188 A, srfm mol|**1.4.2-binary**|**-229.774**|-230.62
+|||1.4.1|-229.7736|
 |||1.4|-229.7736<sup>[3](#3)</sup>
 |||1.3|-229.7735
 |||1.2.1|-229.7735
@@ -30,7 +31,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|Analytical (kJ/mol)
 |||0.2.1|-227.19
 |||0.2.0|-227.19
 |||0.1.8|-227.19
-[apbs-smol-auto.in](apbs-smol-auto.in)|Sequential, 3 A sphere, 3-level focusing to 0.188 A, srfm smol|**1.4.1-binary**|**-229.0124**|-230.62
+[apbs-smol-auto.in](apbs-smol-auto.in)|Sequential, 3 A sphere, 3-level focusing to 0.188 A, srfm smol|**1.4.2-binary**|**-229.012**|-230.62
+|||1.4.1|-229.0124
 |||1.4|-229.0124
 |||1.3|-229.0124
 |||1.2.1|-229.0124
@@ -40,7 +42,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|Analytical (kJ/mol)
 |||0.5.1|-229.0123
 |||0.5.0|-229.0123
 |||0.4.0|-229.0123
-[apbs-mol-parallel.in](apbs-mol-parallel.in)|Parallel with 4 processors, 3 A sphere, focusing to 0.103 A, srfm mol|**1.4.1-binary**|**-230.4918<sup>[4](#4)</sup>**|-230.62
+[apbs-mol-parallel.in](apbs-mol-parallel.in)|Parallel with 4 processors, 3 A sphere, focusing to 0.103 A, srfm mol|**1.4.2-binary**|**-230.492**|-230.62
+|||1.4.1|-230.4918<sup>[4](#4)</sup>|
 |||1.4|-230.4919<sup>[3](#3)</sup>
 |||1.3|-230.4918
 |||1.2.1|-230.4918
@@ -51,7 +54,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|Analytical (kJ/mol)
 |||0.5.0|-230.4916
 |||0.4.0|-230.4916
 |||0.2.1|-230.77
-[apbs-smol-parallel.in](apbs-smol-parallel.in)|Parallel with 4 processors, 3 A sphere, focusing to 0.103 A, srfm smol|**1.4.1-binary**|**-229.3871**|-230.62
+[apbs-smol-parallel.in](apbs-smol-parallel.in)|Parallel with 4 processors, 3 A sphere, focusing to 0.103 A, srfm smol|**1.4.2-binary**|**-229.387**|-230.62
+|||1.4.1|-229.3871
 |||1.4|-229.3871
 |||1.3|-229.3871
 |||1.2.1|-229.3871

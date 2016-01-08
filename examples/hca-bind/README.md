@@ -7,7 +7,8 @@ The UHBD calculations where performed using a van der Waals surface definition f
 
 Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 ---|---|---|---|---
-[apbs-mol.in](apbs-mol.in)|2-level focusing to 0.225 A, VdW surface, srfm mol|**1.4.1-binary**|**-52.4648<sup>[6](#6)</sup>**|-70.00
+[apbs-mol.in](apbs-mol.in)|2-level focusing to 0.225 A, VdW surface, srfm mol|**1.4.2-binary**|**-2.4648**|-70.00
+|||1.4.1|-52.4648<sup>[6](#6)</sup>
 |||1.4|-51.4648<sup>[5](#5)</sup>
 |||1.3|-52.4647
 |||1.2.1|-52.4647
@@ -17,7 +18,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.5.1|-52.4669<sup>[3](#3)</sup>
 |||0.5.0|-52.1062<sup>[2](#2)</sup>
 |||0.4.0|-52.4414
-[apbs-smol.in](apbs-smol.in)|2-level focusing to 0.225 A, VdW surface, srfm smol|**1.4.1-binary**|**-54.0598**|-70.00
+[apbs-smol.in](apbs-smol.in)|2-level focusing to 0.225 A, VdW surface, srfm smol|**1.4.2-binary**|**-54.0598**|-70.00
+|||1.4.1|-54.0598
 |||1.3|-54.0598
 |||1.2.1|-54.0598
 |||1.2|-54.0598<sup>[4](#4)</sup>

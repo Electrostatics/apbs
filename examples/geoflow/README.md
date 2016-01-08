@@ -13,3 +13,7 @@ More information can be found here in [Chen et al.](http://www.ncbi.nlm.nih.gov/
 al](http://www.ncbi.nlm.nih.gov/pubmed/23212974).
 
 The parameters used in the input files (imidazol and glycerol) came from Thomas et al.
+
+| Input File  | Description                 | APBS Version     | Global Net ELEC Energy | Global Net APOL Energy |
+|-------------|-----------------------------|------------------|------------------------|------------------------|
+| imidazol.in | Serial, mdh boundary condts.| **1.4.2-binary** | **-10.3022**           | **54.1742**            |
