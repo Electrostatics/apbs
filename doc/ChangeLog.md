@@ -35,12 +35,13 @@ These are notes for APBS version 1.4.2.
 
 ###Notes
 The following packages are treated as submodules in APBS:
-* Geometric Flow has been moved to it's own [repository](https://github.com/Electrostatics/geoflow_c).
-* FETk has been [cloned](https://github.com/Electrostatics/FETK) so that we have could effect updates.
-* PB-SAM lives [here](https://github.com/Electrostatics/PB-SAM).
+* Geometric Flow has been moved to it's own [repository](https://github.com/Electrostatics/geoflow_c)
+* FETk has been [cloned](https://github.com/Electrostatics/FETK) so that we have could effect updates
+* PB-SAM lives [here](https://github.com/Electrostatics/PB-SAM)
 
 Added [chat feature](https://gitter.im/Electrostatics/help) for users.  This can also be found from the support tab on http://www.poissonboltzmann.org/.
 
 ###Known Bugs
-* Travis CI Linux builds are breaking because Geometric Flow relies on C++11 and Travis boxen have an old GCC that doth not support C++11.
-* BEM is temprarily disabled due to build issues.
+* Travis CI Linux builds are breaking because Geometric Flow relies on C++11 and Travis boxen have an old GCC that doth not support C++11.  This is also an issue for CentOS 5
+* BEM is temprarily disabled due to build issues
+* Geometric Flow build is currently broken on Windows using Visual Studio
