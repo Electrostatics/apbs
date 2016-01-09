@@ -4,7 +4,7 @@ This example was contributed by Nathan Baker and Jason Wagoner.
 
 APBS Version|Alkane|SASA (Å<sup>2</sup>)|SASA energy (kJ/mol)|SAV (Å<sup>3</sup>)|SAV energy (kJ/mol)|WCA energy (kJ/mol)|Total nonpolar solvation energy (kJ/mol)
 ---|---|---|---|---|---|---|---
-**1.4.2-binary**|2-methylbutane|214.202|1.82072|253.665|60.7274|-48.1507|1.439740000000e+01
+**1.4.2**|2-methylbutane|214.202|1.82072|253.665|60.7274|-48.1507|1.439740000000e+01
 ||butane|193.855|1.64777|217.863|52.1564|-41.7207|1.208350000000e+01
 ||cyclohexane|221.799|1.88529|267.435|64.0239|-52.3691|1.354020000000e+01
 ||cyclopentane|193.638|1.64593|217.998|52.1887|-44.471|9.363670000000e+00

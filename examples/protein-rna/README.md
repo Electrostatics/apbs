@@ -26,7 +26,7 @@ in tcsh. Then simply type 'make' to run the example.
 Input file|Description|APBS version|APBS results||Draper PB results||Draper experimental results||
 ---|---|---|---|---|---|---|---|---
 ||||n = -(d Δ G)/(d ln [KCl])/RT|-d( Δ G)/(d log<sub>10</sub> [KCl]) (kcal)|n = -(d Δ G)/(d ln [KCl])/RT|-d( Δ G)/(d log<sub>10</sub> [KCl]) (kcal)|n = -(d Δ G)/(d ln [KCl])/RT|-d( Δ G)/(d log<sub>10</sub> [KCl]) (kcal)
-'make all'|Run a series of binding energy calculations at different ionic strengths|**1.4.2-binary**|**-(4.52831 ± 0.0758878)**|**6.1561 ± 0.109612**|-(4.3 ± 0.2)|5.9 ± 0.2|-(4.4 ± 0.2)|6.0 ± 0.2
+'make all'|Run a series of binding energy calculations at different ionic strengths|**1.4.2**|**-(4.52831 ± 0.0758878)**|**6.1561 ± 0.109612**|-(4.3 ± 0.2)|5.9 ± 0.2|-(4.4 ± 0.2)|6.0 ± 0.2
           |                                                                        |1.0.0           |-(4.52 ± 0.08)|6.2 ± 0.1
 
 Please see the ChangeLog or the [APBS website](http://www.poissonboltzmann.org/) for more information.
