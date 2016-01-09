@@ -8,7 +8,7 @@ The source for this example is UHBD.
 
 Input File                          | Description | APBS Version | Methanol Results (kJ/mol) | Methoxide Results (kJ/mol) |Difference (kJ/mol)| Methanol UHBD (kJ/mol)|Methoxide UHBD (kJ/mol)|Difference UHBD (kJ/mol)
 ---------------------------|---------|-------------|----------|----|-----------|------|----------|--------------
-[apbs-mol.in](apbs-mol.in)| Focusing to 0.25 A, srfm mol| **1.4.2-binary** | **-36.2486** | **-390.4120**|**-354.1640**|-35.595|-390.023|-354.424
+[apbs-mol.in](apbs-mol.in)| Focusing to 0.25 A, srfm mol| **1.4.2** | **-36.2486** | **-390.4120**|**-354.1640**|-35.595|-390.023|-354.424
 | | |1.4.1 |-36.2486|-390.4122|-354.1635 
 | | |1.4   |-36.2486|-390.4122<sup>[3](#3)</sup>|-354.1635
 | | |1.3 | -36.2486| -390.4121| -354.1635
@@ -19,7 +19,7 @@ Input File                          | Description | APBS Version | Methanol Resu
 | | |0.5.1 |-36.2486| -390.4119	| -354.1632
 | | |0.5.0 |-36.2486| -390.4119	| -354.1632
 | | |0.4.0 |-36.2486| -390.4119	| -354.1632
-[apbs-smol.in](apbs-smol.in) | Focusing to 0.25 A, srfm smol | **1.4.2-binary** | **-37.5759** | **391.2390**| **-353.6630**| -35.595| -390.023| -354.424
+[apbs-smol.in](apbs-smol.in) | Focusing to 0.25 A, srfm smol | **1.4.2** | **-37.5759** | **391.2390**| **-353.6630**| -35.595| -390.023| -354.424
 | | |1.4.1|-37.5759|-391.2389|-353.6629
 | | |1.4 |-37.5759<sup>[3](#3)</sup>|-391.2389<sup>[3](#3)</sup>| -353.6629
 | | |1.3 |-37.5760| -391.2388| -353.6629

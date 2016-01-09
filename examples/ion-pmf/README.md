@@ -34,7 +34,7 @@ Mol 1 location|QF||DB||IB||
 2.50|4.6E+01|-4.8E+01|6.3E+01|-2.1E+01|0|0
 3.00|3.8E+01|-3.8E+01|6.3E+00|-6.3E+00|0|0
 
-Here are the results from APBS 1.4.2-binary:
+Here are the results from APBS 1.4.2:
 
     x = 1.000
 
