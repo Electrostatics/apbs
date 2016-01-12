@@ -9,7 +9,10 @@ These are notes for APBS version 1.4.2.
  on [SourceForge](http://sourceforge.net/projects/apbs/files/apbs/).
 
 ###New Features
-* Poisson-Boltzmann Semi-Analytical Method (PB-SAM) packaged and built with APBS
+* Poisson-Boltzmann Semi-Analytical Method (PB-AM) packaged and built with APBS
+  * the binary is called `mpe` and colocated with the apbs binary
+  * documentation is with the APBS documentation, and called PBE_Manual_V1.docx
+  * examples are located with APBS examples in a pb-am directory
 * New Geometric flow API and improvements in speed (#235)
 * Support for BinaryDX file format (#216)
 * SOR solver added for mg-auto input file option
