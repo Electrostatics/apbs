@@ -14,6 +14,7 @@ from inputgen import splitInput
 
 from apbs_check_forces import check_forces
 from apbs_check_results import check_results
+from apbs_check_intermediate_energies import check_energies
 from apbs_logger import Logger
 
 # Matches a floating point number such as -1.23456789E-20
@@ -70,8 +71,13 @@ def process_serial( binary, input_file ):
     output_file = open( output_name, 'r' )
     output_text = output_file.read()
     
+    # Look for intermidiate energy results
+    output_results = check_energies(output_name)
+    
     output_pattern = r'Global net (?:ELEC|APOL) energy \= ' + float_pattern
-    output_results = [ float( r ) for r in re.findall( output_pattern, output_text ) ]
+    output_results2 =[float( r ) for r in re.findall( output_pattern, output_text )]
+    
+    output_results += output_results2
     
     
     # Return all the matched results as a list of floating point numbers
