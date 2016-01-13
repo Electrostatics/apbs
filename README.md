@@ -1,4 +1,4 @@
-apbs-pdb2pqr
+apbs
 ============
 
 ![Build Status](https://travis-ci.org/Electrostatics/apbs-pdb2pqr.svg?branch=master)
@@ -20,3 +20,6 @@ If you want to use the geometric flow implementation, when invoking CMake, set E
 ## Finite Element support (fe-manual)
 If you would like to use the FEM, you will need to be on OS X or Linux.  To enable, when invoking CMake, set ENABLE_FETK to ON, e.g., `-DENABLE_FETK=ON`.
 On Linux the FETK shared libraries need to be locatable by the shared library loader.  One way to do this is to update LD_LIBRARY_PATH to point at `<build-dir>/fetk/lib`, e.g., `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<build-dir>/fetk/lib`.
+
+## Building the python libraries for pdb2pqr
+Use `cmake <path to apbs> -DENABLE_PYTHON=ON -DBUILD_SHARED_LIBS=ON`.  Be sure to add these libraries to your library path so pdb2pqr can find them.
