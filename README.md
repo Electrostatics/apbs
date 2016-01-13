@@ -22,4 +22,6 @@ If you would like to use the FEM, you will need to be on OS X or Linux.  To enab
 On Linux the FETK shared libraries need to be locatable by the shared library loader.  One way to do this is to update LD_LIBRARY_PATH to point at `<build-dir>/fetk/lib`, e.g., `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<build-dir>/fetk/lib`.
 
 ## Building the python libraries for pdb2pqr
-Use `cmake <path to apbs> -DENABLE_PYTHON=ON -DBUILD_SHARED_LIBS=ON`.  Be sure to add these libraries to your library path so pdb2pqr can find them.
+* Install [swig](http://www.swig.org/)
+* Build APBS with the follow flags: `cmake <path to apbs> -DENABLE_PYTHON=ON -DBUILD_SHARED_LIBS=ON`. 
+* Add these libraries to your library path so pdb2pqr can find them.
