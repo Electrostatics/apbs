@@ -11,7 +11,7 @@ We are using Git submodules to manage various pieces of code.  To build the mast
  * `git submodule update`
 
 # Build flags for CMake
-* cmake blah blah blah
+* cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_DOC=OFF -DBUILD_SHARED_LIBS=OFF -DENABLE_FETK=ON <apbs src location>
 
 ## Using geometric flow
 If you want to use the geometric flow implementation, when invoking CMake, set ENABLE_GEOFLOW to ON, e.g., `-DENABLE_GEOFLOW=ON`.
@@ -22,5 +22,5 @@ On Linux the FETK shared libraries need to be locatable by the shared library lo
 
 ## Building the python libraries for pdb2pqr
 * Install [swig](http://www.swig.org/)
-* Build APBS with the follow flags: `cmake <path to apbs> -DENABLE_PYTHON=ON -DBUILD_SHARED_LIBS=ON`. 
+* Build APBS with the follow flag: `-DENABLE_PYTHON=ON`. 
 * Add these libraries to your library path so pdb2pqr can find them.
