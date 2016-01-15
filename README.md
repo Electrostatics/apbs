@@ -22,5 +22,5 @@ On Linux the FETK shared libraries need to be locatable by the shared library lo
 
 ## Building the python libraries for pdb2pqr
 * Install [swig](http://www.swig.org/)
-* Build APBS with the follow flag: `-DENABLE_PYTHON=ON`. 
+* Build APBS with the following flag: `-DENABLE_PYTHON=ON`.  If you are on linux you also need `-DBUILD_SHARED_LIBS=OFF`
 * Add these libraries to your library path so pdb2pqr can find them.
