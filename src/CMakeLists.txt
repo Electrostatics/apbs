@@ -69,9 +69,9 @@ configure_file(
     )
 
 if(ENABLE_iAPBS)
-    ADD_LIBRARY(apbs_routines routines.c routines.h)
-    INSTALL(TARGETS apbs_routines DESTINATION ${LIBRARY_INSTALL_PATH})
-    INSTALL(FILES apbscfg.h DESTINATION ${HEADER_INSTALL_PATH})
+#    ADD_LIBRARY(apbs_routines routines.c routines.h)
+#    INSTALL(TARGETS apbs_routines DESTINATION ${LIBRARY_INSTALL_PATH})
+    INSTALL(FILES ${APBS_BUILD}/src/apbscfg.h DESTINATION ${HEADER_INSTALL_PATH})
 endif()
 
 INSTALL(FILES apbs.h routines.h DESTINATION ${HEADER_INSTALL_PATH})
