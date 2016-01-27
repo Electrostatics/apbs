@@ -7,7 +7,7 @@ APBSINCL=-I$(APBSDIR)/include -I$(APBSDIR)/include/apbs
 
 # gcc/g++
 APBSLIB=-L$(APBSDIR)/lib -liapbs -lapbs_routines -lapbs_mg \
- -lapbs_generic -lapbs_pmgc -lapbs_geoflow -ltabipb -lmaloc -lz -lgfortran
+ -lapbs_generic -lapbs_pmgc -lmaloc -lz -lgfortran
 
 APBSFLAGS=-DNAMD_APBS
 APBS=$(APBSINCL) $(APBSFLAGS)
