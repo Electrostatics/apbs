@@ -1,5 +1,9 @@
 cmake_minimum_required (VERSION 2.8)
+set(CMAKE_VERBOSE_MAKEFILE ON)
+include(ExternalProject)
+
 project (tabipb)
+
 enable_language (Fortran)
 OPTION (BUILD_SHARED_LIBS "Build shared libraries." OFF)
 
@@ -77,4 +81,3 @@ else()
 endif()
 
 install(FILES ${MODULES} DESTINATION ${CMAKE_INSTALL_LIBDIR})
-

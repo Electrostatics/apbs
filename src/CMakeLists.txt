@@ -34,6 +34,7 @@ macro(add_sublibrary LIBRARY)
     message(STATUS "With library dependencies ${LIBRARY_DEPENDENCIES}")
     add_library(${LIBRARY_NAME} ${SOURCES} ${EXTERNAL_HEADERS} ${INTERNAL_HEADERS})
     target_link_libraries(${LIBRARY_NAME} ${LIBRARY_DEPENDENCIES})
+    #add_dependencies(${LIBRARY_NAME} ${LIBRARY_DEPENDENCIES})
     INSTALL(FILES ${EXTERNAL_HEADERS} DESTINATION ${HEADER_INSTALL_PATH}/${LIBRARY})
     INSTALL(TARGETS ${LIBRARY_NAME} DESTINATION ${LIBRARY_INSTALL_PATH})
     list(APPEND APBS_INTERNAL_LIBS ${LIBRARY_NAME})
@@ -57,11 +58,16 @@ add_sublibrary(routines)
 message(STATUS ${EXTERNAL_HEADERS})
 
 add_executable(apbs main.c apbs.h routines.c routines.h)
+message(***************************)
 message(STATUS " ")
-message(STATUS "${APBS_LIBS} ${APBS_INTERNAL_LIBS}")
+message(STATUS "APBS Libraries: ${APBS_LIBS}")
+message(STATUS "Internal Libraries: ${APBS_INTERNAL_LIBS}")
 message(STATUS " ")
+message(***************************)
 
+#add_dependencies(apbs ${BEM_LIB})
 target_link_libraries(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
+#add_dependencies(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
 
 configure_file(
     ${APBS_ROOT}/src/.config/apbscfg.h.in
@@ -78,4 +84,3 @@ INSTALL(FILES apbs.h routines.h DESTINATION ${HEADER_INSTALL_PATH})
 INSTALL(TARGETS apbs DESTINATION ${EXECUTABLE_INSTALL_PATH})
 
 message(STATUS ${CMAKE_C_FLAGS})
-
