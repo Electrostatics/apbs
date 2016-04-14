@@ -191,6 +191,9 @@ if(NOT HAVE_SRAND_FUNC)
     message(FATAL_ERROR "Required srand function not found")
 endif()
 
+##########################################
+#Optionally build BEM
+##########################################
 option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
 if(ENABLE_BEM)
     add_definitions(-DENABLE_BEM)
@@ -221,17 +224,22 @@ if(ENABLE_BEM)
     set(TABI_LIBRARY ${LIBRARY_OUTPUT_PATH}/${TABI_LIBRARY_BASENAME})
 
     set(LIBGFORTRAN_NAME ${CMAKE_SHARED_LIBRARY_PREFIX}gfortran${CMAKE_SHARED_LIBRARY_SUFFIX})
-    execute_process(COMMAND gfortran --print-file-name ${LIBGFORTRAN_NAME} 
+
+    execute_process(COMMAND gfortran --print-file-name ${LIBGFORTRAN_NAME}
                     OUTPUT_VARIABLE LIBGFORTRANPATH
                     RESULT_VARIABLE HAVE_GFORTRAN
     )
     if(HAVE_GFORTRAN GREATER 0)
         message(FATAL_ERROR gfortran is currently required for using BEM/TABIPB in APBS)
     endif()
+
     get_filename_component(LIBGFORTRANPATH ${LIBGFORTRANPATH} PATH)
+
     find_path(LIBGFORTRAN_PATH ${LIBGFORTRAN_NAME} PATH ${LIBGFORTRANPATH})
+
     list(APPEND APBS_LIB_DIRS ${LIBRARY_OUTPUT_PATH} ${LIBGFORTRAN_PATH})
-    list(APPEND APBS_LIBS "gfortran tabipb stdc++" )
+    list(APPEND APBS_LIBS gfortran ${TABI_LIBRARY} stdc++)
+
 endif() # ENABLE_BEM
 
 ################################################################################
@@ -300,7 +308,7 @@ if(ENABLE_FETK)
 	else()
 		message(STATUS "Building FETK components.")
 		set(CONFIG_OPTS --prefix=<INSTALL_DIR>)
-				
+
 		set(MPI_ENV "")
 		if(HAVE_MPI_H)
 		    list(APPEND CONFIG_OPTS --enable-mpi)
@@ -315,7 +323,7 @@ if(ENABLE_FETK)
 
 		    set(MPI_ENV "FETK_MPI_INCLUDE=${MPI_C_INCLUDE_PATH}" "FETK_MPI_LIBRARY=${MPI_LIB_DIR}")
 		endif()
-		    
+
 		ExternalProject_Add(fetk-maloc
 			PREFIX fetk
 			SOURCE_DIR ${EXTERNALS_PATH}/fetk/maloc/src
@@ -344,7 +352,7 @@ if(ENABLE_FETK)
 			BUILD_COMMAND ${MAKE})
 
 		set(FETK_ENABLED 1)
-	
+
 		ExternalProject_Get_Property(fetk-maloc install_dir)
 		include_directories(${install_dir}/include)
 
@@ -352,7 +360,7 @@ if(ENABLE_FETK)
 	    list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
 	    list(APPEND APBS_LIBS maloc amd punc mc gamer superlu umfpack
 	blas vf2c tetgen triangle readline termcap)
-	
+
 	    SET(HAVE_MC_H 1)
 		SET(HAVE_PUNC_H 1)
 		SET(HAVE_BIOM_H 1)
@@ -684,5 +692,3 @@ if(NOT WIN32)
                 DESTINATION ${EXECUTABLE_INSTALL_PATH})
     endif()
 endif()
-
-
