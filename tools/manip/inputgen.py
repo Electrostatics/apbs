@@ -268,7 +268,7 @@ def splitInput(filename):
         line = file.readline()
         if line == "": break
         text += line
-        line = string.strip(line)
+        line = line.strip()
         if line.startswith("pdime"): # Get # Procs
             words = string.split(line)
             nproc = int(words[1]) * int(words[2]) * int(words[3])
