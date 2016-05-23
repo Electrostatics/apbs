@@ -96,8 +96,9 @@ int main(
     GEOFLOWparm *geoflowparm = VNULL;
     PBEparm *pbeparm = VNULL;
     APOLparm *apolparm = VNULL;
+    PBAMpar *pbamparm = VNULL;
     Vparam *param = VNULL;
-
+  
     Vmem *mem = VNULL;
     Vcom *com = VNULL;
     Vio *sock = VNULL;
