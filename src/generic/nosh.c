@@ -102,10 +102,10 @@ VEXTERNC int NOsh_parseGEOFLOW(
                           );
 
 VEXTERNC int NOsh_parsePBAM(
-			    NOsh *the,
-			    Vio *sock,
-			    NOsh_calc *elec
-			    );
+                           NOsh *thee,
+                           Vio *sock,
+                           NOsh_calc *elec
+                           );
 
 VEXTERNC int NOsh_parseAPOL(
                            NOsh *thee,
@@ -153,6 +153,11 @@ VPRIVATE int NOsh_setupCalcGEOFLOW(
                               NOsh *thee,
                               NOsh_calc *elec
                               );
+
+VPRIVATE int NOsh_setupCalcPBAM(
+                               NOsh *thee,
+                               NOsh_calc *elec
+                               );
 
 VPRIVATE int NOsh_setupCalcBEMMANUAL(
                               NOsh *thee,
@@ -377,8 +382,8 @@ VPUBLIC NOsh_calc* NOsh_calc_ctor(
             thee->apolparm = APOLparm_ctor();
             break;
         case NCT_PBAM:
-	    thee->pbamparm = PBAMpaarm_ctor(PBAM_AUTO);
-	    break;
+            thee->pbamparm = PBAMparm_ctor(PBAM_AUTO);
+            break;
         default:
             Vnm_print(2, "NOsh_calc_ctor:  unknown calculation type (%d)!\n",
                       calctype);
@@ -1242,11 +1247,11 @@ ELEC section!\n");
             calc->geoflowparm->type = GFCT_AUTO;
             return NOsh_parseGEOFLOW(thee, sock, calc);
         } else if (Vstring_strcasecmp(tok, "pbam-auto") == 0) {
-	    thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_PBAM);
-	    calc = thee->elec[thee->nelec];
-	    (thee->nelec)++;
-	    calc->pbamparm->type = PBAM_AUTO;
-	} else {
+            thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_PBAM);
+            calc = thee->elec[thee->nelec];
+            (thee->nelec)++;
+            calc->pbamparm->type = PBAM_AUTO;
+        } else {
             Vnm_print(2, "NOsh_parseELEC: The method (\"mg\",\"fem\", \"bem\", \"geoflow\" \"pbam\") or \
 \"name\" must be the first keyword in the ELEC section\n");
             return 0;
@@ -1384,9 +1389,9 @@ map is used!\n");
             case NCT_FEM:
                 NOsh_setupCalcFEM(thee, elec);
                 break;
-	    case NCT_PBAM:
-	        NOsh_setupCalcPBAM(thee, elec);
-		break;
+            case NCT_PBAM:
+                NOsh_setupCalcPBAM(thee, elec);
+                break;
             case NCT_BEM:
                 NOsh_setupCalcBEM(thee, elec);
                 break;
@@ -1631,9 +1636,10 @@ VPRIVATE int NOsh_setupCalcGEOFLOW(NOsh *thee, NOsh_calc *calc) {
 VPRIVATE int NOsh_setupCalcPBAM(NOsh *thee, NOsh_calc *calc){
 
   PBAMparm *parm = VNULL;
+
   VASSERT(thee!=VNULL);
   VASSERT(calc!=VNULL);
-  parm = calc->pbamaparm;
+  parm = calc->pbamparm;
   VASSERT(parm!=VNULL);
 
   /*Lisa will take care of this in case we need more pbam option (i.e. pbsam)*/
@@ -2658,7 +2664,7 @@ set up?\n");
     return 1;
 }
 
-VPRIVATE int NOsh_setupCalcPBAMUTO(
+VPRIVATE int NOsh_setupCalcPBAMAUTO(
                                    NOsh *thee,
                                    NOsh_calc *elec
                                    ) {
@@ -2675,7 +2681,7 @@ VPRIVATE int NOsh_setupCalcPBAMUTO(
         Vnm_print(2, "NOsh_setupCalcPBAMAUTO:  Got NULL calc!\n");
         return 0;
     }
-    parm = elec->pbeparm;
+    parm = elec->pbamparm;
     if (parm == VNULL) {
         Vnm_print(2, "NOsh_setupCalcPBAMAUTO:  Got NULL pbamparm -- was this calculation \
 set up?\n");
@@ -2683,7 +2689,7 @@ set up?\n");
     }
     pbeparm = elec->pbeparm;
     if (pbeparm == VNULL) {
-        Vnm_print(2, "NOsh_setupCalcPBAMUATO:  Got NULL pbeparm -- was this calculation \
+        Vnm_print(2, "NOsh_setupCalcPBAMAUTO:  Got NULL pbeparm -- was this calculation \
 set up?\n");
         return 0;
     }
@@ -2904,6 +2910,107 @@ VPUBLIC int NOsh_parseGEOFLOW(
 		Vnm_print(2, "NOsh_parseGEOFLOW: please change bcfl keyword.\n");
 		return 0;
 	}
+
+    return 1;
+}
+
+
+VPUBLIC int NOsh_parsePBAM(
+                          NOsh *thee,
+                          Vio *sock,
+                          NOsh_calc *elec
+                          ) {
+
+    char tok[VMAX_BUFSIZE];
+    PBAMparm *parm = VNULL;
+    PBEparm *pbeparm = VNULL;
+    int rc;
+
+    /* Check the arguments */
+    if (thee == VNULL) {
+        Vnm_print(2, "NOsh:  Got NULL thee!\n");
+        return 0;
+    }
+    if (sock == VNULL) {
+        Vnm_print(2, "NOsh:  Got pointer to NULL socket!\n");
+        return 0;
+    }
+    if (elec == VNULL) {
+        Vnm_print(2, "NOsh:  Got pointer to NULL elec object!\n");
+        return 0;
+    }
+    parm = elec->pbamparm;
+    if (parm == VNULL) {
+        Vnm_print(2, "NOsh:  Got pointer to NULL pbam object!\n");
+        return 0;
+    }
+    pbeparm = elec->pbeparm;
+    if (pbeparm == VNULL) {
+        Vnm_print(2, "NOsh:  Got pointer to NULL pbeparm object!\n");
+        return 0;
+    }
+
+    Vnm_print(0, "NOsh_parsePBAM: Parsing parameters for PBAM calculation\n");
+
+
+    /* Start snarfing tokens from the input stream */
+    rc = 1;
+    while (Vio_scanf(sock, "%s", tok) == 1) {
+
+        Vnm_print(0, "NOsh_parsePBAM:  Parsing %s...\n", tok);
+
+        /* See if it's an END token */
+        if (Vstring_strcasecmp(tok, "end") == 0) {
+            parm->parsed = 1;
+            pbeparm->parsed = 1;
+            rc = 1;
+            break;
+        }
+
+        if (Vstring_strcasecmp(tok, "ion") == 0) {
+            Vnm_print(2, "parsePBAM: WARNING! ion not implemented for PBAM!\n");
+        }
+
+        /* Pass the token through a series of parsers */
+        rc = PBEparm_parseToken(pbeparm, tok, sock);
+        if (rc == -1) {
+            Vnm_print(0, "NOsh_parsePBAM:  parsePBE error!\n");
+            break;
+        } else if (rc == 0) {
+             rc = PBAMparm_parseToken(parm, tok, sock);
+             if (rc == -1) {
+                 Vnm_print(0, "NOsh_parsePBAM:  parsePBAM error!\n");
+                 break;
+             } else if (rc == 0) {
+                 /* We ran out of parsers! */
+                 Vnm_print(2, "NOsh:  Unrecognized keyword: %s\n", tok);
+                 break;
+            }
+        }
+    }
+
+    pbeparm->setsrfm=1; //TODO: verify what these are?
+    pbeparm->srad=0.0;
+    pbeparm->setsrad=1;
+    pbeparm->settemp=1;
+
+    /* Handle various errors arising in the token-snarfing loop -- these all
+        just result in simple returns right now */
+    if (rc == -1) return 0;
+    if (rc == 0) return 0;
+
+    /* Check the status of the parameter objects */
+    if ((PBAMparm_check(parm) == VRC_FAILURE) || (!PBEparm_check(pbeparm))) {
+        Vnm_print(2, "NOsh:  PBAM parameters not set correctly!\n");
+        return 0;
+    }
+  /*Not sure what BCs if any we can handle?*/
+  /*
+	if(pbeparm->bcfl != BCFL_MDH){
+		Vnm_print(2, "NOsh_parseGEOFLOW: Geoflow currently only supports mdh boundary conditions!\n");
+		Vnm_print(2, "NOsh_parseGEOFLOW: please change bcfl keyword.\n");
+		return 0;
+	}*/
 
     return 1;
 }
