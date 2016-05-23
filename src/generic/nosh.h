@@ -75,7 +75,7 @@
 #include "generic/valist.h"
 #include "generic/bemparm.h"
 #include "generic/geoflowparm.h"
-#include "generic/pbam.h" //path might change
+#include "generic/pbamparm.h" //path might change
 
 /** @brief Maximum number of molecules in a run
 *  @ingroup NOsh */
