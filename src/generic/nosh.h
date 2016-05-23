@@ -75,7 +75,8 @@
 #include "generic/valist.h"
 #include "generic/bemparm.h"
 #include "generic/geoflowparm.h"
-#include "generic/pbam.h" //path migh change
+#include "generic/pbam.h" //path might change
+
 /** @brief Maximum number of molecules in a run
 *  @ingroup NOsh */
 #define NOSH_MAXMOL 20
@@ -171,8 +172,8 @@ struct sNOsh_calc {
     FEMparm *femparm;       /**< Finite element parameters */
     BEMparm *bemparm;       /**< boundary element (tabi) parameters */
     GEOFLOWparm *geoflowparm; /**< Geometric Flow Solver*/
-  PBAM *pbamparm;           /**< Anlytical Poisson-Boltzmann Solver */
-    PBEparm *pbeparm;       /**< Generic PBE parameters */
+    PBAMparm *pbamparm;       /**< Analytical Poisson-Boltzmann Solver */
+    PBEparm *pbeparm;      /**< Generic PBE parameters */
     APOLparm *apolparm;		/**< Non-polar parameters */
     NOsh_CalcType calctype; /**< Calculation type */
 };
