@@ -96,8 +96,10 @@ int main(
     GEOFLOWparm *geoflowparm = VNULL;
     PBEparm *pbeparm = VNULL;
     APOLparm *apolparm = VNULL;
-    PBAMpar *pbamparm = VNULL;
     Vparam *param = VNULL;
+#ifdef ENABLE_PBAM
+    PBAMparm *pbamparm = VNULL;
+#endif
   
     Vmem *mem = VNULL;
     Vcom *com = VNULL;
@@ -750,6 +752,45 @@ int main(
                 exit(2);
 #endif
                 
+ 		        /* Poisson-boltzmann analytical method */
+            case NCT_PBAM:
+#ifdef ENABLE_PBAM
+                /* What is this?  This seems like a very awkward way to find
+                the right ELEC statement... */
+                Vnm_tprint( 1, "Made it to start\n");
+                for (k=0; k<nosh->nelec; k++) {
+                    if (nosh->elec2calc[k] >= i) {
+                        break;
+                    }
+                }
+                if (Vstring_strcasecmp(nosh->elecname[k], "") == 0) {
+                    Vnm_tprint( 1, "CALCULATION #%d: PBAM\n", i+1);
+                } else {
+                    Vnm_tprint( 1, "CALCULATION #%d (%s): PBAM\n",
+                                i+1, nosh->elecname[k]);
+                }
+                /* Useful local variables */
+                pbamparm = nosh->calc[i]->pbamparm;
+                pbeparm = nosh->calc[i]->pbeparm;
+
+                /* Set up problem */
+                Vnm_tprint( 1, "  Setting up problem...\n");
+
+                
+                /* Solve LPBE with PBAM method */
+            /*  if (solveGeometricFlow(alist, nosh, pbeparm, apolparm, geoflowparm) != 1) {
+                    Vnm_tprint(2, "Error solving GEOFLOW!\n");
+                    VJMPERR1(0);
+                }
+            */
+                fflush(stdout);
+                fflush(stderr);
+                break;
+#else /* ifdef ENABLE_PBAM*/
+                    Vnm_print(2, "Error!  APBS not compiled with PBAM!\n");
+                exit(2);
+#endif
+
             default:
                 Vnm_tprint(2, "  Unknown calculation type (%d)!\n", nosh->calc[i]->calctype);
                 exit(2);

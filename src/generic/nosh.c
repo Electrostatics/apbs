@@ -169,6 +169,11 @@ VPRIVATE int NOsh_setupCalcGEOFLOWMANUAL(
                               NOsh_calc *elec
                               );
 
+VPRIVATE int NOsh_setupCalcPBAMAUTO(
+                                   NOsh *thee,
+                                   NOsh_calc *elec
+                                   );
+
 VPRIVATE int NOsh_setupCalcAPOL(
                                 NOsh *thee,
                                 NOsh_calc *elec
@@ -382,7 +387,7 @@ VPUBLIC NOsh_calc* NOsh_calc_ctor(
             thee->apolparm = APOLparm_ctor();
             break;
         case NCT_PBAM:
-            thee->pbamparm = PBAMparm_ctor(PBAM_AUTO);
+            thee->pbamparm = PBAMparm_ctor(PBAMCT_AUTO);
             break;
         default:
             Vnm_print(2, "NOsh_calc_ctor:  unknown calculation type (%d)!\n",
@@ -1250,7 +1255,9 @@ ELEC section!\n");
             thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_PBAM);
             calc = thee->elec[thee->nelec];
             (thee->nelec)++;
-            calc->pbamparm->type = PBAM_AUTO;
+            calc->pbamparm->type = PBAMCT_AUTO;
+            Vnm_print(2, "NOsh_parseELEC: Found PBAM!\n");
+            return NOsh_parsePBAM(thee, sock, calc);
         } else {
             Vnm_print(2, "NOsh_parseELEC: The method (\"mg\",\"fem\", \"bem\", \"geoflow\" \"pbam\") or \
 \"name\" must be the first keyword in the ELEC section\n");
@@ -1643,10 +1650,10 @@ VPRIVATE int NOsh_setupCalcPBAM(NOsh *thee, NOsh_calc *calc){
   VASSERT(parm!=VNULL);
 
   /*Lisa will take care of this in case we need more pbam option (i.e. pbsam)*/
-  if(parm->type == PBAM_AUTO){
+  if(parm->type == PBAMCT_AUTO){
     return NOsh_setupCalcPBAMAUTO(thee, calc);
   } else {
-    Vnm_print(2, "NOsh_setupCalcPBAM: undefined PBAM calculation type (%d)!\n", parm-type);
+    Vnm_print(2, "NOsh_setupCalcPBAM: undefined PBAM calculation type (%d)!\n", parm->type);
     return 0;
   }
 }

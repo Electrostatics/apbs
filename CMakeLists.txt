@@ -74,8 +74,8 @@ find_file(CONTRIB_PATH "contrib" PATHS "${APBS_ROOT}"
     DOC "The path to contributed modules for apbs"
     )
 find_file(EXTERNALS_PATH "externals" PATHS "${APBS_ROOT}"
-	DOC "The path to the external git submodules"
-	)
+  DOC "The path to the external git submodules"
+  )
 
 set(SYS_LIBPATHS /usr/lib64)
 #list(APPEND SYS_LIBPATHS /usr/lib64)
@@ -85,7 +85,7 @@ set(SYS_LIBPATHS /usr/lib64)
 # https://github.com/Electrostatics/apbs-pdb2pqr/issues/364                    #
 ################################################################################
 if(EXISTS "/etc/debian_version" AND
-	"${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed")
 endif()
 
@@ -249,13 +249,13 @@ endif() # ENABLE_BEM
 # to add CMake support to MALOC, and that FETK has no such support, in general.#
 ################################################################################
 if(NOT ENABLE_FETK)
-	# We'll use autotools to build MALOC if FETK is enabled.
-	set(MALOC_ROOT ${EXTERNALS_PATH}/fetk/maloc)
-	add_subdirectory(${MALOC_ROOT})
-	include_directories(${MALOC_ROOT}/src/base ${MALOC_ROOT}/src/vsys
-		${MALOC_ROOT}/src/vsh ${MALOC_ROOT}/src/psh)
-	list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
-	list(APPEND APBS_LIBS maloc)
+  # We'll use autotools to build MALOC if FETK is enabled.
+  set(MALOC_ROOT ${EXTERNALS_PATH}/fetk/maloc)
+  add_subdirectory(${MALOC_ROOT})
+  include_directories(${MALOC_ROOT}/src/base ${MALOC_ROOT}/src/vsys
+    ${MALOC_ROOT}/src/vsh ${MALOC_ROOT}/src/psh)
+  list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
+  list(APPEND APBS_LIBS maloc)
 endif()
 
 ##############################################################################
@@ -272,7 +272,7 @@ endif()
 ################################################################################
 # Handle conditional building with MPI Support                                 #
 # There may be a better way, but for now this comes before FETK because FETK   #
-# depends on having the libraries located.    	    	   		       #
+# depends on having the libraries located.                          #
 ################################################################################
 
 option(ENABLE_MPI "Enable MPI parallelism" OFF)
@@ -283,7 +283,7 @@ if(ENABLE_MPI)
         find_package(MPI)
         if(MPI_FOUND)
             message(STATUS "MPI support enabled")
-	    set(HAVE_MPI_H 1)
+      set(HAVE_MPI_H 1)
             include_directories(${MPI_C_INCLUDE_PATH})
             list(APPEND APBS_LIBS ${MPI_C_LIBRARIES})
         else()
@@ -303,68 +303,68 @@ option(ENABLE_FETK "Enable the finite element solver" OFF)
 
 if(ENABLE_FETK)
 
-	if(WIN32)
-		message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
-	else()
-		message(STATUS "Building FETK components.")
-		set(CONFIG_OPTS --prefix=<INSTALL_DIR>)
+  if(WIN32)
+    message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
+  else()
+    message(STATUS "Building FETK components.")
+    set(CONFIG_OPTS --prefix=<INSTALL_DIR>)
 
-		set(MPI_ENV "")
-		if(HAVE_MPI_H)
-		    list(APPEND CONFIG_OPTS --enable-mpi)
+    set(MPI_ENV "")
+    if(HAVE_MPI_H)
+        list(APPEND CONFIG_OPTS --enable-mpi)
 
-		    # MALOC just cares about libmpi
-		    foreach(LIB_PATH ${MPI_C_LIBRARIES})
-		        get_filename_component(LIB ${LIB_PATH} NAME_WE)
-		        if(LIB STREQUAL "libmpi")
-		            get_filename_component(MPI_LIB_DIR ${LIB_PATH} DIRECTORY)
-		    	 endif()
-		    endforeach()
+        # MALOC just cares about libmpi
+        foreach(LIB_PATH ${MPI_C_LIBRARIES})
+            get_filename_component(LIB ${LIB_PATH} NAME_WE)
+            if(LIB STREQUAL "libmpi")
+                get_filename_component(MPI_LIB_DIR ${LIB_PATH} DIRECTORY)
+           endif()
+        endforeach()
 
-		    set(MPI_ENV "FETK_MPI_INCLUDE=${MPI_C_INCLUDE_PATH}" "FETK_MPI_LIBRARY=${MPI_LIB_DIR}")
-		endif()
+        set(MPI_ENV "FETK_MPI_INCLUDE=${MPI_C_INCLUDE_PATH}" "FETK_MPI_LIBRARY=${MPI_LIB_DIR}")
+    endif()
 
-		ExternalProject_Add(fetk-maloc
-			PREFIX fetk
-			SOURCE_DIR ${EXTERNALS_PATH}/fetk/maloc/src
-			CONFIGURE_COMMAND ${MPI_ENV} ${EXTERNALS_PATH}/fetk/maloc/configure ${CONFIG_OPTS}
-			BUILD_COMMAND ${MAKE})
+    ExternalProject_Add(fetk-maloc
+      PREFIX fetk
+      SOURCE_DIR ${EXTERNALS_PATH}/fetk/maloc/src
+      CONFIGURE_COMMAND ${MPI_ENV} ${EXTERNALS_PATH}/fetk/maloc/configure ${CONFIG_OPTS}
+      BUILD_COMMAND ${MAKE})
 
-		ExternalProject_Add(fetk-punc
-			PREFIX fetk
-			DEPENDS fetk-maloc
-			SOURCE_DIR ${EXTERNALS_PATH}/fetk/punc/src
-			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure ${CONFIG_OPTS}
-			BUILD_COMMAND ${MAKE})
+    ExternalProject_Add(fetk-punc
+      PREFIX fetk
+      DEPENDS fetk-maloc
+      SOURCE_DIR ${EXTERNALS_PATH}/fetk/punc/src
+      CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure ${CONFIG_OPTS}
+      BUILD_COMMAND ${MAKE})
 
-		ExternalProject_Add(fetk-gamer
-			PREFIX fetk
-			DEPENDS fetk-maloc
-			SOURCE_DIR ${EXTERNALS_PATH}/fetk/gamer/src
-			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure ${CONFIG_OPTS}
-			BUILD_COMMAND ${MAKE})
+    ExternalProject_Add(fetk-gamer
+      PREFIX fetk
+      DEPENDS fetk-maloc
+      SOURCE_DIR ${EXTERNALS_PATH}/fetk/gamer/src
+      CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure ${CONFIG_OPTS}
+      BUILD_COMMAND ${MAKE})
 
-		ExternalProject_Add(fetk-mc
-			PREFIX fetk
-			DEPENDS fetk-maloc fetk-punc
-			SOURCE_DIR ${EXTERNALS_PATH}/fetk/mc/src
-			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure ${CONFIG_OPTS}
-			BUILD_COMMAND ${MAKE})
+    ExternalProject_Add(fetk-mc
+      PREFIX fetk
+      DEPENDS fetk-maloc fetk-punc
+      SOURCE_DIR ${EXTERNALS_PATH}/fetk/mc/src
+      CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure ${CONFIG_OPTS}
+      BUILD_COMMAND ${MAKE})
 
-		set(FETK_ENABLED 1)
+    set(FETK_ENABLED 1)
 
-		ExternalProject_Get_Property(fetk-maloc install_dir)
-		include_directories(${install_dir}/include)
+    ExternalProject_Get_Property(fetk-maloc install_dir)
+    include_directories(${install_dir}/include)
 
-	    list(APPEND APBS_LIBS "stdc++")
-	    list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
-	    list(APPEND APBS_LIBS maloc amd punc mc gamer superlu umfpack
-	blas vf2c tetgen triangle readline termcap)
+      list(APPEND APBS_LIBS "stdc++")
+      list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
+      list(APPEND APBS_LIBS maloc amd punc mc gamer superlu umfpack
+  blas vf2c tetgen triangle readline termcap)
 
-	    SET(HAVE_MC_H 1)
-		SET(HAVE_PUNC_H 1)
-		SET(HAVE_BIOM_H 1)
-	endif()
+      SET(HAVE_MC_H 1)
+    SET(HAVE_PUNC_H 1)
+    SET(HAVE_BIOM_H 1)
+  endif()
 endif()
 
 
@@ -374,22 +374,45 @@ endif()
 
 option(ENABLE_GEOFLOW "geoflow method" OFF)
 if(ENABLE_GEOFLOW)
-	message(STATUS "Building GEOFLOW")
-	add_definitions(-DGEOFLOW_APBS)
-	ExternalProject_Add(
-		geoflow
-		SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-		CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON
-		BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
-		INSTALL_COMMAND ""
-	)
-	ExternalProject_Get_Property(geoflow binary_dir)
-	add_definitions(-DENABLE_GEOFLOW)
-	list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
-	list(APPEND APBS_LIBS stdc++ GeometricFlowLib)
-	include_directories(${EXTERNALS_PATH}/geoflow_c/src)
+  message(STATUS "Building GEOFLOW")
+  add_definitions(-DGEOFLOW_APBS)
+  ExternalProject_Add(
+    geoflow
+    SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
+    CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON
+    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
+    INSTALL_COMMAND ""
+  )
+  ExternalProject_Get_Property(geoflow binary_dir)
+  add_definitions(-DENABLE_GEOFLOW)
+  list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
+  list(APPEND APBS_LIBS stdc++ GeometricFlowLib)
+  include_directories(${EXTERNALS_PATH}/geoflow_c/src)
 endif()
 
+
+## TODO: Fix this and point to PBAM source
+################################################################################
+# Optionally build pbam (git submodule)
+################################################################################
+
+option(ENABLE_PBAM "pbam method" ON)
+if(ENABLE_PBAM)
+  message(STATUS "Building PBAM")
+  add_definitions(-DPBAM_APBS)
+# ExternalProject_Add(
+#   pbam
+#   SOURCE_DIR ${EXTERNALS_PATH}/pbam_c
+#   CMAKE_ARGS -DENABLE_PBAM_APBS=ON
+#   BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
+#   INSTALL_COMMAND ""
+# )
+# ExternalProject_Get_Property(pbam binary_dir)
+  add_definitions(-DENABLE_PBAM)
+  list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
+#list(APPEND APBS_LIBS stdc++ PBAMLib)
+  include_directories(${EXTERNALS_PATH}/pbam/src)
+endif()
 
 ################################################################################
 # Handle conditional fast mode                                                 #
@@ -583,7 +606,7 @@ add_subdirectory(src)
 # Build APBS documentation                                                     #
 ################################################################################
 
-option(BUILD_DOC "Build/Rebuild documentation using doxygen" ON)
+option(BUILD_DOC "Build/Rebuild documentation using doxygen" OFF)
 
 if(BUILD_DOC)
     message(STATUS "Building documentation enabled")

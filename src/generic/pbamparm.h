@@ -103,7 +103,6 @@ typedef struct sPBAMparm {
     /* *** GENERIC PARAMETERS *** */
     int vdw;
     int setvdw;
-    double etol; /**< user defined error tolerance */
 
 } PBAMparm;
 
@@ -167,9 +166,6 @@ VEXTERNC Vrc_Codes      PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZ
 VEXTERNC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm);
 
 VPRIVATE Vrc_Codes PBAMparm_parseVDW(PBAMparm *thee, Vio *sock);
-
-VPRIVATE Vrc_Codes PBAMparm_parseETOL(PBAMparm *thee, Vio *sock);
-
 
 
 #endif
