@@ -400,17 +400,17 @@ option(ENABLE_PBAM "pbam method" ON)
 if(ENABLE_PBAM)
   message(STATUS "Building PBAM")
   add_definitions(-DPBAM_APBS)
-# ExternalProject_Add(
-#   pbam
-#   SOURCE_DIR ${EXTERNALS_PATH}/pbam_c
-#   CMAKE_ARGS -DENABLE_PBAM_APBS=ON
-#   BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
-#   INSTALL_COMMAND ""
-# )
-# ExternalProject_Get_Property(pbam binary_dir)
+  ExternalProject_Add(
+    pbam
+    SOURCE_DIR ${EXTERNALS_PATH}/pbam_c
+    CMAKE_ARGS -DENABLE_PBAM_APBS=ON
+    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
+    INSTALL_COMMAND ""
+  )
+  ExternalProject_Get_Property(pbam binary_dir)
   add_definitions(-DENABLE_PBAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
-#list(APPEND APBS_LIBS stdc++ PBAMLib)
+ list(APPEND APBS_LIBS stdc++ PBAMLib)
   include_directories(${EXTERNALS_PATH}/pbam/src)
 endif()
 
