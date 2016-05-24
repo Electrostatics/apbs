@@ -1256,7 +1256,6 @@ ELEC section!\n");
             calc = thee->elec[thee->nelec];
             (thee->nelec)++;
             calc->pbamparm->type = PBAMCT_AUTO;
-            Vnm_print(2, "NOsh_parseELEC: Found PBAM!\n");
             return NOsh_parsePBAM(thee, sock, calc);
         } else {
             Vnm_print(2, "NOsh_parseELEC: The method (\"mg\",\"fem\", \"bem\", \"geoflow\" \"pbam\") or \

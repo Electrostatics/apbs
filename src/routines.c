@@ -5140,3 +5140,46 @@ VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
 }
 
 #endif
+
+#ifdef ENABLE_PBAM
+
+/**
+ * Initialize a PBAM calculation.
+ */
+VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL], 
+                                NOsh *nosh, 
+                                PBEparm *pbeparm, 
+                                PBAMparm *parm )
+{
+  //printf("solveGeometricFlow!!!\n");
+  if (nosh != VNULL) {
+    if (nosh->bogus) return 1;
+  }
+
+  Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
+
+  struct PBAMInput pbamIn = getPBAMParams();
+
+  // change any of the parameters you want...
+  pbamIn.m_gamma =  apolparm->gamma; 
+  pbamIn.m_pdie = pbeparm->pdie ;
+  pbamIn.m_sdie = pbeparm->sdie ;
+
+  
+  // debug
+  printPBAMStruct( pbamIn );
+  
+  printf("num mols: %i\n", nosh->nmol);
+  struct PBAMOutput pbamOut = 
+     runPBAMWrapAPBS( pbamIn, molecules );
+
+  //Vnm_tprint( 1,"  Global net energy = %1.12E\n", geoflowOut.m_totalSolvation);
+  //Vnm_tprint( 1,"  Global net ELEC energy = %1.12E\n", geoflowOut.m_elecSolvation);
+
+  Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
+
+  return 1;
+
+}
+
+#endif
