@@ -5162,14 +5162,28 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
 
   // change any of the parameters you want...
   pbamIn.temp_ =  pbeparm->temp; 
-  pbamIn.idiel_ = pbeparm->pdie ;
-  pbamIn.sdiel_ = pbeparm->sdie ;
+  if (abs(pbamIn.temp_-0.0) < 1e-3)
+  {
+    printf("No temperature specified. Setting to 298.15K\n");
+    pbamIn.temp_ = 298.15;
+  }
 
+  // Dielectrics
+  pbamIn.idiel_ = pbeparm->pdie;
+  pbamIn.sdiel_ = pbeparm->sdie;
+
+  // Salt conc
+  pbamIn.salt_ = parm->salt;
+
+  // Runtype: can be energyforce, electrostatics etc
+  strncpy(pbamIn.runType_, parm->runtype, VMAX_ARGLEN);
+
+  strncpy(pbamIn.runName_, parm->runname, VMAX_ARGLEN);
   
   // debug
   printPBAMStruct( pbamIn );
   
-  printf("num mols: %i\n", nosh->nmol);
+  // Run the darn thing
   struct PBAMOutput pbamOut = 
      runPBAMWrapAPBS( pbamIn, molecules, nosh->nmol );
 

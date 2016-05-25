@@ -101,8 +101,19 @@ typedef struct sPBAMparm {
     int parsed;  /**< Has this structure been filled? (0 = no, 1 = yes) */
 
     /* *** GENERIC PARAMETERS *** */
-    int vdw;
-    int setvdw;
+    double salt;
+    int setsalt;
+
+    // This is the type of run you want
+    char runtype[VMAX_ARGLEN];
+    int setruntype;
+
+    // This is the name for output files
+    char runname[VMAX_ARGLEN];
+    int setrunname;
+
+    // For setting random orientation of molecules
+    int setrandorient;
 
 } PBAMparm;
 
@@ -112,7 +123,7 @@ typedef struct sPBAMparm {
  *  @param   type Type of PBAM calculation
  *  @returns Newly allocated and initialized PBAMparm object
  */
-VEXTERNC PBAMparm*  PBAMparm_ctor(PBAMparm_CalcType type);
+VEXTERNC PBAMparm* PBAMparm_ctor(PBAMparm_CalcType type);
 
 /** @brief   FORTRAN stub to construct PBAMparm object ?????????!!!!!!!
  *  @ingroup PBAMparm
@@ -121,21 +132,21 @@ VEXTERNC PBAMparm*  PBAMparm_ctor(PBAMparm_CalcType type);
  *  @param   type Type of MG calculation
  *  @returns Success enumeration
  */
-VEXTERNC Vrc_Codes      PBAMparm_ctor2(PBAMparm *thee, PBAMparm_CalcType type);
+VEXTERNC Vrc_Codes PBAMparm_ctor2(PBAMparm *thee, PBAMparm_CalcType type);
 
 /** @brief   Object destructor
  *  @ingroup PBAMparm
  *  @author  Andrew Stevens, Kyle Monson
  *  @param   thee  Pointer to memory location of PBAMparm object
  */
-VEXTERNC void     PBAMparm_dtor(PBAMparm **thee);
+VEXTERNC void PBAMparm_dtor(PBAMparm **thee);
 
 /** @brief   FORTRAN stub for object destructor   ?????????!!!!!!!!!!!!
  *  @ingroup PBAMparm
  *  @author  Andrew Stevens, Kyle Monson
  *  @param   thee  Pointer to PBAMparm object
  */
-VEXTERNC void     PBAMparm_dtor2(PBAMparm *thee);
+VEXTERNC void PBAMparm_dtor2(PBAMparm *thee);
 
 /** @brief   Consistency check for parameter values stored in object
  *  @ingroup PBAMparm
@@ -143,7 +154,7 @@ VEXTERNC void     PBAMparm_dtor2(PBAMparm *thee);
  *  @param   thee   PBAMparm object
  *  @returns Success enumeration
  */
-VEXTERNC Vrc_Codes      PBAMparm_check(PBAMparm *thee);
+VEXTERNC Vrc_Codes PBAMparm_check(PBAMparm *thee);
 
 /** @brief   Parse an MG keyword from an input file
  *  @ingroup PBAMparm
@@ -154,7 +165,7 @@ VEXTERNC Vrc_Codes      PBAMparm_check(PBAMparm *thee);
  *  @returns Success enumeration (1 if matched and assigned; -1 if matched, but there's some sort
  *            of error (i.e., too few args); 0 if not matched)
  */
-VEXTERNC Vrc_Codes      PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
+VEXTERNC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
                     Vio *sock);
 /**
  * @brief copy PBAMparm object int thee.
@@ -165,7 +176,71 @@ VEXTERNC Vrc_Codes      PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZ
  */
 VEXTERNC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm);
 
-VPRIVATE Vrc_Codes PBAMparm_parseVDW(PBAMparm *thee, Vio *sock);
+/**
+ * @brief Find salt conc and save it as a structure variable
+ * @ingroup PBAMparm
+ * @author
+ * @param thee PBAMparm object to be copied into
+ * @param parm The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBAMparm_parseSalt(PBAMparm *thee, Vio *sock);
+
+/**
+ * @brief Find runType and save it as a structure variable
+ * @ingroup PBAMparm
+ * @author
+ * @param thee PBAMparm object to be copied into
+ * @param sock The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBAMparm_parseRunType(PBAMparm *thee, Vio *sock);
+
+/**
+ * @brief Find runName and save it as a structure variable
+ * @ingroup PBAMparm
+ * @author
+ * @param thee PBAMparm object to be copied into
+ * @param sock The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBAMparm_parseRunName(PBAMparm *thee, Vio *sock);
+
+/**
+ * @brief Find randomorientation flag and save it as a boolean
+ * @ingroup PBAMparm
+ * @author
+ * @param thee PBAMparm object to be copied into
+ * @param sock The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBAMparm_parseRandorient(PBAMparm *thee, Vio *sock);
+
+/**
+ * @brief Find PBC flag and save the type and the boxlength
+ * @ingroup PBAMparm
+ * @author
+ * @param thee PBAMparm object to be copied into
+ * @param sock The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBAMparm_parsePBCS(PBAMparm *thee, Vio *sock);
+
+/**
+ * @brief Find 3D map filename and save it
+ * @ingroup PBAMparm
+ * @author
+ * @param thee PBAMparm object to be copied into
+ * @param sock The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBAMparm_parse3Dmap(PBAMparm *thee, Vio *sock);
+
+/**
+ * @brief Find 2D grid filename and save it
+ * @ingroup PBAMparm
+ * @author
+ * @param thee PBAMparm object to be copied into
+ * @param sock The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBAMparm_parseGrid2D(PBAMparm *thee, Vio *sock);
+
+
+
 
 
 #endif
