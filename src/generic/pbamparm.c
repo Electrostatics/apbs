@@ -80,9 +80,10 @@ VPUBLIC Vrc_Codes PBAMparm_ctor2(PBAMparm *thee, PBAMparm_CalcType type) {
 
     if (thee == VNULL) return VRC_FAILURE;
 
-    thee->parsed = 0; //TODO: Initialization list taken from geoflow
+    thee->parsed = 0; 
     thee->type = type;
-    thee->vdw = 0;
+    thee->salt = 0;
+    
 
     return VRC_SUCCESS;
 }
@@ -130,54 +131,87 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
     thee->type = parm->type;
     thee->parsed = parm->parsed;
 
-    thee->vdw = parm->vdw;
+    thee->salt = parm->salt;
+    thee->setsalt = parm->setsalt;
+    for (int i=0; i<VMAX_ARGLEN; i++) thee->runtype[i] = parm->runtype[i];
+    thee->setruntype = parm->setruntype;
+
+    for (int i=0; i<VMAX_ARGLEN; i++) thee->runname[i] = parm->runname[i];
+    thee->setrunname = parm->setrunname;
 }
 
-// TODO: Copied from geoflow, unneeded?
-Vrc_Codes PBAMFUBAR(const char* name){
-    Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
-    return VRC_WARNING;
-}
-/*
-Vrc_Codes PBAMparseNonNeg(double* tf, double def, int* set, char* name, Vio* sock){
+
+VPRIVATE Vrc_Codes PBAMparm_parseSalt(PBAMparm *thee, Vio *sock){
+    const char* name = "salt";
     char tok[VMAX_BUFSIZE];
+	double tf;
     if(Vio_scanf(sock, "%s", tok) == 0) {
-        *tf = def;
-        return PBAMFUBAR(name);
+        Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+        return VRC_WARNING;
     }
-
-    if (sscanf(tok, "%lf", tf) == 0){
+    
+    if (sscanf(tok, "%lf", &tf) == 0){
         Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
-        *tf = def;
-        return VRC_WARNING;
-    }else if(*tf < 0.0){
-        Vnm_print(2, "parsePBAM:  %s must be greater than 0!\n", name);
-        *tf = def;
-        return VRC_WARNING;
-    }
-
-    *set = 1;
-    return VRC_SUCCESS;
-}*/
-
-VPRIVATE Vrc_Codes PBAMparm_parseVDW(PBAMparm *thee, Vio *sock){
-    const char* name = "vdw";
-    char tok[VMAX_BUFSIZE];
-	int tf;
-    if(Vio_scanf(sock, "%s", tok) == 0) {
-        return PBAMFUBAR(name);
-    }
-
-    if (sscanf(tok, "%u", &tf) == 0){
-        Vnm_print(2, "NOsh:  Read non-unsigned int (%s) while parsing %s keyword!\n", tok, name);
-        return VRC_WARNING;
-    }else if(tf != 0 && tf != 1){
-        Vnm_print(2, "parsePBAM:  %s must be 0 or 1!\n", name);
         return VRC_WARNING;
     }else{
-        thee->vdw = tf;
+        thee->salt = tf;
     }
-    thee->setvdw = 1;
+    thee->setsalt = 1;
+    return VRC_SUCCESS;
+}
+
+VPRIVATE Vrc_Codes PBAMparm_parseRunType(PBAMparm *thee, Vio *sock){
+    const char* name = "runtype";
+    char tok[VMAX_BUFSIZE];
+
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+      Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+      return VRC_WARNING;
+    } else {
+      strncpy(thee->runtype, tok, VMAX_ARGLEN);
+      thee->setruntype=1;
+    }
+
+    return VRC_SUCCESS;
+}
+
+VPRIVATE Vrc_Codes PBAMparm_parseRunName(PBAMparm *thee, Vio *sock){
+    const char* name = "runname";
+    char tok[VMAX_BUFSIZE];
+
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+      Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+      return VRC_WARNING;
+    } else {
+      strncpy(thee->runname, tok, VMAX_ARGLEN);
+      thee->setrunname=1;
+    }
+
+    return VRC_SUCCESS;
+}
+
+VPRIVATE Vrc_Codes PBAMparm_parseRandorient(PBAMparm *thee, Vio *sock){
+    const char* name = "randorient";
+    thee->setrandorient=1;
+    return VRC_SUCCESS;
+}
+
+VPRIVATE Vrc_Codes PBAMparm_parseSalt(PBAMparm *thee, Vio *sock){
+    const char* name = "salt";
+    char tok[VMAX_BUFSIZE];
+    double tf;
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+        Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+        return VRC_WARNING;
+    }
+    
+    if (sscanf(tok, "%lf", &tf) == 0){
+        Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+        return VRC_WARNING;
+    }else{
+        thee->salt = tf;
+    }
+    thee->setsalt = 1;
     return VRC_SUCCESS;
 }
 
@@ -196,13 +230,23 @@ VPUBLIC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
 
     Vnm_print(0, "PBAMparm_parseToken:  trying %s...\n", tok);
 
-    if (Vstring_strcasecmp(tok, "vdwdisp") == 0) {
-        return PBAMparm_parseVDW(thee, sock);
+    if (Vstring_strcasecmp(tok, "salt") == 0) {
+        return PBAMparm_parseSalt(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "runtype") == 0) {
+        return PBAMparm_parseRunType(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "runname") == 0) {
+        return PBAMparm_parseRunName(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "randorient") == 0) {
+        return PBAMparm_parseRandorient(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "pbc") == 0) {
+        return PBAMparm_parsePBCS(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "3dmap") == 0) {
+        return PBAMparm_parse3Dmap(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "grid2d") == 0) {
+        return PBAMparm_parseGrid2D(thee, sock);
     }else {
         Vnm_print(2, "parsePBAM:  Unrecognized keyword (%s)!\n", tok);
         return VRC_WARNING;
     }
-
-
     return VRC_FAILURE;
 }

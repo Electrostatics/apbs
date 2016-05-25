@@ -2,16 +2,19 @@ read
     mol pqr pos_charge.pqr
     mol pqr neg_charge.pqr
 end
-elec name comp_solv        # Solvated complex
+elec name comp_solv        # Toy charges
     pbam-auto
 
-    lpbe
+    lpbe                    # Needed for apbs not pbam
     bcfl mdh                # only supported boundary condition
-    mol 2
+    mol 2                   # Needed for apbs not pbam
     
-    temp 250.0
+    runtype energyforce     # Can be energyforce, electrostatics etc
+    runname toy_test        # Output name for files created by program
+    temp 250.0              # System temperature (K)
     pdie 4.0                # Solute dielectric                 
     sdie 78.00              # Solvent dielectric                
+    salt 0.01               # Monovalent salt conc in M
 end
 
 quit
