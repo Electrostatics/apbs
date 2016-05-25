@@ -778,11 +778,11 @@ int main(
 
                 
                 /* Solve LPBE with PBAM method */
-            /*  if (solveGeometricFlow(alist, nosh, pbeparm, apolparm, geoflowparm) != 1) {
-                    Vnm_tprint(2, "Error solving GEOFLOW!\n");
+                if (solvePBAM(alist, nosh, pbeparm, pbamparm) != 1) {
+                    Vnm_tprint(2, "Error solving PBAM!\n");
                     VJMPERR1(0);
                 }
-            */
+            
                 fflush(stdout);
                 fflush(stderr);
                 break;

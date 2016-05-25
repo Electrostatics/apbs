@@ -1,0 +1,18 @@
+read
+    mol pqr pos_charge.pqr
+    mol pqr neg_charge.pqr
+end
+elec name comp_solv        # Solvated complex
+    pbam-auto
+
+    lpbe
+    bcfl mdh                # only supported boundary condition
+    mol 2
+    
+    temp 250.0
+    pdie 4.0                # Solute dielectric                 
+    sdie 78.00              # Solvent dielectric                
+end
+
+quit
+
