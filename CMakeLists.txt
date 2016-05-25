@@ -411,7 +411,7 @@ if(ENABLE_PBAM)
   add_definitions(-DENABLE_PBAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
   list(APPEND APBS_LIBS stdc++ PBAMLib)
-  include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/pbam)
+  include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
 endif()
 
 ################################################################################
