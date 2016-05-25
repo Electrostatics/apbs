@@ -402,7 +402,7 @@ if(ENABLE_PBAM)
   add_definitions(-DPBAM_APBS)
   ExternalProject_Add(
     pbam
-    SOURCE_DIR ${EXTERNALS_PATH}/pbam_c
+    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am/pbam
     CMAKE_ARGS -DENABLE_PBAM_APBS=ON
     BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
     INSTALL_COMMAND ""
@@ -410,8 +410,8 @@ if(ENABLE_PBAM)
   ExternalProject_Get_Property(pbam binary_dir)
   add_definitions(-DENABLE_PBAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
- list(APPEND APBS_LIBS stdc++ PBAMLib)
-  include_directories(${EXTERNALS_PATH}/pbam/src)
+  list(APPEND APBS_LIBS stdc++ PBAMLib)
+  include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/pbam)
 endif()
 
 ################################################################################
@@ -499,7 +499,7 @@ endif()
 # Handle conditional building with verbose debugging information printouts     #
 ################################################################################
 
-option(ENABLE_VERBOSE_DEBUG "Enable verbose debugging mode" OFF)
+option(ENABLE_VERBOSE_DEBUG "Enable verbose debugging mode" ON)
 
 if(ENABLE_VERBOSE_DEBUG)
     set(VERBOSE_DEBUG 1)
