@@ -84,6 +84,19 @@ VPUBLIC Vrc_Codes PBAMparm_ctor2(PBAMparm *thee, PBAMparm_CalcType type) {
     thee->type = type;
     thee->salt = 0;
     
+    thee->setsalt = 0;
+    thee->setruntype = 0;
+    thee->setrunname = 0;
+
+    thee->setrandorient = 0;
+
+    thee->setpbcs = 0;
+    thee->pbcboxlen = 0.0;
+
+    thee->set3dmap = 0;
+    thee->setgrid2Dname = 0;
+    thee->grid2Dct = 0;
+    thee->setdxname = 0;
 
     return VRC_SUCCESS;
 }
@@ -138,6 +151,28 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
 
     for (int i=0; i<VMAX_ARGLEN; i++) thee->runname[i] = parm->runname[i];
     thee->setrunname = parm->setrunname;
+
+    thee->setrandorient = parm->setrandorient ;
+
+    thee->setpbcs = parm->setpbcs;
+    thee->pbcboxlen = parm->pbcboxlen;
+
+    for (int i=0; i<VMAX_ARGLEN; i++) thee->map3dname[i] = parm->map3dname[i];
+    thee->set3dmap = parm->set3dmap;
+
+    for (int i=0; i<PBAMPARM_MAXWRITE; i++)
+    {
+        for (int j=0; j<VMAX_ARGLEN; j++)
+        { 
+            thee->grid2Dname[i][j] = parm->grid2Dname[i][j];
+            thee->grid2Dax[i][j] = parm->grid2Dax[i][j];
+        }
+        thee->grid2Dloc[i] = parm->grid2Dloc[i];
+    }
+    thee->set3dmap = parm->set3dmap;
+
+    for (int i=0; i<VMAX_ARGLEN; i++) thee->dxname[i] = parm->dxname[i];
+    thee->set3dmap = parm->setdxname;
 }
 
 
@@ -196,25 +231,101 @@ VPRIVATE Vrc_Codes PBAMparm_parseRandorient(PBAMparm *thee, Vio *sock){
     return VRC_SUCCESS;
 }
 
-VPRIVATE Vrc_Codes PBAMparm_parseSalt(PBAMparm *thee, Vio *sock){
-    const char* name = "salt";
+// TODO
+VPRIVATE Vrc_Codes PBAMparm_parsePBCS(PBAMparm *thee, Vio *sock){
+    const char* name = "pbc";
     char tok[VMAX_BUFSIZE];
     double tf;
+    int td;
     if(Vio_scanf(sock, "%s", tok) == 0) {
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
     }
     
+    if (sscanf(tok, "%d", &td) == 0) {
+        Vnm_print(2, "parsePBAM:  Read non-int (%s) while parsing pbc keyword!\n", tok);
+        return VRC_FAILURE;
+    } else{
+        thee->setpbcs = td;
+    }
+
     if (sscanf(tok, "%lf", &tf) == 0){
         Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
         return VRC_WARNING;
     }else{
-        thee->salt = tf;
+        thee->pbcboxlen = tf;
     }
-    thee->setsalt = 1;
     return VRC_SUCCESS;
 }
 
+// TODO
+VPRIVATE Vrc_Codes PBAMparm_parse3Dmap(PBAMparm *thee, Vio *sock){
+    const char* name = "3dmap";
+    char tok[VMAX_BUFSIZE];
+
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+      Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+      return VRC_WARNING;
+    } else {
+      strncpy(thee->map3dname, tok, VMAX_ARGLEN);
+      thee->set3dmap=1;
+    }
+
+    return VRC_SUCCESS;
+}
+
+
+
+VPRIVATE Vrc_Codes PBAMparm_parseGrid2D(PBAMparm *thee, Vio *sock){
+    const char* name = "grid2d";
+    char tok[VMAX_BUFSIZE];
+    double tf;
+
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+        Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+        return VRC_WARNING;
+    } else {
+      strncpy(thee->grid2Dname[thee->grid2Dct], tok, VMAX_ARGLEN);
+      thee->setgrid2Dname=1;
+    }
+    
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+        Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+        return VRC_WARNING;
+    } else {
+        printf("This is my ax: %s\n", tok);
+      strncpy(thee->grid2Dax[thee->grid2Dct], tok, VMAX_ARGLEN);
+    }
+
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+        Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+        return VRC_WARNING;
+    }
+
+    if (sscanf(tok, "%lf", &tf) == 0){
+        Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+        return VRC_WARNING;
+    }else{
+        thee->grid2Dloc[thee->grid2Dct] = tf;
+        thee->grid2Dct = thee->grid2Dct+1;
+    }
+    return VRC_SUCCESS;
+}
+
+VPRIVATE Vrc_Codes PBAMparm_parseDX(PBAMparm *thee, Vio *sock){
+    const char* name = "dx";
+    char tok[VMAX_BUFSIZE];
+
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+      Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+      return VRC_WARNING;
+    } else {
+      strncpy(thee->dxname, tok, VMAX_ARGLEN);
+      thee->setdxname=1;
+    }
+
+    return VRC_SUCCESS;
+}
 
 VPUBLIC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
   Vio *sock) {
@@ -244,6 +355,8 @@ VPUBLIC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
         return PBAMparm_parse3Dmap(thee, sock);
     }else if (Vstring_strcasecmp(tok, "grid2d") == 0) {
         return PBAMparm_parseGrid2D(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "dx") == 0) {
+        return PBAMparm_parseDX(thee, sock);
     }else {
         Vnm_print(2, "parsePBAM:  Unrecognized keyword (%s)!\n", tok);
         return VRC_WARNING;

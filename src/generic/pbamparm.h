@@ -70,6 +70,11 @@
 #include "generic/vhal.h"
 #include "generic/vstring.h"
 
+ /** @brief   Number of things that can be written out in a single calculation
+ *  @ingroup PBAMparm
+ */
+#define PBAMPARM_MAXWRITE 20
+
 /**
  * @brief  Calculation type
  * @ingroup PBAMparm
@@ -114,6 +119,26 @@ typedef struct sPBAMparm {
 
     // For setting random orientation of molecules
     int setrandorient;
+
+    // For periodic boundary conditions
+    double pbcboxlen;
+    int setpbcs;
+
+    // For 3d map printing
+    char map3dname[VMAX_ARGLEN];
+    int set3dmap;
+
+    // For 2D
+    char grid2Dname[PBAMPARM_MAXWRITE][VMAX_ARGLEN];
+    char grid2Dax[PBAMPARM_MAXWRITE][VMAX_ARGLEN];
+    double grid2Dloc[PBAMPARM_MAXWRITE];
+    int grid2Dct;
+    int setgrid2Dname;
+
+    // For dx
+    char dxname[VMAX_ARGLEN];
+    int setdxname;
+
 
 } PBAMparm;
 
@@ -239,7 +264,14 @@ VPRIVATE Vrc_Codes PBAMparm_parse3Dmap(PBAMparm *thee, Vio *sock);
  */
 VPRIVATE Vrc_Codes PBAMparm_parseGrid2D(PBAMparm *thee, Vio *sock);
 
-
+/**
+ * @brief Find DX filename and save it
+ * @ingroup PBAMparm
+ * @author
+ * @param thee PBAMparm object to be copied into
+ * @param sock The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBAMparm_parseDX(PBAMparm *thee, Vio *sock);
 
 
 
