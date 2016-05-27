@@ -74,7 +74,7 @@
  *  @ingroup PBAMparm
  */
 #define PBAMPARM_MAXWRITE 20
-#define PBAMPARM_MAXMOL 500
+#define PBAMPARM_MAXMOL 200
 
 /**
  * @brief  Calculation type
@@ -150,12 +150,13 @@ typedef struct sPBAMparm {
     //
     // DYNAMICS
     //
-    // char termcombine[VMAX_ARGLEN];
-    // int settermcombine;
+    char termcombine[VMAX_ARGLEN];
+    int settermcombine;
 
-    // char moveType[PBAMPARM_MAXMOL][VMAX_ARGLEN];
-    // double transDiff[PBAMPARM_MAXMOL];
-    // double rotDiff[PBAMPARM_MAXMOL];
+    int diffct;
+    char moveType[PBAMPARM_MAXMOL][VMAX_ARGLEN];
+    double transDiff[PBAMPARM_MAXMOL];
+    double rotDiff[PBAMPARM_MAXMOL];
 
 
 

@@ -5179,6 +5179,7 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
   // Runtype: can be energyforce, electrostatics etc
   strncpy(pbamIn.runType_, parm->runtype, VMAX_ARGLEN);
   strncpy(pbamIn.runName_, parm->runname, VMAX_ARGLEN);
+  printf("This is runtype: %s\n", pbamIn.runType_);
 
   pbamIn.randOrient_ = parm->setrandorient;
 
@@ -5187,10 +5188,7 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
 
   // Electrostatic stuff
   pbamIn.gridPts_ = parm->gridpt;
-
   strncpy(pbamIn.map3D_, parm->map3dname, VMAX_ARGLEN);
-
-  printf("From routine, gridct %d\n", parm->grid2Dct);
   pbamIn.grid2Dct_ = parm->grid2Dct;
   for (int i=0; i<pbamIn.grid2Dct_; i++)
   {
@@ -5198,23 +5196,26 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
     strncpy(pbamIn.grid2Dax_[i], parm->grid2Dax[i], VMAX_ARGLEN); 
     pbamIn.grid2Dloc_[i] = parm->grid2Dloc[i];
   }
-  
   strncpy(pbamIn.dxname_, parm->dxname, VMAX_ARGLEN);
 
-  // Dynamics stuff
-  
-  // printf("From routine, %s\n", parm->termcombine);
-  // strncpy(pbamIn.termCombine_, parm->termcombine, VMAX_ARGLEN);
+  // Dynamics stuff  
+  strncpy(pbamIn.termCombine_, parm->termcombine, VMAX_ARGLEN);
 
-  // for (int i=0; i<pbamIn.nmol_; i++)
-  // {
-  //   printf("This is my movetype: %s\n", parm->moveType[i]);
-  //   strncpy(pbamIn.moveType_[i], parm->moveType[i], VMAX_ARGLEN);
-  //   pbamIn.transDiff_[i] = parm->transDiff[i]; 
-  //   pbamIn.rotDiff_[i] = parm->rotDiff[i]; 
-  //   printf("This is mol: %d\t type: %s \t diff: %lf\t rot: %lf\n", 
-  //       i, pbamIn.moveType_[i], pbamIn.transDiff_[i], pbamIn.rotDiff_[i]);
-  // }
+  if (strncmp(pbamIn.runType_, "dynamics", 8)== 0)
+  {
+    if (pbamIn.nmol_ > parm->diffct)
+    {
+      Vnm_tprint(2, "Error!  You need more diffusion information!\n");
+      return 0;
+    }
+
+    for (int i=0; i<pbamIn.nmol_; i++)
+    {
+      strncpy(pbamIn.moveType_[i], parm->moveType[i], VMAX_ARGLEN);
+      pbamIn.transDiff_[i] = parm->transDiff[i]; 
+      pbamIn.rotDiff_[i] = parm->rotDiff[i]; 
+    }
+  }
   
   // pbamIn. = parm->;
   // pbamIn. = parm->;
@@ -5224,8 +5225,7 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
   printPBAMStruct( pbamIn );
   
   // Run the darn thing
-  struct PBAMOutput pbamOut = 
-     runPBAMWrapAPBS( pbamIn, molecules, nosh->nmol );
+  struct PBAMOutput pbamOut = runPBAMWrapAPBS( pbamIn, molecules, nosh->nmol );
 
   Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
 
