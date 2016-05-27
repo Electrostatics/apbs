@@ -1,0 +1,26 @@
+read
+    mol pqr pos_charge.pqr
+    mol pqr neg_charge.pqr
+end
+elec name comp_solv        # Toy charges
+    pbam-auto
+
+    lpbe                    # Needed for apbs not pbam
+    bcfl mdh                # only supported boundary condition
+    mol 2                   # Needed for apbs not pbam
+    
+    runtype electrostatics  # Can be energyforce, electrostatics etc
+    runname toy_elec        # Output name for files created by program
+    temp 298.15             # System temperature (K)
+    pdie 4.0                # Solute dielectric                 
+    sdie 78.0               # Solvent dielectric                
+    salt 0.05               # Monovalent salt conc in M
+
+    dx toy.dx
+    3dmap  toy.map
+    grid2d toy.x0.dat x 0.0
+
+end
+
+quit
+

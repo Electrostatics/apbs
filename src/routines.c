@@ -5157,8 +5157,9 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
   }
   
   Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
-
   struct PBAMInput pbamIn = getPBAMParams();
+
+  pbamIn.nmol_ = nosh->nmol;
 
   // change any of the parameters you want...
   pbamIn.temp_ =  pbeparm->temp; 
@@ -5177,9 +5178,26 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
 
   // Runtype: can be energyforce, electrostatics etc
   strncpy(pbamIn.runType_, parm->runtype, VMAX_ARGLEN);
-
   strncpy(pbamIn.runName_, parm->runname, VMAX_ARGLEN);
-  
+
+  pbamIn.randOrient_ = parm->setrandorient;
+
+  pbamIn.boxLen_ = parm->pbcboxlen;
+  pbamIn.pbcType_ = parm->setpbcs;
+
+  // Electrostatic stuff
+  strncpy(pbamIn.map3D_, parm->map3dname, VMAX_ARGLEN);
+
+  for (int i=0; i<PBAMPARM_MAXWRITE; i++)
+  {
+    strncpy(pbamIn.grid2D_[i], parm->grid2Dname[i], VMAX_ARGLEN); 
+    strncpy(pbamIn.grid2Dax_[i], parm->grid2Dax[i], VMAX_ARGLEN); 
+    pbamIn.grid2Dloc_[i] = parm->grid2Dloc[i];
+  }
+  pbamIn.grid2Dct_ = parm->grid2Dct;
+
+  strncpy(pbamIn.dxname_, parm->dxname, VMAX_ARGLEN);
+
   // debug
   printPBAMStruct( pbamIn );
   
