@@ -102,7 +102,8 @@ VPUBLIC Vrc_Codes PBAMparm_ctor2(PBAMparm *thee, PBAMparm_CalcType type) {
     thee->setdxname = 0;
 
     //Dynamics
-    // thee->settermcombine = 0;
+    thee->settermcombine = 0;
+    thee->diffct = 0;
 
     return VRC_SUCCESS;
 }
@@ -157,7 +158,7 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
     for (int i=0; i<VMAX_ARGLEN; i++) thee->runname[i] = parm->runname[i];
     thee->setrunname = parm->setrunname;
 
-    thee->setrandorient = parm->setrandorient ;
+    thee->setrandorient = parm->setrandorient;
 
     thee->setpbcs = parm->setpbcs;
     thee->pbcboxlen = parm->pbcboxlen;
@@ -184,10 +185,21 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
     thee->setdxname = parm->setdxname;
 
     // Dynamics parts
-    // for (int i=0; i<VMAX_ARGLEN; i++) thee->termcombine[i] = parm->termcombine[i];
-    // thee->settermcombine = parm->settermcombine;
+    for (int i=0; i<VMAX_ARGLEN; i++) thee->termcombine[i] = parm->termcombine[i];
+    thee->settermcombine = parm->settermcombine;
 
-    
+    thee->diffct = parm->diffct;
+
+    for (int i=0; i<PBAMPARM_MAXMOL; i++)
+    {
+        for (int j=0; j<VMAX_ARGLEN; j++)
+        { 
+            thee->moveType[i][j] = parm->moveType[i][j];
+        }
+        thee->transDiff[i] = parm->transDiff[i];
+        thee->rotDiff[i] = parm->rotDiff[i];
+    }
+
 }
 
 
@@ -359,13 +371,13 @@ VPRIVATE Vrc_Codes PBAMparm_parseTermcombine(PBAMparm *thee, Vio *sock){
     const char* name = "termcombine";
     char tok[VMAX_BUFSIZE];
 
-    // if(Vio_scanf(sock, "%s", tok) == 0) {
-    //   Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
-    //   return VRC_WARNING;
-    // } else {
-    //   strncpy(thee->termcombine, tok, VMAX_ARGLEN);
-    //   thee->settermcombine=1;
-    // }
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+      Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+      return VRC_WARNING;
+    } else {
+      strncpy(thee->termcombine, tok, VMAX_ARGLEN);
+      thee->settermcombine=1;
+    }
     return VRC_SUCCESS;
 }
 
@@ -375,66 +387,69 @@ VPRIVATE Vrc_Codes PBAMparm_parseDiff(PBAMparm *thee, Vio *sock){
     int molind;
     double tf;
 
-    // if(Vio_scanf(sock, "%s", tok) == 0) {
-    //     Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
-    //     return VRC_WARNING;
-    // } 
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+        Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+        return VRC_WARNING;
+    } 
 
     // // looking for index
-    // if (sscanf(tok, "%d", &molind) == 0){
-    //     Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
-    //     return VRC_WARNING;
-    // }
+    if (sscanf(tok, "%d", &molind) == 0){
+        Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+        return VRC_WARNING;
+    }
     
-    // // looking for move type = move, stat, rot
-    // if(Vio_scanf(sock, "%s", tok) == 0) {
-    //     Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
-    //     return VRC_WARNING;
-    // } else {
-    //   strncpy(thee->moveType[molind], tok, VMAX_ARGLEN);
-    // }
+    molind -= 1;
+    // looking for move type = move, stat, rot
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+        Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+        return VRC_WARNING;
+    } else {
+       strncpy(thee->moveType[molind], tok, VMAX_ARGLEN);
+      thee->diffct += 1;
+    }
 
-    // if (strncmp(thee->moveType[molind], "move", 4) == 0)
-    // {
-    //   if(Vio_scanf(sock, "%s", tok) == 0) {
-    //       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
-    //       return VRC_WARNING;
-    //   }
-    //   if (sscanf(tok, "%lf", &tf) == 0){
-    //       Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
-    //       return VRC_WARNING;
-    //   }else{
-    //       thee->transDiff[molind] = tf;
-    //   }
+    if (strncmp(thee->moveType[molind], "move", 4) == 0)
+    {
+      if(Vio_scanf(sock, "%s", tok) == 0) {
+          Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+          return VRC_WARNING;
+      }
+      if (sscanf(tok, "%lf", &tf) == 0){
+          Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+          return VRC_WARNING;
+      }else{
+          thee->transDiff[molind] = tf;
+      }
 
-    //   // rot diffusion coeff
-    //   if(Vio_scanf(sock, "%s", tok) == 0) {
-    //       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
-    //       return VRC_WARNING;
-    //   }
-    //   if (sscanf(tok, "%lf", &tf) == 0){
-    //       Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
-    //       return VRC_WARNING;
-    //   }else{
-    //       thee->rotDiff[molind] = tf;
-    //   }
-    // } else if (strncmp(thee->moveType[molind], "rot", 3) == 0)
-    // {
-    //   if(Vio_scanf(sock, "%s", tok) == 0) {
-    //       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
-    //       return VRC_WARNING;
-    //   }
-    //   if (sscanf(tok, "%lf", &tf) == 0){
-    //       Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
-    //       return VRC_WARNING;
-    //   }else{
-    //       thee->rotDiff[molind] = tf;
-    //       thee->transDiff[molind] = 0.0;
-    //   }
-    // } else{
-    //    thee->transDiff[molind] = 0.0;
-    //    thee->rotDiff[molind] = 0.0;
-    // }
+      // rot diffusion coeff
+      if(Vio_scanf(sock, "%s", tok) == 0) {
+          Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+          return VRC_WARNING;
+      }
+      if (sscanf(tok, "%lf", &tf) == 0){
+          Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+          return VRC_WARNING;
+      }else{
+          thee->rotDiff[molind] = tf;
+      }
+    } else if (strncmp(thee->moveType[molind], "rot", 3) == 0)
+    {
+      if(Vio_scanf(sock, "%s", tok) == 0) {
+          Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+          return VRC_WARNING;
+      }
+      if (sscanf(tok, "%lf", &tf) == 0){
+          Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+          return VRC_WARNING;
+      }else{
+          thee->rotDiff[molind] = tf;
+          thee->transDiff[molind] = 0.0;
+      }
+    } else{
+       thee->transDiff[molind] = 0.0;
+       thee->rotDiff[molind] = 0.0;
+    }
+
     return VRC_SUCCESS;
 }
 
@@ -477,11 +492,11 @@ VPUBLIC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
     }
 
     // Dynamics parsing
-    // else if (Vstring_strcasecmp(tok, "termcombine") == 0) {
-    //     return PBAMparm_parseTermcombine(thee, sock);
-    // }else if (Vstring_strcasecmp(tok, "diff") == 0) {
-    //     return PBAMparm_parseDiff(thee, sock);
-    // }
+    else if (Vstring_strcasecmp(tok, "termcombine") == 0) {
+        return PBAMparm_parseTermcombine(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "diff") == 0) {
+        return PBAMparm_parseDiff(thee, sock);
+    }
 
     else {
         Vnm_print(2, "parsePBAM:  Unrecognized keyword (%s)!\n", tok);

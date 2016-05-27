@@ -9,16 +9,17 @@ elec name comp_solv        # Toy charges
     bcfl mdh                # only supported boundary condition
     mol 2                   # Needed for apbs not pbam
     
-    runtype electrostatics  # Can be energyforce, electrostatics etc
-    runname elec_toy        # Output name for files created by program
+    runtype dynamics        # Can be energyforce, electrostatics etc
+    runname dyn_toy         # Output name for files created by program
     temp 298.15             # System temperature (K)
     pdie 4.0                # Solute dielectric                 
     sdie 78.0               # Solvent dielectric                
     salt 0.05               # Monovalent salt conc in M
 
-    dx toy.dx
-    3dmap  toy.map
-    grid2d toy.x0.dat x 0.0
+    termcombine and
+
+    diff 1 move 0.01 0.001
+    diff 2 stat
 
 end
 
