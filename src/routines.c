@@ -5186,17 +5186,39 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
   pbamIn.pbcType_ = parm->setpbcs;
 
   // Electrostatic stuff
+  pbamIn.gridPts_ = parm->gridpt;
+
   strncpy(pbamIn.map3D_, parm->map3dname, VMAX_ARGLEN);
 
-  for (int i=0; i<PBAMPARM_MAXWRITE; i++)
+  printf("From routine, gridct %d\n", parm->grid2Dct);
+  pbamIn.grid2Dct_ = parm->grid2Dct;
+  for (int i=0; i<pbamIn.grid2Dct_; i++)
   {
     strncpy(pbamIn.grid2D_[i], parm->grid2Dname[i], VMAX_ARGLEN); 
     strncpy(pbamIn.grid2Dax_[i], parm->grid2Dax[i], VMAX_ARGLEN); 
     pbamIn.grid2Dloc_[i] = parm->grid2Dloc[i];
   }
-  pbamIn.grid2Dct_ = parm->grid2Dct;
-
+  
   strncpy(pbamIn.dxname_, parm->dxname, VMAX_ARGLEN);
+
+  // Dynamics stuff
+  
+  // printf("From routine, %s\n", parm->termcombine);
+  // strncpy(pbamIn.termCombine_, parm->termcombine, VMAX_ARGLEN);
+
+  // for (int i=0; i<pbamIn.nmol_; i++)
+  // {
+  //   printf("This is my movetype: %s\n", parm->moveType[i]);
+  //   strncpy(pbamIn.moveType_[i], parm->moveType[i], VMAX_ARGLEN);
+  //   pbamIn.transDiff_[i] = parm->transDiff[i]; 
+  //   pbamIn.rotDiff_[i] = parm->rotDiff[i]; 
+  //   printf("This is mol: %d\t type: %s \t diff: %lf\t rot: %lf\n", 
+  //       i, pbamIn.moveType_[i], pbamIn.transDiff_[i], pbamIn.rotDiff_[i]);
+  // }
+  
+  // pbamIn. = parm->;
+  // pbamIn. = parm->;
+  // pbamIn. = parm->;
 
   // debug
   printPBAMStruct( pbamIn );
@@ -5204,9 +5226,6 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
   // Run the darn thing
   struct PBAMOutput pbamOut = 
      runPBAMWrapAPBS( pbamIn, molecules, nosh->nmol );
-
-  //Vnm_tprint( 1,"  Global net energy = %1.12E\n", geoflowOut.m_totalSolvation);
-  //Vnm_tprint( 1,"  Global net ELEC energy = %1.12E\n", geoflowOut.m_elecSolvation);
 
   Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
 

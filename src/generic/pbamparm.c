@@ -91,12 +91,18 @@ VPUBLIC Vrc_Codes PBAMparm_ctor2(PBAMparm *thee, PBAMparm_CalcType type) {
     thee->setrandorient = 0;
 
     thee->setpbcs = 0;
-    thee->pbcboxlen = 0.0;
+    thee->pbcboxlen = 1e15;
 
+    // Electrostatics
+    thee->gridpt = 15;
+    thee->setgridpt = 0;
     thee->set3dmap = 0;
     thee->setgrid2Dname = 0;
     thee->grid2Dct = 0;
     thee->setdxname = 0;
+
+    //Dynamics
+    // thee->settermcombine = 0;
 
     return VRC_SUCCESS;
 }
@@ -128,7 +134,6 @@ VPUBLIC Vrc_Codes PBAMparm_check(PBAMparm *thee) {
 
 
     /* Check type settings */
-    //if ((thee->type != GFCT_MANUAL)&& (thee->type != GFCT_AUTO)&& (thee->type != GFCT_NONE)) {
     if(thee->type != PBAMCT_AUTO) {
          Vnm_print(2,"PBAMparm_check: type not set");
          rc = VRC_FAILURE;
@@ -157,9 +162,14 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
     thee->setpbcs = parm->setpbcs;
     thee->pbcboxlen = parm->pbcboxlen;
 
+    // Electrostatic parts
+    thee->gridpt = parm->gridpt;
+    thee->setgridpt = parm->setgridpt;
     for (int i=0; i<VMAX_ARGLEN; i++) thee->map3dname[i] = parm->map3dname[i];
     thee->set3dmap = parm->set3dmap;
 
+
+    thee->grid2Dct = parm->grid2Dct;
     for (int i=0; i<PBAMPARM_MAXWRITE; i++)
     {
         for (int j=0; j<VMAX_ARGLEN; j++)
@@ -169,10 +179,15 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
         }
         thee->grid2Dloc[i] = parm->grid2Dloc[i];
     }
-    thee->set3dmap = parm->set3dmap;
 
     for (int i=0; i<VMAX_ARGLEN; i++) thee->dxname[i] = parm->dxname[i];
-    thee->set3dmap = parm->setdxname;
+    thee->setdxname = parm->setdxname;
+
+    // Dynamics parts
+    // for (int i=0; i<VMAX_ARGLEN; i++) thee->termcombine[i] = parm->termcombine[i];
+    // thee->settermcombine = parm->settermcombine;
+
+    
 }
 
 
@@ -231,7 +246,6 @@ VPRIVATE Vrc_Codes PBAMparm_parseRandorient(PBAMparm *thee, Vio *sock){
     return VRC_SUCCESS;
 }
 
-// TODO
 VPRIVATE Vrc_Codes PBAMparm_parsePBCS(PBAMparm *thee, Vio *sock){
     const char* name = "pbc";
     char tok[VMAX_BUFSIZE];
@@ -258,7 +272,25 @@ VPRIVATE Vrc_Codes PBAMparm_parsePBCS(PBAMparm *thee, Vio *sock){
     return VRC_SUCCESS;
 }
 
-// TODO
+VPRIVATE Vrc_Codes PBAMparm_parseGridPts(PBAMparm *thee, Vio *sock){
+    const char* name = "gridpts";
+    char tok[VMAX_BUFSIZE];
+    int td;
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+        Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+        return VRC_WARNING;
+    }
+    
+    if (sscanf(tok, "%d", &td) == 0){
+        Vnm_print(2, "NOsh:  Read non-integer (%s) while parsing %s keyword!\n", tok, name);
+        return VRC_WARNING;
+    }else{
+        thee->gridpt = td;
+    }
+    thee->setgridpt = 1;
+    return VRC_SUCCESS;
+}
+
 VPRIVATE Vrc_Codes PBAMparm_parse3Dmap(PBAMparm *thee, Vio *sock){
     const char* name = "3dmap";
     char tok[VMAX_BUFSIZE];
@@ -273,8 +305,6 @@ VPRIVATE Vrc_Codes PBAMparm_parse3Dmap(PBAMparm *thee, Vio *sock){
 
     return VRC_SUCCESS;
 }
-
-
 
 VPRIVATE Vrc_Codes PBAMparm_parseGrid2D(PBAMparm *thee, Vio *sock){
     const char* name = "grid2d";
@@ -293,7 +323,6 @@ VPRIVATE Vrc_Codes PBAMparm_parseGrid2D(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
     } else {
-        printf("This is my ax: %s\n", tok);
       strncpy(thee->grid2Dax[thee->grid2Dct], tok, VMAX_ARGLEN);
     }
 
@@ -323,7 +352,89 @@ VPRIVATE Vrc_Codes PBAMparm_parseDX(PBAMparm *thee, Vio *sock){
       strncpy(thee->dxname, tok, VMAX_ARGLEN);
       thee->setdxname=1;
     }
+    return VRC_SUCCESS;
+}
 
+VPRIVATE Vrc_Codes PBAMparm_parseTermcombine(PBAMparm *thee, Vio *sock){
+    const char* name = "termcombine";
+    char tok[VMAX_BUFSIZE];
+
+    // if(Vio_scanf(sock, "%s", tok) == 0) {
+    //   Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+    //   return VRC_WARNING;
+    // } else {
+    //   strncpy(thee->termcombine, tok, VMAX_ARGLEN);
+    //   thee->settermcombine=1;
+    // }
+    return VRC_SUCCESS;
+}
+
+VPRIVATE Vrc_Codes PBAMparm_parseDiff(PBAMparm *thee, Vio *sock){
+    const char* name = "diff";
+    char tok[VMAX_BUFSIZE];
+    int molind;
+    double tf;
+
+    // if(Vio_scanf(sock, "%s", tok) == 0) {
+    //     Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+    //     return VRC_WARNING;
+    // } 
+
+    // // looking for index
+    // if (sscanf(tok, "%d", &molind) == 0){
+    //     Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+    //     return VRC_WARNING;
+    // }
+    
+    // // looking for move type = move, stat, rot
+    // if(Vio_scanf(sock, "%s", tok) == 0) {
+    //     Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+    //     return VRC_WARNING;
+    // } else {
+    //   strncpy(thee->moveType[molind], tok, VMAX_ARGLEN);
+    // }
+
+    // if (strncmp(thee->moveType[molind], "move", 4) == 0)
+    // {
+    //   if(Vio_scanf(sock, "%s", tok) == 0) {
+    //       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+    //       return VRC_WARNING;
+    //   }
+    //   if (sscanf(tok, "%lf", &tf) == 0){
+    //       Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+    //       return VRC_WARNING;
+    //   }else{
+    //       thee->transDiff[molind] = tf;
+    //   }
+
+    //   // rot diffusion coeff
+    //   if(Vio_scanf(sock, "%s", tok) == 0) {
+    //       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+    //       return VRC_WARNING;
+    //   }
+    //   if (sscanf(tok, "%lf", &tf) == 0){
+    //       Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+    //       return VRC_WARNING;
+    //   }else{
+    //       thee->rotDiff[molind] = tf;
+    //   }
+    // } else if (strncmp(thee->moveType[molind], "rot", 3) == 0)
+    // {
+    //   if(Vio_scanf(sock, "%s", tok) == 0) {
+    //       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+    //       return VRC_WARNING;
+    //   }
+    //   if (sscanf(tok, "%lf", &tf) == 0){
+    //       Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+    //       return VRC_WARNING;
+    //   }else{
+    //       thee->rotDiff[molind] = tf;
+    //       thee->transDiff[molind] = 0.0;
+    //   }
+    // } else{
+    //    thee->transDiff[molind] = 0.0;
+    //    thee->rotDiff[molind] = 0.0;
+    // }
     return VRC_SUCCESS;
 }
 
@@ -341,6 +452,7 @@ VPUBLIC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
 
     Vnm_print(0, "PBAMparm_parseToken:  trying %s...\n", tok);
 
+    // General terms to parse
     if (Vstring_strcasecmp(tok, "salt") == 0) {
         return PBAMparm_parseSalt(thee, sock);
     }else if (Vstring_strcasecmp(tok, "runtype") == 0) {
@@ -351,13 +463,27 @@ VPUBLIC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
         return PBAMparm_parseRandorient(thee, sock);
     }else if (Vstring_strcasecmp(tok, "pbc") == 0) {
         return PBAMparm_parsePBCS(thee, sock);
+    }
+
+    // Electrostatic parsing
+    else if (Vstring_strcasecmp(tok, "gridpts") == 0) {
+        return PBAMparm_parseGridPts(thee, sock);
     }else if (Vstring_strcasecmp(tok, "3dmap") == 0) {
         return PBAMparm_parse3Dmap(thee, sock);
     }else if (Vstring_strcasecmp(tok, "grid2d") == 0) {
         return PBAMparm_parseGrid2D(thee, sock);
     }else if (Vstring_strcasecmp(tok, "dx") == 0) {
         return PBAMparm_parseDX(thee, sock);
-    }else {
+    }
+
+    // Dynamics parsing
+    // else if (Vstring_strcasecmp(tok, "termcombine") == 0) {
+    //     return PBAMparm_parseTermcombine(thee, sock);
+    // }else if (Vstring_strcasecmp(tok, "diff") == 0) {
+    //     return PBAMparm_parseDiff(thee, sock);
+    // }
+
+    else {
         Vnm_print(2, "parsePBAM:  Unrecognized keyword (%s)!\n", tok);
         return VRC_WARNING;
     }

@@ -74,6 +74,7 @@
  *  @ingroup PBAMparm
  */
 #define PBAMPARM_MAXWRITE 20
+#define PBAMPARM_MAXMOL 500
 
 /**
  * @brief  Calculation type
@@ -124,6 +125,13 @@ typedef struct sPBAMparm {
     double pbcboxlen;
     int setpbcs;
 
+    //
+    // ELECTROSTATICS
+    //
+    // For the grid, store gridpt
+    int gridpt;
+    int setgridpt;
+
     // For 3d map printing
     char map3dname[VMAX_ARGLEN];
     int set3dmap;
@@ -138,6 +146,17 @@ typedef struct sPBAMparm {
     // For dx
     char dxname[VMAX_ARGLEN];
     int setdxname;
+
+    //
+    // DYNAMICS
+    //
+    // char termcombine[VMAX_ARGLEN];
+    // int settermcombine;
+
+    // char moveType[PBAMPARM_MAXMOL][VMAX_ARGLEN];
+    // double transDiff[PBAMPARM_MAXMOL];
+    // double rotDiff[PBAMPARM_MAXMOL];
+
 
 
 } PBAMparm;
@@ -272,6 +291,34 @@ VPRIVATE Vrc_Codes PBAMparm_parseGrid2D(PBAMparm *thee, Vio *sock);
  * @param sock The stream from which parameter is taken
  */
 VPRIVATE Vrc_Codes PBAMparm_parseDX(PBAMparm *thee, Vio *sock);
+
+/**
+ * @brief Find Grid points and save them
+ * @ingroup PBAMparm
+ * @author
+ * @param thee PBAMparm object to be copied into
+ * @param sock The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBAMparm_parseGridPts(PBAMparm *thee, Vio *sock);
+
+/**
+ * @brief Find Termination logic and save it
+ * @ingroup PBAMparm
+ * @author
+ * @param thee PBAMparm object to be copied into
+ * @param sock The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBAMparm_parseTermcombine(PBAMparm *thee, Vio *sock);
+
+/**
+ * @brief Find diffusion coeffs for each molecule and save them
+ * @ingroup PBAMparm
+ * @author
+ * @param thee PBAMparm object to be copied into
+ * @param sock The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBAMparm_parseDiff(PBAMparm *thee, Vio *sock);
+
 
 
 
