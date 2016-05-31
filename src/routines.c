@@ -5177,9 +5177,8 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
   pbamIn.salt_ = parm->salt;
 
   // Runtype: can be energyforce, electrostatics etc
-  strncpy(pbamIn.runType_, parm->runtype, VMAX_ARGLEN);
-  strncpy(pbamIn.runName_, parm->runname, VMAX_ARGLEN);
-  printf("This is runtype: %s\n", pbamIn.runType_);
+  strncpy(pbamIn.runType_, parm->runtype, CHR_MAXLEN);
+  strncpy(pbamIn.runName_, parm->runname, CHR_MAXLEN);
 
   pbamIn.randOrient_ = parm->setrandorient;
 
@@ -5187,39 +5186,66 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
   pbamIn.pbcType_ = parm->setpbcs;
 
   // Electrostatic stuff
-  pbamIn.gridPts_ = parm->gridpt;
-  strncpy(pbamIn.map3D_, parm->map3dname, VMAX_ARGLEN);
+  if (parm->setgridpt) pbamIn.gridPts_ = parm->gridpt;
+  strncpy(pbamIn.map3D_, parm->map3dname, CHR_MAXLEN);
   pbamIn.grid2Dct_ = parm->grid2Dct;
   for (int i=0; i<pbamIn.grid2Dct_; i++)
   {
-    strncpy(pbamIn.grid2D_[i], parm->grid2Dname[i], VMAX_ARGLEN); 
-    strncpy(pbamIn.grid2Dax_[i], parm->grid2Dax[i], VMAX_ARGLEN); 
+    strncpy(pbamIn.grid2D_[i], parm->grid2Dname[i], CHR_MAXLEN); 
+    strncpy(pbamIn.grid2Dax_[i], parm->grid2Dax[i], CHR_MAXLEN); 
     pbamIn.grid2Dloc_[i] = parm->grid2Dloc[i];
   }
-  strncpy(pbamIn.dxname_, parm->dxname, VMAX_ARGLEN);
+  strncpy(pbamIn.dxname_, parm->dxname, CHR_MAXLEN);
 
   // Dynamics stuff  
-  strncpy(pbamIn.termCombine_, parm->termcombine, VMAX_ARGLEN);
+  pbamIn.ntraj_ = parm->ntraj;
+  strncpy(pbamIn.termCombine_, parm->termcombine, CHR_MAXLEN);
+
+  pbamIn.termct_ = parm->termct;
+  pbamIn.contct_ = parm->confilct;
 
   if (strncmp(pbamIn.runType_, "dynamics", 8)== 0)
   {
     if (pbamIn.nmol_ > parm->diffct)
     {
-      Vnm_tprint(2, "Error!  You need more diffusion information!\n");
+      Vnm_tprint(2, "You need more diffusion information!\n");
       return 0;
     }
 
     for (int i=0; i<pbamIn.nmol_; i++)
     {
-      strncpy(pbamIn.moveType_[i], parm->moveType[i], VMAX_ARGLEN);
+      if (parm->xyzct[i] <  parm->ntraj)
+      {
+        Vnm_tprint(2, "For molecule %d, you are missing trajectory!\n", i+1);
+        return 0;
+      } else {
+        for (int j=0; j<pbamIn.ntraj_; j++)
+        {
+          strncpy(pbamIn.xyzfil_[i][j], parm->xyzfil[i][j], CHR_MAXLEN);
+        }
+      }
+    }
+
+    for (int i=0; i<pbamIn.nmol_; i++)
+    {
+      strncpy(pbamIn.moveType_[i], parm->moveType[i], CHR_MAXLEN);
       pbamIn.transDiff_[i] = parm->transDiff[i]; 
       pbamIn.rotDiff_[i] = parm->rotDiff[i]; 
     }
+
+    for (int i=0; i<pbamIn.termct_; i++)
+    {
+        strncpy(pbamIn.termnam_[i], parm->termnam[i], CHR_MAXLEN);
+        pbamIn.termnu_[i][0] = parm->termnu[i][0];
+        pbamIn.termval_[i] = parm->termVal[i];  
+    }
+
+    for (int i=0; i<pbamIn.contct_; i++)
+    {
+        strncpy(pbamIn.confil_[i], parm->confil[i], CHR_MAXLEN);
+    }
+
   }
-  
-  // pbamIn. = parm->;
-  // pbamIn. = parm->;
-  // pbamIn. = parm->;
 
   // debug
   printPBAMStruct( pbamIn );

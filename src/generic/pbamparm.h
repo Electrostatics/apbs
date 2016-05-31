@@ -73,8 +73,9 @@
  /** @brief   Number of things that can be written out in a single calculation
  *  @ingroup PBAMparm
  */
-#define PBAMPARM_MAXWRITE 20
-#define PBAMPARM_MAXMOL 200
+#define CHR_MAXLEN 1000
+#define PBAMPARM_MAXWRITE 15
+#define PBAMPARM_MAXMOL 150
 
 /**
  * @brief  Calculation type
@@ -111,11 +112,11 @@ typedef struct sPBAMparm {
     int setsalt;
 
     // This is the type of run you want
-    char runtype[VMAX_ARGLEN];
+    char runtype[CHR_MAXLEN];
     int setruntype;
 
     // This is the name for output files
-    char runname[VMAX_ARGLEN];
+    char runname[CHR_MAXLEN];
     int setrunname;
 
     // For setting random orientation of molecules
@@ -133,32 +134,47 @@ typedef struct sPBAMparm {
     int setgridpt;
 
     // For 3d map printing
-    char map3dname[VMAX_ARGLEN];
+    char map3dname[CHR_MAXLEN];
     int set3dmap;
 
     // For 2D
-    char grid2Dname[PBAMPARM_MAXWRITE][VMAX_ARGLEN];
-    char grid2Dax[PBAMPARM_MAXWRITE][VMAX_ARGLEN];
+    char grid2Dname[PBAMPARM_MAXWRITE][CHR_MAXLEN];
+    char grid2Dax[PBAMPARM_MAXWRITE][CHR_MAXLEN];
     double grid2Dloc[PBAMPARM_MAXWRITE];
     int grid2Dct;
     int setgrid2Dname;
 
     // For dx
-    char dxname[VMAX_ARGLEN];
+    char dxname[CHR_MAXLEN];
     int setdxname;
 
     //
     // DYNAMICS
     //
-    char termcombine[VMAX_ARGLEN];
+    int ntraj;
+    int setntraj;
+
+    char termcombine[CHR_MAXLEN];
     int settermcombine;
 
     int diffct;
-    char moveType[PBAMPARM_MAXMOL][VMAX_ARGLEN];
+    char moveType[PBAMPARM_MAXMOL][CHR_MAXLEN];
     double transDiff[PBAMPARM_MAXMOL];
     double rotDiff[PBAMPARM_MAXMOL];
 
+    int termct;
+    int setterm;
 
+    char termnam[PBAMPARM_MAXWRITE][CHR_MAXLEN];
+    int termnu[PBAMPARM_MAXWRITE][1];
+    double termVal[PBAMPARM_MAXWRITE];
+    char confil[PBAMPARM_MAXWRITE][CHR_MAXLEN];
+    double conpad[PBAMPARM_MAXWRITE];
+    int confilct;
+
+    int setxyz;
+    int xyzct[PBAMPARM_MAXMOL];
+    char xyzfil[PBAMPARM_MAXMOL][PBAMPARM_MAXWRITE][CHR_MAXLEN];
 
 } PBAMparm;
 
@@ -319,6 +335,15 @@ VPRIVATE Vrc_Codes PBAMparm_parseTermcombine(PBAMparm *thee, Vio *sock);
  * @param sock The stream from which parameter is taken
  */
 VPRIVATE Vrc_Codes PBAMparm_parseDiff(PBAMparm *thee, Vio *sock);
+
+/**
+ * @brief Find xyz files for each molecule for each traj and save them
+ * @ingroup PBAMparm
+ * @author
+ * @param thee PBAMparm object to be copied into
+ * @param sock The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBAMparm_parseXYZ(PBAMparm *thee, Vio *sock);
 
 
 
