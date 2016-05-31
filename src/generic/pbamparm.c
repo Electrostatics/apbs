@@ -95,6 +95,7 @@ VPUBLIC Vrc_Codes PBAMparm_ctor2(PBAMparm *thee, PBAMparm_CalcType type) {
 
     // Electrostatics
     thee->gridpt = 15;
+    printf("Found a pts flag in ctor: %d\n", thee->gridpt);
     thee->setgridpt = 0;
     thee->set3dmap = 0;
     thee->setgrid2Dname = 0;
@@ -102,8 +103,17 @@ VPUBLIC Vrc_Codes PBAMparm_ctor2(PBAMparm *thee, PBAMparm_CalcType type) {
     thee->setdxname = 0;
 
     //Dynamics
+    thee->ntraj = 1;
+    thee->setntraj = 0;
+
     thee->settermcombine = 0;
     thee->diffct = 0;
+
+    thee->termct = 0;
+    thee->setterm = 0;
+
+    thee->setxyz = 0;
+    for (int i = 0; i<PBAMPARM_MAXMOL; i++) thee->xyzct[i] = 0;
 
     return VRC_SUCCESS;
 }
@@ -152,10 +162,10 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
 
     thee->salt = parm->salt;
     thee->setsalt = parm->setsalt;
-    for (int i=0; i<VMAX_ARGLEN; i++) thee->runtype[i] = parm->runtype[i];
+    for (int i=0; i<CHR_MAXLEN; i++) thee->runtype[i] = parm->runtype[i];
     thee->setruntype = parm->setruntype;
 
-    for (int i=0; i<VMAX_ARGLEN; i++) thee->runname[i] = parm->runname[i];
+    for (int i=0; i<CHR_MAXLEN; i++) thee->runname[i] = parm->runname[i];
     thee->setrunname = parm->setrunname;
 
     thee->setrandorient = parm->setrandorient;
@@ -166,14 +176,14 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
     // Electrostatic parts
     thee->gridpt = parm->gridpt;
     thee->setgridpt = parm->setgridpt;
-    for (int i=0; i<VMAX_ARGLEN; i++) thee->map3dname[i] = parm->map3dname[i];
+    for (int i=0; i<CHR_MAXLEN; i++) thee->map3dname[i] = parm->map3dname[i];
     thee->set3dmap = parm->set3dmap;
 
 
     thee->grid2Dct = parm->grid2Dct;
     for (int i=0; i<PBAMPARM_MAXWRITE; i++)
     {
-        for (int j=0; j<VMAX_ARGLEN; j++)
+        for (int j=0; j<CHR_MAXLEN; j++)
         { 
             thee->grid2Dname[i][j] = parm->grid2Dname[i][j];
             thee->grid2Dax[i][j] = parm->grid2Dax[i][j];
@@ -181,23 +191,54 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
         thee->grid2Dloc[i] = parm->grid2Dloc[i];
     }
 
-    for (int i=0; i<VMAX_ARGLEN; i++) thee->dxname[i] = parm->dxname[i];
+    for (int i=0; i<CHR_MAXLEN; i++) thee->dxname[i] = parm->dxname[i];
     thee->setdxname = parm->setdxname;
 
     // Dynamics parts
-    for (int i=0; i<VMAX_ARGLEN; i++) thee->termcombine[i] = parm->termcombine[i];
+    thee->ntraj = parm->ntraj;
+    thee->setntraj = parm->setntraj;
+
+    for (int i=0; i<CHR_MAXLEN; i++) thee->termcombine[i] = parm->termcombine[i];
     thee->settermcombine = parm->settermcombine;
 
     thee->diffct = parm->diffct;
 
     for (int i=0; i<PBAMPARM_MAXMOL; i++)
     {
-        for (int j=0; j<VMAX_ARGLEN; j++)
+        for (int j=0; j<CHR_MAXLEN; j++)
         { 
             thee->moveType[i][j] = parm->moveType[i][j];
         }
         thee->transDiff[i] = parm->transDiff[i];
         thee->rotDiff[i] = parm->rotDiff[i];
+    }
+
+    thee->termct = parm->termct;
+    thee->setterm = parm->setterm;
+    thee->confilct = parm->confilct;
+
+    for (int i=0; i<PBAMPARM_MAXWRITE; i++)
+    {
+        for (int j=0; j<CHR_MAXLEN; j++)
+        { 
+            thee->termnam[i][j] = parm->termnam[i][j];
+            thee->confil[i][j] = parm->confil[i][j];
+        }
+        thee->termVal[i] = parm->termVal[i];
+        thee->termnu[i][0] = parm->termnu[i][0];
+    }
+
+    thee->setxyz = parm->setxyz;
+    for (int i = 0; i<PBAMPARM_MAXMOL; i++) 
+    {
+        thee->xyzct[i] = parm->xyzct[i];
+        for (int j = 0; j<PBAMPARM_MAXWRITE; j++) 
+        {
+            for (int k = 0; k<CHR_MAXLEN; k++) 
+            {
+                thee->xyzfil[i][j][k] = parm->xyzfil[i][j][k];
+            }
+        }
     }
 
 }
@@ -297,6 +338,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseGridPts(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "NOsh:  Read non-integer (%s) while parsing %s keyword!\n", tok, name);
         return VRC_WARNING;
     }else{
+        printf("Found a pts flag in parse: %d\n", td);
         thee->gridpt = td;
     }
     thee->setgridpt = 1;
@@ -381,6 +423,25 @@ VPRIVATE Vrc_Codes PBAMparm_parseTermcombine(PBAMparm *thee, Vio *sock){
     return VRC_SUCCESS;
 }
 
+VPRIVATE Vrc_Codes PBAMparm_parseNtraj(PBAMparm *thee, Vio *sock){
+    const char* name = "ntraj";
+    char tok[VMAX_BUFSIZE];
+    int td;
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+        Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+        return VRC_WARNING;
+    }
+    
+    if (sscanf(tok, "%d", &td) == 0){
+        Vnm_print(2, "NOsh:  Read non-integer (%s) while parsing %s keyword!\n", tok, name);
+        return VRC_WARNING;
+    }else{
+        thee->ntraj = td;
+    }
+    thee->setntraj = 1;
+    return VRC_SUCCESS;
+}
+
 VPRIVATE Vrc_Codes PBAMparm_parseDiff(PBAMparm *thee, Vio *sock){
     const char* name = "diff";
     char tok[VMAX_BUFSIZE];
@@ -394,7 +455,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseDiff(PBAMparm *thee, Vio *sock){
 
     // // looking for index
     if (sscanf(tok, "%d", &molind) == 0){
-        Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+        Vnm_print(2, "NOsh:  Read non-int (%s) while parsing %s keyword!\n", tok, name);
         return VRC_WARNING;
     }
     
@@ -453,6 +514,115 @@ VPRIVATE Vrc_Codes PBAMparm_parseDiff(PBAMparm *thee, Vio *sock){
     return VRC_SUCCESS;
 }
 
+VPRIVATE Vrc_Codes PBAMparm_parseTerm(PBAMparm *thee, Vio *sock){
+    const char* name = "term";
+    char tok[VMAX_BUFSIZE];
+    double tf;
+    int td;
+
+    // looking for term name
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+        Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+        return VRC_WARNING;
+    }else {
+       strncpy(thee->termnam[thee->termct], tok, VMAX_ARGLEN);
+    }
+
+    if (strncmp(thee->termnam[thee->termct], "contact", 7) == 0)
+    {
+      if(Vio_scanf(sock, "%s", tok) == 0) {
+          Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+          return VRC_WARNING;
+      }else{
+          strncpy(thee->confil[thee->confilct], tok, VMAX_ARGLEN);
+      }
+
+      if(Vio_scanf(sock, "%s", tok) == 0) {
+          Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+          return VRC_WARNING;
+      }
+      if (sscanf(tok, "%lf", &tf) == 0){
+          Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+          return VRC_WARNING;
+      }else
+      {
+          thee->termVal[thee->termct] = tf;
+          thee->termnu[thee->termct][0] = 0;
+          thee->confilct += 1;
+      }
+    } else if (strncmp(thee->termnam[thee->termct], "time", 4) == 0)
+    {
+      if(Vio_scanf(sock, "%s", tok) == 0) {
+          Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+          return VRC_WARNING;
+      } 
+      if (sscanf(tok, "%lf", &tf) == 0){
+          Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+          return VRC_WARNING;
+      }else{
+          thee->termVal[thee->termct] = tf;
+          thee->termnu[thee->termct][0] = 0;
+      }
+    } else
+    {
+      if(Vio_scanf(sock, "%s", tok) == 0) {
+          Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+          return VRC_WARNING;
+      }
+      if (sscanf(tok, "%lf", &tf) == 0){
+          Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+          return VRC_WARNING;
+      }else{
+          thee->termVal[thee->termct] = tf;
+      }
+
+      if(Vio_scanf(sock, "%s", tok) == 0) {
+          Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+          return VRC_WARNING;
+      }
+      if (sscanf(tok, "%d", &td) == 0){
+          Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+          return VRC_WARNING;
+      }else{
+          thee->termnu[thee->termct][0] = td-1;
+      }
+    }
+
+    thee->setterm = 1;    
+    thee->termct += 1;
+    return VRC_SUCCESS;
+}
+
+VPRIVATE Vrc_Codes PBAMparm_parseXYZ(PBAMparm *thee, Vio *sock){
+    const char* name = "xyz";
+    char tok[VMAX_BUFSIZE];
+    int td, mol;
+
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+        Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+        return VRC_WARNING;
+    } 
+
+    // // looking for index
+    if (sscanf(tok, "%d", &td) == 0){
+        Vnm_print(2, "NOsh:  Read non-int (%s) while parsing %s keyword!\n", tok, name);
+        return VRC_WARNING;
+    } else{
+        printf("This is my mol in parseXYZ: %d", td);
+        mol = td-1;
+    }
+    
+    // looking for move type = move, stat, rot
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+        Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+        return VRC_WARNING;
+    } else {
+       strncpy(thee->xyzfil[mol][thee->xyzct[mol]], tok, VMAX_ARGLEN);
+      thee->xyzct[mol] += 1;
+    }
+    return VRC_SUCCESS;
+}
+
 VPUBLIC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
   Vio *sock) {
 
@@ -492,10 +662,16 @@ VPUBLIC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
     }
 
     // Dynamics parsing
-    else if (Vstring_strcasecmp(tok, "termcombine") == 0) {
+    else if (Vstring_strcasecmp(tok, "ntraj") == 0) {
+        return PBAMparm_parseNtraj(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "termcombine") == 0) {
         return PBAMparm_parseTermcombine(thee, sock);
     }else if (Vstring_strcasecmp(tok, "diff") == 0) {
         return PBAMparm_parseDiff(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "term") == 0) {
+        return PBAMparm_parseTerm(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "xyz") == 0) {
+        return PBAMparm_parseXYZ(thee, sock);
     }
 
     else {

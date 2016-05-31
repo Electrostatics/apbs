@@ -16,10 +16,23 @@ elec name comp_solv        # Toy charges
     sdie 78.0               # Solvent dielectric                
     salt 0.05               # Monovalent salt conc in M
 
-    termcombine and
+    pbc 100.0
+
+    termcombine or
+    term time 550.0
+    term r>= 81.8 1
+    ntraj 3
 
     diff 1 move 0.01 0.001
     diff 2 stat
+
+    xyz 1 pos_1.xyz
+    xyz 1 pos_2.xyz
+    xyz 1 pos_3.xyz
+    
+    xyz 2 neg_1.xyz
+    xyz 2 neg_2.xyz
+    xyz 2 neg_3.xyz
 
 end
 
