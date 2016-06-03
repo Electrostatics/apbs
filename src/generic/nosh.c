@@ -2955,9 +2955,7 @@ VPUBLIC int NOsh_parsePBAM(
         Vnm_print(2, "NOsh:  Got pointer to NULL pbeparm object!\n");
         return 0;
     }
-
     Vnm_print(0, "NOsh_parsePBAM: Parsing parameters for PBAM calculation\n");
-
 
     /* Start snarfing tokens from the input stream */
     rc = 1;
@@ -2995,10 +2993,14 @@ VPUBLIC int NOsh_parsePBAM(
         }
     }
 
-    pbeparm->setsrfm=1; //TODO: verify what these are?
-    pbeparm->srad=0.0;
+    pbeparm->setsrfm=1; 
     pbeparm->setsrad=1;
-    pbeparm->settemp=1;
+    pbeparm->settemp=1; // do need temp, but have default, incase
+    pbeparm->setmolid=1; // for unneeded mol flag
+    pbeparm->setpbetype=1; // unneeded pbe type
+    pbeparm->setbcfl=1;  // unneeded bcfl
+    pbeparm->setsdens=1;
+
 
     /* Handle various errors arising in the token-snarfing loop -- these all
         just result in simple returns right now */
