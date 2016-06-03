@@ -4,10 +4,6 @@ read
 end
 elec name comp_solv        # Toy charges
     pbam-auto
-
-    lpbe                    # Needed for apbs not pbam
-    bcfl mdh                # only supported boundary condition
-    mol 2                   # Needed for apbs not pbam
     
     runtype energyforce     # Can be energyforce, electrostatics etc
     runname enfor_test      # Output name for files created by program

@@ -271,7 +271,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseRunType(PBAMparm *thee, Vio *sock){
       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
       return VRC_WARNING;
     } else {
-      strncpy(thee->runtype, tok, VMAX_ARGLEN);
+      strncpy(thee->runtype, tok, CHR_MAXLEN);
       thee->setruntype=1;
     }
 
@@ -286,7 +286,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseRunName(PBAMparm *thee, Vio *sock){
       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
       return VRC_WARNING;
     } else {
-      strncpy(thee->runname, tok, VMAX_ARGLEN);
+      strncpy(thee->runname, tok, CHR_MAXLEN);
       thee->setrunname=1;
     }
 
@@ -353,7 +353,7 @@ VPRIVATE Vrc_Codes PBAMparm_parse3Dmap(PBAMparm *thee, Vio *sock){
       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
       return VRC_WARNING;
     } else {
-      strncpy(thee->map3dname, tok, VMAX_ARGLEN);
+      strncpy(thee->map3dname, tok, CHR_MAXLEN);
       thee->set3dmap=1;
     }
 
@@ -369,7 +369,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseGrid2D(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
     } else {
-      strncpy(thee->grid2Dname[thee->grid2Dct], tok, VMAX_ARGLEN);
+      strncpy(thee->grid2Dname[thee->grid2Dct], tok, CHR_MAXLEN);
       thee->setgrid2Dname=1;
     }
     
@@ -377,7 +377,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseGrid2D(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
     } else {
-      strncpy(thee->grid2Dax[thee->grid2Dct], tok, VMAX_ARGLEN);
+      strncpy(thee->grid2Dax[thee->grid2Dct], tok, CHR_MAXLEN);
     }
 
     if(Vio_scanf(sock, "%s", tok) == 0) {
@@ -403,7 +403,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseDX(PBAMparm *thee, Vio *sock){
       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
       return VRC_WARNING;
     } else {
-      strncpy(thee->dxname, tok, VMAX_ARGLEN);
+      strncpy(thee->dxname, tok, CHR_MAXLEN);
       thee->setdxname=1;
     }
     return VRC_SUCCESS;
@@ -417,7 +417,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseTermcombine(PBAMparm *thee, Vio *sock){
       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
       return VRC_WARNING;
     } else {
-      strncpy(thee->termcombine, tok, VMAX_ARGLEN);
+      strncpy(thee->termcombine, tok, CHR_MAXLEN);
       thee->settermcombine=1;
     }
     return VRC_SUCCESS;
@@ -465,7 +465,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseDiff(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
     } else {
-       strncpy(thee->moveType[molind], tok, VMAX_ARGLEN);
+       strncpy(thee->moveType[molind], tok, CHR_MAXLEN);
       thee->diffct += 1;
     }
 
@@ -525,7 +525,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseTerm(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
     }else {
-       strncpy(thee->termnam[thee->termct], tok, VMAX_ARGLEN);
+       strncpy(thee->termnam[thee->termct], tok, CHR_MAXLEN);
     }
 
     if (strncmp(thee->termnam[thee->termct], "contact", 7) == 0)
@@ -534,7 +534,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseTerm(PBAMparm *thee, Vio *sock){
           Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
           return VRC_WARNING;
       }else{
-          strncpy(thee->confil[thee->confilct], tok, VMAX_ARGLEN);
+          strncpy(thee->confil[thee->confilct], tok, CHR_MAXLEN);
       }
 
       if(Vio_scanf(sock, "%s", tok) == 0) {
@@ -617,7 +617,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseXYZ(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
     } else {
-       strncpy(thee->xyzfil[mol][thee->xyzct[mol]], tok, VMAX_ARGLEN);
+       strncpy(thee->xyzfil[mol][thee->xyzct[mol]], tok, CHR_MAXLEN);
       thee->xyzct[mol] += 1;
     }
     return VRC_SUCCESS;

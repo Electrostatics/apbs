@@ -5163,7 +5163,7 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
 
   // change any of the parameters you want...
   pbamIn.temp_ =  pbeparm->temp; 
-  if (abs(pbamIn.temp_-0.0) < 1e-3)
+  if (fabs(pbamIn.temp_-0.0) < 1e-3)
   {
     printf("No temperature specified. Setting to 298.15K\n");
     pbamIn.temp_ = 298.15;

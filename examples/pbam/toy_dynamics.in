@@ -5,10 +5,6 @@ end
 elec name comp_solv        # Toy charges
     pbam-auto
 
-    lpbe                    # Needed for apbs not pbam
-    bcfl mdh                # only supported boundary condition
-    mol 2                   # Needed for apbs not pbam
-    
     runtype dynamics        # Can be energyforce, electrostatics etc
     runname dyn_toy         # Output name for files created by program
     temp 298.15             # System temperature (K)
