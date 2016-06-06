@@ -29,6 +29,7 @@ cmake_minimum_required (VERSION 2.8.7)
 # [ ] Windows 7 with Mingw
 ################################################################################
 
+set( CMAKE_VERBOSE_MAKEFILE true)
 
 
 ################################################################################
@@ -402,16 +403,17 @@ if(ENABLE_PBAM)
   add_definitions(-DPBAM_APBS)
   ExternalProject_Add(
     pbam
-    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am/pbam
+    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
     CMAKE_ARGS -DENABLE_PBAM_APBS=ON
     BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
     INSTALL_COMMAND ""
   )
   ExternalProject_Get_Property(pbam binary_dir)
   add_definitions(-DENABLE_PBAM)
-  list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
+  list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
   list(APPEND APBS_LIBS stdc++ PBAMLib)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
+  include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
 endif()
 
 ################################################################################
