@@ -32,7 +32,7 @@ int readin(char fname[16], char density[16])
   //char fname[16],density[16];
   char fname_tp[256];
 
-  int i,j,k,i1,i2,i3,j1,j2,j3,ii,jj,kk,namelength=4,nfacenew,ichanged;
+  int i,j,k,i1,i2,i3,j1,j2,j3,ii,jj,kk,namelength=4,nfacenew,ichanged,ierr;
   double den,prob_rds,a1,a2,a3,b1,b2,b3,a_norm,r0_norm,v0_norm;
   double r0[3],v0[3],v[3][3],r[3][3];
   int    idx[3],jface[3],iface[3];
@@ -40,6 +40,8 @@ int readin(char fname[16], char density[16])
   double temp_x,temp_q,tchg,tpos[3],dist_local,area_local;
   double cos_theta,G0,tp1,G1,r_s[3];
   double xx[3],yy[3];
+
+  extern double **Make2DIntArray(), **Make2DDoubleArray();
 
   /*read in vertices*/
 
@@ -50,8 +52,8 @@ int readin(char fname[16], char density[16])
   sprintf(fname_tp,"%s%s.xyzr",fpath,fname);
   wfp=fopen(fname_tp,"w");
 
-  while(fscanf(fp,"%s %s %s %s %s %lf %lf %lf %lf %lf",&c1,&c2,&c3,
-               &c4,&c5,&a1,&a2,&a3,&b1,&b2) != EOF){
+  while(fscanf(fp,"%s %s %s %s %s %lf %lf %lf %lf %lf",c1,c2,c3,
+               c4,c5,&a1,&a2,&a3,&b1,&b2) != EOF){
     fprintf(wfp,"%f %f %f %f\n",a1,a2,a3,b2);
   }
   fclose(fp);
@@ -61,7 +63,7 @@ int readin(char fname[16], char density[16])
   sprintf(fname_tp,"msms -if %s%s.xyzr -prob 1.4 -dens %s -of %s%s ",
           fpath,fname,density,fpath,fname);
   printf("%s\n",fname_tp);
-  system(fname_tp);
+  ierr=system(fname_tp);
 
   /* read in vert */
   sprintf(fname_tp, "%s%s.vert",fpath,fname);	//or use "strcat(fname_tp,".vert")"
@@ -73,7 +75,7 @@ int readin(char fname[16], char density[16])
     while (c=getc(fp)!='\n'){
     }
   }
-  fscanf(fp,"%d %d %lf %lf ",&nspt,&natm,&den,&prob_rds);
+  ierr=fscanf(fp,"%d %d %lf %lf ",&nspt,&natm,&den,&prob_rds);
   printf("nspt=%d, natm=%d, den=%lf, prob=%lf\n", nspt,natm,den,prob_rds);
 
   /*allocate variables for vertices file*/
@@ -82,7 +84,7 @@ int readin(char fname[16], char density[16])
   snrm=Make2DDoubleArray(3,nspt,"snrm");
 
   for (i=0;i<=nspt-1;i++){
-    fscanf(fp,"%lf %lf %lf %lf %lf %lf %d %d %d",&a1,&a2,&a3,&b1,&b2,&b3,&i1,&i2,&i3);
+    ierr=fscanf(fp,"%lf %lf %lf %lf %lf %lf %d %d %d",&a1,&a2,&a3,&b1,&b2,&b3,&i1,&i2,&i3);
 
   /*radial projection to improve msms accuracy, ONLY FOR SPHERE!!!!!!!!
   a_norm=sqrt(a1*a1+a2*a2+a3*a3);
@@ -114,14 +116,14 @@ int readin(char fname[16], char density[16])
     while (c=getc(fp)!='\n'){
     }
   }
-  fscanf(fp,"%d %d %lf %lf ",&nface,&natm,&den,&prob_rds);
+  ierr=fscanf(fp,"%d %d %lf %lf ",&nface,&natm,&den,&prob_rds);
   printf("nface=%d, natm=%d, den=%lf, prob=%lf\n", nface,natm,den,prob_rds);
   extr_f=Make2DIntArray(2,nface,"extr_f");
   face=Make2DIntArray(3,nface,"face");
 
 
   for (i=0;i<=nface-1;i++){
-    fscanf(fp,"%d %d %d %d %d",&j1,&j2,&j3,&i1,&i2);
+    ierr=fscanf(fp,"%d %d %d %d %d",&j1,&j2,&j3,&i1,&i2);
     face[0][i]=j1;
     face[1][i]=j2;
     face[2][i]=j3;
@@ -143,7 +145,7 @@ int readin(char fname[16], char density[16])
   atmpos=Make2DDoubleArray(3,natm,"atmpos");
 
   for (i=0;i<=natm-1;i++){
-    fscanf(fp,"%lf %lf %lf %lf ",&a1,&a2,&a3,&b1);
+    ierr=fscanf(fp,"%lf %lf %lf %lf ",&a1,&a2,&a3,&b1);
     atmpos[0][i]=a1;
     atmpos[1][i]=a2;
     atmpos[2][i]=a3;
@@ -166,8 +168,8 @@ int readin(char fname[16], char density[16])
   }
 
   for (i=0;i<=nchr-1;i++){
-    fscanf(fp,"%s %s %s %s %s %lf %lf %lf %lf %lf",&c1,&c2,&c3,
-           &c4,&c5,&a1,&a2,&a3,&b1,&b2);
+    ierr=fscanf(fp,"%s %s %s %s %s %lf %lf %lf %lf %lf",c1,c2,c3,
+           c4,c5,&a1,&a2,&a3,&b1,&b2);
     chrpos[3*i]=a1;
     chrpos[3*i+1]=a2;
     chrpos[3*i+2]=a3;
@@ -285,11 +287,11 @@ int readin(char fname[16], char density[16])
   printf("total area = %.17f\n",sum);
 
   sprintf(fname_tp,"rm %s%s.xyzr",fpath,fname);
-  system(fname_tp);
+  ierr=system(fname_tp);
   sprintf(fname_tp,"rm %s%s.vert",fpath,fname);
-  system(fname_tp);
+  ierr=system(fname_tp);
   sprintf(fname_tp,"rm %s%s.face",fpath,fname);
-  system(fname_tp);
+  ierr=system(fname_tp);
 
   return 0;
 

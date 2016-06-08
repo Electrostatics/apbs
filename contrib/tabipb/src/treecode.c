@@ -30,6 +30,9 @@ int treecode_initialization(int main_order,int main_maxparnode,double main_theta
   double *temp_a, *temp_b;
   double * temp_q;
 
+  extern int setup();
+  extern int create_tree();
+
   printf("Initialize treecode~\n");
   /*  */
   numpars=nface;
@@ -188,7 +191,7 @@ int treecode_initialization(int main_order,int main_maxparnode,double main_theta
   troot = (tnode*)malloc(1*sizeof(tnode));
   printf("Creating tree for %d particles with max %d per node\n",numpars,maxparnode);
 
-  create_tree(troot,0,numpars-1,xyzminmax,level); 
+  create_tree(troot,0,numpars-1,xyzminmax,level);
 
   for (i=0;i<numpars;i++){
     temp_a[i] = tr_area[i];
@@ -265,7 +268,7 @@ int setup(double* x,double* y,double* z,double* q,int numpars,
 /* SETUP allocates and initializes arrays needed for the Taylor expansion.
  Also, global variables are set and the Cartesian coordinates of
  the smallest box containing the particles is determined. The particle
- postions and charges are copied so that they can be restored upon exit.*/  
+ postions and charges are copied so that they can be restored upon exit.*/
   int err,i,j,k;
   double t1;
 
@@ -370,7 +373,7 @@ int setup(double* x,double* y,double* z,double* q,int numpars,
 printf("%f,%f,%f,%f,%f,%f\n",xyzminmax[0],xyzminmax[1],xyzminmax[2],
        xyzminmax[3],xyzminmax[4],xyzminmax[5]);
 
-  orderarr = (double*)calloc(numpars, sizeof(double));
+  orderarr = (int*)calloc(numpars, sizeof(int));
   if (orderarr == NULL){
     fprintf(stderr, "setup error: orderarr empty data array\n");
     return 1;
@@ -394,6 +397,8 @@ int create_tree(tnode* p,int ibeg,int iend,double xyzmm[6],int level){
   double xyzmms[6][8];
   int i,j,limin,limax,err,loclev,numposchild;
   double lxyzmm[6];
+
+  extern int partition_8();
 
 /* set node fields: number of particles, exist_ms and xyz bounds */
   p->numpar=iend-ibeg+1;
@@ -502,12 +507,14 @@ int partition_8(double xyzmms[6][8],double xl,double yl,double zl,double lmax,
  * resulting aspect ratio is not too large. This avoids the creation of
  * "narrow" boxes in which Talyor expansions may become inefficient.
  * On exit the INTEGER array IND (dimension 8 x 2) contains
- * the indice limits of each new box (node) and NUMPOSCHILD the number 
+ * the indice limits of each new box (node) and NUMPOSCHILD the number
  * of possible children.  If IND(J,1) > IND(J,2) for a given J this indicates
  * that box J is empty.*/
   int temp_ind,i,j;
   double critlen;
   int numposchild;
+
+extern int partition();
 
   numposchild = 1;
   critlen = lmax/sqrt(2.0);
@@ -558,8 +565,8 @@ int partition_8(double xyzmms[6][8],double xl,double yl,double zl,double lmax,
 int partition(double *a,double *b,double *c,double *q,int *indarr,int ibeg,
               int iend,double val,int numpars){
 /* PARTITION determines the index MIDIND, after partitioning
- * in place the  arrays A,B,C and Q,  such that 
- * A(IBEG:MIDIND) <= VAL and  A(MIDIND+1:IEND) > VAL. 
+ * in place the  arrays A,B,C and Q,  such that
+ * A(IBEG:MIDIND) <= VAL and  A(MIDIND+1:IEND) > VAL.
  * If on entry IBEG > IEND or  A(IBEG:IEND) > VAL then MIDIND
  * is returned as IBEG-1.  */
   double ta,tb,tc,tq;
@@ -567,7 +574,7 @@ int partition(double *a,double *b,double *c,double *q,int *indarr,int ibeg,
   int midind;
 
   if (ibeg<iend){
-/* temporarily store IBEG entries and set A(IBEG)=VAL for 
+/* temporarily store IBEG entries and set A(IBEG)=VAL for
  * the partitoning algorithm.  */
     ta=a[ibeg];
     tb=b[ibeg];
@@ -626,6 +633,8 @@ int *matvec(double *alpha, double *tpoten_old, double *beta, double *tpoten){
   double time1, time2, tempq[2][16];
   double pre1, pre2;
   double peng[2],peng_old[2];
+
+  extern int pb_kernel(), comp_ms_all(), compp_tree(), remove_mmt();
 
   pb_kernel(tpoten_old);
 
@@ -719,6 +728,8 @@ int comp_ms_all(tnode *p, int ifirst){
   int k1,k2,k3;
   double dx,dy,dz,tx,ty,tz;
 
+  extern int comp_ms();
+
   if (p->exist_ms == 0 && ifirst == 0){
     p->ms = (double****)calloc(16, sizeof(double***));
     for (i=0;i<16;i++){
@@ -744,7 +755,7 @@ int comp_ms_all(tnode *p, int ifirst){
 }
 /********************************************************/
 int comp_ms(tnode *p){
-/* COMP_MS computes the moments for node P needed in the Taylor 
+/* COMP_MS computes the moments for node P needed in the Taylor
  * approximation */
 
   int i,j,k1,k2,k3,n,m,k;
@@ -823,6 +834,8 @@ int compp_tree(tnode* p,double peng[2],double *tpoten_old,double tempq[2][16]){
   double tx,ty,tz,dist,penglocal[2],pengchild[2];
   int i;
 
+  extern int compp_tree_pb(),compp_direct_pb();
+
   /* determine DISTSQ for MAC test */
   tx = p->x_mid - tarpos[0];
   ty = p->y_mid - tarpos[1];
@@ -863,6 +876,8 @@ int compp_tree(tnode* p,double peng[2],double *tpoten_old,double tempq[2][16]){
 int compp_tree_pb(tnode* p,double peng[2],double tempq[2][16]){
   int i,j,k,ikp,indx;
   double kapa[2],sl[4],pt_comp[2][16];
+
+  extern int comp_tcoeff();
 
   kapa[0]=0.0; kapa[1]=kappa;
   for (ikp=0;ikp<2;ikp++){
@@ -1055,7 +1070,7 @@ int comp_tcoeff(tnode *p, double kappa){
 }
 /********************************************************/
 int compp_direct_pb(double peng[2],int ibeg,int iend,double *tpoten_old){
-  /* COMPF_DIRECT directly computes the force on the current target 
+  /* COMPF_DIRECT directly computes the force on the current target
  * particle determined by the global variable TARPOS.*/
   int i,j;
   double dist,dist2,tx,ty,tz,soupos[3],souq[3];
@@ -1093,7 +1108,7 @@ int compp_direct_pb(double peng[2],int ibeg,int iend,double *tpoten_old){
     G20=tp2*G10;
 
     G1=cos_theta*tp1;
-    G2=tp2*G1; 
+    G2=tp2*G1;
 
     dot_tqsq=sq[0]*tq[0]+sq[1]*tq[1]+sq[2]*tq[2];
     G3=(dot_tqsq-3.0*cos_theta0*cos_theta)*irs*tp1;
@@ -1102,7 +1117,7 @@ int compp_direct_pb(double peng[2],int ibeg,int iend,double *tpoten_old){
     L1=G1-eps*G2;
     L2=G0-Gk;
     L3=G4-G3;
-    L4=G10-G20/eps; 
+    L4=G10-G20/eps;
 
     peng_old[0]=tpoten_old[j];peng_old[1]=tpoten_old[j+numpars];
     area=tr_area[j];
@@ -1130,7 +1145,7 @@ int remove_mmt(tnode *p){
       free(p->ms[n]);
     }
     free(p->ms);
-  
+
     p->exist_ms=0;
   }
 
@@ -1143,6 +1158,8 @@ int remove_mmt(tnode *p){
 }
 /********************************************************/
 int treecode_finalization(){
+
+  extern int remove_node();
 
   int i, j, k, m;
 
