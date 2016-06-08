@@ -5,7 +5,7 @@
 #include "gl_constants.h"
 #include <stdlib.h>
 #include <string.h>
-//#include "treecode.h"  /* try to use less variables */
+#include "treecode.h"
 
 int apbs2tabipb_(char** apbs_pqr_filename, int* nion, double* ionc,
                 double* ionq, double* ionr, double* pdie,
@@ -20,6 +20,7 @@ int apbs2tabipb_(char** apbs_pqr_filename, int* nion, double* ionc,
   extern void readin(char *fname, char *density);
   extern double potential_molecule(double s[3]);
   extern int comp_source();
+  extern int output_potential();
   /* variables used to compute potential solution */
   double units_para;
   double *chrptl;
@@ -35,41 +36,26 @@ int apbs2tabipb_(char** apbs_pqr_filename, int* nion, double* ionc,
   double resid;
 
   extern int *matvec(),*psolve();
-  extern int gmres_(long int *n,double *b,double *x,long int *restrt, 
+  extern int gmres_(long int *n,double *b,double *x,long int *restrt,
                     double *work,long int *ldw,double *h,long int *ldh,
-                    long int *iter,double *resid,int (*matvec) (), 
+                    long int *iter,double *resid,int (*matvec) (),
                     int (*psolve) (),long int *info);
 
   timer_start("TOTAL_TIME");
-
-  printf("Address of nion is %x\n",nion);
-  printf("Value of *nion is %d\n",*nion);
-  printf("Portein is %p\n",apbs_pqr_filename);
-  printf("Portein is %s\n",&apbs_pqr_filename[0]);
-  printf("Density is %f\n",*sdens);
-  printf("Value of ionc is %f\n",ionc[0]);
-  printf("Value of ionq is %f\n",ionq[0]);
-  printf("Treecode order is %d\n",*tree_order);
-  printf("Maxparnode is %d\n",*tree_n0);
-  printf("Theta is %f\n",*mac);
 
   /***************input****************/
 //  fnamepqr=*apbs_pqr_filename;
 
   strncpy(fname,&*apbs_pqr_filename,4);
   fname[4]='\0';
-  printf("fname is %s\n",&fname[0]);
 
   sprintf(density,"%f",*sdens);
 
-  printf("density is %s\n",density);
   epsp=*pdie;
   epsw=*sdie;
-  printf("epsp %f epsw %f\n",epsp,epsw);
   bulk_strength=0.0;
   for (i=0;i<*nion;i++)
     bulk_strength+=ionc[i]*ionq[i]*ionq[i];
-  printf("bulk_strength is %f\n",bulk_strength);
   order=*tree_order;
   maxparnode=*tree_n0;
   theta=*mac;
@@ -86,13 +72,7 @@ int apbs2tabipb_(char** apbs_pqr_filename, int* nion, double* ionc,
   kappa2=bulk_coef*bulk_strength/epsw;
   kappa=sqrt(kappa2);
 
-  printf("eps kappa %f %f\n",eps,kappa);
-
   readin(fname,density);
-
-  for(i=0;i<10;i++) printf("chrpos is %f\n",chrpos[i]);
-  for(i=0;i<9;i++) printf("tr_xyz is %f, %f\n",tr_xyz[i],tr_q[i]);
-
 
   comp_source();
   /* tr_xyz=[x[i],y[i],z[i]] */
@@ -120,7 +100,7 @@ int apbs2tabipb_(char** apbs_pqr_filename, int* nion, double* ionc,
   /* the solvation energy computation */
   units_para=2.0;
   units_para=units_para*units_coef;
-  units_para=units_para*pi; 
+  units_para=units_para*pi;
 
   chrptl=(double*) malloc(nface*sizeof(double));
   comp_pot(chrptl);
@@ -129,6 +109,8 @@ int apbs2tabipb_(char** apbs_pqr_filename, int* nion, double* ionc,
   for (i=0;i<nface;i++) soleng=soleng+chrptl[i];
   soleng=soleng*units_para;
   printf("solvation energy = %f kcal/mol\n",soleng);
+
+  output_potential();
 
   timer_end();
 
@@ -157,7 +139,7 @@ int apbs2tabipb_(char** apbs_pqr_filename, int* nion, double* ionc,
     free(extr_f[i]);
   }
   free(extr_f);
-	
+
   for(i=0;i<3;i++) {
     free(atmpos[i]);
   }
@@ -261,7 +243,7 @@ int comp_pot(double *chrptl){
       Gk=exp_kappa_rs*G0;
 
       cos_theta=(v[0]*r_s[0]+v[1]*r_s[1]+v[2]*r_s[2])*irs;
-      
+
       tp1=G0*irs;
       tp2=(1.0+kappa_rs)*exp_kappa_rs;
 
@@ -274,10 +256,113 @@ int comp_pot(double *chrptl){
       chrptl[j]=chrptl[j]+atmchr[i]*(L1*xvct[j]+L2*xvct[nface+j])*tr_area[j];
     }
   }
-  return 0;  
+  return 0;
 }
 /************************************/
+int output_potential(){
+  int i,j,k,jerr,nface_vert;
+  double tot_length,loc_length,aa[3],dot_aa,para_temp,phi_star;
+  int **ind_vert;
+  double *xtemp,*vert_ptl,*xyz_temp;
+  extern double maxval(double*, int), minval(double*, int);
 
+  nface_vert=15; /* one vertex could have been involved
+                   in at most 11 triangles, 15 is safe */
+  para_temp=units_coef*4*pi;
+
+  xtemp=(double*)calloc(2*nface,sizeof(double));
+  ind_vert=(int**)calloc(nface_vert,sizeof(int*));
+  for (i=0;i<nface_vert;i++){
+    ind_vert[i]=(int*)calloc(nspt,sizeof(int));
+  }
+  vert_ptl=(double*)calloc(nspt*2,sizeof(double));
+  xyz_temp=(double*)calloc(3*nface,sizeof(double));
+
+  /* put things back */
+  for (i=0;i<nface;i++){
+    xtemp[orderarr[i]]=xvct[i];
+    xtemp[orderarr[i]+nface]=xvct[i+nface];
+    xyz_temp[orderarr[i]*3]=tr_xyz[i*3];
+    xyz_temp[orderarr[i]*3+1]=tr_xyz[i*3+1];
+    xyz_temp[orderarr[i]*3+2]=tr_xyz[i*3+2];
+  }
+
+  for (i=0;i<nface;i++){
+    xvct[i]=xtemp[i];
+    xvct[i+nface]=xtemp[i+nface];
+    tr_xyz[i*3]=xyz_temp[i*3];
+    tr_xyz[i*3+1]=xyz_temp[i*3+1];
+    tr_xyz[i*3+2]=xyz_temp[i*3+2];
+  }
+
+   for (i=0;i<nface;i++){
+    for (j=0;j<3;j++){
+      for (k=0;k<nface_vert-1;k++){
+        if (ind_vert[k][face[j][i]-1] == 0.0){
+          ind_vert[k][face[j][i]-1] = i+1;
+          ind_vert[nface_vert-1][face[j][i]-1] += 1;
+          break;
+        }
+      }
+    }
+  }
+
+  for (i=0;i<nspt;i++){
+    tot_length=0.0;
+    for (j=0;j<ind_vert[nface_vert-1][i];j++){
+      /* distance between vertices and centroid */
+      aa[0]=tr_xyz[3*(ind_vert[j][i]-1)]-vert[0][i];
+      aa[1]=tr_xyz[3*(ind_vert[j][i]-1)+1]-vert[1][i];
+      aa[2]=tr_xyz[3*(ind_vert[j][i]-1)+2]-vert[2][i];
+      dot_aa=aa[0]*aa[0]+aa[1]*aa[1]+aa[2]*aa[2];
+      loc_length=sqrt(dot_aa);
+
+      vert_ptl[i]+=1.0/loc_length*xvct[ind_vert[j][i]-1];
+      vert_ptl[i+nspt]+=1.0/loc_length*xvct[ind_vert[j][i]+nface-1];
+      tot_length+=1.0/loc_length;
+    }
+    vert_ptl[i]=vert_ptl[i]/tot_length;
+    vert_ptl[i+nspt]=vert_ptl[i+nspt]/tot_length;
+  }
+
+  for (i=0;i<2*nface;i++)
+    xvct[i]=xvct[i]*para_temp;
+  for (i=0;i<nspt;i++){
+    vert_ptl[i]=vert_ptl[i]*para_temp;
+    vert_ptl[i+nspt]=vert_ptl[i+nspt]*para_temp;
+  }
+
+  printf("The max and min potential and normal derivatives on elements are:\n");
+  printf("potential %f %f\n",maxval(xvct,nface),minval(xvct,nface));
+  printf("norm derv %f %f\n",maxval(xvct+nface,nface),minval(xvct+nface,nface));
+
+  printf("The max and min potential and normal derivatives on vertices are:\n");
+  printf("potential %f %f\n",maxval(vert_ptl,nspt),minval(vert_ptl,nspt));
+  printf("norm derv %f %f\n",maxval(vert_ptl+nspt,nspt),minval(vert_ptl+nspt,nspt));
+
+  FILE *fp=fopen("surface_potential.dat","w");
+  fprintf(fp,"%d %d\n",nspt,nface);
+
+  for(i=0;i<nspt;i++)
+    fprintf(fp,"%d %f %f %f %f %f %f %f %f\n",i,vert[0][i],vert[1][i],
+            vert[2][i],snrm[0][i],snrm[1][i],snrm[2][i],vert_ptl[i],
+            vert_ptl[i+nspt]);
+
+  for(i=0;i<nface;i++)
+    fprintf(fp,"%d %d %d\n",face[0][i],face[1][i],face[2][i]);
+
+  fclose(fp);
+
+  free(xtemp);
+  for (i=0;i<nface_vert;i++){
+    free(ind_vert[i]);
+  }
+  free(ind_vert);
+  free(vert_ptl);
+  free(xyz_temp);
+}
+
+/************************************/
 int *matvec_direct(double *alpha, double *x, double *beta, double *y){
   int i,j;
   double pre1,pre2;
@@ -310,19 +395,19 @@ int *matvec_direct(double *alpha, double *x, double *beta, double *y){
         kappa_rs=kappa*rs;
         exp_kappa_rs=exp(-kappa_rs);
         Gk=exp_kappa_rs*G0;
- 
+
         cos_theta =(sq[0]*r_s[0]+sq[1]*r_s[1]+sq[2]*r_s[2])*irs;
         cos_theta0=(tq[0]*r_s[0]+tq[1]*r_s[1]+tq[2]*r_s[2])*irs;
- 
+
         tp1=G0*irs;
         tp2=(1.0+kappa_rs)*exp_kappa_rs;
- 
+
         G10=cos_theta0*tp1;
         G20=tp2*G10;
- 
+
         G1=cos_theta*tp1;
         G2=tp2*G1;
- 
+
         dot_tqsq=sq[0]*tq[0]+sq[1]*tq[1]+sq[2]*tq[2];
         G3=(dot_tqsq-3.0*cos_theta0*cos_theta)*irs*tp1;
         G4=tp2*G3-kappa2*cos_theta0*cos_theta*Gk;
@@ -344,4 +429,3 @@ int *matvec_direct(double *alpha, double *x, double *beta, double *y){
   }
   return 0;
 }
-
