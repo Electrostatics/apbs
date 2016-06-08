@@ -21,6 +21,9 @@ int apbs2tabipb_(char** apbs_pqr_filename, int* nion, double* ionc,
   extern double potential_molecule(double s[3]);
   extern int comp_source();
   extern int output_potential();
+  /* time */
+  extern void timer_start();
+  extern void timer_end();
   /* variables used to compute potential solution */
   double units_para;
   double *chrptl;
