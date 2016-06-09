@@ -7,7 +7,6 @@
 #include <stdlib.h>
 
 #include "gl_variables.h"
-#include "gl_constants.h"
 #include "treecode.h"
 
 
