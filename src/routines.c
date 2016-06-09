@@ -5157,7 +5157,7 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
   }
   
   Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
-  struct PBAMInput pbamIn = getPBAMParams();
+  PBAMInput pbamIn = getPBAMParams();
 
   pbamIn.nmol_ = nosh->nmol;
 
@@ -5251,7 +5251,7 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
   printPBAMStruct( pbamIn );
   
   // Run the darn thing
-  struct PBAMOutput pbamOut = runPBAMWrapAPBS( pbamIn, molecules, nosh->nmol );
+  PBAMOutput pbamOut = runPBAMWrapAPBS( pbamIn, molecules, nosh->nmol );
 
   Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
 
