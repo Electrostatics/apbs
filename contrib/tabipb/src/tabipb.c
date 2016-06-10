@@ -95,7 +95,6 @@ int apbs2tabipb_(char** apbs_pqr_filename, int* nion, double* ionc,
   work=(double *) calloc(ldw*(RESTRT+4),sizeof(double));
   h=(double *) calloc(ldh*(RESTRT+2),sizeof(double));
 
-  for(i=0;i<10;i++) printf("bvct is %f\n",bvct[i]);
   gmres_(&N,bvct,xvct,&RESTRT,work,&ldw,h,&ldh,&iter,
          &resid,matvec,psolve,&info);
 
