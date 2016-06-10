@@ -47,7 +47,7 @@ endif (C_COMPILER_NAME MATCHES "gcc.*")
 set (LIBFILES src/tabipb.c src/gmres.c src/daxpy.c src/dcopy.c src/ddot.c
 src/dgemv.c src/dnrm2.c src/drot.c src/drotg.c src/dscal.c src/d_sign.c
 src/dtrsv.c src/gl_functions.c src/readin.c src/pp_timer.c src/treecode.c)
-set (MODULES src/f2c.h src/gl_constants.h src/gl_variables.h
+set (MODULES src/f2c.h src/gl_variables.h
 src/treecode.h)
 
 message(***** ${CMAKE_INSTALL_PREFIX})
