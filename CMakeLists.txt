@@ -196,50 +196,62 @@ endif()
 ##########################################
 option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
 if(ENABLE_BEM)
+    message(STATUS "Building TABIPB")
     add_definitions(-DENABLE_BEM)
     set(TABI tabipb)
-    set(TABI_PATH ${EXTERNALS_PATH}/tabipb)
+    set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
+    
     ExternalProject_add(
         ${TABI}
-        URL file://${TABI_PATH}
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${APBS_BUILD}
-            -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-            -DENABLE_TABIPB_APBS=ON
+        SOURCE_DIR ${TABI_PATH}
+        
+        #CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${APBS_BUILD}
+        #    -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+        #    -DENABLE_TABIPB_APBS=ON
+        
+        CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
+    	INSTALL_COMMAND ""
     )
-
+    
+    ExternalProject_Get_Property(${TABI} binary_dir)
+    list(APPEND APBS_LIB_DIRS "${binary_dir}")
+    list(APPEND APBS_LIBS stdc++ TABIPBlib)
+    include_directories(${EXTERNALS_PATH}/${TABI})
+    
+    #include_directories(${EXTERNALS_PATH}/${TABI}/src)
+    
     if(BUILD_SHARED_LIBS)
         set(TABI_LIBRARY_BASENAME ${CMAKE_SHARED_LIBRARY_PREFIX}${TABI}${CMAKE_SHARED_LIBRARY_SUFFIX})
     else()
         set(TABI_LIBRARY_BASENAME ${CMAKE_STATIC_LIBRARY_PREFIX}${TABI}${CMAKE_STATIC_LIBRARY_SUFFIX})
     endif()
 
-    install(
-        FILES ${LIBRARY_OUTPUT_PATH}/${TABI_LIBRARY_BASENAME}
-        DESTINATION ${LIBRARY_INSTALL_PATH}
-    )
-    install(
-        DIRECTORY ${LIBRARY_OUTPUT_PATH}
-        DESTINATION ${CMAKE_INSTALL_PREFIX}
-        FILES_MATCHING PATTERN "*.mod"
-    )
-    set(TABI_LIBRARY ${LIBRARY_OUTPUT_PATH}/${TABI_LIBRARY_BASENAME})
 
-    set(LIBGFORTRAN_NAME ${CMAKE_SHARED_LIBRARY_PREFIX}gfortran${CMAKE_SHARED_LIBRARY_SUFFIX})
+    #install(
+    #    FILES ${LIBRARY_OUTPUT_PATH}/${TABI_LIBRARY_BASENAME}
+    #    DESTINATION ${LIBRARY_INSTALL_PATH}
+    #)
+    #install(
+    #    DIRECTORY ${LIBRARY_OUTPUT_PATH}
+    #    DESTINATION ${CMAKE_INSTALL_PREFIX}
+    #    FILES_MATCHING PATTERN "*.mod"
+    #)
+    
+    #set(TABI_LIBRARY ${LIBRARY_OUTPUT_PATH}/${TABI_LIBRARY_BASENAME})
+    #set(LIBGFORTRAN_NAME ${CMAKE_SHARED_LIBRARY_PREFIX}gfortran${CMAKE_SHARED_LIBRARY_SUFFIX})
+    #execute_process(COMMAND gfortran --print-file-name ${LIBGFORTRAN_NAME}
+    #                OUTPUT_VARIABLE LIBGFORTRANPATH
+    #                RESULT_VARIABLE HAVE_GFORTRAN
+    #)
+    #if(HAVE_GFORTRAN GREATER 0)
+    #    message(FATAL_ERROR gfortran is currently required for using BEM/TABIPB in APBS)
+    #endif()
 
-    execute_process(COMMAND gfortran --print-file-name ${LIBGFORTRAN_NAME}
-                    OUTPUT_VARIABLE LIBGFORTRANPATH
-                    RESULT_VARIABLE HAVE_GFORTRAN
-    )
-    if(HAVE_GFORTRAN GREATER 0)
-        message(FATAL_ERROR gfortran is currently required for using BEM/TABIPB in APBS)
-    endif()
-
-    get_filename_component(LIBGFORTRANPATH ${LIBGFORTRANPATH} PATH)
-
-    find_path(LIBGFORTRAN_PATH ${LIBGFORTRAN_NAME} PATH ${LIBGFORTRANPATH})
-
-    list(APPEND APBS_LIB_DIRS ${LIBRARY_OUTPUT_PATH} ${LIBGFORTRAN_PATH})
-    list(APPEND APBS_LIBS gfortran ${TABI_LIBRARY} stdc++)
+    #get_filename_component(LIBGFORTRANPATH ${LIBGFORTRANPATH} PATH)
+    #find_path(LIBGFORTRAN_PATH ${LIBGFORTRAN_NAME} PATH ${LIBGFORTRANPATH})
+    #list(APPEND APBS_LIB_DIRS ${LIBRARY_OUTPUT_PATH} ${LIBGFORTRAN_PATH})
+    #list(APPEND APBS_LIBS gfortran ${TABI_LIBRARY} stdc++)
 
 endif() # ENABLE_BEM
 
