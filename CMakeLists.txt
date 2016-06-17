@@ -205,10 +205,6 @@ if(ENABLE_BEM)
         ${TABI}
         SOURCE_DIR ${TABI_PATH}
         
-        #CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${APBS_BUILD}
-        #    -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-        #    -DENABLE_TABIPB_APBS=ON
-        
         CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
         BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
     	INSTALL_COMMAND ""
@@ -219,7 +215,6 @@ if(ENABLE_BEM)
     list(APPEND APBS_LIBS stdc++ TABIPBlib)
     include_directories(${EXTERNALS_PATH}/${TABI})
     
-    #include_directories(${EXTERNALS_PATH}/${TABI}/src)
     
     if(BUILD_SHARED_LIBS)
         set(TABI_LIBRARY_BASENAME ${CMAKE_SHARED_LIBRARY_PREFIX}${TABI}${CMAKE_SHARED_LIBRARY_SUFFIX})
@@ -228,32 +223,57 @@ if(ENABLE_BEM)
     endif()
 
 
-    #install(
-    #    FILES ${LIBRARY_OUTPUT_PATH}/${TABI_LIBRARY_BASENAME}
-    #    DESTINATION ${LIBRARY_INSTALL_PATH}
-    #)
-    #install(
-    #    DIRECTORY ${LIBRARY_OUTPUT_PATH}
-    #    DESTINATION ${CMAKE_INSTALL_PREFIX}
-    #    FILES_MATCHING PATTERN "*.mod"
-    #)
-    
-    #set(TABI_LIBRARY ${LIBRARY_OUTPUT_PATH}/${TABI_LIBRARY_BASENAME})
-    #set(LIBGFORTRAN_NAME ${CMAKE_SHARED_LIBRARY_PREFIX}gfortran${CMAKE_SHARED_LIBRARY_SUFFIX})
-    #execute_process(COMMAND gfortran --print-file-name ${LIBGFORTRAN_NAME}
-    #                OUTPUT_VARIABLE LIBGFORTRANPATH
-    #                RESULT_VARIABLE HAVE_GFORTRAN
-    #)
-    #if(HAVE_GFORTRAN GREATER 0)
-    #    message(FATAL_ERROR gfortran is currently required for using BEM/TABIPB in APBS)
-    #endif()
-
-    #get_filename_component(LIBGFORTRANPATH ${LIBGFORTRANPATH} PATH)
-    #find_path(LIBGFORTRAN_PATH ${LIBGFORTRAN_NAME} PATH ${LIBGFORTRANPATH})
-    #list(APPEND APBS_LIB_DIRS ${LIBRARY_OUTPUT_PATH} ${LIBGFORTRAN_PATH})
-    #list(APPEND APBS_LIBS gfortran ${TABI_LIBRARY} stdc++)
-
 endif() # ENABLE_BEM
+
+
+
+option(GET_MSMS "Put MSMS executable in the build directory" OFF)
+if(GET_MSMS)
+        if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+                # Mac OS X specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_MacOSX_2.6.1/msms.MacOSX.2.6.1
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})                       
+                file(RENAME ${EXECUTABLE_OUTPUT_PATH}/msms.MacOSX.2.6.1
+                            ${EXECUTABLE_OUTPUT_PATH}/msms)
+
+        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+                # Linux specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_i86_64Linux2_2.6.1/msms.x86_64Linux2.2.6.1.staticgcc
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+                file(RENAME ${EXECUTABLE_OUTPUT_PATH}/msms.x86_64Linux2.2.6.1.staticgcc
+                            ${EXECUTABLE_OUTPUT_PATH}/msms)
+
+        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+                # Windows specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_win32_2.6.1/msms.exe
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+        endif()
+endif()
+
+
+option(GET_NanoShaper "Put NanoShaper executable in the build directory" OFF)
+if(GET_NanoShaper)
+        if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+                # Mac OS X specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/OSX/NanoShaper
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})                       
+
+        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+                # Linux specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/Linux64/NanoShaper
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+
+        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+                # Windows specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/win32/NanoShaper32.exe
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+                file(RENAME ${EXECUTABLE_OUTPUT_PATH}/NanoShaper32.exe
+                            ${EXECUTABLE_OUTPUT_PATH}/NanoShaper.exe)
+        endif()
+endif()
+
+
+
 
 ################################################################################
 # Deal with MALOC                                                              #
