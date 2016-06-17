@@ -4992,7 +4992,7 @@ VPUBLIC int solveBEM(NOsh *nosh, PBEparm *pbeparm, BEMparm *bemparm,
                  &(bemparm->tree_order),
                  &(bemparm->tree_n0),
                  (double*)&(bemparm->mac),
-                 &(bemparm->mesh),
+                 &(bemparm->mesh)
                  );
 
     Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
