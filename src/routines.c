@@ -4960,7 +4960,8 @@ VPUBLIC void killBEM(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC]
 }
 
 
-void apbs2tabipb_(char**, int*, double*, double*, double*, double*, double*, double*, double*, double*, int*, int*, double*);
+void apbs2tabipb_(char**, int*, double*, double*, double*, double*, double*, double*,
+                double*, double*, int*, int*, double*, int*);
 
 VPUBLIC int solveBEM(NOsh *nosh, PBEparm *pbeparm, BEMparm *bemparm,
                     BEMparm_CalcType type
@@ -4990,7 +4991,8 @@ VPUBLIC int solveBEM(NOsh *nosh, PBEparm *pbeparm, BEMparm *bemparm,
                  (double*)&(pbeparm->srad),
                  &(bemparm->tree_order),
                  &(bemparm->tree_n0),
-                 (double*)&(bemparm->mac)
+                 (double*)&(bemparm->mac),
+                 &(bemparm->mesh),
                  );
 
     Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
