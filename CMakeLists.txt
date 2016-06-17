@@ -397,7 +397,7 @@ endif()
 # Optionally build pbam (git submodule)
 ################################################################################
 
-option(ENABLE_PBAM "pbam method" ON)
+option(ENABLE_PBAM "pbam method" OFF)
 if(ENABLE_PBAM)
   message(STATUS "Building PBAM")
   add_definitions(-DPBAM_APBS)
