@@ -110,6 +110,9 @@ typedef struct sBEMparm {
     int nonlintype; /**< Linearity Type Method to be used */
     int setnonlintype; /**< Flag, @see nonlintype */
 
+    int mesh; /**< 0 for msms, 1 for NanoShaper */
+    int setmesh; /**< Flag, @see mesh */
+
 } BEMparm;
 
 /** @brief   Construct BEMparm object
