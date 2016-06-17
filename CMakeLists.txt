@@ -198,7 +198,7 @@ option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
 if(ENABLE_BEM)
     message(STATUS "Building TABIPB")
     add_definitions(-DENABLE_BEM)
-    set(TABI tabipb)
+    set(TABI TABIPB)
     set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
     
     ExternalProject_add(
