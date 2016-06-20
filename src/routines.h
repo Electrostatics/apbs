@@ -75,6 +75,10 @@
   #include "GeometricFlowWrap.h"
 #endif
 
+#ifdef ENABLE_PBAM
+  #include "PBAMWrap.h"
+#endif
+
 /**
  * @brief  Return code for APBS during failure
  * @ingroup  Frontend */
@@ -821,5 +825,21 @@ VEXTERNC int solveGeometricFlow(
                                 PBEparm *pbeparm, 
                                 APOLparm *apolparm, 
                                 GEOFLOWparm *parm 
+);
+#endif
+
+#ifdef ENABLE_PBAM
+/**
+ * @brief  Solve the LPBE with PBAM  
+ * @ingroup  Frontend
+ * @param nosh  Object with parsed input file parameters
+ * @param pbem  PBAM objects for this calculation
+ * @param type  Type of PBAM calculation
+ * @return  1 if successful, 0 otherwise */
+VEXTERNC int solvePBAM(
+      Valist* molecules[NOSH_MAXMOL], 
+                                NOsh *nosh, 
+                                PBEparm *pbeparm, 
+                                PBAMparm *parm 
 );
 #endif

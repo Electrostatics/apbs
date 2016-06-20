@@ -1,0 +1,36 @@
+read
+    mol pqr pos_charge.pqr
+    mol pqr neg_charge.pqr
+end
+elec name comp_solv        # Toy charges
+    pbam-auto
+
+    runtype dynamics        # Can be energyforce, electrostatics etc
+    runname dyn_toy         # Output name for files created by program
+    temp 298.15             # System temperature (K)
+    pdie 4.0                # Solute dielectric                 
+    sdie 78.0               # Solvent dielectric                
+    salt 0.05               # Monovalent salt conc in M
+
+    pbc 100.0
+
+    termcombine or
+    term time 550.0
+    term r>= 81.8 1
+    ntraj 3
+
+    diff 1 move 0.01 0.001
+    diff 2 stat
+
+    xyz 1 pos_1.xyz
+    xyz 1 pos_2.xyz
+    xyz 1 pos_3.xyz
+    
+    xyz 2 neg_1.xyz
+    xyz 2 neg_2.xyz
+    xyz 2 neg_3.xyz
+
+end
+
+quit
+
