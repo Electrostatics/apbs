@@ -734,19 +734,5 @@ file(REMOVE_RECURSE ${EXECUTABLE_OUTPUT_PATH}/temp)
 # Optionally download and build PB-AM                                          #
 ################################################################################
 
-# Won't build on Windows
-if(NOT WIN32)
-    option(BUILD_PBAM "Download and build PB-AM (Only tested on Linux)" OFF)
-
-    if(BUILD_PBAM)
-        ExternalProject_Add(
-            pb_am
-            URL "https://github.com/Electrostatics/PB-AM/archive/master.tar.gz"
-            CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${APBS_ROOT}
-                    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-                    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-        )
-        install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/mpe
-                DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    endif()
-endif()
+#This has been deprecated and we no longer use the BUILD_PBAM option. PBAM now
+# builds with ENABLE_PBAM
