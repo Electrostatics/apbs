@@ -113,7 +113,7 @@ VPUBLIC Vrc_Codes PBAMparm_ctor2(PBAMparm *thee, PBAMparm_CalcType type) {
     thee->setterm = 0;
 
     thee->setxyz = 0;
-    for (int i = 0; i<PBAMPARM_MAXMOL; i++) thee->xyzct[i] = 0;
+    for (i = 0; i<PBAMPARM_MAXMOL; i++) thee->xyzct[i] = 0;
 
     return VRC_SUCCESS;
 }
@@ -154,6 +154,7 @@ VPUBLIC Vrc_Codes PBAMparm_check(PBAMparm *thee) {
 }
 
 VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
+    int i, j, k;
     VASSERT(thee != VNULL);
     VASSERT(parm != VNULL);
 
@@ -162,10 +163,10 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
 
     thee->salt = parm->salt;
     thee->setsalt = parm->setsalt;
-    for (int i=0; i<CHR_MAXLEN; i++) thee->runtype[i] = parm->runtype[i];
+    for (i=0; i<CHR_MAXLEN; i++) thee->runtype[i] = parm->runtype[i];
     thee->setruntype = parm->setruntype;
 
-    for (int i=0; i<CHR_MAXLEN; i++) thee->runname[i] = parm->runname[i];
+    for (i=0; i<CHR_MAXLEN; i++) thee->runname[i] = parm->runname[i];
     thee->setrunname = parm->setrunname;
 
     thee->setrandorient = parm->setrandorient;
@@ -176,14 +177,14 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
     // Electrostatic parts
     thee->gridpt = parm->gridpt;
     thee->setgridpt = parm->setgridpt;
-    for (int i=0; i<CHR_MAXLEN; i++) thee->map3dname[i] = parm->map3dname[i];
+    for (i=0; i<CHR_MAXLEN; i++) thee->map3dname[i] = parm->map3dname[i];
     thee->set3dmap = parm->set3dmap;
 
 
     thee->grid2Dct = parm->grid2Dct;
-    for (int i=0; i<PBAMPARM_MAXWRITE; i++)
+    for (i=0; i<PBAMPARM_MAXWRITE; i++)
     {
-        for (int j=0; j<CHR_MAXLEN; j++)
+        for (j=0; j<CHR_MAXLEN; j++)
         { 
             thee->grid2Dname[i][j] = parm->grid2Dname[i][j];
             thee->grid2Dax[i][j] = parm->grid2Dax[i][j];
@@ -191,21 +192,21 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
         thee->grid2Dloc[i] = parm->grid2Dloc[i];
     }
 
-    for (int i=0; i<CHR_MAXLEN; i++) thee->dxname[i] = parm->dxname[i];
+    for (i=0; i<CHR_MAXLEN; i++) thee->dxname[i] = parm->dxname[i];
     thee->setdxname = parm->setdxname;
 
     // Dynamics parts
     thee->ntraj = parm->ntraj;
     thee->setntraj = parm->setntraj;
 
-    for (int i=0; i<CHR_MAXLEN; i++) thee->termcombine[i] = parm->termcombine[i];
+    for (i=0; i<CHR_MAXLEN; i++) thee->termcombine[i] = parm->termcombine[i];
     thee->settermcombine = parm->settermcombine;
 
     thee->diffct = parm->diffct;
 
-    for (int i=0; i<PBAMPARM_MAXMOL; i++)
+    for (i=0; i<PBAMPARM_MAXMOL; i++)
     {
-        for (int j=0; j<CHR_MAXLEN; j++)
+        for (j=0; j<CHR_MAXLEN; j++)
         { 
             thee->moveType[i][j] = parm->moveType[i][j];
         }
@@ -217,9 +218,9 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
     thee->setterm = parm->setterm;
     thee->confilct = parm->confilct;
 
-    for (int i=0; i<PBAMPARM_MAXWRITE; i++)
+    for (i=0; i<PBAMPARM_MAXWRITE; i++)
     {
-        for (int j=0; j<CHR_MAXLEN; j++)
+        for (j=0; j<CHR_MAXLEN; j++)
         { 
             thee->termnam[i][j] = parm->termnam[i][j];
             thee->confil[i][j] = parm->confil[i][j];
@@ -229,12 +230,12 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
     }
 
     thee->setxyz = parm->setxyz;
-    for (int i = 0; i<PBAMPARM_MAXMOL; i++) 
+    for (i = 0; i<PBAMPARM_MAXMOL; i++) 
     {
         thee->xyzct[i] = parm->xyzct[i];
-        for (int j = 0; j<PBAMPARM_MAXWRITE; j++) 
+        for (j = 0; j<PBAMPARM_MAXWRITE; j++) 
         {
-            for (int k = 0; k<CHR_MAXLEN; k++) 
+            for (k = 0; k<CHR_MAXLEN; k++) 
             {
                 thee->xyzfil[i][j][k] = parm->xyzfil[i][j][k];
             }
