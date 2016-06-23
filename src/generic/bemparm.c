@@ -93,6 +93,9 @@ VPUBLIC Vrc_Codes BEMparm_ctor2(BEMparm *thee, BEMparm_CalcType type) {
     thee->mac = 0.8;
     thee->setmac = 0;
 
+    thee->mesh = 0;
+    thee->setmesh = 0;
+
     /* *** TYPE 1 & 2 PARAMETERS *** */
 
     /* *** TYPE 2 PARAMETERS *** */
@@ -152,6 +155,11 @@ VPUBLIC Vrc_Codes BEMparm_check(BEMparm *thee) {
         rc = VRC_FAILURE;
     }
 
+    if (thee->mesh>1 || thee->mesh <0 ) {
+        Vnm_print(2,"BEMparm_check: mesh must be 0 (msms) or 1 (NanoShaper)");
+        rc = VRC_FAILURE;
+    }
+
     return rc;
 }
 
@@ -176,6 +184,9 @@ VPUBLIC void BEMparm_copy(BEMparm *thee, BEMparm *parm) {
     thee->settree_n0 = parm->settree_n0;
     thee->mac = parm->mac;
     thee->setmac = parm->setmac;
+
+    thee->mesh = parm->mesh;
+    thee->setmesh = parm->setmesh;
 
     /* *** TYPE 1 & 2 PARMS *** */
 
@@ -254,6 +265,28 @@ keyword!\n", tok);
 }
 
 
+VPRIVATE Vrc_Codes BEMparm_parseMESH(BEMparm *thee, Vio *sock) {
+
+    char tok[VMAX_BUFSIZE];
+    int ti;
+
+    VJMPERR1(Vio_scanf(sock, "%s", tok) == 1);
+    if (sscanf(tok, "%d", &ti) == 0) {
+        Vnm_print(2, "NOsh:  Read non-integer (%s) while parsing MESH \
+keyword!\n", tok);
+        return VRC_WARNING;
+    } else if (ti < 0 || ti > 1) {
+        Vnm_print(2, "parseBEM:  mesh must be 0 (msms) or 1 (NanoShaper)!\n");
+        return VRC_WARNING;
+    } else thee->mesh = ti;
+    thee->setmesh = 1;
+    return VRC_SUCCESS;
+
+    VERROR1:
+        Vnm_print(2, "parseBEM:  ran out of tokens!\n");
+        return VRC_WARNING;
+}
+
 VPUBLIC Vrc_Codes BEMparm_parseToken(BEMparm *thee, char tok[VMAX_BUFSIZE],
   Vio *sock) {
 
@@ -275,6 +308,8 @@ VPUBLIC Vrc_Codes BEMparm_parseToken(BEMparm *thee, char tok[VMAX_BUFSIZE],
         return BEMparm_parseTREE_N0(thee, sock);
     } else if (Vstring_strcasecmp(tok, "mac") == 0) {
         return BEMparm_parseMAC(thee, sock);
+    } else if (Vstring_strcasecmp(tok, "mesh") == 0) {
+        return BEMparm_parseMESH(thee, sock);
     } else {
         Vnm_print(2, "parseBEM:  Unrecognized keyword (%s)!\n", tok);
         return VRC_WARNING;
