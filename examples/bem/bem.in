@@ -14,7 +14,7 @@ elec name comp_solv        # Solvated complex
     pdie 1.0               # Solute dielectric
     sdie 80.00             # Solvent dielectric
     srad 1.4               # Solvent probe radius
-    sdens 2                # NO. of Elements per A^2
+    sdens 1                # NO. of Elements per A^2
     temp 300.00            # Temperature
 
     tree_order 1           # taylor expansion order

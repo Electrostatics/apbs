@@ -4960,12 +4960,14 @@ VPUBLIC void killBEM(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC]
 }
 
 
-void apbs2tabipb_(char**, int*, double*, double*, double*, double*, double*, double*,
-                double*, double*, int*, int*, double*, int*);
+void apbs2tabipb_(TABIPBparm* tabiparm,
+                  Valist* molecules);
 
-VPUBLIC int solveBEM(NOsh *nosh, PBEparm *pbeparm, BEMparm *bemparm,
-                    BEMparm_CalcType type
-                   ) {
+VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
+                     NOsh *nosh,
+                     PBEparm *pbeparm,
+                     BEMparm *bemparm,
+                     BEMparm_CalcType type) {
 
     int nx,
         ny,
@@ -4978,22 +4980,30 @@ VPUBLIC int solveBEM(NOsh *nosh, PBEparm *pbeparm, BEMparm *bemparm,
 
     Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
 
-//apbs2tabipb(apbs_pqr_filename, nion, ionc, ionq, ionr, pdie, sdie, sdens, temp, srad, tree_order, tree_n0, mac)
-    apbs2tabipb_( (char**)&(nosh->molpath),
-                 &(pbeparm->nion),
-                 (double*)&(pbeparm->ionc),
-                 (double*)&(pbeparm->ionq),
-                 (double*)&(pbeparm->ionr),
-                 (double*)&(pbeparm->pdie),
-                 (double*)&(pbeparm->sdie),
-                 (double*)&(pbeparm->sdens),
-                 (double*)&(pbeparm->temp),
-                 (double*)&(pbeparm->srad),
-                 &(bemparm->tree_order),
-                 &(bemparm->tree_n0),
-                 (double*)&(bemparm->mac),
-                 &(bemparm->mesh)
-                 );
+    TABIPBparm *tabiparm = (TABIPBparm*)calloc(1,sizeof(TABIPBparm));
+
+    strncpy(tabiparm->fname, nosh->molpath[0],4);
+    tabiparm->fname[4] = '\0';
+
+    sprintf(tabiparm->density, "%f", pbeparm->sdens);
+    sprintf(tabiparm->probe_radius, "%f", pbeparm->srad);
+
+    tabiparm->epsp = pbeparm->pdie;
+    tabiparm->epsw = pbeparm->sdie;
+    tabiparm->bulk_strength = 0.0;
+    for (i=0; i<pbeparm->nion; i++)
+        tabiparm->bulk_strength += pbeparm->ionc[i]
+                                  *pbeparm->ionq[i]*pbeparm->ionq[i];
+
+    tabiparm->order = bemparm->tree_order;
+    tabiparm->maxparnode = bemparm->tree_n0;
+    tabiparm->theta = bemparm->mac;
+    tabiparm->mesh_flag = bemparm->mesh;
+
+//apbs2tabipb(TABIPBparm* tabiparm, Valist* molecules[NOSH_MAXMOL]);
+    apbs2tabipb_(tabiparm, molecules[0]);
+
+    free(tabiparm);
 
     Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
 
@@ -5096,10 +5106,10 @@ VPUBLIC int writematBEM(int rank, NOsh *nosh, PBEparm *pbeparm) {
 /**
  * Initialize a geometric flow calculation.
  */
-VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL], 
-                                NOsh *nosh, 
-                                PBEparm *pbeparm, 
-                                APOLparm *apolparm, 
+VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
+                                NOsh *nosh,
+                                PBEparm *pbeparm,
+                                APOLparm *apolparm,
                                 GEOFLOWparm *parm )
 {
    //printf("solveGeometricFlow!!!\n");
@@ -5116,7 +5126,7 @@ VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
    geoflowIn.m_grid[0] = apolparm->grid[0];
    geoflowIn.m_grid[1] = apolparm->grid[1];
    geoflowIn.m_grid[2] = apolparm->grid[2];
-   geoflowIn.m_gamma =  apolparm->gamma; 
+   geoflowIn.m_gamma =  apolparm->gamma;
    geoflowIn.m_pdie = pbeparm->pdie ;
    geoflowIn.m_sdie = pbeparm->sdie ;
    geoflowIn.m_press = apolparm->press ;
@@ -5127,9 +5137,9 @@ VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
 
    // debug
    //printGeometricFlowStruct( geoflowIn );
-  
+
    //printf("num mols: %i\n", nosh->nmol);
-   struct GeometricFlowOutput geoflowOut = 
+   struct GeometricFlowOutput geoflowOut =
       runGeometricFlowWrapAPBS( geoflowIn, molecules[0] );
 
    Vnm_tprint( 1,"  Global net energy = %1.12E\n", geoflowOut.m_totalSolvation);
@@ -5149,16 +5159,16 @@ VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
 /**
  * Initialize a PBAM calculation.
  */
-VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL], 
-                                NOsh *nosh, 
-                                PBEparm *pbeparm, 
+VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
+                                NOsh *nosh,
+                                PBEparm *pbeparm,
                                 PBAMparm *parm )
 {
   printf("solvePBAM!!!\n");
   if (nosh != VNULL) {
     if (nosh->bogus) return 1;
   }
-  
+
   int i, j;
   Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
   PBAMInput pbamIn = getPBAMParams();
@@ -5166,7 +5176,7 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
   pbamIn.nmol_ = nosh->nmol;
 
   // change any of the parameters you want...
-  pbamIn.temp_ =  pbeparm->temp; 
+  pbamIn.temp_ =  pbeparm->temp;
   if (fabs(pbamIn.temp_-0.0) < 1e-3)
   {
     printf("No temperature specified. Setting to 298.15K\n");
@@ -5195,13 +5205,13 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
   pbamIn.grid2Dct_ = parm->grid2Dct;
   for (i=0; i<pbamIn.grid2Dct_; i++)
   {
-    strncpy(pbamIn.grid2D_[i], parm->grid2Dname[i], CHR_MAXLEN); 
-    strncpy(pbamIn.grid2Dax_[i], parm->grid2Dax[i], CHR_MAXLEN); 
+    strncpy(pbamIn.grid2D_[i], parm->grid2Dname[i], CHR_MAXLEN);
+    strncpy(pbamIn.grid2Dax_[i], parm->grid2Dax[i], CHR_MAXLEN);
     pbamIn.grid2Dloc_[i] = parm->grid2Dloc[i];
   }
   strncpy(pbamIn.dxname_, parm->dxname, CHR_MAXLEN);
 
-  // Dynamics stuff  
+  // Dynamics stuff
   pbamIn.ntraj_ = parm->ntraj;
   strncpy(pbamIn.termCombine_, parm->termcombine, CHR_MAXLEN);
 
@@ -5233,15 +5243,15 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
     for (i=0; i<pbamIn.nmol_; i++)
     {
       strncpy(pbamIn.moveType_[i], parm->moveType[i], CHR_MAXLEN);
-      pbamIn.transDiff_[i] = parm->transDiff[i]; 
-      pbamIn.rotDiff_[i] = parm->rotDiff[i]; 
+      pbamIn.transDiff_[i] = parm->transDiff[i];
+      pbamIn.rotDiff_[i] = parm->rotDiff[i];
     }
 
     for (i=0; i<pbamIn.termct_; i++)
     {
         strncpy(pbamIn.termnam_[i], parm->termnam[i], CHR_MAXLEN);
         pbamIn.termnu_[i][0] = parm->termnu[i][0];
-        pbamIn.termval_[i] = parm->termVal[i];  
+        pbamIn.termval_[i] = parm->termVal[i];
     }
 
     for (i=0; i<pbamIn.contct_; i++)
@@ -5253,7 +5263,7 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
 
   // debug
   printPBAMStruct( pbamIn );
-  
+
   // Run the darn thing
   PBAMOutput pbamOut = runPBAMWrapAPBS( pbamIn, molecules, nosh->nmol );
 
