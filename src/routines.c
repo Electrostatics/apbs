@@ -4982,9 +4982,9 @@ VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
 
     TABIPBparm *tabiparm = (TABIPBparm*)calloc(1,sizeof(TABIPBparm));
 
+    sprintf(tabiparm->fpath, "");
     strncpy(tabiparm->fname, nosh->molpath[0],4);
     tabiparm->fname[4] = '\0';
-
     sprintf(tabiparm->density, "%f", pbeparm->sdens);
     sprintf(tabiparm->probe_radius, "%f", pbeparm->srad);
 
@@ -4998,7 +4998,12 @@ VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
     tabiparm->order = bemparm->tree_order;
     tabiparm->maxparnode = bemparm->tree_n0;
     tabiparm->theta = bemparm->mac;
+
     tabiparm->mesh_flag = bemparm->mesh;
+
+    tabiparm->number_of_lines = Valist_getNumberAtoms(molecules[0]);
+
+    printf("number of lines %d\n",tabiparm->number_of_lines);
 
 //apbs2tabipb(TABIPBparm* tabiparm, Valist* molecules[NOSH_MAXMOL]);
     apbs2tabipb_(tabiparm, molecules[0]);
