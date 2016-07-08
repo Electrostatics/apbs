@@ -4994,6 +4994,7 @@ VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
     for (i=0; i<pbeparm->nion; i++)
         tabiparm->bulk_strength += pbeparm->ionc[i]
                                   *pbeparm->ionq[i]*pbeparm->ionq[i];
+    tabiparm->temp = pbeparm->temp;
 
     tabiparm->order = bemparm->tree_order;
     tabiparm->maxparnode = bemparm->tree_n0;
