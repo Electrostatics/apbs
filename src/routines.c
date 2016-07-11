@@ -4961,7 +4961,7 @@ VPUBLIC void killBEM(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC]
 
 
 void apbs2tabipb_(TABIPBparm* tabiparm,
-                  Valist* molecules);
+                  TABIPBvars* tabivars);
 
 VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
                      NOsh *nosh,
@@ -5004,12 +5004,41 @@ VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
 
     tabiparm->number_of_lines = Valist_getNumberAtoms(molecules[0]);
 
-    printf("number of lines %d\n",tabiparm->number_of_lines);
+    TABIPBvars *tabivars = (TABIPBvars*)calloc(1,sizeof(TABIPBvars));
+    if ((tabivars->chrpos = (double *) malloc(3 * tabiparm->number_of_lines * sizeof(double))) == NULL) {
+            printf("Error in allocating t_chrpos!\n");
+    }
+    if ((tabivars->atmchr = (double *) malloc(tabiparm->number_of_lines * sizeof(double))) == NULL) {
+            printf("Error in allocating t_atmchr!\n");
+    }
+    if ((tabivars->atmrad = (double *) malloc(tabiparm->number_of_lines * sizeof(double))) == NULL) {
+            printf("Error in allocating t_atmrad!\n");
+    }
+
+    Vatom *atom;
+
+    for (i = 0; i < tabiparm->number_of_lines; i++){
+      atom = Valist_getAtom(molecules[0], i);
+      tabivars->chrpos[3*i] = Vatom_getPosition(atom)[0];
+      tabivars->chrpos[3*i + 1] = Vatom_getPosition(atom)[1];
+      tabivars->chrpos[3*i + 2] = Vatom_getPosition(atom)[2];
+      tabivars->atmchr[i] = Vatom_getCharge(atom);
+      tabivars->atmrad[i] = Vatom_getRadius(atom);
+    }
 
 //apbs2tabipb(TABIPBparm* tabiparm, Valist* molecules[NOSH_MAXMOL]);
-    apbs2tabipb_(tabiparm, molecules[0]);
+    apbs2tabipb_(tabiparm, tabivars);
 
     free(tabiparm);
+    free(tabivars->chrpos);
+    free(tabivars->atmchr);
+    free(tabivars->atmrad);
+    free(tabivars->vert_ptl); // allocate in output_potential()
+    free(tabivars->xvct); // allocate in output_potential()
+    free_matrix(tabivars->vert); // allocate in output_potential()
+    free_matrix(tabivars->snrm); // allocate in output_potential()
+    free_matrix(tabivars->face); // allocate in output_potential()
+    free(tabivars);
 
     Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
 
