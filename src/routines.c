@@ -4985,8 +4985,8 @@ VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
     sprintf(tabiparm->fpath, "");
     strncpy(tabiparm->fname, nosh->molpath[0],4);
     tabiparm->fname[4] = '\0';
-    sprintf(tabiparm->density, "%f", pbeparm->sdens);
-    sprintf(tabiparm->probe_radius, "%f", pbeparm->srad);
+    tabiparm->density = pbeparm->sdens;
+    tabiparm->probe_radius = pbeparm->srad;
 
     tabiparm->epsp = pbeparm->pdie;
     tabiparm->epsw = pbeparm->sdie;
