@@ -100,7 +100,7 @@ int main(
 #ifdef ENABLE_PBAM
     PBAMparm *pbamparm = VNULL;
 #endif
-  
+
     Vmem *mem = VNULL;
     Vcom *com = VNULL;
     Vio *sock = VNULL;
@@ -357,6 +357,7 @@ int main(
     /* *************** PARSE INPUT FILE ******************* */
     nosh = NOsh_ctor(rank, size);
     Vnm_tprint( 1, "Parsing input file %s...\n", input_path);
+    Vnm_tprint( 1, "rank %d size %d...\n", rank, size);
     sock = Vio_ctor("FILE", "ASC", VNULL, input_path, "r");
     if (sock == VNULL) {
         Vnm_tprint(2, "Error while opening input file %s!\n", input_path);
@@ -645,7 +646,7 @@ int main(
                     VJMPERR1(0);
                 }
                 break;
-                
+
         /* Boundary Element (tabi) */
             case NCT_BEM:
 #ifdef ENABLE_BEM
@@ -679,7 +680,7 @@ int main(
                 printPBEPARM(pbeparm);
 
                 /* Solve PDE */
-                if (solveBEM(nosh, pbeparm, bemparm, bemparm->type) != 1) {
+                if (solveBEM(alist, nosh, pbeparm, bemparm, bemparm->type) != 1) {
                     Vnm_tprint(2, "Error solving PDE!\n");
                     VJMPERR1(0);
                 }
@@ -737,7 +738,7 @@ int main(
                 /* Set up problem */
                 Vnm_tprint( 1, "  Setting up problem...\n");
 
-                
+
                 /* Solve PDE */
                 if (solveGeometricFlow(alist, nosh, pbeparm, apolparm, geoflowparm) != 1) {
                     Vnm_tprint(2, "Error solving GEOFLOW!\n");
@@ -751,7 +752,7 @@ int main(
                     Vnm_print(2, "Error!  APBS not compiled with GEOFLOW!\n");
                 exit(2);
 #endif
-                
+
  		        /* Poisson-boltzmann analytical method */
             case NCT_PBAM:
 #ifdef ENABLE_PBAM
@@ -776,13 +777,13 @@ int main(
                 /* Set up problem */
                 Vnm_tprint( 1, "  Setting up problem...\n");
 
-                
+
                 /* Solve LPBE with PBAM method */
                 if (solvePBAM(alist, nosh, pbeparm, pbamparm) != 1) {
                     Vnm_tprint(2, "Error solving PBAM!\n");
                     VJMPERR1(0);
                 }
-            
+
                 fflush(stdout);
                 fflush(stderr);
                 break;
@@ -796,7 +797,7 @@ int main(
                 exit(2);
                 break;
             }
-              
+
     }
 
     //Clear out the parameter file memory

@@ -155,8 +155,8 @@ VPUBLIC Vrc_Codes BEMparm_check(BEMparm *thee) {
         rc = VRC_FAILURE;
     }
 
-    if (thee->mesh>1 || thee->mesh <0 ) {
-        Vnm_print(2,"BEMparm_check: mesh must be 0 (msms) or 1 (NanoShaper)");
+    if (thee->mesh>2 || thee->mesh <0 ) {
+        Vnm_print(2,"BEMparm_check: mesh must be 0 (msms) or 1 and 2 (NanoShaper)");
         rc = VRC_FAILURE;
     }
 
@@ -275,8 +275,8 @@ VPRIVATE Vrc_Codes BEMparm_parseMESH(BEMparm *thee, Vio *sock) {
         Vnm_print(2, "NOsh:  Read non-integer (%s) while parsing MESH \
 keyword!\n", tok);
         return VRC_WARNING;
-    } else if (ti < 0 || ti > 1) {
-        Vnm_print(2, "parseBEM:  mesh must be 0 (msms) or 1 (NanoShaper)!\n");
+    } else if (ti < 0 || ti > 2) {
+        Vnm_print(2, "parseBEM:  mesh must be 0 (msms) or 1 (NanoShaper_ses) 2 (NanoShaper_Skin)!\n");
         return VRC_WARNING;
     } else thee->mesh = ti;
     thee->setmesh = 1;

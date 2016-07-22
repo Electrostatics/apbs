@@ -199,24 +199,26 @@ option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
 if(ENABLE_BEM)
     message(STATUS "Building TABIPB")
     add_definitions(-DENABLE_BEM)
-    set(TABI TABIPB)
+    set(TABI bem)
     set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
-    
+
     ExternalProject_add(
         ${TABI}
         SOURCE_DIR ${TABI_PATH}
-        
+
         CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
         BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
     	INSTALL_COMMAND ""
     )
-    
+
     ExternalProject_Get_Property(${TABI} binary_dir)
+    list(APPEND APBS_LIB_DIRS "${binary_dir}/src")
     list(APPEND APBS_LIB_DIRS "${binary_dir}")
     list(APPEND APBS_LIBS stdc++ TABIPBlib)
     include_directories(${EXTERNALS_PATH}/${TABI})
-    
-    
+    include_directories(${EXTERNALS_PATH}/${TABI}/src)
+
+
     if(BUILD_SHARED_LIBS)
         set(TABI_LIBRARY_BASENAME ${CMAKE_SHARED_LIBRARY_PREFIX}${TABI}${CMAKE_SHARED_LIBRARY_SUFFIX})
     else()
@@ -233,7 +235,7 @@ if(GET_MSMS)
         if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
                 # Mac OS X specific code
                 file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_MacOSX_2.6.1/msms.MacOSX.2.6.1
-                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})                       
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
                 file(RENAME ${EXECUTABLE_OUTPUT_PATH}/msms.MacOSX.2.6.1
                             ${EXECUTABLE_OUTPUT_PATH}/msms)
 
@@ -257,7 +259,7 @@ if(GET_NanoShaper)
         if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
                 # Mac OS X specific code
                 file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/OSX/NanoShaper
-                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})                       
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
 
         elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
                 # Linux specific code
