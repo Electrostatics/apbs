@@ -1,5 +1,5 @@
 read
-    mol pqr 1a63.pqr       # PDB ID
+    mol pqr test_proteins/1a63.pqr       # PQR location 
 end
 elec name comp_solv        # Solvated complex
     bem-manual
@@ -9,8 +9,12 @@ elec name comp_solv        # Solvated complex
     srfm mol               # Molecular surface
 
     mol 1
-    ion  1 0.15 0.95       # sodium ions
-    ion -1 0.15 1.81       # chloride ions
+    ion charge 1 
+        conc 0.15 
+        radius 0.95        # sodium ions
+    ion charge -1 
+        conc 0.15 
+        radius 1.81        # chloride ions
     pdie 1.0               # Solute dielectric
     sdie 80.00             # Solvent dielectric
     srad 1.4               # Solvent probe radius
@@ -21,7 +25,7 @@ elec name comp_solv        # Solvated complex
     tree_n0 500            # maxium particle per leaf
     mac 0.8                # multipole acceptance criterion
 
-    mesh 0 
+    mesh 2                 # mesh (0-MSMS, 1-NanoShaper SES, 2-NanoShaper Skin)
 end
 
 quit
