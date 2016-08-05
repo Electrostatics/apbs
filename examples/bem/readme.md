@@ -16,3 +16,5 @@ Three examples calculate surface potentials for 1a63 in a 0.15 M salt solution:
 Two examples calculate surface potentials for 451c in a 0.15 M salt solution:
         1. 451c_order1.in uses a 1st order Taylor series expansion for the treecode.
         2. 451c_order5.in uses a 5th order Taylor series expansion for the treecode.
+
+Additionally, more pqr files are available in the test_proteins directory.
