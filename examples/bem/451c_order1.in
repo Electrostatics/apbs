@@ -27,7 +27,7 @@ elec name comp_solv        # Solvated complex
 
     mesh 1                 # mesh (0 - MSMS, 1 - NanoShaper SES, 2 - NanoShaper Skin)
 
-    outputdata 1           # outputdata (0 - dat file, 1 - dat and VTK file) 
+    outdata 1              # outdata (0 - dat file, 1 - dat and VTK file) 
 end
 
 quit
