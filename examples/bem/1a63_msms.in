@@ -26,6 +26,8 @@ elec name comp_solv        # Solvated complex
     mac 0.8                # multipole acceptance criterion
 
     mesh 0                 # mesh (0-MSMS, 1-NanoShaper SES, 2-NanoShaper Skin)
+
+    outputdata 1           # outputdata (1-VTK)
 end
 
 quit

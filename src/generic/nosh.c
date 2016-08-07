@@ -2566,7 +2566,7 @@ VPRIVATE int NOsh_setupCalcBEMMANUAL(
     }
     bemparm = elec->bemparm;
     if (bemparm == VNULL) {
-        Vnm_print(2, "NOsh_setupCalcBEMMANUAL:  Got NULL mgparm -- was this calculation \
+        Vnm_print(2, "NOsh_setupCalcBEMMANUAL:  Got NULL bemparm -- was this calculation \
 set up?\n");
         return 0;
     }

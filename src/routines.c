@@ -5004,6 +5004,8 @@ VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
 
     tabiparm->number_of_lines = Valist_getNumberAtoms(molecules[0]);
 
+    tabiparm->output_datafile = bemparm->outdata;
+
     TABIPBvars *tabivars = (TABIPBvars*)calloc(1,sizeof(TABIPBvars));
     if ((tabivars->chrpos = (double *) malloc(3 * tabiparm->number_of_lines * sizeof(double))) == NULL) {
             printf("Error in allocating t_chrpos!\n");
