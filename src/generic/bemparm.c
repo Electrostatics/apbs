@@ -287,7 +287,7 @@ VPRIVATE Vrc_Codes BEMparm_parseMESH(BEMparm *thee, Vio *sock) {
                       keyword!\n", tok);
         return VRC_WARNING;
     } else if (ti < 0 || ti > 2) {
-        Vnm_print(2, "parseBEM:  mesh must be 0 (msms), 1 (NanoShaper_ses),
+        Vnm_print(2, "parseBEM:  mesh must be 0 (msms), 1 (NanoShaper_ses), \
                       or 2 (NanoShaper_Skin)!\n");
         return VRC_WARNING;
     } else thee->mesh = ti;
