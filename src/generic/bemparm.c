@@ -311,7 +311,7 @@ VPRIVATE Vrc_Codes BEMparm_parseOUTDATA(BEMparm *thee, Vio *sock) {
                       keyword!\n", tok);
         return VRC_WARNING;
     } else if (ti < 0 || ti > 2) {
-        Vnm_print(2, "parseBEM:  outdata must be 0, 1 (vtk),
+        Vnm_print(2, "parseBEM:  outdata must be 0, 1 (vtk), \
                       or 2 (unspecified)!\n");
         return VRC_WARNING;
     } else thee->outdata = ti;
