@@ -838,9 +838,6 @@ int main(
             default:
                 Vnm_tprint(2, "  Unknown calculation type (%d)!\n", nosh->calc[i]->calctype);
                 exit(2);
-            default:
-                Vnm_tprint(2, "  Unknown calculation type (%d)!\n", nosh->calc[i]->calctype);
-                exit(2);
                 break;
             }
 

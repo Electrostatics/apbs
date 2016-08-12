@@ -408,7 +408,7 @@ VPUBLIC NOsh_calc* NOsh_calc_ctor(
             break;
         case NCT_PBSAM:
             thee->pbamparm = PBAMparm_ctor(PBAMCT_AUTO);
-            thee->pbamparm = PBSAMparm_ctor(PBSAMCT_AUTO);
+            thee->pbsamparm = PBSAMparm_ctor(PBSAMCT_AUTO);
             break;
         default:
             Vnm_print(2, "NOsh_calc_ctor:  unknown calculation type (%d)!\n",
@@ -450,7 +450,7 @@ VPUBLIC void NOsh_calc_dtor(
             break;
         case NCT_PBSAM:
             PBAMparm_dtor(&(calc->pbamparm));
-            PBSAMparm_dtor(&(calc->pbamparm));
+            PBSAMparm_dtor(&(calc->pbsamparm));
             break;
         default:
             Vnm_print(2, "NOsh_calc_ctor:  unknown calculation type (%d)!\n",
@@ -1289,7 +1289,7 @@ ELEC section!\n");
             thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_PBSAM);
             calc = thee->elec[thee->nelec];
             (thee->nelec)++;
-            calc->pbamparm->type = PBSAMCT_AUTO;
+            calc->pbsamparm->type = PBSAMCT_AUTO;
             return NOsh_parsePBSAM(thee, sock, calc);
         } else {
             Vnm_print(2, "NOsh_parseELEC: The method (\"mg\",\"fem\", \"bem\", \"geoflow\" \"pbam\", \"pbsam\") or \
@@ -1700,7 +1700,7 @@ VPRIVATE int NOsh_setupCalcPBSAM(NOsh *thee, NOsh_calc *calc){
 
   VASSERT(thee!=VNULL);
   VASSERT(calc!=VNULL);
-  parm = calc->pbamparm;
+  parm = calc->pbsamparm;
   VASSERT(parm!=VNULL);
 
   if(parm->type == PBSAMCT_AUTO){
@@ -1709,6 +1709,8 @@ VPRIVATE int NOsh_setupCalcPBSAM(NOsh *thee, NOsh_calc *calc){
     Vnm_print(2, "NOsh_setupCalcPBSAM: undefined PBSAM calculation type (%d)!\n", parm->type);
     return 0;
   }
+}
+
 
 VPRIVATE int NOsh_setupCalcFEM(
                                NOsh *thee,
@@ -2803,6 +2805,7 @@ set up?\n");
         Vnm_print(2, "NOsh_setupCalcPBSAMAUTO:  Got NULL pbsamparm -- was this calculation \
 set up?\n");
         return 0;
+    }
     pbeparm = elec->pbeparm;
     if (pbeparm == VNULL) {
         Vnm_print(2, "NOsh_setupCalcPBAMAUTO:  Got NULL pbeparm -- was this calculation \
@@ -3176,6 +3179,7 @@ VPUBLIC int NOsh_parsePBSAM(
         /* See if it's an END token */
         if (Vstring_strcasecmp(tok, "end") == 0) {
             parm->parsed = 1;
+            samparm->parsed = 1;
             pbeparm->parsed = 1;
             rc = 1;
             break;
@@ -3196,7 +3200,7 @@ VPUBLIC int NOsh_parsePBSAM(
                  Vnm_print(0, "NOsh_parsePBAM:  parsePBAM error!\n");
                  break;
              } else if ( rc == 0 ) {
-                  rc = PBSAMparm_parseToken(parm, tok, sock);
+                  rc = PBSAMparm_parseToken(samparm, tok, sock);
                   if (rc == -1) {
                       Vnm_print(0, "NOsh_parsePBSAM:  parsePBSAM error!\n");
                       break;

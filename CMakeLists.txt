@@ -449,6 +449,7 @@ if(ENABLE_PBAM)
   list(APPEND APBS_LIBS stdc++ PBAMLib)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
+  include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
 endif()
 
 ################################################################################
