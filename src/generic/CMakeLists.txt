@@ -4,6 +4,7 @@ add_items(
     mgparm.c
     femparm.c
     pbamparm.c
+    pbsamparm.c
     pbeparm.c
     bemparm.c
     geoflowparm.c
@@ -25,6 +26,7 @@ add_items(
     mgparm.h
     femparm.h
     pbamparm.h
+    pbsamparm.h
     pbeparm.h
     bemparm.h
     geoflowparm.h
