@@ -1,14 +1,19 @@
 
 #SET(APBS_AUX_PATH ${APBS_SRC_PATH}/src/CMakeFiles/apbs.dir)
+#Removed ${APBS_INST_PATH}/include from INCLUDE_DIRECTORIES,
+#       because it doesn't exist
 
-INCLUDE_DIRECTORIES(. ${APBS_ROOT}/src ${APBS_INST_PATH}/include)
+INCLUDE_DIRECTORIES(. ${APBS_ROOT}/src)
 LINK_DIRECTORIES(${APBS_ROOT_PATH}/lib)
 
 #ADD_LIBRARY(iapbs SHARED apbs_driver.c apbs_driver.h)
 ADD_LIBRARY(iapbs STATIC apbs_driver.c apbs_driver.h)
 
-option(BUILD_WRAPPER "Optionally build Fortran wrapper" OFF)
-if(BUILD_WRAPPER)
+option(BUILD_iAPBS_FORTRAN_WRAPPER "Optionally build iAPBS Fortran wrapper" OFF)
+if(BUILD_iAPBS_FORTRAN_WRAPPER)
+
+   MESSAGE(STATUS "SETTING UP iAPBS FORTRAN WRAPPER")
+
    ENABLE_LANGUAGE(Fortran)
    ADD_EXECUTABLE(wrapper wrapper.f)
    TARGET_LINK_LIBRARIES(wrapper 
