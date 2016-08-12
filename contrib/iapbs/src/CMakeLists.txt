@@ -12,7 +12,7 @@ ADD_LIBRARY(iapbs STATIC apbs_driver.c apbs_driver.h)
 option(BUILD_iAPBS_FORTRAN_WRAPPER "Optionally build iAPBS Fortran wrapper" OFF)
 if(BUILD_iAPBS_FORTRAN_WRAPPER)
 
-   MESSAGE(STATUS "SETTING UP iAPBS FORTRAN WRAPPER")
+   MESSAGE(STATUS "Building of iAPBS Fortran wrapper enabled")
 
    ENABLE_LANGUAGE(Fortran)
    ADD_EXECUTABLE(wrapper wrapper.f)
