@@ -109,6 +109,9 @@ typedef struct sPBSAMparm {
 
     /* The only parms in addition to PBAM would be MSMS
        IMAT and Selfpol */
+    int settolsp;
+    double tolsp;
+
     int setsurf;
     int surfct;
     char surffil[PBSAMPARM_MAXMOL][CHR_MAXLEN];
@@ -183,7 +186,16 @@ VEXTERNC Vrc_Codes PBSAMparm_parseToken(PBSAMparm *thee, char tok[VMAX_BUFSIZE],
 VEXTERNC void PBSAMparm_copy(PBSAMparm *thee, PBSAMparm *parm);
 
 /**
- * @brief Find vertex files for each molecule for each traj and save them
+ * @brief Find sphere tolerance for coarse-graining
+ * @ingroup PBSAMparm
+ * @author
+ * @param thee PBSAMparm object to be copied into
+ * @param sock The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBSAMparm_parseTolsp(PBSAMparm *thee, Vio *sock);
+
+/**
+ * @brief Find vertex files for each molecule and save them
  * @ingroup PBSAMparm
  * @author
  * @param thee PBSAMparm object to be copied into
@@ -192,7 +204,7 @@ VEXTERNC void PBSAMparm_copy(PBSAMparm *thee, PBSAMparm *parm);
 VPRIVATE Vrc_Codes PBSAMparm_parseSurf(PBSAMparm *thee, Vio *sock);
 
 /**
- * @brief Find vertex files for each molecule for each traj and save them
+ * @brief Find IMAT files for each molecule and save them
  * @ingroup PBSAMparm
  * @author
  * @param thee PBSAMparm object to be copied into
@@ -201,7 +213,7 @@ VPRIVATE Vrc_Codes PBSAMparm_parseSurf(PBSAMparm *thee, Vio *sock);
 VPRIVATE Vrc_Codes PBSAMparm_parseImat(PBSAMparm *thee, Vio *sock);
 
 /**
- * @brief Find vertex files for each molecule for each traj and save them
+ * @brief Find expansion files for each molecule and save them
  * @ingroup PBSAMparm
  * @author
  * @param thee PBSAMparm object to be copied into

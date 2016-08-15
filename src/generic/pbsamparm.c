@@ -132,6 +132,10 @@ VPUBLIC void PBSAMparm_copy(PBSAMparm *thee, PBSAMparm *parm) {
     VASSERT(thee != VNULL);
     VASSERT(parm != VNULL);
 
+
+    thee->settolsp = parm->settolsp;
+    thee->tolsp = parm->tolsp;
+
     thee->setsurf = parm->setsurf;
     thee->surfct  = parm->surfct;
     thee->setimat = parm->setimat;
@@ -210,6 +214,26 @@ VPRIVATE Vrc_Codes PBSAMparm_parseExp(PBSAMparm *thee, Vio *sock){
     return VRC_SUCCESS;
 }
 
+VPRIVATE Vrc_Codes PBSAMparm_parseTolsp(PBSAMparm *thee, Vio *sock){
+    const char* name = "tolsp";
+    char tok[VMAX_BUFSIZE];
+    double tf; 
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+        Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+        return VRC_WARNING;
+    }   
+    
+    if (sscanf(tok, "%lf", &tf) == 0){ 
+        Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
+        return VRC_WARNING;
+    }else{
+        thee->tolsp = tf; 
+    }   
+    thee->settolsp = 1;
+    return VRC_SUCCESS;
+}
+
+
 VPUBLIC Vrc_Codes PBSAMparm_parseToken(PBSAMparm *thee, char tok[VMAX_BUFSIZE],
   Vio *sock) {
 
@@ -231,6 +255,8 @@ VPUBLIC Vrc_Codes PBSAMparm_parseToken(PBSAMparm *thee, char tok[VMAX_BUFSIZE],
         return PBSAMparm_parseImat(thee, sock);
     }else if (Vstring_strcasecmp(tok, "exp") == 0) {
         return PBSAMparm_parseExp(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "tolsp") == 0) {
+        return PBSAMparm_parseTolsp(thee, sock);
     }
 
     else {

@@ -5331,99 +5331,100 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
   int i, j;
   Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
   PBSAMInput pbsamIn = getPBSAMParams();
+  PBAMInput pbamIn = getPBAMParams();
 
-  pbsamIn.nmol_ = nosh->nmol;
+  pbamIn.nmol_ = nosh->nmol;
 
   // change any of the parameters you want...
-  pbsamIn.temp_ =  pbeparm->temp;
-  if (fabs(pbsamIn.temp_-0.0) < 1e-3)
+  pbamIn.temp_ =  pbeparm->temp;
+  if (fabs(pbamIn.temp_-0.0) < 1e-3)
   {
     printf("No temperature specified. Setting to 298.15K\n");
-    pbsamIn.temp_ = 298.15;
+    pbamIn.temp_ = 298.15;
   }
 
   // Dielectrics
-  pbsamIn.idiel_ = pbeparm->pdie;
-  pbsamIn.sdiel_ = pbeparm->sdie;
+  pbamIn.idiel_ = pbeparm->pdie;
+  pbamIn.sdiel_ = pbeparm->sdie;
 
   // Salt conc
-  pbsamIn.salt_ = parm->salt;
+  pbamIn.salt_ = parm->salt;
 
   // Runtype: can be energyforce, electrostatics etc
-  strncpy(pbsamIn.runType_, parm->runtype, CHR_MAXLEN);
-  strncpy(pbsamIn.runName_, parm->runname, CHR_MAXLEN);
+  strncpy(pbamIn.runType_, parm->runtype, CHR_MAXLEN);
+  strncpy(pbamIn.runName_, parm->runname, CHR_MAXLEN);
 
-  pbsamIn.randOrient_ = parm->setrandorient;
+  pbamIn.randOrient_ = parm->setrandorient;
 
-  pbsamIn.boxLen_ = parm->pbcboxlen;
-  pbsamIn.pbcType_ = parm->setpbcs;
+  pbamIn.boxLen_ = parm->pbcboxlen;
+  pbamIn.pbcType_ = parm->setpbcs;
 
   // Electrostatic stuff
-  if (parm->setgridpt) pbsamIn.gridPts_ = parm->gridpt;
-  strncpy(pbsamIn.map3D_, parm->map3dname, CHR_MAXLEN);
-  pbsamIn.grid2Dct_ = parm->grid2Dct;
-  for (i=0; i<pbsamIn.grid2Dct_; i++)
+  if (parm->setgridpt) pbamIn.gridPts_ = parm->gridpt;
+  strncpy(pbamIn.map3D_, parm->map3dname, CHR_MAXLEN);
+  pbamIn.grid2Dct_ = parm->grid2Dct;
+  for (i=0; i<pbamIn.grid2Dct_; i++)
   {
-    strncpy(pbsamIn.grid2D_[i], parm->grid2Dname[i], CHR_MAXLEN);
-    strncpy(pbsamIn.grid2Dax_[i], parm->grid2Dax[i], CHR_MAXLEN);
-    pbsamIn.grid2Dloc_[i] = parm->grid2Dloc[i];
+    strncpy(pbamIn.grid2D_[i], parm->grid2Dname[i], CHR_MAXLEN);
+    strncpy(pbamIn.grid2Dax_[i], parm->grid2Dax[i], CHR_MAXLEN);
+    pbamIn.grid2Dloc_[i] = parm->grid2Dloc[i];
   }
-  strncpy(pbsamIn.dxname_, parm->dxname, CHR_MAXLEN);
+  strncpy(pbamIn.dxname_, parm->dxname, CHR_MAXLEN);
 
   // Dynamics stuff
-  pbsamIn.ntraj_ = parm->ntraj;
-  strncpy(pbsamIn.termCombine_, parm->termcombine, CHR_MAXLEN);
+  pbamIn.ntraj_ = parm->ntraj;
+  strncpy(pbamIn.termCombine_, parm->termcombine, CHR_MAXLEN);
 
-  pbsamIn.termct_ = parm->termct;
-  pbsamIn.contct_ = parm->confilct;
+  pbamIn.termct_ = parm->termct;
+  pbamIn.contct_ = parm->confilct;
 
-  if (strncmp(pbsamIn.runType_, "dynamics", 8)== 0)
+  if (strncmp(pbamIn.runType_, "dynamics", 8)== 0)
   {
-    if (pbsamIn.nmol_ > parm->diffct)
+    if (pbamIn.nmol_ > parm->diffct)
     {
       Vnm_tprint(2, "You need more diffusion information!\n");
       return 0;
     }
 
-    for (i=0; i<pbsamIn.nmol_; i++)
+    for (i=0; i<pbamIn.nmol_; i++)
     {
       if (parm->xyzct[i] <  parm->ntraj)
       {
         Vnm_tprint(2, "For molecule %d, you are missing trajectory!\n", i+1);
         return 0;
       } else {
-        for (j=0; j<pbsamIn.ntraj_; j++)
+        for (j=0; j<pbamIn.ntraj_; j++)
         {
-          strncpy(pbsamIn.xyzfil_[i][j], parm->xyzfil[i][j], CHR_MAXLEN);
+          strncpy(pbamIn.xyzfil_[i][j], parm->xyzfil[i][j], CHR_MAXLEN);
         }
       }
     }
 
-    for (i=0; i<pbsamIn.nmol_; i++)
+    for (i=0; i<pbamIn.nmol_; i++)
     {
-      strncpy(pbsamIn.moveType_[i], parm->moveType[i], CHR_MAXLEN);
-      pbsamIn.transDiff_[i] = parm->transDiff[i];
-      pbsamIn.rotDiff_[i] = parm->rotDiff[i];
+      strncpy(pbamIn.moveType_[i], parm->moveType[i], CHR_MAXLEN);
+      pbamIn.transDiff_[i] = parm->transDiff[i];
+      pbamIn.rotDiff_[i] = parm->rotDiff[i];
     }
 
-    for (i=0; i<pbsamIn.termct_; i++)
+    for (i=0; i<pbamIn.termct_; i++)
     {
-        strncpy(pbsamIn.termnam_[i], parm->termnam[i], CHR_MAXLEN);
-        pbsamIn.termnu_[i][0] = parm->termnu[i][0];
-        pbsamIn.termval_[i] = parm->termVal[i];
+        strncpy(pbamIn.termnam_[i], parm->termnam[i], CHR_MAXLEN);
+        pbamIn.termnu_[i][0] = parm->termnu[i][0];
+        pbamIn.termval_[i] = parm->termVal[i];
     }
 
-    for (i=0; i<pbsamIn.contct_; i++)
+    for (i=0; i<pbamIn.contct_; i++)
     {
-        strncpy(pbsamIn.confil_[i], parm->confil[i], CHR_MAXLEN);
+        strncpy(pbamIn.confil_[i], parm->confil[i], CHR_MAXLEN);
     }
   }
 
   // debug
-  printPBSAMStruct( pbsamIn );
+  printPBSAMStruct( pbamIn, pbsamIn );
 
   // Run the darn thing
-  PBSAMOutput pbsamOut = runPBSAMWrapAPBS( pbsamIn, molecules, nosh->nmol );
+  PBAMOutput pbamOut = runPBSAMWrapAPBS(pbamIn, pbsamIn, molecules, nosh->nmol);
   Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
   return 1;
 }

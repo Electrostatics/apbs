@@ -79,8 +79,12 @@
   #include "GeometricFlowWrap.h"
 #endif
 
-#ifdef ENABLE_PBAM
+#if defined(ENABLE_PBAM) || defined(ENABLE_PBSAM)
   #include "PBAMWrap.h"
+#endif
+
+#ifdef ENABLE_PBSAM
+  #include "PBSAMWrap.h"
 #endif
 
 /**
@@ -845,5 +849,22 @@ VEXTERNC int solvePBAM(
                                 NOsh *nosh,
                                 PBEparm *pbeparm,
                                 PBAMparm *parm
+);
+#endif
+
+#ifdef ENABLE_PBSAM
+/**
+ * @brief  Solve the LPBE with PBSAM
+ * @ingroup  Frontend
+ * @param nosh  Object with parsed input file parameters
+ * @param pbem  PBAM objects for this calculation
+ * @param type  Type of PBAM calculation
+ * @return  1 if successful, 0 otherwise */
+VEXTERNC int solvePBSAM(
+      Valist* molecules[NOSH_MAXMOL],
+                                NOsh *nosh,
+                                PBEparm *pbeparm,
+                                PBAMparm *parm,
+                                PBSAMparm *samparm
 );
 #endif

@@ -427,7 +427,18 @@ if(ENABLE_GEOFLOW)
 endif()
 
 
-## TODO: Fix this and point to PBAM source
+################################################################################
+# Optionally build pbam and pbsam(git submodule)
+################################################################################
+
+option(ENABLE_PB_S_AM "pbam and pbsam method" OFF)
+if(ENABLE_PB_S_AM)
+  message(STATUS "Building PBAM and PBSAM")
+
+  add_definitions(-DENABLE_PBAM)
+  add_definitions(-DENABLE_PBSAM)
+endif()
+
 ################################################################################
 # Optionally build pbam (git submodule)
 ################################################################################
@@ -446,8 +457,39 @@ if(ENABLE_PBAM)
   ExternalProject_Get_Property(pbam binary_dir)
   add_definitions(-DENABLE_PBAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
-  list(APPEND APBS_LIBS stdc++ PBAMLib)
+  list(APPEND APBS_LIBS stdc++ PBAMLib )
   include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
+  include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
+  include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
+endif()
+
+################################################################################
+# Optionally build pbsam (git submodule)
+################################################################################
+
+option(ENABLE_PBSAM "pbsam method" OFF)
+if(ENABLE_PBSAM)
+  message(STATUS "Building PBSAM")
+  add_definitions(-DPBSAM_APBS)
+  
+  list(APPEND CMAKE_MODULE_PATH ${EXTERNALS_PATH}/pb_s_am/cmake/modules)
+  include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
+  include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
+  include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
+
+  ExternalProject_Add(
+                      pbsam
+                      SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+                      CMAKE_ARGS -DENABLE_PBSAM_APBS=ON
+                      BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
+                      INSTALL_COMMAND ""
+                      )
+  ExternalProject_Get_Property(pbsam binary_dir)
+  add_definitions(-DENABLE_PBSAM)
+  list(APPEND APBS_LIB_DIRS "${binary_dir}/pbsam/src")
+  list(APPEND APBS_LIBS stdc++ PBSAMLib ${PBSAM_LINKER_LIBS})
+  message(STATUS "Adding in " ${PBSAM_LINKER_LIBS} )
+  include_directories(${EXTERNALS_PATH}/pb_s_am/pbsam/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
 endif()
