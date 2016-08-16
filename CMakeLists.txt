@@ -214,7 +214,7 @@ if(ENABLE_BEM)
     ExternalProject_Get_Property(${TABI} binary_dir)
     list(APPEND APBS_LIB_DIRS "${binary_dir}/src")
     list(APPEND APBS_LIB_DIRS "${binary_dir}")
-    list(APPEND APBS_LIBS stdc++ TABIPBlib)
+    list(APPEND APBS_LIBS TABIPBlib)
     include_directories(${EXTERNALS_PATH}/${TABI})
     include_directories(${EXTERNALS_PATH}/${TABI}/src)
 
@@ -294,21 +294,21 @@ if(NOT ENABLE_FETK)
   list(APPEND APBS_LIBS maloc)
 endif()
 
-##############################################################################
-##
-# Find some libraries                                                          #
+################################################################################
+#                                                                              #
+# Find some libraries; Windows finds these automatically                       #
 ################################################################################
 
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
-    list(APPEND APBS_LIBS m)
+    list(APPEND APBS_LIBS m stdc++)
 endif()
 
 
 ################################################################################
 # Handle conditional building with MPI Support                                 #
 # There may be a better way, but for now this comes before FETK because FETK   #
-# depends on having the libraries located.                          #
+# depends on having the libraries located.                                     #
 ################################################################################
 
 option(ENABLE_MPI "Enable MPI parallelism" OFF)
@@ -392,7 +392,7 @@ if(ENABLE_FETK)
     ExternalProject_Get_Property(fetk-maloc install_dir)
     include_directories(${install_dir}/include)
 
-      list(APPEND APBS_LIBS "stdc++")
+#list(APPEND APBS_LIBS "stdc++")
       list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
       list(APPEND APBS_LIBS maloc amd punc mc gamer superlu umfpack
   blas vf2c tetgen triangle readline termcap)
@@ -422,7 +422,8 @@ if(ENABLE_GEOFLOW)
   ExternalProject_Get_Property(geoflow binary_dir)
   add_definitions(-DENABLE_GEOFLOW)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
-  list(APPEND APBS_LIBS stdc++ GeometricFlowLib)
+  list(APPEND APBS_LIBS GeometricFlowLib)
+#list(APPEND APBS_LIBS stdc++ GeometricFlowLib)
   include_directories(${EXTERNALS_PATH}/geoflow_c/src)
 endif()
 
@@ -446,7 +447,8 @@ if(ENABLE_PBAM)
   ExternalProject_Get_Property(pbam binary_dir)
   add_definitions(-DENABLE_PBAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
-  list(APPEND APBS_LIBS stdc++ PBAMLib)
+  list(APPEND APBS_LIBS PBAMLib)
+#list(APPEND APBS_LIBS stdc++ PBAMLib)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
 endif()
