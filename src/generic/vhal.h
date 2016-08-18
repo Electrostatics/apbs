@@ -57,8 +57,6 @@
 
 #include "stdio.h"
 
-FILE *data;
-
 /**
  *    @ingroup Vhal
  *    @author     David Gohara
