@@ -5420,6 +5420,22 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
     }
   }
 
+  
+  // SAM details
+  pbsamIn.tolsp_ = samparm->tolsp;
+  for (i=0; i<samparm->surfct; i++)
+  {
+      strncpy(pbsamIn.surffil_[i], samparm->surffil[i], CHR_MAXLEN);
+  }
+  for (i=0; i<samparm->imatct; i++)
+  {
+      strncpy(pbsamIn.imatfil_[i], samparm->imatfil[i], CHR_MAXLEN);
+  }
+  for (i=0; i<samparm->expct; i++)
+  {
+      strncpy(pbsamIn.expfil_[i], samparm->expfil[i], CHR_MAXLEN);
+  }
+
   // debug
   printPBSAMStruct( pbamIn, pbsamIn );
 

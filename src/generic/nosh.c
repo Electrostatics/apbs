@@ -3192,12 +3192,12 @@ VPUBLIC int NOsh_parsePBSAM(
         /* Pass the token through a series of parsers */
         rc = PBEparm_parseToken(pbeparm, tok, sock);
         if (rc == -1) {
-            Vnm_print(0, "NOsh_parsePBAM:  parsePBE error!\n");
+            Vnm_print(0, "NOsh_parsePBSAM:  parsePBE error!\n");
             break;
         } else if (rc == 0) {
              rc = PBAMparm_parseToken(parm, tok, sock);
              if (rc == -1) {
-                 Vnm_print(0, "NOsh_parsePBAM:  parsePBAM error!\n");
+                 Vnm_print(0, "NOsh_parsePBSAM:  parsePBAM error!\n");
                  break;
              } else if ( rc == 0 ) {
                   rc = PBSAMparm_parseToken(samparm, tok, sock);

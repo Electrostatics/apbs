@@ -675,9 +675,14 @@ VPUBLIC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
         return PBAMparm_parseXYZ(thee, sock);
     }
 
-    else {
+
+    else
+     return 0;
+  
+  /*else {
         Vnm_print(2, "parsePBAM:  Unrecognized keyword (%s)!\n", tok);
         return VRC_WARNING;
     }
     return VRC_FAILURE;
+  */
 }

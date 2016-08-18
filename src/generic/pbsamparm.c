@@ -80,6 +80,8 @@ VPUBLIC Vrc_Codes PBSAMparm_ctor2(PBSAMparm *thee, PBSAMparm_CalcType type) {
 
     if (thee == VNULL) return VRC_FAILURE;
 
+    thee->tolsp = 2.5;
+
     thee->setsurf = 0;
     thee->surfct = 0;
 
@@ -162,11 +164,6 @@ VPRIVATE Vrc_Codes PBSAMparm_parseSurf(PBSAMparm *thee, Vio *sock){
     if(Vio_scanf(sock, "%s", tok) == 0) {
         Vnm_print(2, "parsePBSAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
-    } 
-
-    if(Vio_scanf(sock, "%s", tok) == 0) {
-        Vnm_print(2, "parsePBSAM:  ran out of tokens on %s!\n", name);
-        return VRC_WARNING;
     } else {
        strncpy(thee->surffil[thee->surfct], tok, CHR_MAXLEN);
       thee->surfct += 1;
@@ -182,11 +179,6 @@ VPRIVATE Vrc_Codes PBSAMparm_parseImat(PBSAMparm *thee, Vio *sock){
     if(Vio_scanf(sock, "%s", tok) == 0) {
         Vnm_print(2, "parsePBSAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
-    } 
-
-    if(Vio_scanf(sock, "%s", tok) == 0) {
-        Vnm_print(2, "parsePBSAM:  ran out of tokens on %s!\n", name);
-        return VRC_WARNING;
     } else {
        strncpy(thee->imatfil[thee->imatct], tok, CHR_MAXLEN);
       thee->imatct += 1;
@@ -198,11 +190,6 @@ VPRIVATE Vrc_Codes PBSAMparm_parseImat(PBSAMparm *thee, Vio *sock){
 VPRIVATE Vrc_Codes PBSAMparm_parseExp(PBSAMparm *thee, Vio *sock){
     const char* name = "exp";
     char tok[VMAX_BUFSIZE];
-
-    if(Vio_scanf(sock, "%s", tok) == 0) {
-        Vnm_print(2, "parsePBSAM:  ran out of tokens on %s!\n", name);
-        return VRC_WARNING;
-    } 
 
     if(Vio_scanf(sock, "%s", tok) == 0) {
         Vnm_print(2, "parsePBSAM:  ran out of tokens on %s!\n", name);
