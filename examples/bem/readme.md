@@ -17,4 +17,10 @@ Two examples calculate surface potentials for 451c in a 0.15 M salt solution:
         1. 451c_order1.in uses a 1st order Taylor series expansion for the treecode.
         2. 451c_order5.in uses a 5th order Taylor series expansion for the treecode.
 
+binding_energy is an example to calculate binding energy on 1d30.
+
+pKa is an example to use TABI-PB to calculate pKa as http://www.poissonboltzmann.org/examples/Lysozyme_pKa_example/.
+
+More details are on apbs website contributions.
+
 Additionally, more pqr files are available in the test_proteins directory.

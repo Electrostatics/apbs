@@ -1,0 +1,33 @@
+read
+    mol pqr ../test_proteins/ASP66.pqr       # PQR location 
+end
+elec name comp_solv        # Solvated complex
+    bem-manual
+
+    lpbe                   # Linearized PB
+    bcfl mdh               # Full multipole boundary condition
+    srfm mol               # Molecular surface
+
+    mol 1
+    ion charge 1 
+        conc 0.00 
+        radius 0.95        # sodium ions
+    ion charge -1 
+        conc 0.00 
+        radius 1.81        # chloride ions
+    pdie 20.0               # Solute dielectric
+    sdie 78.54             # Solvent dielectric
+    srad 1.4               # Solvent probe radius
+    sdens 2                # NO. of Elements per A^2
+    temp 298.00            # Temperature
+
+    tree_order 1           # taylor expansion order
+    tree_n0 500            # maxium particle per leaf
+    mac 0.8                # multipole acceptance criterion
+
+    mesh 0                 # mesh (0 - MSMS, 1 - NanoShaper SES, 2 - NanoShaper Skin)
+
+    outdata 0              # outdata (0 - dat file, 1 - dat and VTK file) 
+end
+
+quit

@@ -1,0 +1,22 @@
+read
+    mol pqr gly.pqr
+end
+elec name comp_solv        # Solvated complex
+    geoflow-auto
+
+    lpbe
+    bcfl mdh                # only supported boundary condition
+    mol 1
+
+    grid 0.25 0.25 0.25     # grid spacing                    
+    gamma 0.0001            # surface tension kcal/(mol*A^2) 
+    pdie 1.5                # Solute dielectric
+    sdie 80.00              # Solvent dielectric                
+    press 0.008             # pressure kcal/(mol*A^3)           
+    bconc 0.03346           # bulk solvent density A^-3   
+    vdwdisp 0               # van der wal dispersion (on/off)
+    etol 0.00001            # error tolerance for the solver
+end
+
+quit
+
