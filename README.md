@@ -31,7 +31,7 @@ MSMS, developed by Michel Sanner, and NanoShaper, developed by W. Rocchia and S.
 If you would like to use the FEM, you will need to be on OS X or Linux.  To enable, when invoking CMake, set ENABLE_FETK to ON, e.g., `-DENABLE_FETK=ON`.
 On Linux the FETK shared libraries need to be locatable by the shared library loader.  One way to do this is to update LD_LIBRARY_PATH to point at `<build-dir>/fetk/lib`, e.g., `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<build-dir>/fetk/lib`.
 
-## Building the python libraries for pdb2pqr
+## Building the APBS python libraries (needed for pdb2pqr)
 * Install [swig](http://www.swig.org/)
 * Build APBS with the following flag: `-DENABLE_PYTHON=ON`.  If you are on Linux you also need `-DBUILD_SHARED_LIBS=OFF`
 * Add these libraries to your library path so pdb2pqr can find them.
