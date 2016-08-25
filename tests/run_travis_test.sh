@@ -10,5 +10,14 @@ echo $2
 if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$FETK" = "ON" ]; then
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$1/../fetk/lib
 fi
+
 PATH=$PATH:$1 python apbs_tester.py -t $2
-! grep FAILED test.log
+let result=$?
+
+if [ "$result" -eq 0 ]; then
+	! grep FAILED test.log
+	exit $?
+else
+	exit $result
+fi
+
