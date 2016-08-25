@@ -5040,6 +5040,11 @@ VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
     free_matrix(tabivars->vert); // allocate in output_potential()
     free_matrix(tabivars->snrm); // allocate in output_potential()
     free_matrix(tabivars->face); // allocate in output_potential()
+
+    Vnm_tprint( 1,"Solvation energy and Coulombic energy in kJ/mol...\n\n");
+    Vnm_tprint( 1,"  Global net ELEC energy = %1.12E\n", 4.184*tabivars->soleng);
+    Vnm_tprint( 1,"  Global net COULOMBIC energy = %1.12E\n\n", 4.184*tabivars->couleng);
+
     free(tabivars);
 
     Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
