@@ -1,5 +1,5 @@
 read
-    mol pqr ../test_proteins/2LZT-ASH66.pqr       # PQR location 
+    mol pqr test_proteins/1d30.pqr       # PQR location 
 end
 elec name comp_solv        # Solvated complex
     bem-manual
@@ -10,15 +10,15 @@ elec name comp_solv        # Solvated complex
 
     mol 1
     ion charge 1 
-        conc 0.00 
+        conc 0.05 
         radius 0.95        # sodium ions
     ion charge -1 
-        conc 0.00 
+        conc 0.05 
         radius 1.81        # chloride ions
-    pdie 20.0               # Solute dielectric
-    sdie 78.54             # Solvent dielectric
+    pdie 1.0               # Solute dielectric
+    sdie 80.00             # Solvent dielectric
     srad 1.4               # Solvent probe radius
-    sdens 10                # NO. of Elements per A^2
+    sdens 5                # NO. of Elements per A^2
     temp 298.00            # Temperature
 
     tree_order 3           # taylor expansion order

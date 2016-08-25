@@ -1,5 +1,5 @@
 read
-    mol pqr ../test_proteins/1d30_monomer2.pqr       # PQR location 
+    mol pqr test_proteins/1d30_monomer2.pqr       # PQR location 
 end
 elec name comp_solv        # Solvated complex
     bem-manual

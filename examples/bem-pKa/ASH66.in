@@ -1,5 +1,5 @@
 read
-    mol pqr ../test_proteins/2LZT-ASP66.pqr       # PQR location 
+    mol pqr test_proteins/ASH66.pqr       # PQR location 
 end
 elec name comp_solv        # Solvated complex
     bem-manual
