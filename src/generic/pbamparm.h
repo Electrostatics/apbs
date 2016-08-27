@@ -126,6 +126,10 @@ typedef struct sPBAMparm {
     double pbcboxlen;
     int setpbcs;
 
+    // This is units of the calculation
+    char units[CHR_MAXLEN];
+    int setunits;
+
     //
     // ELECTROSTATICS
     //
@@ -281,6 +285,15 @@ VPRIVATE Vrc_Codes PBAMparm_parseRandorient(PBAMparm *thee, Vio *sock);
  * @param sock The stream from which parameter is taken
  */
 VPRIVATE Vrc_Codes PBAMparm_parsePBCS(PBAMparm *thee, Vio *sock);
+
+/**
+ * @brief Find units flag and save units
+ * @ingroup PBAMparm
+ * @author
+ * @param thee PBAMparm object to be copied into
+ * @param sock The stream from which parameter is taken
+ */
+VPRIVATE Vrc_Codes PBAMparm_parseUnits(PBAMparm *thee, Vio *sock);
 
 /**
  * @brief Find 3D map filename and save it

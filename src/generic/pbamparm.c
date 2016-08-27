@@ -87,6 +87,7 @@ VPUBLIC Vrc_Codes PBAMparm_ctor2(PBAMparm *thee, PBAMparm_CalcType type) {
     thee->setsalt = 0;
     thee->setruntype = 0;
     thee->setrunname = 0;
+    thee->setunits = 0;
 
     thee->setrandorient = 0;
 
@@ -173,6 +174,9 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
 
     thee->setpbcs = parm->setpbcs;
     thee->pbcboxlen = parm->pbcboxlen;
+
+    for (i=0; i<CHR_MAXLEN; i++) thee->units[i] = parm->units[i];
+    thee->setunits = parm->setunits;
 
     // Electrostatic parts
     thee->gridpt = parm->gridpt;
@@ -323,6 +327,21 @@ VPRIVATE Vrc_Codes PBAMparm_parsePBCS(PBAMparm *thee, Vio *sock){
     }else{
         thee->pbcboxlen = tf;
     }
+    return VRC_SUCCESS;
+}
+
+VPRIVATE Vrc_Codes PBAMparm_parseUnits(PBAMparm *thee, Vio *sock){
+    const char* name = "units";
+    char tok[VMAX_BUFSIZE];
+
+    if(Vio_scanf(sock, "%s", tok) == 0) {
+      Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
+      return VRC_WARNING;
+    } else {
+      strncpy(thee->units, tok, CHR_MAXLEN);
+      thee->setunits=1;
+    }
+
     return VRC_SUCCESS;
 }
 
@@ -649,6 +668,8 @@ VPUBLIC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
         return PBAMparm_parseRandorient(thee, sock);
     }else if (Vstring_strcasecmp(tok, "pbc") == 0) {
         return PBAMparm_parsePBCS(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "units") == 0) {
+        return PBAMparm_parseUnits(thee, sock);
     }
 
     // Electrostatic parsing

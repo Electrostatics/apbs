@@ -7,6 +7,7 @@ elec name comp_solv        # Gly
     runtype electrostatics  # Can be energyforce, electrostatics etc
     runname elec_gly        # Output name for files created by program
 
+    units jmol
     ## info for molecule
     surf gly.vert
     tolsp 2.5

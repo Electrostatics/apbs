@@ -5236,6 +5236,9 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
   pbamIn.boxLen_ = parm->pbcboxlen;
   pbamIn.pbcType_ = parm->setpbcs;
 
+  pbamIn.setunits_ = parm->setunits;
+  if(parm->setunits == 1) strncpy(pbamIn.units_, parm->units, CHR_MAXLEN);
+
   // Electrostatic stuff
   if (parm->setgridpt) pbamIn.gridPts_ = parm->gridpt;
   strncpy(pbamIn.map3D_, parm->map3dname, CHR_MAXLEN);
@@ -5354,6 +5357,8 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
   strncpy(pbamIn.runType_, parm->runtype, CHR_MAXLEN);
   strncpy(pbamIn.runName_, parm->runname, CHR_MAXLEN);
 
+  pbamIn.setunits_ = parm->setunits;
+  if(parm->setunits == 1) strncpy(pbamIn.units_, parm->units, CHR_MAXLEN);
   pbamIn.randOrient_ = parm->setrandorient;
 
   pbamIn.boxLen_ = parm->pbcboxlen;
