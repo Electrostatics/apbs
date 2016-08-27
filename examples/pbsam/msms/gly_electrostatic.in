@@ -1,5 +1,5 @@
 read
-    mol pqr gly.pqr
+    mol pqr gly_msms.pqr
 end
 elec name comp_solv        # Gly
     pbsam-auto

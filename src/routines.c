@@ -301,38 +301,38 @@ VPUBLIC int loadDielMaps(NOsh *nosh,Vgrid *dielXMap[NOSH_MAXMOL], Vgrid *dielYMa
 
             //DX binary file (.dxbin)
             case VDF_DXBIN:
-            	//TODO: add this method and maybe change the if stmt.
-            	if (Vgrid_readDXBIN(dielXMap[i], "FILE", "ASC", VNULL,
-            	                                 nosh->dielXpath[i]) != 1) {
-            	                    Vnm_tprint( 2, "Fatal error while reading from %s\n",
-            	                                nosh->dielXpath[i]);
-            	                    return 0;
-            	}
+              //TODO: add this method and maybe change the if stmt.
+              if (Vgrid_readDXBIN(dielXMap[i], "FILE", "ASC", VNULL,
+                                               nosh->dielXpath[i]) != 1) {
+                                  Vnm_tprint( 2, "Fatal error while reading from %s\n",
+                                              nosh->dielXpath[i]);
+                                  return 0;
+              }
 
-            	// Set grid sizes
-				nx = dielXMap[i]->nx;
-				ny = dielXMap[i]->ny;
-				nz = dielXMap[i]->nz;
+              // Set grid sizes
+        nx = dielXMap[i]->nx;
+        ny = dielXMap[i]->ny;
+        nz = dielXMap[i]->nz;
 
-				// Set spacings
-				hx = dielXMap[i]->hx;
-				hy = dielXMap[i]->hy;
-				hzed = dielXMap[i]->hzed;
+        // Set spacings
+        hx = dielXMap[i]->hx;
+        hy = dielXMap[i]->hy;
+        hzed = dielXMap[i]->hzed;
 
-				// Set minimum lower corner
-				xmin = dielXMap[i]->xmin;
-				ymin = dielXMap[i]->ymin;
-				zmin = dielXMap[i]->zmin;
-				Vnm_tprint(1, "  %d x %d x %d grid\n", nx, ny, nz);
-				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", hx, hy, hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
-						   xmin, ymin, zmin);
-				sum = 0;
-				for (ii=0; ii<(nx*ny*nz); ii++)
-					sum += (dielXMap[i]->data[ii]);
-					sum = sum*hx*hy*hzed;
-				Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
-				break;
+        // Set minimum lower corner
+        xmin = dielXMap[i]->xmin;
+        ymin = dielXMap[i]->ymin;
+        zmin = dielXMap[i]->zmin;
+        Vnm_tprint(1, "  %d x %d x %d grid\n", nx, ny, nz);
+        Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", hx, hy, hzed);
+        Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+               xmin, ymin, zmin);
+        sum = 0;
+        for (ii=0; ii<(nx*ny*nz); ii++)
+          sum += (dielXMap[i]->data[ii]);
+          sum = sum*hx*hy*hzed;
+        Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
+        break;
 
             // Binary file (GZip)
             case VDF_GZ:
@@ -423,39 +423,39 @@ VPUBLIC int loadDielMaps(NOsh *nosh,Vgrid *dielXMap[NOSH_MAXMOL], Vgrid *dielYMa
                 Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
                 break;
             //DX Binary file (.dxbin)
-			case VDF_DXBIN:
-				//TODO: add this funct/method and maybe change the if stmt.
-				if (Vgrid_readDXBIN(dielYMap[i], "FILE", "ASC", VNULL,
-								 nosh->dielYpath[i]) != 1) {
-					Vnm_tprint( 2, "Fatal error while reading from %s\n",
-								nosh->dielYpath[i]);
-					return 0;
-				}
+      case VDF_DXBIN:
+        //TODO: add this funct/method and maybe change the if stmt.
+        if (Vgrid_readDXBIN(dielYMap[i], "FILE", "ASC", VNULL,
+                 nosh->dielYpath[i]) != 1) {
+          Vnm_tprint( 2, "Fatal error while reading from %s\n",
+                nosh->dielYpath[i]);
+          return 0;
+        }
 
-				// Read grid
-				nx = dielYMap[i]->nx;
-				ny = dielYMap[i]->ny;
-				nz = dielYMap[i]->nz;
+        // Read grid
+        nx = dielYMap[i]->nx;
+        ny = dielYMap[i]->ny;
+        nz = dielYMap[i]->nz;
 
-				// Read spacings
-				hx = dielYMap[i]->hx;
-				hy = dielYMap[i]->hy;
-				hzed = dielYMap[i]->hzed;
+        // Read spacings
+        hx = dielYMap[i]->hx;
+        hy = dielYMap[i]->hy;
+        hzed = dielYMap[i]->hzed;
 
-				// Read minimum lower corner
-				xmin = dielYMap[i]->xmin;
-				ymin = dielYMap[i]->ymin;
-				zmin = dielYMap[i]->zmin;
-				Vnm_tprint(1, "  %d x %d x %d grid\n", nx, ny, nz);
-				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", hx, hy, hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
-						   xmin, ymin, zmin);
-				sum = 0;
-				for (ii=0; ii<(nx*ny*nz); ii++)
-					sum += (dielYMap[i]->data[ii]);
-					sum = sum*hx*hy*hzed;
-				Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
-				break;
+        // Read minimum lower corner
+        xmin = dielYMap[i]->xmin;
+        ymin = dielYMap[i]->ymin;
+        zmin = dielYMap[i]->zmin;
+        Vnm_tprint(1, "  %d x %d x %d grid\n", nx, ny, nz);
+        Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", hx, hy, hzed);
+        Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+               xmin, ymin, zmin);
+        sum = 0;
+        for (ii=0; ii<(nx*ny*nz); ii++)
+          sum += (dielYMap[i]->data[ii]);
+          sum = sum*hx*hy*hzed;
+        Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
+        break;
             // Binary file (GZip) format
             case VDF_GZ:
                 if (Vgrid_readGZ(dielYMap[i], nosh->dielYpath[i]) != 1) {
@@ -548,39 +548,39 @@ VPUBLIC int loadDielMaps(NOsh *nosh,Vgrid *dielXMap[NOSH_MAXMOL], Vgrid *dielYMa
                 break;
             //OpenDX Binary format (.dxbin)
             case VDF_DXBIN:
-            	//TODO: add this funct/method and maybe change the if stmt.
-				if (Vgrid_readDXBIN(dielZMap[i], "FILE", "ASC", VNULL,
-								 nosh->dielZpath[i]) != 1) {
-					Vnm_tprint( 2, "Fatal error while reading from %s\n",
-								nosh->dielZpath[i]);
-					return 0;
-				}
+              //TODO: add this funct/method and maybe change the if stmt.
+        if (Vgrid_readDXBIN(dielZMap[i], "FILE", "ASC", VNULL,
+                 nosh->dielZpath[i]) != 1) {
+          Vnm_tprint( 2, "Fatal error while reading from %s\n",
+                nosh->dielZpath[i]);
+          return 0;
+        }
 
-				// Read grid
-				nx = dielZMap[i]->nx;
-				ny = dielZMap[i]->ny;
-				nz = dielZMap[i]->nz;
+        // Read grid
+        nx = dielZMap[i]->nx;
+        ny = dielZMap[i]->ny;
+        nz = dielZMap[i]->nz;
 
-				// Read spacings
-				hx = dielZMap[i]->hx;
-				hy = dielZMap[i]->hy;
-				hzed = dielZMap[i]->hzed;
+        // Read spacings
+        hx = dielZMap[i]->hx;
+        hy = dielZMap[i]->hy;
+        hzed = dielZMap[i]->hzed;
 
-				// Read minimum lower corner
-				xmin = dielZMap[i]->xmin;
-				ymin = dielZMap[i]->ymin;
-				zmin = dielZMap[i]->zmin;
-				Vnm_tprint(1, "  %d x %d x %d grid\n",
-						   nx, ny, nz);
-				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
-						   hx, hy, hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
-						   xmin, ymin, zmin);
-				sum = 0;
-				for (ii=0; ii<(nx*ny*nz); ii++) sum += (dielZMap[i]->data[ii]);
-					sum = sum*hx*hy*hzed;
-				Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
-				break;
+        // Read minimum lower corner
+        xmin = dielZMap[i]->xmin;
+        ymin = dielZMap[i]->ymin;
+        zmin = dielZMap[i]->zmin;
+        Vnm_tprint(1, "  %d x %d x %d grid\n",
+               nx, ny, nz);
+        Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
+               hx, hy, hzed);
+        Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+               xmin, ymin, zmin);
+        sum = 0;
+        for (ii=0; ii<(nx*ny*nz); ii++) sum += (dielZMap[i]->data[ii]);
+          sum = sum*hx*hy*hzed;
+        Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
+        break;
             // Binary file (GZip) format
             case VDF_GZ:
                 if (Vgrid_readGZ(dielZMap[i], nosh->dielZpath[i]) != 1) {
@@ -706,30 +706,30 @@ VPUBLIC int loadKappaMaps(NOsh *nosh,
                 Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
                 break;
                 // OpenDX Binary (.dxbin) format
-				case VDF_DXBIN:
-					//TODO: write method and possible change if stmt.
-					if (Vgrid_readDXBIN(map[i], "FILE", "ASC", VNULL,
-									 nosh->kappapath[i]) != 1) {
-						Vnm_tprint( 2, "Fatal error while reading from %s\n",
-									nosh->kappapath[i]);
-						return 0;
-					}
-					Vnm_tprint(1, "  %d x %d x %d grid\n",
-							   map[i]->nx, map[i]->ny, map[i]->nz);
-					Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
-							   map[i]->hx, map[i]->hy, map[i]->hzed);
-					Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
-							   map[i]->xmin, map[i]->ymin, map[i]->zmin);
-					sum = 0;
-					for (ii = 0, len = map[i]->nx * map[i]->ny * map[i]->nz;
-						 ii < len;
-						 ii++
-						) {
-						sum += (map[i]->data[ii]);
-					}
-						sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
-					Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
-					break;
+        case VDF_DXBIN:
+          //TODO: write method and possible change if stmt.
+          if (Vgrid_readDXBIN(map[i], "FILE", "ASC", VNULL,
+                   nosh->kappapath[i]) != 1) {
+            Vnm_tprint( 2, "Fatal error while reading from %s\n",
+                  nosh->kappapath[i]);
+            return 0;
+          }
+          Vnm_tprint(1, "  %d x %d x %d grid\n",
+                 map[i]->nx, map[i]->ny, map[i]->nz);
+          Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
+                 map[i]->hx, map[i]->hy, map[i]->hzed);
+          Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+                 map[i]->xmin, map[i]->ymin, map[i]->zmin);
+          sum = 0;
+          for (ii = 0, len = map[i]->nx * map[i]->ny * map[i]->nz;
+             ii < len;
+             ii++
+            ) {
+            sum += (map[i]->data[ii]);
+          }
+            sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
+          Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
+          break;
             // UHBD format
             case VDF_UHBD:
                 Vnm_tprint( 2, "UHBD input not supported yet!\n");
@@ -922,26 +922,26 @@ VPUBLIC int loadChargeMaps(NOsh *nosh,
                 Vnm_tprint(1, "  Charge map integral = %3.2e e\n", sum);
                 break;
             case VDF_DXBIN:
-            	//TODO: write Vgrid_readDXBIN and possibly change if stmt.
-				if (Vgrid_readDXBIN(map[i], "FILE", "ASC", VNULL,
-								 nosh->chargepath[i]) != 1) {
-					Vnm_tprint( 2, "Fatal error while reading from %s\n",
-								nosh->chargepath[i]);
-					return 0;
-				}
-				Vnm_tprint(1, "  %d x %d x %d grid\n",
-						   map[i]->nx, map[i]->ny, map[i]->nz);
-				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
-						   map[i]->hx, map[i]->hy, map[i]->hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
-						   map[i]->xmin, map[i]->ymin, map[i]->zmin);
-				sum = 0;
-				for (ii=0,len=map[i]->nx*map[i]->ny*map[i]->nz; ii<len; ii++) {
-					sum += (map[i]->data[ii]);
-				}
-					sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
-				Vnm_tprint(1, "  Charge map integral = %3.2e e\n", sum);
-				break;
+              //TODO: write Vgrid_readDXBIN and possibly change if stmt.
+        if (Vgrid_readDXBIN(map[i], "FILE", "ASC", VNULL,
+                 nosh->chargepath[i]) != 1) {
+          Vnm_tprint( 2, "Fatal error while reading from %s\n",
+                nosh->chargepath[i]);
+          return 0;
+        }
+        Vnm_tprint(1, "  %d x %d x %d grid\n",
+               map[i]->nx, map[i]->ny, map[i]->nz);
+        Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
+               map[i]->hx, map[i]->hy, map[i]->hzed);
+        Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+               map[i]->xmin, map[i]->ymin, map[i]->zmin);
+        sum = 0;
+        for (ii=0,len=map[i]->nx*map[i]->ny*map[i]->nz; ii<len; ii++) {
+          sum += (map[i]->data[ii]);
+        }
+          sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
+        Vnm_tprint(1, "  Charge map integral = %3.2e e\n", sum);
+        break;
             case VDF_UHBD:
                 Vnm_tprint( 2, "UHBD input not supported yet!\n");
                 return 0;
@@ -1150,8 +1150,8 @@ to ");
                 Vnm_tprint(1, "%s.%s\n", pbeparm->writestem[i], "dx");
                 break;
             case VDF_DXBIN:
-				Vnm_tprint(1, "%s.%s\n", pbeparm->writestem[i], "dxbin");
-				break;
+        Vnm_tprint(1, "%s.%s\n", pbeparm->writestem[i], "dxbin");
+        break;
             case VDF_GZ:
                 Vnm_tprint(1, "%s.%s\n", pbeparm->writestem[i], "dx.gz");
                 break;
@@ -1851,7 +1851,7 @@ Poisson-Boltzmann operator matrix to %s...\n", outpath);
 
         Vnm_tprint(0, "  Printing operator...\n");
         //Vpmg_printColComp(pmg, outpath, outpath, mxtype,
-        //				  pbeparm->writematflag);
+        //          pbeparm->writematflag);
         return 0;
 
     }
@@ -2665,15 +2665,15 @@ VPUBLIC int writedataMG(int rank,
                 break;
 
             case VDF_DXBIN:
-				sprintf(outpath, "%s.%s", writestem, "dxbin");
-				Vnm_tprint(1, "%s\n", outpath);
-				grid = Vgrid_ctor(nx, ny, nz, hx, hy, hzed, xmin, ymin, zmin,
-								  pmg->rwork);
-				//TODO: write Vgrid_writeDXBIN method
-				Vgrid_writeDXBIN(grid, "FILE", "ASC", VNULL, outpath, title,
-							  pmg->pvec);
-				Vgrid_dtor(&grid);
-				break;
+        sprintf(outpath, "%s.%s", writestem, "dxbin");
+        Vnm_tprint(1, "%s\n", outpath);
+        grid = Vgrid_ctor(nx, ny, nz, hx, hy, hzed, xmin, ymin, zmin,
+                  pmg->rwork);
+        //TODO: write Vgrid_writeDXBIN method
+        Vgrid_writeDXBIN(grid, "FILE", "ASC", VNULL, outpath, title,
+                pmg->pvec);
+        Vgrid_dtor(&grid);
+        break;
 
             case VDF_AVS:
                 sprintf(outpath, "%s.%s", writestem, "ucd");
@@ -3627,7 +3627,7 @@ calculations %d and %d\n", nosh->apol2calc[nosh->printcalc[iprint][0]]+1,
         Vnm_tprint( 1, "    tot all -- Total force for system\n");
 
         //Vnm_tprint( 1, "    gamma, pressure, bconc are: %f %f %f\n\n",
-        //			gamma,press,bconc);
+        //      gamma,press,bconc);
 
         totforce[0] = 0.0;
         totforce[1] = 0.0;
@@ -3816,8 +3816,8 @@ VPUBLIC Vrc_Codes initFE(int icalc, /**< Index in pb, fetk to initialize (calcul
                 Vnm_tprint(2, "DX finite element mesh input not supported yet!\n");
                 return VRC_FAILURE;
             case VDF_DXBIN:
-				Vnm_tprint(2, "DXBIN finite element mesh input not supported yet!\n");
-				return VRC_FAILURE;
+        Vnm_tprint(2, "DXBIN finite element mesh input not supported yet!\n");
+        return VRC_FAILURE;
             case VDF_UHBD:
                 Vnm_tprint( 2, "UHBD finite element mesh input not supported!\n");
                 return VRC_FAILURE;
@@ -4432,11 +4432,11 @@ VPUBLIC int writedataFE(int rank, /**< Rank of processor (for parallel runs) */
                 break;
 
             case VDF_DXBIN:
-            	//TODO: probably change some or all of below.
-				sprintf(outpath, "%s.%s", writestem, "dxbin");
-				Vnm_tprint(1, "%s\n", outpath);
-				Vfetk_write(fetk, "FILE", "ASC", VNULL, outpath, vec, VDF_DXBIN);
-				break;
+              //TODO: probably change some or all of below.
+        sprintf(outpath, "%s.%s", writestem, "dxbin");
+        Vnm_tprint(1, "%s\n", outpath);
+        Vfetk_write(fetk, "FILE", "ASC", VNULL, outpath, vec, VDF_DXBIN);
+        break;
 
             case VDF_AVS:
                 sprintf(outpath, "%s.%s", writestem, "ucd");
@@ -4734,7 +4734,7 @@ VPUBLIC int forceAPOL(Vacc *acc,
     double srad, /* Probe radius */
            xF,
            yF,
-           zF,	/* Individual forces */
+           zF,  /* Individual forces */
            press,
            gamma,
            offset,
@@ -5327,11 +5327,12 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
                                 PBSAMparm *samparm )
 {
   printf("solvePBSAM!!!\n");
+  char fname_tp[VMAX_ARGLEN];
   if (nosh != VNULL) {
     if (nosh->bogus) return 1;
   }
 
-  int i, j;
+  int i, j, k, ierr;
   Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
   PBSAMInput pbsamIn = getPBSAMParams();
   PBAMInput pbamIn = getPBAMParams();
@@ -5440,6 +5441,61 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
   {
       strncpy(pbsamIn.expfil_[i], samparm->expfil[i], CHR_MAXLEN);
   }
+
+  // Running MSMS if the MSMS flag is used
+  if (samparm->setmsms == 1) {
+    for (i=0; i<pbamIn.nmol_; i++) {
+    // find a clever way to use prefix of molecule name for msms outputs
+    for (j=0; j < VMAX_ARGLEN; j++) 
+       if (nosh->molpath[i][j] == '\0') break;
+     
+    // assume terminated by '.pqr' -> 4 char, want to term w/ '.xyzr'
+    char xyzr[j+2], surf[j+2], outname[j-4]; 
+    for( k=0; k < j - 4; k++) 
+    {
+        xyzr[k] = nosh->molpath[i][k];
+        outname[k] = nosh->molpath[i][k];
+        surf[k] = nosh->molpath[i][k];
+    }
+    outname[k] = '\0';
+    xyzr[k]   = '.';  surf[k]   = '.';
+    xyzr[k+1] = 'x';  surf[k+1] = 'v';
+    xyzr[k+2] = 'y';  surf[k+2] = 'e';
+    xyzr[k+3] = 'z';  surf[k+3] = 'r';
+    xyzr[k+4] = 'r';  surf[k+4] = 't';
+    xyzr[k+5] = '\0'; surf[k+5] = '\0';;
+
+    // write an XYZR file from xyzr data
+    FILE *fp;
+    fp=fopen(xyzr, "w");
+    Vatom *atom;
+    for(k=0; k< Valist_getNumberAtoms(molecules[i]); k++)
+    {
+       atom = Valist_getAtom(molecules[i],k);
+       fprintf(fp, "%.4f  %.4f  %.4f  %.4f\n", Vatom_getPosition(atom)[0],
+                                               Vatom_getPosition(atom)[1],
+                                               Vatom_getPosition(atom)[2],
+                                               Vatom_getRadius(atom));
+    }
+    fclose(fp);
+
+    #ifdef _WIN32
+       sprintf(fname_tp, "msms.exe -if %s -prob %f -dens %f -of %s",
+               xyzr, samparm->probe_radius,samparm->density, outname);
+    #else
+       sprintf(fname_tp, "msms -if %s -prob %f -dens %f -of %s",
+               xyzr, samparm->probe_radius,samparm->density, outname);
+    #endif
+ 
+      printf("%s\n", fname_tp);
+ 
+      printf("Running MSMS...\n");
+      ierr = system(fname_tp);
+
+      strncpy(pbsamIn.surffil_[i], surf, CHR_MAXLEN);
+    }
+  }
+
 
   // debug
   printPBSAMStruct( pbamIn, pbsamIn );

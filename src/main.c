@@ -798,8 +798,6 @@ int main(
 
             case NCT_PBSAM:
 #ifdef ENABLE_PBSAM
-                /* What is this?  This seems like a very awkward way to find
-                the right ELEC statement... */
                 Vnm_tprint( 1, "Made it to start\n");
                 for (k=0; k<nosh->nelec; k++) {
                     if (nosh->elec2calc[k] >= i) {

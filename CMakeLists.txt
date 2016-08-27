@@ -230,52 +230,12 @@ endif() # ENABLE_BEM
 
 
 
+##########################################
+#Optionally copy MSMS/nanoshaper exectutables
+# the actual grab is later for PBSAM enable
+##########################################
 option(GET_MSMS "Put MSMS executable in the build directory" OFF)
-if(GET_MSMS)
-        if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-                # Mac OS X specific code
-                file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_MacOSX_2.6.1/msms.MacOSX.2.6.1
-                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-                file(RENAME ${EXECUTABLE_OUTPUT_PATH}/msms.MacOSX.2.6.1
-                            ${EXECUTABLE_OUTPUT_PATH}/msms)
-
-        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-                # Linux specific code
-                file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_i86_64Linux2_2.6.1/msms.x86_64Linux2.2.6.1.staticgcc
-                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-                file(RENAME ${EXECUTABLE_OUTPUT_PATH}/msms.x86_64Linux2.2.6.1.staticgcc
-                            ${EXECUTABLE_OUTPUT_PATH}/msms)
-
-        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-                # Windows specific code
-                file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_win32_2.6.1/msms.exe
-                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-        endif()
-endif()
-
-
 option(GET_NanoShaper "Put NanoShaper executable in the build directory" OFF)
-if(GET_NanoShaper)
-        if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-                # Mac OS X specific code
-                file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/OSX/NanoShaper
-                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-
-        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-                # Linux specific code
-                file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/Linux64/NanoShaper
-                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-
-        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-                # Windows specific code
-                file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/win32/NanoShaper32.exe
-                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-                file(RENAME ${EXECUTABLE_OUTPUT_PATH}/NanoShaper32.exe
-                            ${EXECUTABLE_OUTPUT_PATH}/NanoShaper.exe)
-        endif()
-endif()
-
-
 
 
 ################################################################################
@@ -471,6 +431,8 @@ option(ENABLE_PBSAM "pbsam method" OFF)
 if(ENABLE_PBSAM)
   message(STATUS "Building PBSAM")
   add_definitions(-DPBSAM_APBS)
+  set(GET_MSMS ON ) #CACHE BOOL "Grabbing msms path")
+  message(STATUS "copying msms ${GET_MSMS}")
   
   list(APPEND CMAKE_MODULE_PATH ${EXTERNALS_PATH}/pb_s_am/cmake/modules)
   include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
@@ -493,6 +455,58 @@ if(ENABLE_PBSAM)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
 endif()
+
+
+
+
+################################################################################
+# Getting msms and /or nanoshaper
+################################################################################
+if(GET_MSMS)
+        message(STATUS "Copying MSMS exectuable")
+        if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+                # Mac OS X specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_MacOSX_2.6.1/msms.MacOSX.2.6.1
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+                file(RENAME ${EXECUTABLE_OUTPUT_PATH}/msms.MacOSX.2.6.1
+                            ${EXECUTABLE_OUTPUT_PATH}/msms)
+
+        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+                # Linux specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_i86_64Linux2_2.6.1/msms.x86_64Linux2.2.6.1.staticgcc
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+                file(RENAME ${EXECUTABLE_OUTPUT_PATH}/msms.x86_64Linux2.2.6.1.staticgcc
+                            ${EXECUTABLE_OUTPUT_PATH}/msms)
+
+        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+                # Windows specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_win32_2.6.1/msms.exe
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+        endif()
+endif()
+
+
+if(GET_NanoShaper)
+        if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+                # Mac OS X specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/OSX/NanoShaper
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+
+        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+                # Linux specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/Linux64/NanoShaper
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+
+        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+                # Windows specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/win32/NanoShaper32.exe
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+                file(RENAME ${EXECUTABLE_OUTPUT_PATH}/NanoShaper32.exe
+                            ${EXECUTABLE_OUTPUT_PATH}/NanoShaper.exe)
+        endif()
+endif()
+
+
 
 ################################################################################
 # Handle conditional fast mode                                                 #

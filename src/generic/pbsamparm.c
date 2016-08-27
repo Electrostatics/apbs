@@ -81,6 +81,9 @@ VPUBLIC Vrc_Codes PBSAMparm_ctor2(PBSAMparm *thee, PBSAMparm_CalcType type) {
     if (thee == VNULL) return VRC_FAILURE;
 
     thee->tolsp = 2.5;
+    thee->setmsms = 0;
+    thee->probe_radius = 1.5;
+    thee->density = 3.0;
 
     thee->setsurf = 0;
     thee->surfct = 0;
@@ -138,6 +141,9 @@ VPUBLIC void PBSAMparm_copy(PBSAMparm *thee, PBSAMparm *parm) {
     thee->settolsp = parm->settolsp;
     thee->tolsp = parm->tolsp;
 
+    thee->setmsms = parm->setmsms;
+    thee->probe_radius = parm->probe_radius;
+    thee->density = parm->density;
     thee->setsurf = parm->setsurf;
     thee->surfct  = parm->surfct;
     thee->setimat = parm->setimat;
@@ -171,6 +177,12 @@ VPRIVATE Vrc_Codes PBSAMparm_parseSurf(PBSAMparm *thee, Vio *sock){
     return VRC_SUCCESS;
 }
 
+
+//Parsing imat prefix file
+VPRIVATE Vrc_Codes PBSAMparm_parseMSMS(PBSAMparm *thee, Vio *sock){
+    thee->setmsms = 1;
+    return VRC_SUCCESS;
+}
 //Parsing imat prefix file
 VPRIVATE Vrc_Codes PBSAMparm_parseImat(PBSAMparm *thee, Vio *sock){
     const char* name = "imat";
@@ -238,6 +250,8 @@ VPUBLIC Vrc_Codes PBSAMparm_parseToken(PBSAMparm *thee, char tok[VMAX_BUFSIZE],
     // Molecule terms
     if (Vstring_strcasecmp(tok, "surf") == 0) {
         return PBSAMparm_parseSurf(thee, sock);
+    }else if (Vstring_strcasecmp(tok, "msms") == 0) {
+        return PBSAMparm_parseMSMS(thee, sock);
     }else if (Vstring_strcasecmp(tok, "imat") == 0) {
         return PBSAMparm_parseImat(thee, sock);
     }else if (Vstring_strcasecmp(tok, "exp") == 0) {
