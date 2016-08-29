@@ -1,6 +1,6 @@
 read
-    mol pqr barnase.pqr
-    mol pqr barstar.pqr
+    mol pqr barnase_cg.pqr
+    mol pqr barstar_cg.pqr
 
 end
 elec name comp_solv        # Gly
@@ -11,7 +11,7 @@ elec name comp_solv        # Gly
 
     units jmol
     ## info for molecule
-    msms
+    #msms
     tolsp 4.5
 
     temp 298.15             # System temperature (K)
