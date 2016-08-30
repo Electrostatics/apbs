@@ -46,7 +46,7 @@ void multivalue_usage(void) {
     Vnm_print(1,"Usage: > multivalue csvCoordinatesFile dxFormattedFile outputFile"
                 "[outputformat]\n\n");
     Vnm_print(1,"csvCoordinatesFile is the input CSV file containing 3D coordinates\n");
-    Vnm_print(1,"dxFormattedFile is the input DX grid on which coords are evaluated\n");
+    Vnm_print(1,"dxFormattedFile is the input DX grid on which coords are evaluated\n\n");
     Vnm_print(1,"The optional argument outputformat specifies output OpenDX type.\n");
     Vnm_print(1,"Acceptable values include\n\
        dx:  standard OpenDX format\n\
