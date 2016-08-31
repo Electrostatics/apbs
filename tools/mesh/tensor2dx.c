@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
 	FILE * pfile3 = NULL;
 	
 	if (argc != 7 && argc != 8) {
-		printf("\n*** Syntax error: got %d arguments, expected 7 or 8.\n\n",argc);
+		printf("\n*** Syntax error: got %d arguments, expected 6 or 7.\n\n",argc-1);
 		printf("%s\n", usage);
 		return -1;
 	} else {

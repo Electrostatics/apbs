@@ -23,8 +23,8 @@ For converting the DelPhi format of the electrostatic potential to the\n\
 OpenDX format.\n\
 \n\
 Usage:  del2dx <delphi_file> <opendx_file> [outputformat]\n\n\
-where delphi_file is a file in DelPhi format and opendx_file is the\n\
-file to be written in OpenDX format.\n\n\
+where delphi_file is a file in DelPhi format,\n\
+and opendx_file is the file to be written in OpenDX format.\n\n\
 The optional argument outputformat specifies the output OpenDX format.\n\
 Acceptable values include\n\
        dx:  standard OpenDX format\n\
@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 	FILE * pfile = NULL;
 	
     if (!(argc == 3 || argc == 4)) {
-        printf("\n*** Syntax error: got %d arguments, expected 3 or 4.\n\n",argc);
+        printf("\n*** Syntax error: got %d arguments, expected 2 or 3.\n\n",argc-1);
         printf("%s\n", usage);
         return EXIT_FAILURE;
     } else {
