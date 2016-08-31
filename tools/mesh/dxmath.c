@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
 
     strncpy(gridPath[0], tok, VMAX_BUFSIZE);
     dot = strrchr(tok, '.');
-    if (dot && !strcasecmp(dot, ".dxbin")) {
+    if (dot && !Vstring_strcasecmp(dot, ".dxbin")) {
         Vnm_print(1, "main:  Assuming %s is OpenDX binary format...\n", tok);
         obType[0] = DXM_ISGRIDBIN;
     } else {
@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
             strncpy(gridPath[numop+1], tok, VMAX_BUFSIZE);
 
             dot = strrchr(tok, '.');
-            if (dot && !strcasecmp(dot, ".dxbin")) {
+            if (dot && !Vstring_strcasecmp(dot, ".dxbin")) {
                 Vnm_print(1, "main:  Assuming %s is OpenDX binary format...\n", tok);
                 obType[numop+1] = DXM_ISGRIDBIN;
             } else {

@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
     strncpy(outpath, tok, VMAX_BUFSIZE);                                                 
     dot = strrchr(tok, '.');                                                                 
 
-    if (dot && !strcasecmp(dot, ".dxbin")) {                                                 
+    if (dot && !Vstring_strcasecmp(dot, ".dxbin")) {                                                 
         /* Read binary DX format file */
         Vnm_print(1, "Reading %s as binary OpenDX format...\n", tok);                
         if(Vgrid_readDXBIN(grid, "FILE", "ASC", VNULL, inpath) != 1) {

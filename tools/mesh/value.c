@@ -58,20 +58,11 @@ int main(int argc, char **argv) {
         } else if (Vstring_strcasecmp(argv[5], "dxbin")) {
             format = VDF_DXBIN;
         } else {
-            printf("\n*** Argument error: format must be 'dx' or 'dxbin'.\n\n");
+            Vnm_print(2, "main:  Format must be 'dx' or 'dxbin'.\n\n");
             return EXIT_FAILURE;
         }
     } else {
         format = VDF_DX;
-    }
-
-    /* *************** READ DATA ******************* */
-    Vnm_print(1, "Reading data from %s...\n", path);
-    grid = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
-    if (!Vgrid_readDX(grid, "FILE", "ASC", VNULL, path)) {
-        Vnm_print(2, "main:  Problem reading OpenDX-format grid from %s\n",
-                  path);
-        return 2;
     }
 
     /* *************** READ DATA ******************* */
@@ -81,13 +72,13 @@ int main(int argc, char **argv) {
         if (!Vgrid_readDX(grid, "FILE", "ASC", VNULL, path)) {
             Vnm_print(2, "main:  Problem reading standard OpenDX-format grid from %s\n",
               path);
-            return EXIT_FAILURE;
+            return 2;
         }
     } else if (format == VDF_DXBIN) {
         if (!Vgrid_readDXBIN(grid, "FILE", "ASC", VNULL, path)) {
             Vnm_print(2, "main:  Problem reading binary OpenDX-format grid from %s\n",
               path);
-            return EXIT_FAILURE;
+            return 2;
         }
     } else {
         Vnm_print(2, "main:  Format not properly specified. \n");

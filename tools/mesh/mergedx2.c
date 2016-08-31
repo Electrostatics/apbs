@@ -1,5 +1,5 @@
 /**
-*  @file     mergedx2.c
+ *  @file     mergedx2.c
  *  @author  David Gohara, Stephen Bond and Nathan Baker
  *  @brief   Program that merges OpenDX files
  *  @version $Id$
@@ -589,7 +589,7 @@ VPRIVATE int Char_parseARGV(int argc, char **argv,
 			} else if (!strcmp(opt,"-o")) {
 				strcpy(outname,argv[i++]);
 			} else if (!strcmp(opt,"-i")) {
-				if (!strcmp(argv[i++],"dx")) {
+				if (!strcmp(argv[i],"dx")) {
                                         *formatin = VDF_DX;
                                 } else if (!strcmp(argv[i],"dxbin")) {
                                         *formatin = VDF_DXBIN;
@@ -597,8 +597,9 @@ VPRIVATE int Char_parseARGV(int argc, char **argv,
                                         printf("Unknown -i specification: %s\n",argv[i]);
                                         return 1;
                                 }
+                                i++;
 			} else if (!strcmp(opt,"-t")) {
-				if (!strcmp(argv[i++],"dx")) {
+				if (!strcmp(argv[i],"dx")) {
                                         *formatout = VDF_DX;
                                 } else if (!strcmp(argv[i],"dxbin")) {
                                         *formatout = VDF_DXBIN;
@@ -606,6 +607,7 @@ VPRIVATE int Char_parseARGV(int argc, char **argv,
                                         printf("Unknown -t specification: %s\n",argv[i]);
                                         return 1;
                                 }
+                                i++;
 			} else if (!strcmp(opt,"-s")) {
 				*spec = 1;
 			} else if (!strcmp(opt,"-h")) {
