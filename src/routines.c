@@ -5307,6 +5307,9 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
   // Run the darn thing
   PBAMOutput pbamOut = runPBAMWrapAPBS( pbamIn, molecules, nosh->nmol );
 
+  printf("This is energy 1: %.5f \t force: %.5f %.5f %.5f\n", pbamOut.energies_[0], 
+         pbamOut.forces_[0][0], pbamOut.forces_[0][1],pbamOut.forces_[0][2]);
+
   Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
 
   return 1;
@@ -5428,7 +5431,9 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
 
   
   // SAM details
-  pbsamIn.tolsp_ = samparm->tolsp;
+  pbsamIn.tolsp_  = samparm->tolsp;
+  pbsamIn.imatct_ = samparm->imatct;
+  pbsamIn.expct_  = samparm->expct;
   for (i=0; i<samparm->surfct; i++)
   {
       strncpy(pbsamIn.surffil_[i], samparm->surffil[i], CHR_MAXLEN);

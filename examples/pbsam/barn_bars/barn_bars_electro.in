@@ -1,6 +1,6 @@
 read
-    mol pqr barnase_cg.pqr
     mol pqr barstar_cg.pqr
+    mol pqr barnase_cg.pqr
 
 end
 elec name comp_solv        # Gly
@@ -11,18 +11,29 @@ elec name comp_solv        # Gly
 
     units jmol
     ## info for molecule
-    #msms
     tolsp 4.5
+   #msms  #uncomment if there are no vertex files and system is not CG
+
+   #surf barstar.vert # uncomment if system needs to be CGed
+   #surf barnase.vert # uncomment if system needs to be CGed
+
+    imat  imat/mol0sph  # For barstar
+    imat  imat/mol1sph  # For barnase
+
+    exp   exp/mol0      # For barstar
+    exp   exp/mol1      # For barnase
 
     temp 298.15             # System temperature (K)
     pdie 4.0                # Solute dielectric                 
     sdie 78.0               # Solvent dielectric                
     salt 0.10               # Monovalent salt conc in M
 
-    gridpts 20
+    gridpts 150
     dx barn_bars_0.1M.dx
     3dmap  barn_bars_0.1M.map
     grid2d barn_bars_0.1M.x0.dat x 0.0
+    grid2d barn_bars_0.1M.y0.dat y 0.0
+    grid2d barn_bars_0.1M.z0.dat z 0.0
 
 end
 
