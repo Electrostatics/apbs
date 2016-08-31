@@ -1,5 +1,5 @@
 /**
-*  @file     mergedx2.c
+ *  @file     mergedx2.c
  *  @author  David Gohara, Stephen Bond and Nathan Baker
  *  @brief   Program that merges OpenDX files
  *  @version $Id$
@@ -21,7 +21,8 @@ VPRIVATE int Char_parseARGV(int argc, char **argv,
   double *res1, double *res2, double *res3, 
   double *xmin, double *ymin, double *zmin,
   double *xmax, double *ymax, double *zmax,
-  int *spec, char *outname, char fnams[MAX_INPUT_2][MAX_INPUT_PATH], int *numfnams);
+  int *spec, char *outname, char fnams[MAX_INPUT_2][MAX_INPUT_PATH], int *numfnams,
+  Vdata_Format *formatin, Vdata_Format *formatout);
 
 VPRIVATE char *MCwhiteChars = " =,;\t\n";
 VPRIVATE char *MCcommChars  = "#%";
@@ -35,6 +36,10 @@ void usage(){
 				"			The OpenDX files to be merged\n"
 				"FLAGS:\n"
 				"	-o		Output OpenDX file		(default: gridmerged.dx)\n"
+				"	-i		Type of OpenDX input files as: dx for standard, dxbin for binary\n"
+				"							(default: dx)\n"
+				"	-t		Type of OpenDX output file as: dx for standard, dxbin for binary\n"
+				"							(default: dx)\n"
 				"	-r		Resolution of gridpoints as: resx yres zres\n"
 				"							(default: <1.0, 1.0, 1.0> Angstroms)\n"
 				"	-b		Bounds of output map as: xmin ymin zmin xmax ymax zmax\n"
@@ -63,6 +68,12 @@ void usage(){
 				"The default values are the full bounds of all input files.\n"
 				"\n"
 				"Specifying -o will assign an output name to the merged OpenDX file. The default file name is gridmerged.dx.\n"
+				"\n"
+				"Specifying -i will specify the type of the OpenDX files to be read in, either dx for standard OpenDX format\n"
+				"files or dxbin for binary OpenDX format files. The default type is dx, or standard OpenDX.\n"
+				"\n"
+				"Specifying -t will specify the type of the OpenDX file to be output, either dx for a standard OpenDX format\n"
+				"file or dxbin for a binary OpenDX format files. The default type is dx, or standard OpenDX.\n"
 				"\n"
 				"Examples:\n"
 				"\n"
@@ -99,6 +110,8 @@ int main(int argc, char **argv) {
 	char *snam = "# main:  ";
 	char outname[MAX_INPUT_PATH];
 
+        Vdata_Format formatin;
+        Vdata_Format formatout;
 
 	Vgrid *grid, *mgrid;
 
@@ -111,6 +124,8 @@ int main(int argc, char **argv) {
 	xmin = ymin = zmin = 0.0;
 	xmax = ymax = zmax = 0.0;
 	sprintf(outname,"gridmerged.dx");
+        formatin = VDF_DX;
+        formatout = VDF_DX;
 
 	/* Begin processing command line options */
 
@@ -118,7 +133,8 @@ int main(int argc, char **argv) {
 	if(argc <= 1){ usage(); return 1; }
 
 	if(Char_parseARGV(argc, argv, &res1, &res2, &res3, &xmin, &ymin, &zmin,
-					  &xmax, &ymax, &zmax, &spec, outname, fnams, &numfnams))
+					  &xmax, &ymax, &zmax, &spec, outname, fnams,
+                                          &numfnams, &formatin, &formatout))
 	{
 		usage();
 		return 1;
@@ -237,7 +253,11 @@ int main(int argc, char **argv) {
 	/* ************** MERGE THE GRID FILES **************** */
 	Vnm_print(1, "%s Reading and Merging...\n",snam);
 	for (count=0; count<numfnams; count++) {
-		Vgrid_readDX(grid, "FILE", "ASC", VNULL, fnams[count]);
+                if (formatin == VDF_DX) {
+		        Vgrid_readDX(grid, "FILE", "ASC", VNULL, fnams[count]);
+                } else if (formatin == VDF_DXBIN) {
+		        Vgrid_readDXBIN(grid, "FILE", "ASC", VNULL, fnams[count]);
+                }
 		xmin = grid->xmin - grid->hx   - VSMALL;
 		ymin = grid->ymin - grid->hy   - VSMALL;
 		zmin = grid->zmin - grid->hzed - VSMALL;
@@ -296,7 +316,11 @@ int main(int argc, char **argv) {
 	/* ************** WRITE THE MERGED GRID **************** */
 	Vnm_print(1, "%s Writing...\n",snam);
 	Vnm_print(0, "%s  Writing merged data to %s...\n",snam,outname);
-	Vgrid_writeDX(mgrid, "FILE", "ASC", VNULL, outname,"mergedx",VNULL);
+        if (formatout == VDF_DX) {
+	        Vgrid_writeDX(mgrid, "FILE", "ASC", VNULL, outname,"mergedx",VNULL);
+        } else if (formatout == VDF_DXBIN) {
+	        Vgrid_writeDXBIN(mgrid, "FILE", "ASC", VNULL, outname,"mergedx",VNULL);
+        }
 
 	Vmem_free(VNULL,(mgrid->nx*mgrid->ny*mgrid->nz), sizeof(short),
 			  (void **)&(carray));
@@ -541,7 +565,8 @@ VPRIVATE int Char_parseARGV(int argc, char **argv,
   double *res1, double *res2, double *res3, 
   double *xmin, double *ymin, double *zmin, 
   double *xmax, double *ymax, double *zmax, 
-  int* spec, char *outname, char fnams[MAX_INPUT_2][MAX_INPUT_PATH], int *numfnams)
+  int* spec, char *outname, char fnams[MAX_INPUT_2][MAX_INPUT_PATH], int *numfnams,
+  Vdata_Format *formatin, Vdata_Format *formatout)
 {
 	int i;
 	i = 1;
@@ -563,6 +588,26 @@ VPRIVATE int Char_parseARGV(int argc, char **argv,
 				*zmax = atof(argv[i++]);
 			} else if (!strcmp(opt,"-o")) {
 				strcpy(outname,argv[i++]);
+			} else if (!strcmp(opt,"-i")) {
+				if (!strcmp(argv[i],"dx")) {
+                                        *formatin = VDF_DX;
+                                } else if (!strcmp(argv[i],"dxbin")) {
+                                        *formatin = VDF_DXBIN;
+                                } else {
+                                        printf("Unknown -i specification: %s\n",argv[i]);
+                                        return 1;
+                                }
+                                i++;
+			} else if (!strcmp(opt,"-t")) {
+				if (!strcmp(argv[i],"dx")) {
+                                        *formatout = VDF_DX;
+                                } else if (!strcmp(argv[i],"dxbin")) {
+                                        *formatout = VDF_DXBIN;
+                                } else {
+                                        printf("Unknown -t specification: %s\n",argv[i]);
+                                        return 1;
+                                }
+                                i++;
 			} else if (!strcmp(opt,"-s")) {
 				*spec = 1;
 			} else if (!strcmp(opt,"-h")) {

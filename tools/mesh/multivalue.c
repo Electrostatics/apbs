@@ -41,10 +41,18 @@
 
 #include "apbs.h"
 
-void multivalue_usage(void){
+void multivalue_usage(void) {
     Vnm_print(1,"\n");
-    Vnm_print(1,"Usage: > multivalue csvCoordinatesFile dxFormattedFile outputFile\n\n");
-    Vnm_print(1,"Example input file:\n\n\t");
+    Vnm_print(1,"Usage: > multivalue csvCoordinatesFile dxFormattedFile outputFile"
+                "[outputformat]\n\n");
+    Vnm_print(1,"csvCoordinatesFile is the input CSV file containing 3D coordinates\n");
+    Vnm_print(1,"dxFormattedFile is the input DX grid on which coords are evaluated\n\n");
+    Vnm_print(1,"The optional argument outputformat specifies output OpenDX type.\n");
+    Vnm_print(1,"Acceptable values include\n\
+       dx:  standard OpenDX format\n\
+       dxbin:  binary OpenDX format\n");
+    Vnm_print(1,"If this arg is not specified, the output is standard OpenDX.\n\n");
+    Vnm_print(1,"Example input csvCoordinatesfile:\n\n\t");
     Vnm_print(1,"123.234,23.8E03,9.6e-4\n\t");
     Vnm_print(1,"5.9,6.2,0.3\n\t");
     Vnm_print(1,"-7e3,91,0.6\n\n\t");
@@ -55,34 +63,60 @@ void multivalue_usage(void){
     Vnm_print(1,"-No column headers/titles\n");
 }
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
     char *inputFileName, *dxFileName, *outputFileName;
     int scanNum = 0;
     double pt[3], val;
     FILE *inputFileStream, *outputFileStream;
+    Vdata_Format format;
     Vgrid *grid;
 
     /* *************** CHECK INVOCATION ******************* */
     Vio_start();
     Vnm_redirect(1);
     Vnm_print(1, "\n");
-    if(argc != 4){
+    if (argc != 4 && argc != 5) {
         Vnm_print(2,"Invalid number of arguments, # of arguments received: %d\n",argc);
         multivalue_usage();
-        exit(0);
+        exit(1);
     }
 
     inputFileName = argv[1];
     dxFileName = argv[2];
     outputFileName = argv[3];
 
+    if (argc == 5) {
+        if (Vstring_strcasecmp(argv[4], "dx")) {
+            format = VDF_DX;
+        } else if (Vstring_strcasecmp(argv[4], "dxbin")) {
+            format = VDF_DXBIN;
+        } else {
+            printf("\n*** Argument error: format must be 'dx' or 'dxbin'.\n\n");
+            exit(1);
+        }
+    } else {
+        format = VDF_DX;
+    }
+
     Vnm_print(1,"Input file:\t%s\ndx file:\t%s\nOutput file:\t%s\n", inputFileName, dxFileName, outputFileName);
 
     /* *************** READ DATA ******************* */
-    Vnm_print(1,"Reading data from %s...\n",dxFileName);
+    Vnm_print(1, "main:  Reading data from %s...\n", dxFileName);
     grid = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
-    if (!Vgrid_readDX(grid, "FILE", "ASC", VNULL,dxFileName)) {
-        Vnm_print(2, "Error reading dx file: %s\n",dxFileName);
+    if (format == VDF_DX) {
+        if (!Vgrid_readDX(grid, "FILE", "ASC", VNULL, dxFileName)) {
+            Vnm_print(2, "main:  Problem reading standard OpenDX-format grid from %s\n",
+              dxFileName);
+            exit(1);
+        }
+    } else if (format == VDF_DXBIN) {
+        if (!Vgrid_readDXBIN(grid, "FILE", "ASC", VNULL, dxFileName)) {
+            Vnm_print(2, "main:  Problem reading binary OpenDX-format grid from %s\n",
+              dxFileName);
+            exit(1);
+        }
+    } else {
+        Vnm_print(2, "main:  Format not properly specified. \n");
         exit(1);
     }
 

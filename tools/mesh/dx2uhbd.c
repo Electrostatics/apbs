@@ -4,8 +4,14 @@
 // Purpose:  Convert OpenDx format potential to UHBD format
 //
 // Author:   rok, based on dx2mol.c
+//           Additional changes by Leighton Wilson
 //
 // rcsid="$Id$"
+//
+//
+// Last update: 08/29/2016 by Leighton Wilson
+// Description: Added ability to read in binary DX files as input
+//
 /////////////////////////////////////////////////////////////////////////// */
 
 #include "apbs.h"
@@ -25,14 +31,18 @@ int main(int argc, char **argv) {
   char *iodev = "FILE";
   char *iofmt = "ASC";
   char *thost = VNULL;
+  char *dot = VNULL;
+  char tok[VMAX_BUFSIZE];
   char *title = "dx2uhbd conversion";
   char *usage = "\n\n\
     -----------------------------------------------------------------------\n\
     Converts the OpenDX format of the electrostatic potential \n\
     to the UHBD format.\n\n\
-    Usage:  dx2uhbd file1.dx file2.grd\n\n\
-            where file1.dx is a file in OpenDX format and file2.grd is the\n\
-            file to be written in UHBD format.\n\
+    Usage:  dx2uhbd file1 file2.grd\n\n\
+            where file1 is a file in OpenDX format and file2.grd is the\n\
+            file to be written in UHBD format. If the extension of file1\n\
+            is .dxbin, it is assumed to be a binary OpenDX format file.\n\
+            Otherwise, the file is assumed to be a standard OpenDX file.\n\
     -----------------------------------------------------------------------\n\
     \n";
 
@@ -43,20 +53,36 @@ int main(int argc, char **argv) {
     Vnm_print(2, "\n*** Syntax error: got %d arguments, expected 2.\n\n",
           argc-1);
     Vnm_print(2,"%s\n", usage);
-    return -1;
+    return EXIT_FAILURE;
   } else {
     inpath = argv[1];
     outpath = argv[2];
   }
 
-  /*** Read DX format file ***/
-  grid = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
-  Vnm_tprint(1, "Reading DX file ... \n");
-  if(Vgrid_readDX(grid, "FILE", "ASC", VNULL, inpath) != 1) {
-    Vnm_tprint( 2, "Fatal error while reading from %s\n",
-        inpath);
-    return 0;
-  }
+    /* Read DX format file */
+    grid = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
+
+    strncpy(outpath, tok, VMAX_BUFSIZE);                                                 
+    dot = strrchr(tok, '.');                                                                 
+
+    if (dot && !Vstring_strcasecmp(dot, ".dxbin")) {                                                 
+        /* Read binary DX format file */
+        Vnm_print(1, "Reading %s as binary OpenDX format...\n", tok);                
+        if(Vgrid_readDXBIN(grid, "FILE", "ASC", VNULL, inpath) != 1) {
+                Vnm_print(2, "\n*** Fatal error while reading from %s as\
+                              binary DX format file\n", inpath);
+                return EXIT_FAILURE;
+        }
+    } else {                                                                                 
+        /* Read standard DX format file */
+        Vnm_print(1, "Reading %s as standard OpenDX format...\n", tok);              
+        if(Vgrid_readDX(grid, "FILE", "ASC", VNULL, inpath) != 1) {
+                Vnm_print(2, "\n*** Fatal error while reading from %s as\
+                              standard DX format file\n", inpath);
+                return EXIT_FAILURE;
+        }
+    } 
+
   nx = grid->nx;
   ny = grid->ny;
   nz = grid->nz;

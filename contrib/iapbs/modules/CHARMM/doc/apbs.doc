@@ -1,0 +1,168 @@
+CHARMM Element doc/apbs.doc 1.1
+$Id: apbs.doc,v 1.3 2006/03/29 15:52:50 rok Exp $
+
+                             APBS Module   
+
+    The APBS module integrates APBS (Adaptive Poisson-Boltzmann
+Solver, http://agave.wustl.edu/apbs) with CHARMM. For detailed
+documentation and implementation information please see the official
+iAPBS web site http://mccammon.ucsd.edu/iapbs
+
+Description
+-----------
+
+APBS (Adaptive Poisson-Boltzmann Solver) is a software package for the
+numerical solution of the Poisson-Boltzmann equation (PBE), one of the
+most popular continuum models for describing electrostatic
+interactions between molecular solutes in salty, aqueous media. APBS
+was designed to efficiently evaluate electrostatic properties for a
+wide range of length scales to enable the investigation of molecules
+with tens to millions of atoms.
+
+The APBS/CHARMM module makes most of the APBS functionality available
+from within CHARMM. This allows to perform variety of calculations
+which includes: evaluation of electrostatic properties of biomolecular
+systems, performing optimization and molecular dynamics in implicit
+solvent using APBS calculated solvation forces, visualization of
+calculated electrostatic properties, etc.
+
+Since this module's functionality overlaps in many aspects
+functionality of the CHARMM's PBEQ module please read also pbeq.doc
+file and example input files.
+
+Syntax
+------
+
+The APBS/CHARMM module mimics APBS syntax as close as possible. For
+detailed description and discussion of all APBS parameters please see
+APBS documentation (http://agave.wustl.edu/apbs/doc/index.html) and
+APBS/CHARMM documentation
+(http://mccammon.ucsd.edu/iapbs/usersguide/index.html) for specific
+instructions for using APBS inside of CHARMM.
+
+Installation
+------------
+
+For complete installation instructions please see 
+http://mccammon.ucsd.edu/iapbs/usersguide/index.html
+
+In summary:
+
+1. first download and install the following packages: atlas (BLAS),
+   maloc, apbs and iapbs
+
+2. set the following environment variables APBS_LIB, IAPBS_LIB,
+   APBS_BLAS:
+
+   APBS_LIB  - points to where libapbs.lib and libmaloc.a are installed
+   IAPBS_LIB - points to where iapbs.a is installed
+   APBS_BLAS "-L${BLAS_LIB} -llapack -lcblas -lf77blas -latlas"
+	     where BLAS_LIB is a directory where BLAS library is
+	     located; these flags are BLAS-dependent, the above
+	     example works with ATLAS
+
+3. run 'install.com gnu medium APBS' to compile APBS-enabled CHARMM
+
+
+Examples
+--------
+
+There are three example input files provided with this release:
+
+Example (1)
+
+- Simple calculation of electrostatic energies (apbs_elstat.inp)
+
+This shows how to do a single point electrostatic evaluation on a
+molecule. The result is electrostatic energy of the molecule.
+
+PBEQ
+  stream @0radius.str
+
+  APBS mgauto lpbe dimx 65 dimy 65 dimz 65 -
+  cglx 30 cgly 30 cglz 30 fglx 15 fgly 15 fglz 15 -
+  srfm 2 -
+  calcene 1 -
+  sele all END
+
+  set elstaten80 = ?enpb
+
+  APBS mgauto lpbe dimx 65 dimy 65 dimz 65 -
+  cglx 30 cgly 30 cglz 30 fglx 15 fgly 15 fglz 15 -
+  srfm 2 sdie 1.0 -
+  calcene 1 -
+  sele all END
+
+  set elstaten1 = ?enpb
+
+END
+
+!  Electrostatic free energy of solvation
+calc solv = @elstaten80 - @elstaten1
+
+
+Example (2)
+
+- Molecular dynamics in implicit solvent (apbs_md.inp)
+
+This is an example of a short molecular dynamics simulation in
+implicit solvent using APBS-calculated solvation forces.
+
+PBEQ
+   set factor 0.939
+   set sw     0.4
+   stream @0radius.str
+   scalar wmain add  @sw
+   scalar wmain mult @factor
+   scalar wmain set 0.0 sele type H* end
+
+  APBS mgauto lpbe dimx 65 dimy 65 dimz 65 -
+  cglx 30 cgly 30 cglz 30 fglx 15 fgly 15 fglz 15 -
+  swin @sw srfm 2 -
+  calcene 1 calcfor 1 -
+  sforce -
+  sele all END
+END
+
+skip none
+
+dynamics leap verlet strt nstep 20 timestep 0.001 -
+firstt 100.0 finalt 300.0 teminc 100.0 -
+twindh 10.0
+
+
+Example (3)
+
+- Visualization of calculated elstat properties (apbs_vis.inp)
+
+This input file show how to generate properties files (electrostatics,
+SASA and charge) which can be then visualized using an external
+application (VMD, PyMol, OpenDX, etc; for details please see the APBS
+Tutorial at http://agave.wustl.edu/apbs/doc/html/tutorial/index.html).
+
+
+PBEQ
+   stream @0radius.str
+
+  APBS mgauto lpbe dimx 65 dimy 65 dimz 65 -
+  cglx 30 cgly 30 cglz 30 fglx 15 fgly 15 fglz 15 -
+  calcene 1 -
+  ionq1 1.0 ionc1 0.15 ionr1 2.0 ionq2 -1.0 ionc2 0.15 ionr2 2.0 -
+  wpot wsmol wchg -
+  sele all END
+
+END
+
+
+
+
+To-Do
+-----
+
+- enable parallel APBS execution in CHARMM
+
+
+
+Please send any comments or bug reports to Robert Konecny (rok@ucsd.edu).
+
+

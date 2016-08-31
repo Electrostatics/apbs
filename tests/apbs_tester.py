@@ -295,8 +295,7 @@ def main():
         # Verify that the test is described in the test cases file
         if test_name not in config.sections():
             print "  " + test_name + " section not found in " + options.test_config
-            print "  skipping..."
-            continue
+            return 1
 
         # Grab the test directory
         test_directory = config.get( test_name, 'input_dir' )
@@ -313,9 +312,11 @@ def main():
         # Run the test!
         run_test( binary, config.items( test_name ), test_name, test_directory, test_setup, logger, options.ocd )
 
+    return 0
+
 
 
 # If this file is executed as a script, call the main function
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
 

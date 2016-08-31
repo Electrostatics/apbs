@@ -29,7 +29,7 @@ cmake_minimum_required (VERSION 2.8.7)
 # [ ] Windows 7 with Mingw
 ################################################################################
 
-set( CMAKE_VERBOSE_MAKEFILE true)
+set(CMAKE_VERBOSE_MAKEFILE true)
 
 
 ################################################################################
@@ -129,6 +129,7 @@ endif()
 ################################################################################
 
 OPTION(CHECK_EPSILON "Compute machine epsilon values" YES)
+
 if(CHECK_EPSILON)
     message(STATUS "Computing machine epsilon values")
     try_run(
@@ -166,6 +167,7 @@ else()
 endif()
 
 
+
 ################################################################################
 # Check for a few required functions                                           #
 ################################################################################
@@ -192,10 +194,25 @@ if(NOT HAVE_SRAND_FUNC)
     message(FATAL_ERROR "Required srand function not found")
 endif()
 
-##########################################
-#Optionally build BEM
-##########################################
+
+
+################################################################################
+# Find some libraries; Windows finds these automatically                       #
+################################################################################
+
+if(NOT WIN32)
+    find_library(MATH_LIBRARY "m")
+    list(APPEND APBS_LIBS m stdc++)
+endif()
+
+
+
+################################################################################
+#Optionally build BEM: TABI-PB method                                          #
+################################################################################
+
 option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
+
 if(ENABLE_BEM)
     message(STATUS "Building TABIPB")
     add_definitions(-DENABLE_BEM)
@@ -212,9 +229,8 @@ if(ENABLE_BEM)
     )
 
     ExternalProject_Get_Property(${TABI} binary_dir)
-    list(APPEND APBS_LIB_DIRS "${binary_dir}/src")
     list(APPEND APBS_LIB_DIRS "${binary_dir}")
-    list(APPEND APBS_LIBS stdc++ TABIPBlib)
+    list(APPEND APBS_LIBS TABIPBlib)
     include_directories(${EXTERNALS_PATH}/${TABI})
     include_directories(${EXTERNALS_PATH}/${TABI}/src)
 
@@ -237,13 +253,13 @@ endif() # ENABLE_BEM
 option(GET_MSMS "Put MSMS executable in the build directory" OFF)
 option(GET_NanoShaper "Put NanoShaper executable in the build directory" OFF)
 
-
 ################################################################################
 # Deal with MALOC                                                              #
 # Note that we depend exclusively on the MALOC that is in our external FETK    #
 # repository.  Also note, that in order for this to work on Windows, we've had #
 # to add CMake support to MALOC, and that FETK has no such support, in general.#
 ################################################################################
+
 if(NOT ENABLE_FETK)
   # We'll use autotools to build MALOC if FETK is enabled.
   set(MALOC_ROOT ${EXTERNALS_PATH}/fetk/maloc)
@@ -254,21 +270,12 @@ if(NOT ENABLE_FETK)
   list(APPEND APBS_LIBS maloc)
 endif()
 
-##############################################################################
-##
-# Find some libraries                                                          #
-################################################################################
-
-if(NOT WIN32)
-    find_library(MATH_LIBRARY "m")
-    list(APPEND APBS_LIBS m)
-endif()
 
 
 ################################################################################
 # Handle conditional building with MPI Support                                 #
 # There may be a better way, but for now this comes before FETK because FETK   #
-# depends on having the libraries located.                          #
+# depends on having the libraries located.                                     #
 ################################################################################
 
 option(ENABLE_MPI "Enable MPI parallelism" OFF)
@@ -289,6 +296,7 @@ if(ENABLE_MPI)
         message(WARNING "MPI may not be enabled in debugging mode")
     endif()
 endif()
+
 
 
 ################################################################################
@@ -352,7 +360,6 @@ if(ENABLE_FETK)
     ExternalProject_Get_Property(fetk-maloc install_dir)
     include_directories(${install_dir}/include)
 
-      list(APPEND APBS_LIBS "stdc++")
       list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
       list(APPEND APBS_LIBS maloc amd punc mc gamer superlu umfpack
   blas vf2c tetgen triangle readline termcap)
@@ -364,11 +371,13 @@ if(ENABLE_FETK)
 endif()
 
 
+
 ################################################################################
 # Optionally build geoflow (git submodule)
 ################################################################################
 
 option(ENABLE_GEOFLOW "geoflow method" OFF)
+
 if(ENABLE_GEOFLOW)
   message(STATUS "Building GEOFLOW")
   add_definitions(-DGEOFLOW_APBS)
@@ -382,7 +391,7 @@ if(ENABLE_GEOFLOW)
   ExternalProject_Get_Property(geoflow binary_dir)
   add_definitions(-DENABLE_GEOFLOW)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
-  list(APPEND APBS_LIBS stdc++ GeometricFlowLib)
+  list(APPEND APBS_LIBS GeometricFlowLib)
   include_directories(${EXTERNALS_PATH}/geoflow_c/src)
 endif()
 
@@ -399,11 +408,13 @@ if(ENABLE_PB_S_AM)
   add_definitions(-DENABLE_PBSAM)
 endif()
 
+
 ################################################################################
 # Optionally build pbam (git submodule)
 ################################################################################
 
 option(ENABLE_PBAM "pbam method" OFF)
+
 if(ENABLE_PBAM)
   message(STATUS "Building PBAM")
   add_definitions(-DPBAM_APBS)
@@ -417,11 +428,13 @@ if(ENABLE_PBAM)
   ExternalProject_Get_Property(pbam binary_dir)
   add_definitions(-DENABLE_PBAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
-  list(APPEND APBS_LIBS stdc++ PBAMLib )
+  list(APPEND APBS_LIBS PBAMLib)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
 endif()
+
+
 
 ################################################################################
 # Optionally build pbsam (git submodule)
@@ -565,7 +578,6 @@ endif()
 ################################################################################
 # Enable inline functions conditionally dependent on debug mode                #
 ################################################################################
-
 
 option(ENABLE_INLINE "Enable inline functions" ON)
 

@@ -4,13 +4,16 @@
  *
  *  Created by David Gohara on 3/17/10.
  *  Copyright 2010 Washington University. All rights reserved.
- *
+ * 
+ *  Last updated by Leighton Wilson on 08/29/2016:
+ *  Added ability to output binary DX files
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <apbs.h>
 
 char *usage = "\n\n\
 -----------------------------------------------------------------------\n\
@@ -19,9 +22,14 @@ del2dx\n\
 For converting the DelPhi format of the electrostatic potential to the\n\
 OpenDX format.\n\
 \n\
-Usage:  del2dx delphi_file opendx_file\n\
+Usage:  del2dx <delphi_file> <opendx_file> [outputformat]\n\n\
 where delphi_file is a file in DelPhi format and opendx_file is the\n\
-file to be written in OpenDX format.\n\
+file to be written in OpenDX format.\n\n\
+The optional argument outputformat specifies the output OpenDX format.\n\
+Acceptable values include\n\
+       dx:  standard OpenDX format\n\
+       dxbin:  binary OpenDX format\n\
+If the argument is not specified, the output format is standard OpenDX.\n\
 -----------------------------------------------------------------------\n\
 \n";
 
@@ -29,9 +37,9 @@ int main(int argc, char **argv) {
 	
 	int i,j,k,index;
 	char *inpath = NULL;
-    char *outpath = NULL;
-	
+        char *outpath = NULL;
 	char buffer[1024];
+        Vdata_Format format;
 	
 	int igrid, tot_grid, icol;
 	float val, xmax, scale, oldmid[3], temp, xdata, range, extent, origin[3], delta[3];
@@ -39,13 +47,26 @@ int main(int argc, char **argv) {
 	
 	FILE * pfile = NULL;
 	
-    if (argc != 3) {
-        printf("\n*** Syntax error: got %d arguments, expected 3.\n\n",argc);
+    if (!(argc == 3 || argc == 4)) {
+        printf("\n*** Syntax error: got %d arguments, expected 3 or 4.\n\n",argc);
         printf("%s\n", usage);
-        return -1;
+        return EXIT_FAILURE;
     } else {
         inpath = argv[1];
         outpath = argv[2];
+
+        if (argc == 4) {
+            if (Vstring_strcasecmp(argv[3], "dx")) {
+                format = VDF_DX;
+            } else if (Vstring_strcasecmp(argv[3], "dxbin")) {
+                format = VDF_DXBIN;
+            } else {
+                printf("\n*** Argument error: format must be 'dx' or 'dxbin'.\n\n");
+                return EXIT_FAILURE;
+            }
+        } else {
+            format = VDF_DX;
+        }
     }
 	
 	pfile = fopen(inpath, "r+b");
@@ -127,19 +148,39 @@ int main(int argc, char **argv) {
 	//For the moment I'm assuming the data for DelPhi is row major
 	//Write out the data
 	icol = 0;
-	for (i=0; i<igrid; i++) {
-		for (j=0; j<igrid; j++) { 
-			for (k=0; k<igrid; k++) {
-				index = k*(igrid)*(igrid)+j*(igrid)+i;
-				fprintf(pfile, "%12.6e ", data[index]);
-				icol++;
-				if (icol == 3) {
-					icol = 0;
-					fprintf(pfile, "\n");
-				}
+        if (format == VDF_DX) {
+	    for (i=0; i<igrid; i++) {
+	        for (j=0; j<igrid; j++) { 
+		    for (k=0; k<igrid; k++) {
+		        index = k*(igrid)*(igrid)+j*(igrid)+i;
+			fprintf(pfile, "%12.6e ", data[index]);
+			icol++;
+			if (icol == 3) {
+			    icol = 0;
+			    fprintf(pfile, "\n");
 			}
+		    }
 		}
-	}
+	    }
+        } else if (format == VDF_DXBIN) {
+	    for (i=0; i<igrid; i++) {
+	        for (j=0; j<igrid; j++) { 
+		    for (k=0; k<igrid; k++) {
+		        index = k*(igrid)*(igrid)+j*(igrid)+i;
+                        fwrite(&(data)[index], sizeof(double), 1, pfile);
+			icol++;
+			if (icol == 3) {
+			    icol = 0;
+			}
+		    }
+		}
+	    }
+        } else {
+            printf("\n*** Error: output format (format) incorrectly defined.\n\n");
+            return EXIT_FAILURE;
+        }
+
+
 	if (icol != 0) fprintf(pfile, "\n");
 	fprintf(pfile, "attribute \"dep\" string \"positions\"\n" \
 			"object \"regular positions regular connections\" class field\n" \

@@ -1,5 +1,5 @@
-README for TABI-PB (Boundary Element Method)
-============================================
+README for TABI-PB (Boundary Element Method) Examples
+=====================================================
 
 The example input files included in this folder uses a boundary element approach called
 TABI-PB to solve the PBE. BEMs have the characteristic that only the boundary of the 
@@ -18,3 +18,4 @@ Two examples calculate surface potentials for 451c in a 0.15 M salt solution:
         2. 451c_order5.in uses a 5th order Taylor series expansion for the treecode.
 
 Additionally, more pqr files are available in the test_proteins directory.
+More details on TABI-PB are available on the APBS website contributions section.
