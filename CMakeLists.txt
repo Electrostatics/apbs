@@ -404,8 +404,10 @@ option(ENABLE_PB_S_AM "pbam and pbsam method" OFF)
 if(ENABLE_PB_S_AM)
   message(STATUS "Building PBAM and PBSAM")
 
-  add_definitions(-DENABLE_PBAM)
-  add_definitions(-DENABLE_PBSAM)
+  option(ENABLE_PBAM "pbam method" ON)
+  option(ENABLE_PBSAM "pbsam method" ON)
+##add_definitions(-DENABLE_PBAM)
+##add_definitions(-DENABLE_PBSAM)
 endif()
 
 
