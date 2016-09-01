@@ -43,8 +43,8 @@
 
 void multivalue_usage(void) {
     Vnm_print(1,"\n");
-    Vnm_print(1,"Usage: > multivalue csvCoordinatesFile dxFormattedFile outputFile"
-                "[outputformat]\n\n");
+    Vnm_print(1,"Usage: multivalue <csvCoordinatesFile> <dxFormattedFile> <outputFile>"
+                " [outputformat]\n\n");
     Vnm_print(1,"csvCoordinatesFile is the input CSV file containing 3D coordinates\n");
     Vnm_print(1,"dxFormattedFile is the input DX grid on which coords are evaluated\n\n");
     Vnm_print(1,"The optional argument outputformat specifies output OpenDX type.\n");
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
     Vnm_redirect(1);
     Vnm_print(1, "\n");
     if (argc != 4 && argc != 5) {
-        Vnm_print(2,"Invalid number of arguments, # of arguments received: %d\n",argc);
+        Vnm_print(2,"Invalid number of arguments, # of arguments received: %d\n",argc-1);
         multivalue_usage();
         exit(1);
     }

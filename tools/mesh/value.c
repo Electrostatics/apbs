@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     Vnm_redirect(1);
     Vnm_print(1, "\n");
     if (argc != 5 && argc != 6) {
-        Vnm_print(2, "Error -- got %d arguments, expected 5 or 6.\n", argc);
+        Vnm_print(2, "Error -- got %d arguments, expected 4 or 5.\n", argc-1);
         usage(2);
     }
     sscanf(argv[1], "%lf", &(pt[0]));
