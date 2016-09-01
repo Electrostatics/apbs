@@ -5343,7 +5343,7 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
   int i, j, k, ierr;
   Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
   PBSAMInput pbsamIn = getPBSAMParams();
-  PBAMInput pbamIn = getPBAMParams();
+  PBAMInput pbamIn;// = getPBAMParams();
 
   pbamIn.nmol_ = nosh->nmol;
 
