@@ -5041,9 +5041,10 @@ VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
     free_matrix(tabivars->snrm); // allocate in output_potential()
     free_matrix(tabivars->face); // allocate in output_potential()
 
-    Vnm_tprint( 1,"Solvation energy and Coulombic energy in kJ/mol...\n\n");
-    Vnm_tprint( 1,"  Global net ELEC energy = %1.12E\n", 4.184*tabivars->soleng);
-    Vnm_tprint( 1,"  Global net COULOMBIC energy = %1.12E\n\n", 4.184*tabivars->couleng);
+    Vnm_tprint(1, "\n\nReturning to APBS caller...\n\n");
+    Vnm_tprint(1, "Solvation energy and Coulombic energy in kCal/mol...\n\n");
+    Vnm_tprint(1, "  Global net ELEC energy = %1.12E\n", tabivars->soleng);
+    Vnm_tprint(1, "  Global net COULOMBIC energy = %1.12E\n\n", tabivars->couleng);
 
     free(tabivars);
 
@@ -5308,6 +5309,53 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
 
   // Run the darn thing
   PBAMOutput pbamOut = runPBAMWrapAPBS( pbamIn, molecules, nosh->nmol );
+
+  Vnm_tprint(1, "\n\nReturning to APBS caller...\n\n");
+
+  if (!(strncmp(pbamIn.runType_, "dynamics", 8) &&
+        strncmp(pbamIn.runType_, "energyforce", 11))) {
+
+      if (!strncmp(pbamIn.units_, "kcalmol", 7)) {  //scale to kjmol is 4.18400
+
+          Vnm_tprint(1, "Interaction energy in kCal/mol...\n\n");
+
+          for (int i = 0; i < PBAMPARM_MAXMOL; i++) {
+              Vnm_tprint(1, "  Molecule %d: Global net ELEC energy = %1.12E\n",
+                            i+1, pbamOut.energies_[i]);
+              Vnm_tprint(1, "              Force = (%1.6E, %1.6E, %1.6E)\n\n",
+                            pbamOut.forces_[i][0], pbamOut.forces_[i][1],
+                            pbamOut.forces_[i][2]);
+              if (pbamOut.energies_[i+1] == 0.) break;
+          }
+
+      } else if (!strncmp(pbamIn.units_, "jmol", 4)) {  //scale to kjmol is 0.001
+
+          Vnm_tprint(1, "Interaction energy in J/mol...\n\n");
+
+          for (int i = 0; i < PBAMPARM_MAXMOL; i++) {
+              Vnm_tprint(1, "  Molecule %d: Global net ELEC energy = %1.12E\n",
+                            i+1, pbamOut.energies_[i]);
+              Vnm_tprint(1, "              Force = (%1.6E, %1.6E, %1.6E)\n\n",
+                            pbamOut.forces_[i][0], pbamOut.forces_[i][1],
+                            pbamOut.forces_[i][2]);
+              if (pbamOut.energies_[i+1] == 0.) break;
+          }
+
+      } else { // if (!strncmp(pbamIn.units_, "kT", 2)) //scale to kjmol is 2.478 @ 298K
+                                                        // or 0.008315436242 * 298
+
+          Vnm_tprint(1, "Interaction energy in kT @ %6.2f K...\n\n", pbamIn.temp_);
+
+          for (int i = 0; i < PBAMPARM_MAXMOL; i++) {
+              Vnm_tprint(1, "  Molecule %d: Global net ELEC energy = %1.12E\n",
+                            i+1, pbamOut.energies_[i]);
+              Vnm_tprint(1, "              Force = (%1.6E, %1.6E, %1.6E)\n\n",
+                            pbamOut.forces_[i][0], pbamOut.forces_[i][1],
+                            pbamOut.forces_[i][2]);
+              if (pbamOut.energies_[i+1] == 0.) break;
+          }
+      }
+  }
 
   Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
 
