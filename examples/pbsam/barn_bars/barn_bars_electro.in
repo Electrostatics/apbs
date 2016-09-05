@@ -9,7 +9,7 @@ elec name comp_solv        # Gly
     runtype electrostatics  # Can be energyforce, electrostatics etc
     runname elec_barn_bars  # Output name for files created by program
 
-    units jmol
+    units kT
     ## info for molecule
     tolsp 4.5
    #msms  #uncomment if there are no vertex files and system is not CG
@@ -17,11 +17,11 @@ elec name comp_solv        # Gly
    #surf barstar.vert # uncomment if system needs to be CGed
    #surf barnase.vert # uncomment if system needs to be CGed
 
-    imat  imat/mol0sph  # For barstar
-    imat  imat/mol1sph  # For barnase
+   #imat  imat/mol0sph  # For barstar, when imat is gen
+   #imat  imat/mol1sph  # For barnase, when imat is gen
 
-    exp   exp/mol0      # For barstar
-    exp   exp/mol1      # For barnase
+   #exp   exp/mol0      # For barstar, when exp are gen
+   #exp   exp/mol1      # For barnase, when exp files gen
 
     temp 298.15             # System temperature (K)
     pdie 4.0                # Solute dielectric                 
