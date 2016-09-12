@@ -1,6 +1,6 @@
 read
-    mol pqr barstar_cg.pqr
-    mol pqr barnase_cg.pqr
+    mol pqr barstar.pqr
+    mol pqr barnase.pqr
 
 end
 elec name comp_solv        # Gly
@@ -12,7 +12,7 @@ elec name comp_solv        # Gly
     units kT
     ## info for molecule
     tolsp 4.5
-   #msms  #uncomment if there are no vertex files and system is not CG
+    msms  #comment if the system has been coarse-grained
 
    #surf barstar.vert # uncomment if system needs to be CGed
    #surf barnase.vert # uncomment if system needs to be CGed
