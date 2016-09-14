@@ -5556,9 +5556,56 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
 
   // Run the darn thing
   PBAMOutput pbamOut = runPBSAMWrapAPBS(pbamIn, pbsamIn, molecules, nosh->nmol);
-  printf("This is energy 1: %.8f \t force: %.8f %.8f %.8f\n", pbamOut.energies_[0], 
-         pbamOut.forces_[0][0], pbamOut.forces_[0][1],pbamOut.forces_[0][2]);
+
+  Vnm_tprint(1, "\n\nReturning to APBS caller...\n\n");
+
+  if (!(strncmp(pbamIn.runType_, "dynamics", 8) &&
+        strncmp(pbamIn.runType_, "energyforce", 11))) {
+
+      if (!strncmp(pbamIn.units_, "kcalmol", 7)) {  //scale to kjmol is 4.18400
+
+          Vnm_tprint(1, "Interaction energy in kCal/mol...\n\n");
+
+          for (int i = 0; i < PBAMPARM_MAXMOL; i++) {
+              Vnm_tprint(1, "  Molecule %d: Global net ELEC energy = %1.12E\n",
+                            i+1, pbamOut.energies_[i]);
+              Vnm_tprint(1, "              Force = (%1.6E, %1.6E, %1.6E)\n\n",
+                            pbamOut.forces_[i][0], pbamOut.forces_[i][1],
+                            pbamOut.forces_[i][2]);
+              if (pbamOut.energies_[i+1] == 0.) break;
+          }
+
+      } else if (!strncmp(pbamIn.units_, "jmol", 4)) {  //scale to kjmol is 0.001
+
+          Vnm_tprint(1, "Interaction energy in J/mol...\n\n");
+
+          for (int i = 0; i < PBAMPARM_MAXMOL; i++) {
+              Vnm_tprint(1, "  Molecule %d: Global net ELEC energy = %1.12E\n",
+                            i+1, pbamOut.energies_[i]);
+              Vnm_tprint(1, "              Force = (%1.6E, %1.6E, %1.6E)\n\n",
+                            pbamOut.forces_[i][0], pbamOut.forces_[i][1],
+                            pbamOut.forces_[i][2]);
+              if (pbamOut.energies_[i+1] == 0.) break;
+          }
+
+      } else { // if (!strncmp(pbamIn.units_, "kT", 2)) //scale to kjmol is 2.478 @ 298K
+                                                        // or 0.008315436242 * 298
+
+          Vnm_tprint(1, "Interaction energy in kT @ %6.2f K...\n\n", pbamIn.temp_);
+
+          for (int i = 0; i < PBAMPARM_MAXMOL; i++) {
+              Vnm_tprint(1, "  Molecule %d: Global net ELEC energy = %1.12E\n",
+                            i+1, pbamOut.energies_[i]);
+              Vnm_tprint(1, "              Force = (%1.6E, %1.6E, %1.6E)\n\n",
+                            pbamOut.forces_[i][0], pbamOut.forces_[i][1],
+                            pbamOut.forces_[i][2]);
+              if (pbamOut.energies_[i+1] == 0.) break;
+          }
+      }
+  }
+
   Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
+
   return 1;
 }
 
