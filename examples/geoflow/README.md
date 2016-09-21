@@ -16,4 +16,5 @@ The parameters used in the input files (imidazol and glycerol) came from Thomas 
 
 | Input File  | Description                 | APBS Version     | Global Net ELEC Energy | Global Net APOL Energy |
 |-------------|-----------------------------|------------------|------------------------|------------------------|
-| imidazol.in | Serial, mdh boundary condts.| **1.4.2-binary** | **-10.3022**           | **.541742**            |
+| imidazol.in | Serial, mdh boundary condts.| **1.5** | **-10.3022** | **0.541742** |
+|||1.4.2|-10.3022|0.541742
