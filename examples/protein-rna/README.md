@@ -22,7 +22,7 @@ in bash or
             
 
 in tcsh. Then simply type 'make' to run the example.
-
+<center>
 APBS Version|Input file|APBS Result
 ---|---|---
 1.5  |apbs-0.025.in|8.674120000000e+01
@@ -61,7 +61,7 @@ APBS Version|Input file|APBS Result
      |apbs-0.600.in|1.238080000000e+02
      |apbs-0.700.in|1.252360000000e+02
      |apbs-0.800.in|1.264340000000e+02
-
+</center>
 <!---
 %%%%%%
 Commented this out since is the result of running all the example. Reather, I am putting the results of the test in here. JB.
