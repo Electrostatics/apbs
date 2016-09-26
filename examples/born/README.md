@@ -9,6 +9,7 @@ This example was contributed by Nathan Baker.
 
 Input File|Description|APBS Version|Results (kJ/mol)|Analytical (kJ/mol)
 ---|---|---|---|---
+<<<<<<< HEAD
 [apbs-mol-auto.in](apbs-mol-auto.in)|Sequential, 3 A sphere, 3-level focusing to 0.188 A, srfm mol|**1.5**|**-229.7740**|-230.62
 |||1.4.2|-229.774
 |||1.4.1|-229.7736|
@@ -33,7 +34,7 @@ Input File|Description|APBS Version|Results (kJ/mol)|Analytical (kJ/mol)
 |||0.2.0|-227.19
 |||0.1.8|-227.19
 [apbs-smol-auto.in](apbs-smol-auto.in)|Sequential, 3 A sphere, 3-level focusing to 0.188 A, srfm smol|**1.5**|**-229.012**|-230.62
-|||1.4.2|-229.012
+|||1.4.2|-229.0124
 |||1.4.1|-229.0124
 |||1.4|-229.0124
 |||1.3|-229.0124

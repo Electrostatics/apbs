@@ -59,7 +59,7 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.5.1|14.4254
 |||0.5.0|14.4254
 |||0.4.0|14.4254
-[1d7i-dss/apbs-smol.in](1d7i-dss/apbs-smol.in)|1d7i-dss, 2-level focusing to 0.225 A, VdW surface, srfm smol|**1.5**|**15.45150**|16.231
+[1d7i-dss/apbs-smol.in](1d7i-dss/apbs-smol.in)|1d7i-dss, 2-level focusing to 0.225 A, VdW surface, srfm smol|**1.5**|**15.4515**|16.231
 |||1.4.2|15.4515
 |||1.4.1|15.4515
 |||1.4|15.4515

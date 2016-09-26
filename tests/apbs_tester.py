@@ -165,7 +165,7 @@ def run_test( binary, test_files, test_name, test_directory, setup, logger, ocd 
             start_time = datetime.datetime.now()
 
             computed_results = None
-            
+
             # Determine if this is a parallel run
             match = re.search( r'\s*pdime((\s+\d+)+)', open( input_file, 'r' ).read() )
             
@@ -269,6 +269,7 @@ def main():
 
     # Read the test cases file
     config = ConfigParser()
+    config.optionxform = str
     config.read( options.test_config )
 
     # Make sure that the apbs binary can be found
@@ -300,7 +301,7 @@ def main():
         # Grab the test directory
         test_directory = config.get( test_name, 'input_dir' )
         config.remove_option( test_name, 'input_dir' )
-        
+
         # Check if there is a setup step.
         test_setup = None
         try:
