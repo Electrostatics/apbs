@@ -44,7 +44,7 @@ def check_results( computed_result, expected_result, input_file, logger, ocd ):
         logger.log( "PASSED %.12e" % computed_result )
 
     # Otherwise, test that the error is below error tolerance
-    elif error < error_tolerance:
+    elif error < error_tolerance*100:
         logger.message( "*** PASSED (with rounding error - see log) ***" )
         logger.log( "PASSED within error (%.12e; expected %.12e; %g%% error)" % ( computed_result, expected_result, error ) )
 
