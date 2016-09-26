@@ -13,3 +13,9 @@ This directory contains three example .in files:
 
 These files provide an example to demonstrate the calculation of binding energy on 1d30.
 More details are available on the APBS website contributions section.
+
+Input File| APBS Version| Result (kCal/mol)| Expected (kCal/mol)
+---|---|---|---
+[1d30.in](1d30.in)| **1.5**| **-5249.040**| -5249.030
+[1d30_monomer1.in](1d30_monomer1.in)| **1.5**| **-6232.160**| -6232.150
+[1d30_monomer2.in](1d30_monomer2.in)| **1.5**| **-182.1470**| -182.1471

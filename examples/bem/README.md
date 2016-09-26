@@ -19,3 +19,8 @@ Two examples calculate surface potentials for 451c in a 0.15 M salt solution:
 
 Additionally, more pqr files are available in the test_proteins directory.
 More details on TABI-PB are available on the APBS website contributions section.
+
+Input File| APBS Version| Result (kCal/mol) | Expected (kCal/mol)
+---|---|---|---
+[451c_order1.in](451c_order1.in)| **1.5**| **-1172.910**| -1172.907
+[451c_order5.in](451c_order5.in)| **1.5**| **-1175.930**| -1175.940
