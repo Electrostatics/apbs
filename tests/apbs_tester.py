@@ -37,7 +37,7 @@ def test_binary():
 
     # Next, looks for the apbs binary in the apbs bin directory
     try:
-        binary = os.path.abspath( "../bin/apbs" )
+        binary = os.path.abspath( "../build/bin/apbs" )
         subprocess.call( [binary, "--version"] )
         return binary
     except OSError:

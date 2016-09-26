@@ -219,6 +219,9 @@ if(ENABLE_BEM)
     set(TABI bem)
     set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
 
+    set(GET_MSMS ON) #CACHE BOOL "Grabbing msms path"
+    set(GET_NANOSHAPER ON) #CACHE BOOL "Grabbing NanoShaper path"
+
     ExternalProject_add(
         ${TABI}
         SOURCE_DIR ${TABI_PATH}
@@ -446,7 +449,7 @@ option(ENABLE_PBSAM "pbsam method" OFF)
 if(ENABLE_PBSAM)
   message(STATUS "Building PBSAM")
   add_definitions(-DPBSAM_APBS)
-  set(GET_MSMS ON ) #CACHE BOOL "Grabbing msms path")
+  set(GET_MSMS ON) #CACHE BOOL "Grabbing msms path")
   message(STATUS "copying msms ${GET_MSMS}")
   
   list(APPEND CMAKE_MODULE_PATH ${EXTERNALS_PATH}/pb_s_am/cmake/modules)
