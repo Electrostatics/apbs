@@ -1,53 +1,33 @@
-APBS 1.4.2 CHANGELOG
-====================
+APBS 1.5 CHANGELOG
+==================
 
-These are notes for APBS version 1.4.2.1.
----------------------------------------
+These are notes for APBS version 1.5
+------------------------------------
 
-* Binary releases may be found on
- [GitHub](https://github.com/Electrostatics/apbs-pdb2pqr/releases) and
- on [SourceForge](http://sourceforge.net/projects/apbs/files/apbs/).
-
-### Changes from 1.4.2
-* Actually included PB-AM binary, examples and documentation -- note that this is Linux and OS X only!
-* Fixed Windows build so that it is not a Debug build, and ensured that no DLLs are missing
+* Binary releases may be found on [GitHub](https://github.com/Electrostatics/apbs-pdb2pqr/releases) and on [SourceForge](http://sourceforge.net/projects/apbs/files/apbs).
 
 ### New Features
-* Poisson-Boltzmann Semi-Analytical Method (PB-AM) packaged and built with APBS
-  * the binary is called `mpe` and colocated with the apbs binary
-  * documentation is with the APBS documentation, and called PBE_Manual_V1.docx
-  * examples are located with APBS examples in a pb-am directory
-* New Geometric flow API and improvements in speed (#235)
-* Support for BinaryDX file format (#216)
-* SOR solver added for mg-auto input file option
-* DXMath improvements (#168, #216)
-* Test suite improvements
-  * APBS build in Travis-CI
-  * Geometric Flow tests added
-  * Protein RNA tests enabled (#149)
-  * Intermetiate result testing (#64)
-* Example READMEs onverted to markdown and updated with latest results
-  
+
+* Poisson-Boltzmann Anlytical Method (PBAM) and Semi-Anlytical Method (PBSAM) packaged and built with APBS.
+    * Examples are located with the APBS examples in the pbam/ and pbsam/ directories.
+    * Documentation is within the APBS documentations and more information can be found in the "Contributions" section of the [APBS-PDB2PQR](http://www.poissonboltzmann.org/) website.
+* Tree-Code Accelerated Boundary Integral Poisson-Boltzmann Method (TABI-PB) packaged and built with APBS.
+    * Examples are located with the APBS examples in the bem/, bem-pKa/, and bem-binding-energies/ folders.
+    * Included NanoShaper alternative to MSMS (#374).
+    * Documentation is within the APBS documentations and more informations can be found in the "Contributions" section fo the [APBS-PDB2PQR](http://www.poissonboltzmann.org/) website.
+* Added binary DX format support to the Tools (#323).
+* Test suite expanded to account for new methods.
+
 ### Bug Fixes
-* OpenMPI (mg-para) functionality restored (#190)
-* Fixed parsing PQR files that contained records other than _ATOM_ and _HETATM_ (#77, #214)
-* Geometric Flow boundary indexing bug fixed
-* Build fixes:
-  * Out of source CMake builds are again working
-  * Python library may be built (#372)
-  * CentOS 5 binary builds for glibc compatibility
-  * Pull requests merged
-* Removed irrelevant warning messages (#378)
+
+* Fix a bug where Geoflow and TABI-PB could not be built together.
+* Build a bug when building iAPBS where it looked like an error was occuring when invoking Fortran where it was not.
+* Fixed miscelaneous Windows build issues.
 
 ### Notes
-The following packages are treated as submodules in APBS:
-* Geometric Flow has been moved to it's own [repository](https://github.com/Electrostatics/geoflow_c)
-* FETk has been [cloned](https://github.com/Electrostatics/FETK) so that we have could effect updates
-* PB-SAM lives [here](https://github.com/Electrostatics/PB-SAM)
 
-Added [chat feature](https://gitter.im/Electrostatics/help) for users.  This can also be found from the support tab on http://www.poissonboltzmann.org/.
-
-### Known Bugs
-* Travis CI Linux builds are breaking because Geometric Flow relies on C++11 and Travis boxen have an old GCC that doth not support C++11.  This is also an issue for CentOS 5
-* BEM is temprarily disabled due to build issues
-* Geometric Flow build is currently broken on Windows using Visual Studio
+The following are treated as submodules in APBS:
+* Geometric Flow ([link](https://github.com/Electrostatics/geoflow_c/tree/e8ce510a670e0b7f3501e72be6141fc20328f947))
+* FETk ([link](https://github.com/Electrostatics/FETK/tree/0c6fdeabe8929acea7481cb1480b5706b343b7e0))
+* PBAM/PBASAM ([link](https://github.com/davas301/pb_solvers/tree/4805cbec02b30e9bae927f03ac2fecd3217c4dad))
+* TABI-PB ([link](https://github.com/lwwilson1/TABIPB/tree/941eff91acd4153a06764e34d29b633c6e3b980f))
