@@ -226,7 +226,7 @@ if(ENABLE_BEM)
         ${TABI}
         SOURCE_DIR ${TABI_PATH}
 
-        CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+        CMAKE_ARGS -DENABLE_TABIPB_APBS=ON 
         BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
     	INSTALL_COMMAND ""
     )
@@ -236,14 +236,6 @@ if(ENABLE_BEM)
     list(APPEND APBS_LIBS TABIPBlib)
     include_directories(${EXTERNALS_PATH}/${TABI})
     include_directories(${EXTERNALS_PATH}/${TABI}/src)
-
-
-    if(BUILD_SHARED_LIBS)
-        set(TABI_LIBRARY_BASENAME ${CMAKE_SHARED_LIBRARY_PREFIX}${TABI}${CMAKE_SHARED_LIBRARY_SUFFIX})
-    else()
-        set(TABI_LIBRARY_BASENAME ${CMAKE_STATIC_LIBRARY_PREFIX}${TABI}${CMAKE_STATIC_LIBRARY_SUFFIX})
-    endif()
-
 
 endif() # ENABLE_BEM
 
@@ -399,19 +391,6 @@ if(ENABLE_GEOFLOW)
 endif()
 
 
-################################################################################
-# Optionally build pbam and pbsam(git submodule)
-################################################################################
-
-option(ENABLE_PB_S_AM "pbam and pbsam method" OFF)
-if(ENABLE_PB_S_AM)
-  message(STATUS "Building PBAM and PBSAM")
-
-  option(ENABLE_PBAM "pbam method" ON)
-  option(ENABLE_PBSAM "pbsam method" ON)
-##add_definitions(-DENABLE_PBAM)
-##add_definitions(-DENABLE_PBSAM)
-endif()
 
 
 ################################################################################
