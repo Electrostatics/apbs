@@ -237,14 +237,6 @@ if(ENABLE_BEM)
     include_directories(${EXTERNALS_PATH}/${TABI})
     include_directories(${EXTERNALS_PATH}/${TABI}/src)
 
-
-    if(BUILD_SHARED_LIBS)
-        set(TABI_LIBRARY_BASENAME ${CMAKE_SHARED_LIBRARY_PREFIX}${TABI}${CMAKE_SHARED_LIBRARY_SUFFIX})
-    else()
-        set(TABI_LIBRARY_BASENAME ${CMAKE_STATIC_LIBRARY_PREFIX}${TABI}${CMAKE_STATIC_LIBRARY_SUFFIX})
-    endif()
-
-
 endif() # ENABLE_BEM
 
 
