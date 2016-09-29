@@ -6,13 +6,11 @@ elec name comp_solv        # Toy charges
     pbam-auto
     
     runtype energyforce     # Can be energyforce, electrostatics etc
-    #runname enfor_test      # Output name for files created by program
+    runname enfor_test      # Output name for files created by program
     temp 250.0              # System temperature (K)
     pdie 4.0                # Solute dielectric                 
     sdie 78.00              # Solvent dielectric                
     salt 0.01               # Monovalent salt conc in M
-
-    randorient
 
 end
 
