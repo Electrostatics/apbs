@@ -227,7 +227,7 @@ if(ENABLE_BEM)
         SOURCE_DIR ${TABI_PATH}
 
         CMAKE_ARGS -DENABLE_TABIPB_APBS=ON 
-        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
+        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target TABIPBlib
     	INSTALL_COMMAND ""
     )
 
@@ -380,7 +380,7 @@ if(ENABLE_GEOFLOW)
     geoflow
     SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
     CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON
-    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
+    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target GeometricFlowLib
     INSTALL_COMMAND ""
   )
   ExternalProject_Get_Property(geoflow binary_dir)
@@ -406,7 +406,7 @@ if(ENABLE_PBAM)
     pbam
     SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
     CMAKE_ARGS -DENABLE_PBAM_APBS=ON
-    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
+    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBAMLib
     INSTALL_COMMAND ""
   )
   ExternalProject_Get_Property(pbam binary_dir)
@@ -433,20 +433,24 @@ if(ENABLE_PBSAM)
   
   list(APPEND CMAKE_MODULE_PATH ${EXTERNALS_PATH}/pb_s_am/cmake/modules)
   include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
-  include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
+  #include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
   include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
 
   ExternalProject_Add(
                       pbsam
                       SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
                       CMAKE_ARGS -DENABLE_PBSAM_APBS=ON
-                      BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
+                      BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBSAMLib
                       INSTALL_COMMAND ""
                       )
   ExternalProject_Get_Property(pbsam binary_dir)
   add_definitions(-DENABLE_PBSAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/pbsam/src")
-  list(APPEND APBS_LIBS stdc++ PBSAMLib ${PBSAM_LINKER_LIBS})
+  if(WIN32)
+	list(APPEND APBS_LIBS PBSAMLib ${PBSAM_LINKER_LIBS})
+  else()
+    list(APPEND APBS_LIBS stdc++ PBSAMLib ${PBSAM_LINKER_LIBS})
+  endif()
   message(STATUS "Adding in " ${PBSAM_LINKER_LIBS} )
   include_directories(${EXTERNALS_PATH}/pb_s_am/pbsam/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
