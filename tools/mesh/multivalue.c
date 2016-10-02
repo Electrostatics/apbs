@@ -6,6 +6,10 @@
 * 		this function for reference and more importantly for any licensing issues).
 * Date:	November 29, 2006
 *
+* Additional updates: Leighton Wilson
+* Description of updates: added DXBIN support
+* Date: August 30, 2016
+*
 * Description:	Accepts a CSV (with no column titles) file containing 3D coordinates for which the
 *			value from a DX-formatted grid is evaluated.  The original coordinates and their its
 * 			values are output to a text file formatted exactly like the input but with one extra
@@ -86,9 +90,9 @@ int main(int argc, char *argv[]) {
     outputFileName = argv[3];
 
     if (argc == 5) {
-        if (Vstring_strcasecmp(argv[4], "dx")) {
+        if (!Vstring_strcasecmp(argv[4], "dx")) {
             format = VDF_DX;
-        } else if (Vstring_strcasecmp(argv[4], "dxbin")) {
+        } else if (!Vstring_strcasecmp(argv[4], "dxbin")) {
             format = VDF_DXBIN;
         } else {
             printf("\n*** Argument error: format must be 'dx' or 'dxbin'.\n\n");

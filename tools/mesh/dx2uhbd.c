@@ -63,9 +63,9 @@ int main(int argc, char **argv) {
     outpath = argv[2];
 
     if (argc == 4) {
-        if (Vstring_strcasecmp(argv[3], "dx")) {
+        if (!Vstring_strcasecmp(argv[3], "dx")) {
             dx_type = VDF_DX;
-        } else if (Vstring_strcasecmp(argv[3], "dxbin")) {
+        } else if (!Vstring_strcasecmp(argv[3], "dxbin")) {
             dx_type = VDF_DXBIN;
         } else {
             Vnm_print(2, "\n*** Argument error: dx_type must be 'dx' or 'dxbin'.\n\n");
