@@ -149,7 +149,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    Vnm_print(2, "Finished writing to %s\n", outpath)
+    Vnm_print(2, "Finished writing to %s\n", outpath);
 
     /* Close off the socket */
     Vio_connectFree(sock);
