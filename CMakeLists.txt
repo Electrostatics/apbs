@@ -220,7 +220,7 @@ if(ENABLE_BEM)
     set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
 
     set(GET_MSMS ON) #CACHE BOOL "Grabbing msms path"
-    set(GET_NANOSHAPER ON) #CACHE BOOL "Grabbing NanoShaper path"
+    set(GET_NanoShaper ON) #CACHE BOOL "Grabbing NanoShaper path"
 
     ExternalProject_add(
         ${TABI}
