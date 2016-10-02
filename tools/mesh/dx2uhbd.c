@@ -83,16 +83,16 @@ int main(int argc, char **argv) {
         /* Read binary DX format file */
         Vnm_print(1, "Reading %s as binary OpenDX format...\n", inpath);
         if(Vgrid_readDXBIN(grid, "FILE", "ASC", VNULL, inpath) != 1) {
-                Vnm_print(2, "\n*** Fatal error while reading from %s as\
-                              binary DX format file\n", inpath);
+                Vnm_print(2, "\n*** Fatal error while reading from %s as "
+                             "binary DX format file\n", inpath);
                 return EXIT_FAILURE;
         }
     } else if (dx_type == VDF_DX) {                                                                                 
         /* Read standard DX format file */
         Vnm_print(1, "Reading %s as standard OpenDX format...\n", inpath);
         if(Vgrid_readDX(grid, "FILE", "ASC", VNULL, inpath) != 1) {
-                Vnm_print(2, "\n*** Fatal error while reading from %s as\
-                              standard DX format file\n", inpath);
+                Vnm_print(2, "\n*** Fatal error while reading from %s as "
+                             "standard DX format file\n", inpath);
                 return EXIT_FAILURE;
         }
     } else {
