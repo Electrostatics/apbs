@@ -53,9 +53,9 @@ int main(int argc, char **argv) {
     path = argv[4];
 
     if (argc == 6) {
-        if (Vstring_strcasecmp(argv[5], "dx")) {
+        if (!Vstring_strcasecmp(argv[5], "dx")) {
             format = VDF_DX;
-        } else if (Vstring_strcasecmp(argv[5], "dxbin")) {
+        } else if (!Vstring_strcasecmp(argv[5], "dxbin")) {
             format = VDF_DXBIN;
         } else {
             Vnm_print(2, "main:  Format must be 'dx' or 'dxbin'.\n\n");

@@ -63,9 +63,9 @@ int main(int argc, char **argv) {
     outpath = argv[2];
 
     if (argc == 4) {
-        if (Vstring_strcasecmp(argv[3], "dx")) {
+        if (!Vstring_strcasecmp(argv[3], "dx")) {
             dx_type = VDF_DX;
-        } else if (Vstring_strcasecmp(argv[3], "dxbin")) {
+        } else if (!Vstring_strcasecmp(argv[3], "dxbin")) {
             dx_type = VDF_DXBIN;
         } else {
             Vnm_print(2, "\n*** Argument error: dx_type must be 'dx' or 'dxbin'.\n\n");
@@ -83,16 +83,16 @@ int main(int argc, char **argv) {
         /* Read binary DX format file */
         Vnm_print(1, "Reading %s as binary OpenDX format...\n", inpath);
         if(Vgrid_readDXBIN(grid, "FILE", "ASC", VNULL, inpath) != 1) {
-                Vnm_print(2, "\n*** Fatal error while reading from %s as\
-                              binary DX format file\n", inpath);
+                Vnm_print(2, "\n*** Fatal error while reading from %s as "
+                             "binary DX format file\n", inpath);
                 return EXIT_FAILURE;
         }
     } else if (dx_type == VDF_DX) {                                                                                 
         /* Read standard DX format file */
         Vnm_print(1, "Reading %s as standard OpenDX format...\n", inpath);
         if(Vgrid_readDX(grid, "FILE", "ASC", VNULL, inpath) != 1) {
-                Vnm_print(2, "\n*** Fatal error while reading from %s as\
-                              standard DX format file\n", inpath);
+                Vnm_print(2, "\n*** Fatal error while reading from %s as "
+                             "standard DX format file\n", inpath);
                 return EXIT_FAILURE;
         }
     } else {

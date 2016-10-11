@@ -82,12 +82,12 @@ int main(int argc, char **argv) {
     for (i=1; i<argc; i++) {
         Vnm_print(1, "Parsing: %s...\n", argv[i]);
         if (strstr(argv[i], "--format") != NULL) {
-            if (strstr(argv[i], "dx") != NULL) {
-                gotFormat = 1;
-                format = VDF_DX;
-            } else if (strstr(argv[i], "dxbin") != NULL) {
+            if (strstr(argv[i], "dxbin") != NULL) {
                 gotFormat = 1;
                 format = VDF_DXBIN;
+            } else if (strstr(argv[i], "dx") != NULL) {
+                gotFormat = 1;
+                format = VDF_DX;
             } else {
                 Vnm_print(2, "Error:  %s\n", argv[i]);
                 usage(2);

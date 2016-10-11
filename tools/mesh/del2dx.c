@@ -56,9 +56,9 @@ int main(int argc, char **argv) {
         outpath = argv[2];
 
         if (argc == 4) {
-            if (Vstring_strcasecmp(argv[3], "dx")) {
+            if (!Vstring_strcasecmp(argv[3], "dx")) {
                 format = VDF_DX;
-            } else if (Vstring_strcasecmp(argv[3], "dxbin")) {
+            } else if (!Vstring_strcasecmp(argv[3], "dxbin")) {
                 format = VDF_DXBIN;
             } else {
                 printf("\n*** Argument error: format must be 'dx' or 'dxbin'.\n\n");

@@ -220,7 +220,7 @@ if(ENABLE_BEM)
     set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
 
     set(GET_MSMS ON) #CACHE BOOL "Grabbing msms path"
-    set(GET_NANOSHAPER ON) #CACHE BOOL "Grabbing NanoShaper path"
+    set(GET_NanoShaper ON) #CACHE BOOL "Grabbing NanoShaper path"
 
     ExternalProject_add(
         ${TABI}
@@ -446,11 +446,13 @@ if(ENABLE_PBSAM)
   ExternalProject_Get_Property(pbsam binary_dir)
   add_definitions(-DENABLE_PBSAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/pbsam/src")
+
   if(WIN32)
 	list(APPEND APBS_LIBS PBSAMLib ${PBSAM_LINKER_LIBS})
   else()
     list(APPEND APBS_LIBS stdc++ PBSAMLib ${PBSAM_LINKER_LIBS})
   endif()
+
   message(STATUS "Adding in " ${PBSAM_LINKER_LIBS} )
   include_directories(${EXTERNALS_PATH}/pb_s_am/pbsam/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
