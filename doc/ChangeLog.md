@@ -8,7 +8,7 @@ These are notes for APBS version 1.5
 
 ### New Features
 
-* Poisson-Boltzmann Anlytical Method (PBAM) and Semi-Anlytical Method (PBSAM) packaged and built with APBS.
+* Poisson-Boltzmann Anlytical Method (PBAM) and Semi-Anlytical Method (PBSAM)(Linux and OS X only) packaged and built with APBS.
     * Examples are located with the APBS examples in the pbam/ and pbsam/ directories.
     * Documentation is within the APBS documentations and more information can be found in the "Contributions" section of the [APBS-PDB2PQR](http://www.poissonboltzmann.org/) website.
 * Tree-Code Accelerated Boundary Integral Poisson-Boltzmann Method (TABI-PB) packaged and built with APBS.
@@ -18,8 +18,9 @@ These are notes for APBS version 1.5
 * Added binary DX format support to the Tools (#323).
 * Test suite expanded to account for new methods.
 
-### Bug Fixes
+### Bugs & Bug Fixes
 
+* PBSAM not building in windows due to differences in C standard implementations.
 * Fix a bug where Geoflow and TABI-PB could not be built together.
 * Build a bug when building iAPBS where it looked like an error was occuring when invoking Fortran where it was not.
 * Fixed miscelaneous Windows build issues.
