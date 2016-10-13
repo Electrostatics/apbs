@@ -433,7 +433,7 @@ if(ENABLE_PBSAM)
   
   list(APPEND CMAKE_MODULE_PATH ${EXTERNALS_PATH}/pb_s_am/cmake/modules)
   include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
-  #include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
+  include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
   include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
 
   ExternalProject_Add(
