@@ -227,7 +227,9 @@ if(ENABLE_BEM)
         SOURCE_DIR ${TABI_PATH}
 
         CMAKE_ARGS -DENABLE_TABIPB_APBS=ON 
-        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target TABIPBlib
+        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
+		#if building in Windows
+		#BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target TABIPBlib
     	INSTALL_COMMAND ""
     )
 
@@ -380,7 +382,9 @@ if(ENABLE_GEOFLOW)
     geoflow
     SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
     CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON
-    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target GeometricFlowLib
+	BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
+	#if building in Windows
+    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target GeometricFlowLib
     INSTALL_COMMAND ""
   )
   ExternalProject_Get_Property(geoflow binary_dir)
@@ -406,7 +410,9 @@ if(ENABLE_PBAM)
     pbam
     SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
     CMAKE_ARGS -DENABLE_PBAM_APBS=ON
-    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBAMLib
+	BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
+	#if building on Windows
+    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBAMLib
     INSTALL_COMMAND ""
   )
   ExternalProject_Get_Property(pbam binary_dir)
@@ -440,7 +446,9 @@ if(ENABLE_PBSAM)
                       pbsam
                       SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
                       CMAKE_ARGS -DENABLE_PBSAM_APBS=ON
-                      BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBSAMLib
+					  BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
+					  #if building on windows
+                      #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBSAMLib
                       INSTALL_COMMAND ""
                       )
   ExternalProject_Get_Property(pbsam binary_dir)
