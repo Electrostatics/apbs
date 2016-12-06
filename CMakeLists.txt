@@ -250,24 +250,6 @@ endif() # ENABLE_BEM
 option(GET_MSMS "Put MSMS executable in the build directory" OFF)
 option(GET_NanoShaper "Put NanoShaper executable in the build directory" OFF)
 
-################################################################################
-# Deal with MALOC                                                              #
-# Note that we depend exclusively on the MALOC that is in our external FETK    #
-# repository.  Also note, that in order for this to work on Windows, we've had #
-# to add CMake support to MALOC, and that FETK has no such support, in general.#
-################################################################################
-
-if(NOT ENABLE_FETK)
-  # We'll use autotools to build MALOC if FETK is enabled.
-  set(MALOC_ROOT ${EXTERNALS_PATH}/fetk/maloc)
-  add_subdirectory(${MALOC_ROOT})
-  include_directories(${MALOC_ROOT}/src/base ${MALOC_ROOT}/src/vsys
-    ${MALOC_ROOT}/src/vsh ${MALOC_ROOT}/src/psh)
-  list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
-  list(APPEND APBS_LIBS maloc)
-endif()
-
-
 
 ################################################################################
 # Handle conditional building with MPI Support                                 #
@@ -292,6 +274,23 @@ if(ENABLE_MPI)
     else()
         message(WARNING "MPI may not be enabled in debugging mode")
     endif()
+endif()
+
+################################################################################
+# Deal with MALOC                                                              #
+# Note that we depend exclusively on the MALOC that is in our external FETK    #
+# repository.  Also note, that in order for this to work on Windows, we've had #
+# to add CMake support to MALOC, and that FETK has no such support, in general.#
+################################################################################
+
+if(NOT ENABLE_FETK)
+  # We'll use autotools to build MALOC if FETK is enabled.
+  set(MALOC_ROOT ${EXTERNALS_PATH}/fetk/maloc)
+  add_subdirectory(${MALOC_ROOT})
+  include_directories(${MALOC_ROOT}/src/base ${MALOC_ROOT}/src/vsys
+    ${MALOC_ROOT}/src/vsh ${MALOC_ROOT}/src/psh)
+  list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
+  list(APPEND APBS_LIBS maloc)
 endif()
 
 
