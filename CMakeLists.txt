@@ -205,7 +205,12 @@ if(NOT WIN32)
     list(APPEND APBS_LIBS m stdc++)
 endif()
 
-
+##########################################
+#Optionally copy MSMS/nanoshaper exectutables
+# the actual grab is later for PBSAM enable
+##########################################
+option(GET_MSMS "Put MSMS executable in the build directory" OFF)
+option(GET_NanoShaper "Put NanoShaper executable in the build directory" OFF)
 
 ################################################################################
 #Optionally build BEM: TABI-PB method                                          #
@@ -225,7 +230,6 @@ if(ENABLE_BEM)
     ExternalProject_add(
         ${TABI}
         SOURCE_DIR ${TABI_PATH}
-
         CMAKE_ARGS -DENABLE_TABIPB_APBS=ON 
         BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
 		#if building in Windows
@@ -240,15 +244,6 @@ if(ENABLE_BEM)
     include_directories(${EXTERNALS_PATH}/${TABI}/src)
 
 endif() # ENABLE_BEM
-
-
-
-##########################################
-#Optionally copy MSMS/nanoshaper exectutables
-# the actual grab is later for PBSAM enable
-##########################################
-option(GET_MSMS "Put MSMS executable in the build directory" OFF)
-option(GET_NanoShaper "Put NanoShaper executable in the build directory" OFF)
 
 
 ################################################################################
@@ -765,17 +760,19 @@ install(
         PATTERN "README"
 )
 
-install(
+if(BUILD_TOOLS)
+  install(
     DIRECTORY ${APBS_ROOT}/tools
     DESTINATION ${SHARE_INSTALL_PATH}
     PATTERN "CMakeLists.txt" EXCLUDE
-)
-
-if(NOT "${APBS_ROOT}" STREQUAL "${APBS_BUILD}")
-    install(
-        DIRECTORY ${APBS_BUILD}/tools/bin
-        DESTINATION ${SHARE_INSTALL_PATH}/tools
     )
+
+  if(NOT "${APBS_ROOT}" STREQUAL "${APBS_BUILD}")
+    install(
+      DIRECTORY ${APBS_BUILD}/tools/bin
+      DESTINATION ${SHARE_INSTALL_PATH}/tools
+      )
+  endif()
 endif()
 
 ################################################################################
