@@ -230,7 +230,7 @@ if(ENABLE_BEM)
     ExternalProject_add(
         ${TABI}
         SOURCE_DIR ${TABI_PATH}
-        CMAKE_ARGS -DENABLE_TABIPB_APBS=ON 
+        CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
         BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
 		#if building in Windows
 		#BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target TABIPBlib
@@ -375,9 +375,9 @@ if(ENABLE_GEOFLOW)
   ExternalProject_Add(
     geoflow
     SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-    CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON
-	BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
-	#if building in Windows
+    CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} 
+    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
+    #if building in Windows
     #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target GeometricFlowLib
     INSTALL_COMMAND ""
   )
@@ -403,9 +403,9 @@ if(ENABLE_PBAM)
   ExternalProject_Add(
     pbam
     SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-    CMAKE_ARGS -DENABLE_PBAM_APBS=ON
-	BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
-	#if building on Windows
+    CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
+    #if building on Windows
     #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBAMLib
     INSTALL_COMMAND ""
   )
@@ -437,14 +437,14 @@ if(ENABLE_PBSAM)
   include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
 
   ExternalProject_Add(
-                      pbsam
-                      SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-                      CMAKE_ARGS -DENABLE_PBSAM_APBS=ON
-					  BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
-					  #if building on windows
-                      #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBSAMLib
-                      INSTALL_COMMAND ""
-                      )
+    pbsam
+    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+    CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
+    #if building on windows
+    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBSAMLib
+    INSTALL_COMMAND ""
+    )
   ExternalProject_Get_Property(pbsam binary_dir)
   add_definitions(-DENABLE_PBSAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/pbsam/src")
