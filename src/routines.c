@@ -1314,15 +1314,23 @@ VPUBLIC int initMG(int icalc,
             Vnm_tprint(2, "Sorry, NRPBE isn't supported with the MG solver!\n");
             return 0;
         case PBE_SMPBE: /* SMPBE Added */
+        	/* Due to numerical issues the SMPBE is currenty disabled. (JMB)*/
+        	Vnm_tprint(2, "  ** Sorry, due to numerical stability issues SMPBE is currently disabled. We apologize for the inconvenience.\n");
+            Vnm_tprint(2, "  ** Please let us know if you would like to use it in the future.\n");
+            return 0;
+
+        	/*
             mgparm->nonlintype = NONLIN_SMPBE;
             pmgp[icalc] = Vpmgp_ctor(mgparm);
-
+			*/
             /* Copy Code */
+            /*
             pbe[icalc]->smsize = pbeparm->smsize;
             pbe[icalc]->smvolume = pbeparm->smvolume;
             pbe[icalc]->ipkey = pmgp[icalc]->ipkey;
 
             break;
+            */
         default:
             Vnm_tprint(2, "Error!  Unknown PBE type (%d)!\n", pbeparm->pbetype);
             return 0;
