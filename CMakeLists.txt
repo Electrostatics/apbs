@@ -764,6 +764,7 @@ if(BUILD_TOOLS)
   install(
     DIRECTORY ${APBS_ROOT}/tools
     DESTINATION ${SHARE_INSTALL_PATH}
+    USE_SOURCE_PERMISSIONS
     PATTERN "CMakeLists.txt" EXCLUDE
     )
 
@@ -771,6 +772,7 @@ if(BUILD_TOOLS)
     install(
       DIRECTORY ${APBS_BUILD}/tools/bin
       DESTINATION ${SHARE_INSTALL_PATH}/tools
+      USE_SOURCE_PERMISSIONS
       )
   endif()
 endif()
