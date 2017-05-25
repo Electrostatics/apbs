@@ -1,0 +1,96 @@
+--- source/misc/apbs.src.orig	2017-05-25 11:46:06.386542718 -0700
++++ source/misc/apbs.src	2017-05-25 12:26:58.745013883 -0700
+@@ -219,6 +219,7 @@
+ ! forces common block: dx, dy, dz
+   use deriv
+   use parallel
++  use param_store, only: set_param
+   use select
+ 
+       implicit none
+@@ -247,6 +248,8 @@
+       real(chm_real) apbsnpx(NATOM), apbsnpy(NATOM), apbsnpz(NATOM)
+       real(chm_real) apbsdbx(NATOM), apbsdby(NATOM), apbsdbz(NATOM)
+ 
++      real(chm_real) apbsgrid_meta(13), apbsgrid(3*NATOM)
++
+       INTEGER ntpbi
+ ! Local variables
+       INTEGER IMODE, I, LISTR, NN
+@@ -371,6 +374,14 @@
+     ! number of PB steps
+       napbs = 0
+ 
++      do i = 1, 13
++          apbsgrid_meta(i) = 0.0
++      end do
++      do i = 1, 3*natom
++           apbsgrid(i) = 0.0
++      end do
++
++
+ !-----------------------------------------------------------------
+ ! PBEparm
+ !-----------------------------------------------------------------
+@@ -763,7 +774,8 @@
+               esenerg, npenerg, &
+               apbsdx, apbsdy, apbsdz, &
+               apbsqfx, apbsqfy, apbsqfz, apbsibx, apbsiby, apbsibz, &
+-              apbsnpx, apbsnpy, apbsnpz, apbsdbx, apbsdby, apbsdbz)
++              apbsnpx, apbsnpy, apbsnpz, apbsdbx, apbsdby, apbsdbz, &
++              apbsgrid_meta, apbsgrid)
+ 
+          if (apbs_debug .gt. 0) then
+             write(outu, '(3x, a, i3)') "APBS> APBS return code: ", rc
+@@ -813,6 +825,7 @@
+   use memory
+   use timerm
+   use parallel
++  use param_store, only: set_param
+ !-----------------------------------------------------------------
+ ! local variables
+       real(chm_real) apbsdx(natom), apbsdy(natom), apbsdz(natom)
+@@ -837,7 +850,8 @@
+       real(chm_real) vacibx(natom), vaciby(natom), vacibz(natom)
+       real(chm_real) vacnpx(natom), vacnpy(natom), vacnpz(natom)
+       real(chm_real) vacdbx(natom), vacdby(natom), vacdbz(natom)
+-
++      real(chm_real) apbsgrid_meta(13), apbsgrid(3*natom)
++      
+       integer f_natom, i, apbsdrv, icall, rc
+       logical qprin
+ !--------------------------------------------------------------------
+@@ -846,6 +860,13 @@
+ ! solvation force is the difference 
+ !
+ 
++      do i = 1, 13
++         apbsgrid_meta(i) = 0.0
++      end do
++      do i = 1, 3*natom
++         apbsgrid(i) = 0.0
++      end do
++
+ ! did we parse options first?
+       if (.not. qaparsed) then
+          call wrndie(-5, '<APBSFRC>', 'Must have APBS options first!')
+@@ -928,7 +949,8 @@
+               esenerg, npenerg, &
+               apbsdx, apbsdy, apbsdz, &
+               apbsqfx, apbsqfy, apbsqfz, apbsibx, apbsiby, apbsibz, &
+-              apbsnpx, apbsnpy, apbsnpz, apbsdbx, apbsdby, apbsdbz)
++              apbsnpx, apbsnpy, apbsnpz, apbsdbx, apbsdby, apbsdbz, &
++              apbsgrid_meta, apbsgrid)
+ 
+ !         write(*,*)'APBSFRC> after apbsdrv...,ncalc=',ncalc(1)
+ 
+@@ -990,7 +1012,8 @@
+               esenerg, npenerg, &
+               apbsdx, apbsdy, apbsdz, &
+               apbsqfx, apbsqfy, apbsqfz, apbsibx, apbsiby, apbsibz, &
+-              apbsnpx, apbsnpy, apbsnpz, apbsdbx, apbsdby, apbsdbz)
++              apbsnpx, apbsnpy, apbsnpz, apbsdbx, apbsdby, apbsdbz, &
++              apbsgrid_meta, apbsgrid)
+ 
+ ! return back the original sdie and ionc concentration values
+          r_param(2) = sdie
