@@ -8,8 +8,6 @@
 -        -L$(APBS_LIB) -lapbsmainroutines -lapbs -lmaloc $(APBS_BLAS) -lz
 -
 +ADDLIB := $(ADDLIB) $(APBS_LIB)
-+#ADDLIB := $(ADDLIB) -L$(IAPBS_LIB) -liapbs \
-+#        -L$(APBS_LIB) -lapbsmainroutines -lapbs -lmaloc $(APBS_BLAS) -lz
  endif
  
  RANLIB = ranlib
