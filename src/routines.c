@@ -5050,7 +5050,7 @@ VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
     free_matrix(tabivars->face); // allocate in output_potential()
 
     Vnm_tprint(1, "\n\nReturning to APBS caller...\n\n");
-    Vnm_tprint(1, "Solvation energy and Coulombic energy in kCal/mol...\n\n");
+    Vnm_tprint(1, "Solvation energy and Coulombic energy in kJ/mol...\n\n");
     Vnm_tprint(1, "  Global net ELEC energy = %1.12E\n", tabivars->soleng);
     Vnm_tprint(1, "  Global net COULOMBIC energy = %1.12E\n\n", tabivars->couleng);
 
