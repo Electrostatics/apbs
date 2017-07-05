@@ -1256,6 +1256,18 @@ ELEC section!\n");
             (thee->nelec)++;
             calc->femparm->type = FCT_MANUAL;
             return NOsh_parseFEM(thee, sock, calc);
+        } else if (Vstring_strcasecmp(tok, "tabi") == 0) {
+            thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_BEM);
+            calc = thee->elec[thee->nelec];
+            (thee->nelec)++;
+            calc->bemparm->type = BCT_MANUAL;
+            return NOsh_parseBEM(thee, sock, calc);
+        } else if (Vstring_strcasecmp(tok, "bem") == 0) {
+            thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_BEM);
+            calc = thee->elec[thee->nelec];
+            (thee->nelec)++;
+            calc->bemparm->type = BCT_MANUAL;
+            return NOsh_parseBEM(thee, sock, calc);
         } else if (Vstring_strcasecmp(tok, "bem-manual") == 0) {
             thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_BEM);
             calc = thee->elec[thee->nelec];
@@ -2905,6 +2917,10 @@ VPUBLIC int NOsh_parseBEM(
             }
         }
     }
+
+    pbeparm->setsrfm=1;     // unneeded srfm
+    pbeparm->setpbetype=1;  // unneeded pbe type
+    pbeparm->setbcfl=1;     // unneeded bcfl
 
     /* Handle various errors arising in the token-snarfing loop -- these all
         just result in simple returns right now */

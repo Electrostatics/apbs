@@ -2,11 +2,7 @@ read
     mol pqr test_proteins/1d30.pqr       # PQR location 
 end
 elec name comp_solv        # Solvated complex
-    bem-manual
-
-    lpbe                   # Linearized PB
-    bcfl mdh               # Full multipole boundary condition
-    srfm mol               # Molecular surface
+    tabi
 
     mol 1
     ion charge 1 
