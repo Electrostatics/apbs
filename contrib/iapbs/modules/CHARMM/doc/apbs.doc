@@ -1,5 +1,4 @@
 CHARMM Element doc/apbs.doc 1.1
-$Id: apbs.doc,v 1.3 2006/03/29 15:52:50 rok Exp $
 
                              APBS Module   
 
@@ -43,25 +42,10 @@ instructions for using APBS inside of CHARMM.
 Installation
 ------------
 
-For complete installation instructions please see 
+*****************************************************
+For up-to-date installation instructions please see
 http://mccammon.ucsd.edu/iapbs/usersguide/index.html
-
-In summary:
-
-1. first download and install the following packages: atlas (BLAS),
-   maloc, apbs and iapbs
-
-2. set the following environment variables APBS_LIB, IAPBS_LIB,
-   APBS_BLAS:
-
-   APBS_LIB  - points to where libapbs.lib and libmaloc.a are installed
-   IAPBS_LIB - points to where iapbs.a is installed
-   APBS_BLAS "-L${BLAS_LIB} -llapack -lcblas -lf77blas -latlas"
-	     where BLAS_LIB is a directory where BLAS library is
-	     located; these flags are BLAS-dependent, the above
-	     example works with ATLAS
-
-3. run 'install.com gnu medium APBS' to compile APBS-enabled CHARMM
+*****************************************************
 
 
 Examples

@@ -3,6 +3,8 @@ add_items(
     nosh.c
     mgparm.c
     femparm.c
+    pbamparm.c
+    pbsamparm.c
     pbeparm.c
     bemparm.c
     geoflowparm.c
@@ -23,6 +25,8 @@ add_items(
     nosh.h
     mgparm.h
     femparm.h
+    pbamparm.h
+    pbsamparm.h
     pbeparm.h
     bemparm.h
     geoflowparm.h

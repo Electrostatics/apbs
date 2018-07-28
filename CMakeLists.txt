@@ -29,6 +29,7 @@ cmake_minimum_required (VERSION 2.8.7)
 # [ ] Windows 7 with Mingw
 ################################################################################
 
+set(CMAKE_VERBOSE_MAKEFILE true)
 
 
 ################################################################################
@@ -39,7 +40,7 @@ include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(ExternalProject)
 
-set(APBS_VERSION "1.4.2")
+set(APBS_VERSION "1.5")
 set(PACKAGE_STRING ${APBS_VERSION})
 set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
 
@@ -74,8 +75,8 @@ find_file(CONTRIB_PATH "contrib" PATHS "${APBS_ROOT}"
     DOC "The path to contributed modules for apbs"
     )
 find_file(EXTERNALS_PATH "externals" PATHS "${APBS_ROOT}"
-	DOC "The path to the external git submodules"
-	)
+  DOC "The path to the external git submodules"
+  )
 
 set(SYS_LIBPATHS /usr/lib64)
 #list(APPEND SYS_LIBPATHS /usr/lib64)
@@ -85,7 +86,7 @@ set(SYS_LIBPATHS /usr/lib64)
 # https://github.com/Electrostatics/apbs-pdb2pqr/issues/364                    #
 ################################################################################
 if(EXISTS "/etc/debian_version" AND
-	"${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed")
 endif()
 
@@ -128,6 +129,7 @@ endif()
 ################################################################################
 
 OPTION(CHECK_EPSILON "Compute machine epsilon values" YES)
+
 if(CHECK_EPSILON)
     message(STATUS "Computing machine epsilon values")
     try_run(
@@ -165,6 +167,7 @@ else()
 endif()
 
 
+
 ################################################################################
 # Check for a few required functions                                           #
 ################################################################################
@@ -191,88 +194,62 @@ if(NOT HAVE_SRAND_FUNC)
     message(FATAL_ERROR "Required srand function not found")
 endif()
 
-##########################################
-#Optionally build BEM
-##########################################
-option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
-if(ENABLE_BEM)
-    add_definitions(-DENABLE_BEM)
-    set(TABI tabipb)
-    set(TABI_PATH ${CONTRIB_PATH}/tabipb)
-    ExternalProject_add(
-        ${TABI}
-        URL file://${TABI_PATH}
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${APBS_BUILD}
-            -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-    )
 
-    if(BUILD_SHARED_LIBS)
-        set(TABI_LIBRARY_BASENAME ${CMAKE_SHARED_LIBRARY_PREFIX}${TABI}${CMAKE_SHARED_LIBRARY_SUFFIX})
-    else()
-        set(TABI_LIBRARY_BASENAME ${CMAKE_STATIC_LIBRARY_PREFIX}${TABI}${CMAKE_STATIC_LIBRARY_SUFFIX})
-    endif()
-
-    install(
-        FILES ${LIBRARY_OUTPUT_PATH}/${TABI_LIBRARY_BASENAME}
-        DESTINATION ${LIBRARY_INSTALL_PATH}
-    )
-    install(
-        DIRECTORY ${LIBRARY_OUTPUT_PATH}
-        DESTINATION ${CMAKE_INSTALL_PREFIX}
-        FILES_MATCHING PATTERN "*.mod"
-    )
-    set(TABI_LIBRARY ${LIBRARY_OUTPUT_PATH}/${TABI_LIBRARY_BASENAME})
-
-    set(LIBGFORTRAN_NAME ${CMAKE_SHARED_LIBRARY_PREFIX}gfortran${CMAKE_SHARED_LIBRARY_SUFFIX})
-
-    execute_process(COMMAND gfortran --print-file-name ${LIBGFORTRAN_NAME}
-                    OUTPUT_VARIABLE LIBGFORTRANPATH
-                    RESULT_VARIABLE HAVE_GFORTRAN
-    )
-    if(HAVE_GFORTRAN GREATER 0)
-        message(FATAL_ERROR gfortran is currently required for using BEM/TABIPB in APBS)
-    endif()
-
-    get_filename_component(LIBGFORTRANPATH ${LIBGFORTRANPATH} PATH)
-
-    find_path(LIBGFORTRAN_PATH ${LIBGFORTRAN_NAME} PATH ${LIBGFORTRANPATH})
-
-    list(APPEND APBS_LIB_DIRS ${LIBRARY_OUTPUT_PATH} ${LIBGFORTRAN_PATH})
-    list(APPEND APBS_LIBS gfortran ${TABI_LIBRARY} stdc++)
-
-endif() # ENABLE_BEM
 
 ################################################################################
-# Deal with MALOC                                                              #
-# Note that we depend exclusively on the MALOC that is in our external FETK    #
-# repository.  Also note, that in order for this to work on Windows, we've had #
-# to add CMake support to MALOC, and that FETK has no such support, in general.#
-################################################################################
-if(NOT ENABLE_FETK)
-	# We'll use autotools to build MALOC if FETK is enabled.
-	set(MALOC_ROOT ${EXTERNALS_PATH}/fetk/maloc)
-	add_subdirectory(${MALOC_ROOT})
-	include_directories(${MALOC_ROOT}/src/base ${MALOC_ROOT}/src/vsys
-		${MALOC_ROOT}/src/vsh ${MALOC_ROOT}/src/psh)
-	list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
-	list(APPEND APBS_LIBS maloc)
-endif()
-
-##############################################################################
-##
-# Find some libraries                                                          #
+# Find some libraries; Windows finds these automatically                       #
 ################################################################################
 
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
-    list(APPEND APBS_LIBS m)
+    list(APPEND APBS_LIBS m stdc++)
 endif()
+
+##########################################
+#Optionally copy MSMS/nanoshaper exectutables
+# the actual grab is later for PBSAM enable
+##########################################
+option(GET_MSMS "Put MSMS executable in the build directory" OFF)
+option(GET_NanoShaper "Put NanoShaper executable in the build directory" OFF)
+
+################################################################################
+#Optionally build BEM: TABI-PB method                                          #
+################################################################################
+
+option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
+
+if(ENABLE_BEM)
+    message(STATUS "Building TABIPB")
+    add_definitions(-DENABLE_BEM)
+    set(TABI bem)
+    set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
+
+    set(GET_MSMS ON) #CACHE BOOL "Grabbing msms path"
+    set(GET_NanoShaper ON) #CACHE BOOL "Grabbing NanoShaper path"
+
+    ExternalProject_add(
+        ${TABI}
+        SOURCE_DIR ${TABI_PATH}
+        CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
+		#if building in Windows
+		#BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target TABIPBlib
+    	INSTALL_COMMAND ""
+    )
+
+    ExternalProject_Get_Property(${TABI} binary_dir)
+    list(APPEND APBS_LIB_DIRS "${binary_dir}")
+    list(APPEND APBS_LIBS TABIPBlib)
+    include_directories(${EXTERNALS_PATH}/${TABI})
+    include_directories(${EXTERNALS_PATH}/${TABI}/src)
+
+endif() # ENABLE_BEM
 
 
 ################################################################################
 # Handle conditional building with MPI Support                                 #
 # There may be a better way, but for now this comes before FETK because FETK   #
-# depends on having the libraries located.    	    	   		       #
+# depends on having the libraries located.                                     #
 ################################################################################
 
 option(ENABLE_MPI "Enable MPI parallelism" OFF)
@@ -283,7 +260,7 @@ if(ENABLE_MPI)
         find_package(MPI)
         if(MPI_FOUND)
             message(STATUS "MPI support enabled")
-	    set(HAVE_MPI_H 1)
+      set(HAVE_MPI_H 1)
             include_directories(${MPI_C_INCLUDE_PATH})
             list(APPEND APBS_LIBS ${MPI_C_LIBRARIES})
         else()
@@ -294,6 +271,24 @@ if(ENABLE_MPI)
     endif()
 endif()
 
+################################################################################
+# Deal with MALOC                                                              #
+# Note that we depend exclusively on the MALOC that is in our external FETK    #
+# repository.  Also note, that in order for this to work on Windows, we've had #
+# to add CMake support to MALOC, and that FETK has no such support, in general.#
+################################################################################
+
+if(NOT ENABLE_FETK)
+  # We'll use autotools to build MALOC if FETK is enabled.
+  set(MALOC_ROOT ${EXTERNALS_PATH}/fetk/maloc)
+  add_subdirectory(${MALOC_ROOT})
+  include_directories(${MALOC_ROOT}/src/base ${MALOC_ROOT}/src/vsys
+    ${MALOC_ROOT}/src/vsh ${MALOC_ROOT}/src/psh)
+  list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
+  list(APPEND APBS_LIBS maloc)
+endif()
+
+
 
 ################################################################################
 # Handle the finite element solver dependencies                                #
@@ -303,69 +298,69 @@ option(ENABLE_FETK "Enable the finite element solver" OFF)
 
 if(ENABLE_FETK)
 
-	if(WIN32)
-		message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
-	else()
-		message(STATUS "Building FETK components.")
-		set(CONFIG_OPTS --prefix=<INSTALL_DIR>)
+  if(WIN32)
+    message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
+  else()
+    message(STATUS "Building FETK components.")
+    set(CONFIG_OPTS --prefix=<INSTALL_DIR>)
 
-		set(MPI_ENV "")
-		if(HAVE_MPI_H)
-		    list(APPEND CONFIG_OPTS --enable-mpi)
+    set(MPI_ENV "")
+    if(HAVE_MPI_H)
+        list(APPEND CONFIG_OPTS --enable-mpi)
 
-		    # MALOC just cares about libmpi
-		    foreach(LIB_PATH ${MPI_C_LIBRARIES})
-		        get_filename_component(LIB ${LIB_PATH} NAME_WE)
-		        if(LIB STREQUAL "libmpi")
-		            get_filename_component(MPI_LIB_DIR ${LIB_PATH} DIRECTORY)
-		    	 endif()
-		    endforeach()
+        # MALOC just cares about libmpi
+        foreach(LIB_PATH ${MPI_C_LIBRARIES})
+            get_filename_component(LIB ${LIB_PATH} NAME_WE)
+            if(LIB STREQUAL "libmpi")
+                get_filename_component(MPI_LIB_DIR ${LIB_PATH} DIRECTORY)
+           endif()
+        endforeach()
 
-		    set(MPI_ENV "FETK_MPI_INCLUDE=${MPI_C_INCLUDE_PATH}" "FETK_MPI_LIBRARY=${MPI_LIB_DIR}")
-		endif()
+        set(MPI_ENV "FETK_MPI_INCLUDE=${MPI_C_INCLUDE_PATH}" "FETK_MPI_LIBRARY=${MPI_LIB_DIR}")
+    endif()
 
-		ExternalProject_Add(fetk-maloc
-			PREFIX fetk
-			SOURCE_DIR ${EXTERNALS_PATH}/fetk/maloc/src
-			CONFIGURE_COMMAND ${MPI_ENV} ${EXTERNALS_PATH}/fetk/maloc/configure ${CONFIG_OPTS}
-			BUILD_COMMAND ${MAKE})
+    ExternalProject_Add(fetk-maloc
+      PREFIX fetk
+      SOURCE_DIR ${EXTERNALS_PATH}/fetk/maloc/src
+      CONFIGURE_COMMAND ${MPI_ENV} ${EXTERNALS_PATH}/fetk/maloc/configure ${CONFIG_OPTS}
+      BUILD_COMMAND ${MAKE})
 
-		ExternalProject_Add(fetk-punc
-			PREFIX fetk
-			DEPENDS fetk-maloc
-			SOURCE_DIR ${EXTERNALS_PATH}/fetk/punc/src
-			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure ${CONFIG_OPTS}
-			BUILD_COMMAND ${MAKE})
+    ExternalProject_Add(fetk-punc
+      PREFIX fetk
+      DEPENDS fetk-maloc
+      SOURCE_DIR ${EXTERNALS_PATH}/fetk/punc/src
+      CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure ${CONFIG_OPTS}
+      BUILD_COMMAND ${MAKE})
 
-		ExternalProject_Add(fetk-gamer
-			PREFIX fetk
-			DEPENDS fetk-maloc
-			SOURCE_DIR ${EXTERNALS_PATH}/fetk/gamer/src
-			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure ${CONFIG_OPTS}
-			BUILD_COMMAND ${MAKE})
+    ExternalProject_Add(fetk-gamer
+      PREFIX fetk
+      DEPENDS fetk-maloc
+      SOURCE_DIR ${EXTERNALS_PATH}/fetk/gamer/src
+      CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure ${CONFIG_OPTS}
+      BUILD_COMMAND ${MAKE})
 
-		ExternalProject_Add(fetk-mc
-			PREFIX fetk
-			DEPENDS fetk-maloc fetk-punc
-			SOURCE_DIR ${EXTERNALS_PATH}/fetk/mc/src
-			CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure ${CONFIG_OPTS}
-			BUILD_COMMAND ${MAKE})
+    ExternalProject_Add(fetk-mc
+      PREFIX fetk
+      DEPENDS fetk-maloc fetk-punc
+      SOURCE_DIR ${EXTERNALS_PATH}/fetk/mc/src
+      CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure ${CONFIG_OPTS}
+      BUILD_COMMAND ${MAKE})
 
-		set(FETK_ENABLED 1)
+    set(FETK_ENABLED 1)
 
-		ExternalProject_Get_Property(fetk-maloc install_dir)
-		include_directories(${install_dir}/include)
+    ExternalProject_Get_Property(fetk-maloc install_dir)
+    include_directories(${install_dir}/include)
 
-	    list(APPEND APBS_LIBS "stdc++")
-	    list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
-	    list(APPEND APBS_LIBS maloc amd punc mc gamer superlu umfpack
-	blas vf2c tetgen triangle readline termcap)
+      list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
+      list(APPEND APBS_LIBS maloc amd punc mc gamer superlu umfpack
+  blas vf2c tetgen triangle readline termcap)
 
-	    SET(HAVE_MC_H 1)
-		SET(HAVE_PUNC_H 1)
-		SET(HAVE_BIOM_H 1)
-	endif()
+      SET(HAVE_MC_H 1)
+    SET(HAVE_PUNC_H 1)
+    SET(HAVE_BIOM_H 1)
+  endif()
 endif()
+
 
 
 ################################################################################
@@ -373,22 +368,149 @@ endif()
 ################################################################################
 
 option(ENABLE_GEOFLOW "geoflow method" OFF)
+
 if(ENABLE_GEOFLOW)
-	message(STATUS "Building GEOFLOW")
-	add_definitions(-DGEOFLOW_APBS)
-	ExternalProject_Add(
-		geoflow
-		SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-		CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON
-		BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
-		INSTALL_COMMAND ""
-	)
-	ExternalProject_Get_Property(geoflow binary_dir)
-	add_definitions(-DENABLE_GEOFLOW)
-	list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
-	list(APPEND APBS_LIBS stdc++ GeometricFlowLib)
-	include_directories(${EXTERNALS_PATH}/geoflow_c/src)
+  message(STATUS "Building GEOFLOW")
+  add_definitions(-DGEOFLOW_APBS)
+  ExternalProject_Add(
+    geoflow
+    SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
+    CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} 
+    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
+    #if building in Windows
+    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target GeometricFlowLib
+    INSTALL_COMMAND ""
+  )
+  ExternalProject_Get_Property(geoflow binary_dir)
+  add_definitions(-DENABLE_GEOFLOW)
+  list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
+  list(APPEND APBS_LIBS GeometricFlowLib)
+  include_directories(${EXTERNALS_PATH}/geoflow_c/src)
 endif()
+
+
+
+
+################################################################################
+# Optionally build pbam (git submodule)
+################################################################################
+
+option(ENABLE_PBAM "pbam method" OFF)
+
+if(ENABLE_PBAM)
+  message(STATUS "Building PBAM")
+  add_definitions(-DPBAM_APBS)
+  ExternalProject_Add(
+    pbam
+    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+    CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
+    #if building on Windows
+    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBAMLib
+    INSTALL_COMMAND ""
+  )
+  ExternalProject_Get_Property(pbam binary_dir)
+  add_definitions(-DENABLE_PBAM)
+  list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
+  list(APPEND APBS_LIBS PBAMLib)
+  include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
+  include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
+  include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
+endif()
+
+
+
+################################################################################
+# Optionally build pbsam (git submodule)
+################################################################################
+
+option(ENABLE_PBSAM "pbsam method" OFF)
+if(ENABLE_PBSAM)
+  message(STATUS "Building PBSAM")
+  add_definitions(-DPBSAM_APBS)
+  set(GET_MSMS ON) #CACHE BOOL "Grabbing msms path")
+  message(STATUS "copying msms ${GET_MSMS}")
+  
+  list(APPEND CMAKE_MODULE_PATH ${EXTERNALS_PATH}/pb_s_am/cmake/modules)
+  include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
+  include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
+  include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
+
+  ExternalProject_Add(
+    pbsam
+    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+    CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
+    #if building on windows
+    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBSAMLib
+    INSTALL_COMMAND ""
+    )
+  ExternalProject_Get_Property(pbsam binary_dir)
+  add_definitions(-DENABLE_PBSAM)
+  list(APPEND APBS_LIB_DIRS "${binary_dir}/pbsam/src")
+
+  if(WIN32)
+	list(APPEND APBS_LIBS PBSAMLib ${PBSAM_LINKER_LIBS})
+  else()
+    list(APPEND APBS_LIBS stdc++ PBSAMLib ${PBSAM_LINKER_LIBS})
+  endif()
+
+  message(STATUS "Adding in " ${PBSAM_LINKER_LIBS} )
+  include_directories(${EXTERNALS_PATH}/pb_s_am/pbsam/src)
+  include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
+  include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
+endif()
+
+
+
+
+################################################################################
+# Getting msms and /or nanoshaper
+################################################################################
+if(GET_MSMS)
+        message(STATUS "Copying MSMS exectuable")
+        if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+                # Mac OS X specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_MacOSX_2.6.1/msms.MacOSX.2.6.1
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+                file(RENAME ${EXECUTABLE_OUTPUT_PATH}/msms.MacOSX.2.6.1
+                            ${EXECUTABLE_OUTPUT_PATH}/msms)
+
+        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+                # Linux specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_i86_64Linux2_2.6.1/msms.x86_64Linux2.2.6.1.staticgcc
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+                file(RENAME ${EXECUTABLE_OUTPUT_PATH}/msms.x86_64Linux2.2.6.1.staticgcc
+                            ${EXECUTABLE_OUTPUT_PATH}/msms)
+
+        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+                # Windows specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_win32_2.6.1/msms.exe
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+        endif()
+endif()
+
+
+if(GET_NanoShaper)
+        if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+                # Mac OS X specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/OSX/NanoShaper
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+
+        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+                # Linux specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/Linux64/NanoShaper
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+
+        elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+                # Windows specific code
+                file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/win32/NanoShaper32.exe
+                          DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+                file(RENAME ${EXECUTABLE_OUTPUT_PATH}/NanoShaper32.exe
+                            ${EXECUTABLE_OUTPUT_PATH}/NanoShaper.exe)
+        endif()
+endif()
+
 
 
 ################################################################################
@@ -449,7 +571,6 @@ endif()
 # Enable inline functions conditionally dependent on debug mode                #
 ################################################################################
 
-
 option(ENABLE_INLINE "Enable inline functions" ON)
 
 if(ENABLE_INLINE)
@@ -476,7 +597,7 @@ endif()
 # Handle conditional building with verbose debugging information printouts     #
 ################################################################################
 
-option(ENABLE_VERBOSE_DEBUG "Enable verbose debugging mode" OFF)
+option(ENABLE_VERBOSE_DEBUG "Enable verbose debugging mode" ON)
 
 if(ENABLE_VERBOSE_DEBUG)
     set(VERBOSE_DEBUG 1)
@@ -583,7 +704,7 @@ add_subdirectory(src)
 # Build APBS documentation                                                     #
 ################################################################################
 
-option(BUILD_DOC "Build/Rebuild documentation using doxygen" ON)
+option(BUILD_DOC "Build/Rebuild documentation using doxygen" OFF)
 
 if(BUILD_DOC)
     message(STATUS "Building documentation enabled")
@@ -639,17 +760,21 @@ install(
         PATTERN "README"
 )
 
-install(
+if(BUILD_TOOLS)
+  install(
     DIRECTORY ${APBS_ROOT}/tools
     DESTINATION ${SHARE_INSTALL_PATH}
+    USE_SOURCE_PERMISSIONS
     PATTERN "CMakeLists.txt" EXCLUDE
-)
-
-if(NOT "${APBS_ROOT}" STREQUAL "${APBS_BUILD}")
-    install(
-        DIRECTORY ${APBS_BUILD}/tools/bin
-        DESTINATION ${SHARE_INSTALL_PATH}/tools
     )
+
+  if(NOT "${APBS_ROOT}" STREQUAL "${APBS_BUILD}")
+    install(
+      DIRECTORY ${APBS_BUILD}/tools/bin
+      DESTINATION ${SHARE_INSTALL_PATH}/tools
+      USE_SOURCE_PERMISSIONS
+      )
+  endif()
 endif()
 
 ################################################################################
@@ -676,19 +801,5 @@ file(REMOVE_RECURSE ${EXECUTABLE_OUTPUT_PATH}/temp)
 # Optionally download and build PB-AM                                          #
 ################################################################################
 
-# Won't build on Windows
-if(NOT WIN32)
-    option(BUILD_PBAM "Download and build PB-AM (Only tested on Linux)" OFF)
-
-    if(BUILD_PBAM)
-        ExternalProject_Add(
-            pb_am
-            URL "https://github.com/Electrostatics/PB-AM/archive/master.tar.gz"
-            CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${APBS_ROOT}
-                    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-                    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-        )
-        install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/mpe
-                DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    endif()
-endif()
+#This has been deprecated and we no longer use the BUILD_PBAM option. PBAM now
+# builds with ENABLE_PBAM

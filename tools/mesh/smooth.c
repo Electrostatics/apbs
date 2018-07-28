@@ -5,6 +5,11 @@
  *  @version $Id$
  */
 
+/*                                                                                           
+ *  Last update: 08/29/2016 by Leighton Wilson                                               
+ *  Description: Added ability to read in and output binary DX files                           
+ */ 
+
 #include "apbs.h"
 
 #define IJK(i,j,k)  (((k)*(nx)*(ny))+((j)*(nx))+(i))
@@ -29,7 +34,9 @@ int usage(int rc) {
     where <args> is a list of the following arguments:\n\
       REQUIRED GENERAL ARGUMENTS:\n\
       --format=<format>  where <format> specifies the data format and is one\n\
-                          of the following: dx (OpenDX)\n\
+                          of the following:\n\
+                                dx (standard OpenDX)\n\
+                                dxbin (binary OpenDX)\n\
       --input=<file>     where <file> is the input mesh data in the\n\
                          specified format\n\
       --output=<file>    where <file> is the output mesh data in the\n\
@@ -75,7 +82,10 @@ int main(int argc, char **argv) {
     for (i=1; i<argc; i++) {
         Vnm_print(1, "Parsing: %s...\n", argv[i]);
         if (strstr(argv[i], "--format") != NULL) {
-            if (strstr(argv[i], "dx") != NULL) {
+            if (strstr(argv[i], "dxbin") != NULL) {
+                gotFormat = 1;
+                format = VDF_DXBIN;
+            } else if (strstr(argv[i], "dx") != NULL) {
                 gotFormat = 1;
                 format = VDF_DX;
             } else {
@@ -152,7 +162,13 @@ int main(int argc, char **argv) {
     grid = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
     if (format == VDF_DX) {
         if (!Vgrid_readDX(grid, "FILE", "ASC", VNULL, inPath)) {
-            Vnm_print(2, "main:  Problem reading OpenDX-format grid from %s\n",
+            Vnm_print(2, "main:  Problem reading standard OpenDX-format grid from %s\n",
+              inPath);
+            return ERRRC;
+        }
+    } else if (format == VDF_DXBIN) {
+        if (!Vgrid_readDXBIN(grid, "FILE", "ASC", VNULL, inPath)) {
+            Vnm_print(2, "main:  Problem reading binary OpenDX-format grid from %s\n",
               inPath);
             return ERRRC;
         }
@@ -173,6 +189,9 @@ int main(int argc, char **argv) {
     Vnm_print(1, "main:  Writing data to %s...\n", outPath);
     if (format == VDF_DX)
       Vgrid_writeDX(grid, "FILE", "ASC", VNULL, outPath, "Smoothed data",
+        VNULL);
+    else if (format == VDF_DXBIN)
+      Vgrid_writeDXBIN(grid, "FILE", "ASC", VNULL, outPath, "Smoothed data",
         VNULL);
 
     return 0;

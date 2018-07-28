@@ -71,8 +71,20 @@
 #    include "mcx/mcx.h"
 #endif
 
+#ifdef ENABLE_BEM
+  #include "TABIPBstruct.h"
+#endif
+
 #ifdef ENABLE_GEOFLOW
   #include "GeometricFlowWrap.h"
+#endif
+
+#if defined(ENABLE_PBAM) || defined(ENABLE_PBSAM)
+  #include "PBAMWrap.h"
+#endif
+
+#ifdef ENABLE_PBSAM
+  #include "PBSAMWrap.h"
 #endif
 
 /**
@@ -724,14 +736,14 @@ VEXTERNC void killBEM(
 );
 
 /**
- * @brief  Solve the PBE with BEM 
+ * @brief  Solve the PBE with BEM
  * @ingroup  Frontend
- * @author  Nathan Baker, Weihua Geng, Andrew Stevens 
+ * @author  Nathan Baker, Weihua Geng, Andrew Stevens
  * @param nosh  Object with parsed input file parameters
  * @param pbem  BEM objects for this calculation
  * @param type  Type of BEM calculation
  * @return  1 if successful, 0 otherwise */
-VEXTERNC int solveBEM(NOsh *nosh, PBEparm *pbeparm, BEMparm *bemparm, BEMparm_CalcType type);
+VEXTERNC int solveBEM(Valist* molecules[NOSH_MAXMOL],NOsh *nosh, PBEparm *pbeparm, BEMparm *bemparm, BEMparm_CalcType type);
 
 /**
  * @brief  Set MG partitions for calculating observables and performing I/O
@@ -756,7 +768,7 @@ VEXTERNC int setPartBEM(NOsh *nosh, BEMparm *bemparm);
  * @param qmEnergy  Set to mobile ion energy (in kT)
  * @param dielEnergy  Set to polarization energy (in kT)
  * @return  1 if successful, 0 otherwise */
-VEXTERNC int energyBEM(NOsh* nosh, int icalc, 
+VEXTERNC int energyBEM(NOsh* nosh, int icalc,
   int *nenergy, double *totEnergy, double *qfEnergy, double *qmEnergy,
   double *dielEnergy);
 
@@ -809,17 +821,50 @@ VEXTERNC int writematBEM(int rank, NOsh *nosh, PBEparm *pbeparm);
 
 #ifdef ENABLE_GEOFLOW
 /**
- * @brief  Solve the PBE with GEOFLOW  
+ * @brief  Solve the PBE with GEOFLOW
  * @ingroup  Frontend
  * @param nosh  Object with parsed input file parameters
  * @param pbem  GEOFLOW objects for this calculation
  * @param type  Type of GEOFLOW calculation
  * @return  1 if successful, 0 otherwise */
 VEXTERNC int solveGeometricFlow(
-      Valist* molecules[NOSH_MAXMOL], 
-                                NOsh *nosh, 
-                                PBEparm *pbeparm, 
-                                APOLparm *apolparm, 
-                                GEOFLOWparm *parm 
+      Valist* molecules[NOSH_MAXMOL],
+                                NOsh *nosh,
+                                PBEparm *pbeparm,
+                                APOLparm *apolparm,
+                                GEOFLOWparm *parm
+);
+#endif
+
+#ifdef ENABLE_PBAM
+/**
+ * @brief  Solve the LPBE with PBAM
+ * @ingroup  Frontend
+ * @param nosh  Object with parsed input file parameters
+ * @param pbem  PBAM objects for this calculation
+ * @param type  Type of PBAM calculation
+ * @return  1 if successful, 0 otherwise */
+VEXTERNC int solvePBAM(
+      Valist* molecules[NOSH_MAXMOL],
+                                NOsh *nosh,
+                                PBEparm *pbeparm,
+                                PBAMparm *parm
+);
+#endif
+
+#ifdef ENABLE_PBSAM
+/**
+ * @brief  Solve the LPBE with PBSAM
+ * @ingroup  Frontend
+ * @param nosh  Object with parsed input file parameters
+ * @param pbem  PBAM objects for this calculation
+ * @param type  Type of PBAM calculation
+ * @return  1 if successful, 0 otherwise */
+VEXTERNC int solvePBSAM(
+      Valist* molecules[NOSH_MAXMOL],
+                                NOsh *nosh,
+                                PBEparm *pbeparm,
+                                PBAMparm *parm,
+                                PBSAMparm *samparm
 );
 #endif

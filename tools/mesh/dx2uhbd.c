@@ -4,8 +4,14 @@
 // Purpose:  Convert OpenDx format potential to UHBD format
 //
 // Author:   rok, based on dx2mol.c
+//           Additional changes by Leighton Wilson
 //
 // rcsid="$Id$"
+//
+//
+// Last update: 08/29/2016 by Leighton Wilson
+// Description: Added ability to read in binary DX files as input
+//
 /////////////////////////////////////////////////////////////////////////// */
 
 #include "apbs.h"
@@ -25,38 +31,75 @@ int main(int argc, char **argv) {
   char *iodev = "FILE";
   char *iofmt = "ASC";
   char *thost = VNULL;
+
+  Vdata_Format dx_type;
+
   char *title = "dx2uhbd conversion";
   char *usage = "\n\n\
     -----------------------------------------------------------------------\n\
     Converts the OpenDX format of the electrostatic potential \n\
     to the UHBD format.\n\n\
-    Usage:  dx2uhbd file1.dx file2.grd\n\n\
-            where file1.dx is a file in OpenDX format and file2.grd is the\n\
-            file to be written in UHBD format.\n\
+    Usage:  dx2uhbd <file1> <file2.grd> [dx_type]\n\n\
+            where file1 is a file in OpenDX format,\n\
+            and file2.grd is the file to be written in UHBD format.\n\n\
+            The optional argument dx_type specifies the input OpenDX type.\n\
+            Acceptable values include\n\
+                dx:  standard OpenDX format\n\
+                dxbin:  binary OpenDX format\n\
+            If the argument is unspecified, the input type is standard OpenDX.\n\
     -----------------------------------------------------------------------\n\
     \n";
 
 
   /*** Check Invocation ***/
   Vio_start();
-  if (argc != 3) {
-    Vnm_print(2, "\n*** Syntax error: got %d arguments, expected 2.\n\n",
+  if (argc != 3 && argc != 4) {
+    Vnm_print(2, "\n*** Syntax error: got %d arguments, expected 2 or 3.\n\n",
           argc-1);
     Vnm_print(2,"%s\n", usage);
-    return -1;
+    return EXIT_FAILURE;
   } else {
     inpath = argv[1];
     outpath = argv[2];
+
+    if (argc == 4) {
+        if (!Vstring_strcasecmp(argv[3], "dx")) {
+            dx_type = VDF_DX;
+        } else if (!Vstring_strcasecmp(argv[3], "dxbin")) {
+            dx_type = VDF_DXBIN;
+        } else {
+            Vnm_print(2, "\n*** Argument error: dx_type must be 'dx' or 'dxbin'.\n\n");
+            return EXIT_FAILURE;
+        }
+    } else {
+        dx_type = VDF_DX;
+    }
   }
 
-  /*** Read DX format file ***/
-  grid = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
-  Vnm_tprint(1, "Reading DX file ... \n");
-  if(Vgrid_readDX(grid, "FILE", "ASC", VNULL, inpath) != 1) {
-    Vnm_tprint( 2, "Fatal error while reading from %s\n",
-        inpath);
-    return 0;
-  }
+    /* Read DX format file */
+    grid = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
+
+    if (dx_type == VDF_DXBIN) {                                                 
+        /* Read binary DX format file */
+        Vnm_print(1, "Reading %s as binary OpenDX format...\n", inpath);
+        if(Vgrid_readDXBIN(grid, "FILE", "ASC", VNULL, inpath) != 1) {
+                Vnm_print(2, "\n*** Fatal error while reading from %s as "
+                             "binary DX format file\n", inpath);
+                return EXIT_FAILURE;
+        }
+    } else if (dx_type == VDF_DX) {                                                                                 
+        /* Read standard DX format file */
+        Vnm_print(1, "Reading %s as standard OpenDX format...\n", inpath);
+        if(Vgrid_readDX(grid, "FILE", "ASC", VNULL, inpath) != 1) {
+                Vnm_print(2, "\n*** Fatal error while reading from %s as "
+                             "standard DX format file\n", inpath);
+                return EXIT_FAILURE;
+        }
+    } else {
+        Vnm_print(2, "\n*** Error: dx_type incorrectly specified.\n\n");
+        return EXIT_FAILURE;
+    }
+
   nx = grid->nx;
   ny = grid->ny;
   nz = grid->nz;

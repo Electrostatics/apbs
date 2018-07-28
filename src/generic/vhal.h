@@ -57,8 +57,6 @@
 
 #include "stdio.h"
 
-FILE *data;
-
 /**
  *    @ingroup Vhal
  *    @author     David Gohara
@@ -408,12 +406,6 @@ typedef enum eVdata_Format Vdata_Format;
  *  @ingroup Vhal
  */
 #define VAPBS_RIGHT 0
-
-/** @brief    Maximum number of points on a sphere
-    @note    Used by VaccSurf
-    @ingroup    Vhal
-    */
-#define MAX_SPHERE_PTS 50000
 
 /** @brief   Face definition for a volume
  *  @note    Consistent with PMG if RIGHT = EAST, BACK = SOUTH

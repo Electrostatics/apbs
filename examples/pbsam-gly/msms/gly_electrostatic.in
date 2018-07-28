@@ -1,0 +1,28 @@
+read
+    mol pqr gly_msms.pqr
+end
+elec name comp_solv        # Gly
+    pbsam-auto
+
+    runtype electrostatics  # Can be energyforce, electrostatics etc
+    runname elec_gly        # Output name for files created by program
+
+    units jmol
+    ## info for molecule
+    msms
+    tolsp 2.5
+
+    temp 298.15             # System temperature (K)
+    pdie 4.0                # Solute dielectric                 
+    sdie 78.0               # Solvent dielectric                
+    salt 0.10               # Monovalent salt conc in M
+
+    gridpts 20
+    dx gly_0.1M.dx
+    3dmap  gly_0.1M.map
+    grid2d gly_0.1M.x0.dat x 0.0
+
+end
+
+quit
+

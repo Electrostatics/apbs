@@ -6,8 +6,14 @@
 //
 // Author:   Jung-Hsin Lin (bits added/modified by Nathan Baker)
 //           Additional changes by Fred Damberger
+//           Additional changes by Leighton Wilson
 //
 // rcsid="$Id$"
+//
+//                                                                                           
+// Last update: 08/29/2016 by Leighton Wilson
+// Description: Added ability to read in binary DX files as input
+//
 /////////////////////////////////////////////////////////////////////////// */
 
 #include "apbs.h"
@@ -28,6 +34,9 @@ int main(int argc, char **argv) {
     char *iodev = "FILE";
     char *iofmt = "ASC";
     char *thost = VNULL;
+
+    Vdata_Format dx_type;
+
     char *usage = "\n\n\
     -----------------------------------------------------------------------\n\
     dx2mol (Contributed by Jung-Hsin Lin)\n\
@@ -36,27 +45,67 @@ int main(int argc, char **argv) {
     MOLMOL format. MOLMOL is a popular free molecular display program\n\
     (http://www.mol.biol.ethz.ch/wuthrich/software/molmol/).\n\
     \n\
-    Usage:  dx2mol file1.dx file2.pot\n\
-            where file1.dx is a file in OpenDX format and file2.pot is the\n\
-            file to be written in MOLMOL format.\n\
+    Usage:  dx2mol <file1> <file2.pot> [dx_type]\n\n\
+            where file1 is a file in OpenDX format,\n\
+            and file2.pot is the file to be written in MOLMOL format.\n\n\
+            The optional argument dx_type specifies the input OpenDX type.\n\
+            Acceptable values include\n\
+                dx:  standard OpenDX format\n\
+                dxbin:  binary OpenDX format\n\
+            If the argument is unspecified, the input type is assumed\n\
+            to be standard OpenDX.\n\
     -----------------------------------------------------------------------\n\
     \n";
 
 
     /* *************** CHECK INVOCATION ******************* */
     Vio_start();
-    if (argc != 3) {
-        Vnm_print(2, "\n*** Syntax error: got %d arguments, expected 3.\n\n",argc);
+    if (argc != 3 && argc != 4) {
+        Vnm_print(2, "\n*** Syntax error: got %d arguments, expected 2 or 3.\n\n",argc-1);
         Vnm_print(2,"%s\n", usage);
-        return -1;
+        return EXIT_FAILURE;
     } else {
         inpath = argv[1];
         outpath = argv[2];
+
+        if (argc == 4) {
+            if (!Vstring_strcasecmp(argv[3], "dx")) {
+                dx_type = VDF_DX;
+            } else if (!Vstring_strcasecmp(argv[3], "dxbin")) {
+                dx_type = VDF_DXBIN;
+            } else {
+                Vnm_print(2, "\n*** Argument error: dx_type must be 'dx' or 'dxbin'.\n\n");
+                return EXIT_FAILURE;
+            }
+        } else {
+            dx_type = VDF_DX;
+        }
     }
 
     /* Read DX format file */
     grid = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
-    Vgrid_readDX(grid, "FILE", "ASC", VNULL, inpath);
+
+    if (dx_type == VDF_DXBIN) {                                                 
+        /* Read binary DX format file */
+        Vnm_print(1, "Reading %s as binary OpenDX format...\n", inpath);
+        if(Vgrid_readDXBIN(grid, "FILE", "ASC", VNULL, inpath) != 1) {
+                Vnm_print(2, "\n*** Fatal error while reading from %s as "
+                             "binary DX format file\n", inpath);
+                return EXIT_FAILURE;
+        }
+    } else if (dx_type == VDF_DX) {
+        /* Read standard DX format file */
+        Vnm_print(1, "Reading %s as standard OpenDX format...\n", inpath);
+        if(Vgrid_readDX(grid, "FILE", "ASC", VNULL, inpath) != 1) {
+                Vnm_print(2, "\n*** Fatal error while reading from %s as "
+                             "standard DX format file\n", inpath);
+                return EXIT_FAILURE;
+        }
+    } else {
+        Vnm_print(2, "\n*** Error: dx_type incorrectly specified.\n\n");
+        return EXIT_FAILURE;
+    }
+
     nx = grid->nx;
     ny = grid->ny;
     nz = grid->nz;
@@ -99,6 +148,8 @@ int main(int argc, char **argv) {
             }
         }
     }
+
+    Vnm_print(2, "Finished writing to %s\n", outpath);
 
     /* Close off the socket */
     Vio_connectFree(sock);

@@ -1,0 +1,29 @@
+read
+    mol pqr test_proteins/451c.pqr       # PQR location 
+end
+elec name comp_solv        # Solvated complex
+    tabi
+
+    mol 1
+    ion charge 1 
+        conc 0.15 
+        radius 0.95        # sodium ions
+    ion charge -1 
+        conc 0.15
+        radius 1.81        # chloride ions
+    pdie 1.0               # Solute dielectric
+    sdie 80.00             # Solvent dielectric
+    srad 1.4               # Solvent probe radius
+    sdens 1                # NO. of Elements per A^2
+    temp 300.00            # Temperature
+
+    tree_order 1           # taylor expansion order
+    tree_n0 500            # maxium particle per leaf
+    mac 0.8                # multipole acceptance criterion
+
+    mesh 1                 # mesh (0 - MSMS, 1 - NanoShaper SES, 2 - NanoShaper Skin)
+
+    outdata 1              # outdata (0 - dat file, 1 - dat and VTK file) 
+end
+
+quit

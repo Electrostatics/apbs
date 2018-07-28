@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "apbs.h"
 
 char *usage = "\n\n\
 -----------------------------------------------------------------------\n\
@@ -19,10 +20,17 @@ tensor2dx\n\
 For converting the a tensor (plotkin) format file to the\n\
 OpenDX format.\n\
 \n\
-Usage:	tensor2dx <x-gpoints> <y-gpoints> <z-gpoints> <originfile> <datafile> <output file>\n\
+Usage:	tensor2dx <x-gpoints> <y-gpoints> <z-gpoints> <originfile> <datafile>\
+ <outputfile> [outputformat]\n\
 {xyz}-gpoints are the number of grid points in the x,y,z direction\n\
 originfile is the file containing origin and grid spacing information\n\
 datafile is the file with the data to use at each grid point\n\
+outputfile specifies the path to the output file\n\n\
+The optional argument outputformat specifies the output OpenDX format.\n\
+Acceptable values include\n\
+       dx:  standard OpenDX format\n\
+       dxbin:  binary OpenDX format\n\
+If the argument is not specified, the output format is standard OpenDX.\n\
 \n\
 NOTE: This program only handles isotropic tensor files at the moment.\n\
 \n\
@@ -46,6 +54,7 @@ int main(int argc, char **argv) {
 	char *data = NULL;
 	
 	char *outpath = NULL;
+        Vdata_Format format;
 	
 	char buffer[1024];
 	
@@ -54,8 +63,8 @@ int main(int argc, char **argv) {
 	
 	FILE * pfile3 = NULL;
 	
-	if (argc != 7) {
-		printf("\n*** Syntax error: got %d arguments, expected 6.\n\n",argc);
+	if (argc != 7 && argc != 8) {
+		printf("\n*** Syntax error: got %d arguments, expected 6 or 7.\n\n",argc-1);
 		printf("%s\n", usage);
 		return -1;
 	} else {
@@ -66,6 +75,19 @@ int main(int argc, char **argv) {
 		origin = argv[4];
 		data = argv[5];
 		outpath = argv[6];
+
+                if (argc == 8) {
+                    if (!Vstring_strcasecmp(argv[7], "dx")) {
+                        format = VDF_DX;
+                    } else if (!Vstring_strcasecmp(argv[7], "dxbin")) {
+                        format = VDF_DXBIN;
+                    } else {
+                        printf("\n*** Argument error: format must be 'dx' or 'dxbin'.\n\n");
+                        return EXIT_FAILURE;
+                    }
+                } else {
+                    format = VDF_DX;
+                }
 	}
 	
 	pfile1 = fopen(origin,"r");
@@ -110,8 +132,9 @@ int main(int argc, char **argv) {
 	//For the moment I'm assuming the data for the tensor file is row major
 	//Write out the data
 	icol = 0;
-	for (i=0; i<nx*ny*nz; i++){
-		fscanf(pfile2,"%i %i %i",&itmp[0],&itmp[1],&itmp[2]);
+        if (format == VDF_DX) {
+	    for (i=0; i<nx*ny*nz; i++) {
+	    	fscanf(pfile2,"%i %i %i",&itmp[0],&itmp[1],&itmp[2]);
 		fscanf(pfile2,"%lf %lf %lf",&datapt[0],&tmp[1],&tmp[2]);
 		fscanf(pfile2,"%lf %lf %lf",&tmp[0],&datapt[1],&tmp[2]);
 		fscanf(pfile2,"%lf %lf %lf",&tmp[0],&tmp[1],&datapt[2]);
@@ -126,7 +149,28 @@ int main(int argc, char **argv) {
 			icol = 0;
 			fprintf(pfile3, "\n");
 		}
-	}
+            } 
+	} else if (format == VDF_DXBIN) {
+	    for (i=0; i<nx*ny*nz; i++) {
+	    	fscanf(pfile2,"%i %i %i",&itmp[0],&itmp[1],&itmp[2]);
+		fscanf(pfile2,"%lf %lf %lf",&datapt[0],&tmp[1],&tmp[2]);
+		fscanf(pfile2,"%lf %lf %lf",&tmp[0],&datapt[1],&tmp[2]);
+		fscanf(pfile2,"%lf %lf %lf",&tmp[0],&tmp[1],&datapt[2]);
+		
+		//TODO: We write out the point for datapt[0], because,
+		//	    we only deal with isotropic tensors at the moment.
+		//	    we'd need to change this code to handle anisotropic
+		//	    tensors in the future.
+                fwrite(&(datapt)[0], sizeof(double), 1, pfile3);
+		icol++;
+		if (icol == 3) {
+			icol = 0;
+		}
+            } 
+        } else {
+            printf("\n*** Error: output format (format) incorrectly defined.\n\n");
+            return EXIT_FAILURE;
+        }
 
 	if (icol != 0) fprintf(pfile3, "\n");
 	fprintf(pfile3, "attribute \"dep\" string \"positions\"\n" \

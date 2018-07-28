@@ -1,8 +1,13 @@
-/**
+/*
  *  @file    dx-math.c
  *  @author  Nathan Baker
  *  @brief   Arithmetic with DX files
  *  @version $Id$
+ */
+
+/*                                                                                           
+ *  Last update: 08/29/2016 by Leighton Wilson                                               
+ *  Description: Added ability to read in binary DX files as input                           
  */
 
 #include "apbs.h"
@@ -12,6 +17,7 @@
 #define DXM_MAXOP 20
 #define DXM_ISGRID 0
 #define DXM_ISSCALAR 1
+#define DXM_ISGRIDBIN 2
 
 VEMBED(rcsid="$Id$")
 
@@ -28,9 +34,11 @@ int main(int argc, char **argv) {
 
     /* *************** VARIABLES ******************* */
     char *input_path;
+    char *dot;
     char *MCwhiteChars = " \t\n";
     char *MCcommChars  = "#%";
     char tok[VMAX_BUFSIZE];
+    char format[VMAX_BUFSIZE];
     char gridPath[DXM_MAXOP+1][VMAX_BUFSIZE];
     double scalar[DXM_MAXOP+1];
     int obType[DXM_MAXOP+1];
@@ -51,7 +59,7 @@ int main(int argc, char **argv) {
     This driver program (like its UHBD counterpart) does simple arithmetic\n\
     with Cartesian grid data.  It is invoked as:\n\n\
       dx-math <path>\n\n\
-    where <path> is the path to a file with operations specified\n\
+    where <path> is the path to a dx file with operations specified\n\
     in a stack-based (RPN) manner.  For example, a command file which adds\n\
     grid1 and grid2, multiplies the result by 5.3, adds grid4, subtracts\n\
     99.3 from the whole thing, and writes the result on grid5 would have the\n\
@@ -64,7 +72,11 @@ int main(int argc, char **argv) {
       grid5 =\n\n\
     where the file names, scalar values, and operations must be separated by\n\
     tabs, line breaks, or white space.  Comments can be included between the\n\
-    character # and a new line (in the usual shell script fashion).\n\
+    character # and a new line (in the usual shell script fashion).\n\n\
+    If the file extension is .dxbin, the file is assumed to be in binary dx\n\
+    format. Otherwise, the file is assumed to be in standard dx format.\n\
+    Similarly, if the output file extension is .dxbin, the output grid file\n\
+    will be in binary dx format, and standard dx otherwise.\n\
     ----------------------------------------------------------------------\n\n";
 
 
@@ -100,21 +112,40 @@ int main(int argc, char **argv) {
         Vnm_print(2, "main:  Ran out of tokens when parsing initial input!\n");
         return ERRRC;
     }
+
     strncpy(gridPath[0], tok, VMAX_BUFSIZE);
-    obType[0] = DXM_ISGRID;
+    dot = strrchr(tok, '.');
+    if (dot && !Vstring_strcasecmp(dot, ".dxbin")) {
+        Vnm_print(1, "main:  Assuming %s is OpenDX binary format...\n", tok);
+        obType[0] = DXM_ISGRIDBIN;
+    } else {
+        Vnm_print(1, "main:  Assuming %s is standard OpenDX format...\n", tok);
+        obType[0] = DXM_ISGRID;
+    }
+
     numop = 0;
     while (Vio_scanf(sock, "%s", tok) == 1) {
         if (sscanf(tok, "%lg", &scalar[numop+1]) == 1) {
             obType[numop+1] = DXM_ISSCALAR;
         } else {
             strncpy(gridPath[numop+1], tok, VMAX_BUFSIZE);
-            obType[numop+1] = DXM_ISGRID;
+
+            dot = strrchr(tok, '.');
+            if (dot && !Vstring_strcasecmp(dot, ".dxbin")) {
+                Vnm_print(1, "main:  Assuming %s is OpenDX binary format...\n", tok);
+                obType[numop+1] = DXM_ISGRIDBIN;
+            } else {
+                Vnm_print(1, "main:  Assuming %s is standard OpenDX format...\n", tok);
+                obType[numop+1] = DXM_ISGRID;
+            }
         }
+
         if (Vio_scanf(sock, "%s", tok) != 1) {
             Vnm_print(2, "main:  Ran out of tokens when parsing input!\n");
             Vnm_print(2, "main:  Last token = %s.\n", tok);
             return ERRRC;
         }
+
         if (strcmp(tok, "*") == 0) op[numop] = DXM_MUL;
         else if (strcmp(tok, "+") == 0) op[numop] = DXM_ADD;
         else if (strcmp(tok, "-") == 0) op[numop] = DXM_SUB;
@@ -142,7 +173,9 @@ int main(int argc, char **argv) {
     Vnm_print(1, "main:    %s \n", gridPath[0]);
     for (iop=0; iop<numop; iop++) {
         if (obType[iop+1] == DXM_ISGRID)
-          Vnm_print(1, "main:    %s (grid) ", gridPath[iop+1]);
+          Vnm_print(1, "main:    %s (dx grid) ", gridPath[iop+1]);
+        else if (obType[iop+1] == DXM_ISGRIDBIN)
+          Vnm_print(1, "main:    %s (dxbin grid) ", gridPath[iop+1]);
         else
           Vnm_print(1, "main:    %g (scalar) ", scalar[iop+1]);
         switch (op[iop]) {
@@ -173,10 +206,21 @@ int main(int argc, char **argv) {
     /* *************** PARSE INPUT FILE ******************* */
     Vnm_print(1, "main:  Reading grid from %s...\n", gridPath[0]);
     grid1 = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
-    if (!Vgrid_readDX(grid1, "FILE", "ASC", VNULL, gridPath[0])) {
-        Vnm_print(2, "main:  Problem reading OpenDX-format grid from %s\n",
-          gridPath[0]);
-        return ERRRC;
+    if (obType[0] == DXM_ISGRID) {
+        if (!Vgrid_readDX(grid1, "FILE", "ASC", VNULL, gridPath[0])) {
+            Vnm_print(2, "main:  Problem reading OpenDX-format grid from %s\n",
+                      gridPath[0]);
+            return ERRRC;
+        }
+    } else if (obType[0] == DXM_ISGRIDBIN) {
+        if (!Vgrid_readDXBIN(grid1, "FILE", "ASC", VNULL, gridPath[0])) {
+            Vnm_print(2, "main:  Problem reading OpenDX binary-format grid from %s\n",
+                      gridPath[0]);
+            return ERRRC;
+        }
+    } else {
+            Vnm_print(2, "main:  First argument must be a grid\n");
+            return ERRRC;
     }
 
     nx = grid1->nx;
@@ -185,14 +229,25 @@ int main(int argc, char **argv) {
     len = nx * ny * nz;
 
     for (iop=0; iop<numop-1; iop++) {
-        if (obType[iop+1] == DXM_ISGRID) {
+        if (obType[iop+1] == DXM_ISGRID || obType[iop+1] == DXM_ISGRIDBIN) {
             Vnm_print(1, "main:  Reading grid from %s...\n", gridPath[iop+1]);
             grid2 = Vgrid_ctor(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, VNULL);
-            if (!Vgrid_readDX(grid2, "FILE", "ASC", VNULL, gridPath[iop+1])) {
-        Vnm_print(2, "main:  Problem reading OpenDX-format grid from \
-%s\n", gridPath[0]);
-                return ERRRC;
-            }
+
+            if (obType[iop+1] == DXM_ISGRID) {
+                if (!Vgrid_readDX(grid2, "FILE", "ASC", VNULL, gridPath[iop+1])) {
+                    Vnm_print(2, "main:  Problem reading OpenDX-format grid from %s\n",
+                          gridPath[iop+1]);
+                    return ERRRC;
+                }
+            } else if (obType[iop+1] == DXM_ISGRIDBIN) {
+                if (!Vgrid_readDXBIN(grid2, "FILE", "ASC", VNULL, gridPath[iop+1])) {
+                    Vnm_print(2, "main:  Problem reading OpenDX binary-format grid \
+                          from %s\n",
+                          gridPath[iop+1]);
+                    return ERRRC;
+                }
+            } 
+
             if ((grid2->nx != nx) || (grid2->ny != ny) || (grid2->nz != nz)) {
                 Vnm_print(2, "main:  Grid dimension mis-match!\n");
                 Vnm_print(2, "main:  Grid 1 is %d x %d x %d\n", nx, ny, nz);
@@ -273,8 +328,17 @@ int main(int argc, char **argv) {
 
     /* The last operation is the = sign, implying that we write out the grid */
     Vnm_print(1, "main:  Writing results to %s...\n", gridPath[numop]);
-    Vgrid_writeDX(grid1, "FILE", "ASC", VNULL, gridPath[numop],
-      "DXMATH RESULTS", VNULL);
+
+    if (obType[numop] == DXM_ISGRID) {
+        Vgrid_writeDX(grid1, "FILE", "ASC", VNULL, gridPath[numop],
+                      "DXMATH RESULTS", VNULL);
+    } else if (obType[numop] == DXM_ISGRIDBIN) {
+        Vgrid_writeDXBIN(grid1, "FILE", "ASC", VNULL, gridPath[numop],
+                         "DXMATH RESULTS", VNULL);
+    } else {
+        Vnm_print(2, "main:  Last object must be output grid\n");
+        return ERRRC;
+    }
 
     Vnm_print(1, "main:  All done -- exiting.\n");
     return 0;

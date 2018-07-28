@@ -301,38 +301,38 @@ VPUBLIC int loadDielMaps(NOsh *nosh,Vgrid *dielXMap[NOSH_MAXMOL], Vgrid *dielYMa
 
             //DX binary file (.dxbin)
             case VDF_DXBIN:
-            	//TODO: add this method and maybe change the if stmt.
-            	if (Vgrid_readDXBIN(dielXMap[i], "FILE", "ASC", VNULL,
-            	                                 nosh->dielXpath[i]) != 1) {
-            	                    Vnm_tprint( 2, "Fatal error while reading from %s\n",
-            	                                nosh->dielXpath[i]);
-            	                    return 0;
-            	}
+              //TODO: add this method and maybe change the if stmt.
+              if (Vgrid_readDXBIN(dielXMap[i], "FILE", "ASC", VNULL,
+                                               nosh->dielXpath[i]) != 1) {
+                                  Vnm_tprint( 2, "Fatal error while reading from %s\n",
+                                              nosh->dielXpath[i]);
+                                  return 0;
+              }
 
-            	// Set grid sizes
-				nx = dielXMap[i]->nx;
-				ny = dielXMap[i]->ny;
-				nz = dielXMap[i]->nz;
+              // Set grid sizes
+        nx = dielXMap[i]->nx;
+        ny = dielXMap[i]->ny;
+        nz = dielXMap[i]->nz;
 
-				// Set spacings
-				hx = dielXMap[i]->hx;
-				hy = dielXMap[i]->hy;
-				hzed = dielXMap[i]->hzed;
+        // Set spacings
+        hx = dielXMap[i]->hx;
+        hy = dielXMap[i]->hy;
+        hzed = dielXMap[i]->hzed;
 
-				// Set minimum lower corner
-				xmin = dielXMap[i]->xmin;
-				ymin = dielXMap[i]->ymin;
-				zmin = dielXMap[i]->zmin;
-				Vnm_tprint(1, "  %d x %d x %d grid\n", nx, ny, nz);
-				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", hx, hy, hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
-						   xmin, ymin, zmin);
-				sum = 0;
-				for (ii=0; ii<(nx*ny*nz); ii++)
-					sum += (dielXMap[i]->data[ii]);
-					sum = sum*hx*hy*hzed;
-				Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
-				break;
+        // Set minimum lower corner
+        xmin = dielXMap[i]->xmin;
+        ymin = dielXMap[i]->ymin;
+        zmin = dielXMap[i]->zmin;
+        Vnm_tprint(1, "  %d x %d x %d grid\n", nx, ny, nz);
+        Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", hx, hy, hzed);
+        Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+               xmin, ymin, zmin);
+        sum = 0;
+        for (ii=0; ii<(nx*ny*nz); ii++)
+          sum += (dielXMap[i]->data[ii]);
+          sum = sum*hx*hy*hzed;
+        Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
+        break;
 
             // Binary file (GZip)
             case VDF_GZ:
@@ -423,39 +423,39 @@ VPUBLIC int loadDielMaps(NOsh *nosh,Vgrid *dielXMap[NOSH_MAXMOL], Vgrid *dielYMa
                 Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
                 break;
             //DX Binary file (.dxbin)
-			case VDF_DXBIN:
-				//TODO: add this funct/method and maybe change the if stmt.
-				if (Vgrid_readDXBIN(dielYMap[i], "FILE", "ASC", VNULL,
-								 nosh->dielYpath[i]) != 1) {
-					Vnm_tprint( 2, "Fatal error while reading from %s\n",
-								nosh->dielYpath[i]);
-					return 0;
-				}
+      case VDF_DXBIN:
+        //TODO: add this funct/method and maybe change the if stmt.
+        if (Vgrid_readDXBIN(dielYMap[i], "FILE", "ASC", VNULL,
+                 nosh->dielYpath[i]) != 1) {
+          Vnm_tprint( 2, "Fatal error while reading from %s\n",
+                nosh->dielYpath[i]);
+          return 0;
+        }
 
-				// Read grid
-				nx = dielYMap[i]->nx;
-				ny = dielYMap[i]->ny;
-				nz = dielYMap[i]->nz;
+        // Read grid
+        nx = dielYMap[i]->nx;
+        ny = dielYMap[i]->ny;
+        nz = dielYMap[i]->nz;
 
-				// Read spacings
-				hx = dielYMap[i]->hx;
-				hy = dielYMap[i]->hy;
-				hzed = dielYMap[i]->hzed;
+        // Read spacings
+        hx = dielYMap[i]->hx;
+        hy = dielYMap[i]->hy;
+        hzed = dielYMap[i]->hzed;
 
-				// Read minimum lower corner
-				xmin = dielYMap[i]->xmin;
-				ymin = dielYMap[i]->ymin;
-				zmin = dielYMap[i]->zmin;
-				Vnm_tprint(1, "  %d x %d x %d grid\n", nx, ny, nz);
-				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", hx, hy, hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
-						   xmin, ymin, zmin);
-				sum = 0;
-				for (ii=0; ii<(nx*ny*nz); ii++)
-					sum += (dielYMap[i]->data[ii]);
-					sum = sum*hx*hy*hzed;
-				Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
-				break;
+        // Read minimum lower corner
+        xmin = dielYMap[i]->xmin;
+        ymin = dielYMap[i]->ymin;
+        zmin = dielYMap[i]->zmin;
+        Vnm_tprint(1, "  %d x %d x %d grid\n", nx, ny, nz);
+        Vnm_tprint(1, "  (%g, %g, %g) A spacings\n", hx, hy, hzed);
+        Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+               xmin, ymin, zmin);
+        sum = 0;
+        for (ii=0; ii<(nx*ny*nz); ii++)
+          sum += (dielYMap[i]->data[ii]);
+          sum = sum*hx*hy*hzed;
+        Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
+        break;
             // Binary file (GZip) format
             case VDF_GZ:
                 if (Vgrid_readGZ(dielYMap[i], nosh->dielYpath[i]) != 1) {
@@ -548,39 +548,39 @@ VPUBLIC int loadDielMaps(NOsh *nosh,Vgrid *dielXMap[NOSH_MAXMOL], Vgrid *dielYMa
                 break;
             //OpenDX Binary format (.dxbin)
             case VDF_DXBIN:
-            	//TODO: add this funct/method and maybe change the if stmt.
-				if (Vgrid_readDXBIN(dielZMap[i], "FILE", "ASC", VNULL,
-								 nosh->dielZpath[i]) != 1) {
-					Vnm_tprint( 2, "Fatal error while reading from %s\n",
-								nosh->dielZpath[i]);
-					return 0;
-				}
+              //TODO: add this funct/method and maybe change the if stmt.
+        if (Vgrid_readDXBIN(dielZMap[i], "FILE", "ASC", VNULL,
+                 nosh->dielZpath[i]) != 1) {
+          Vnm_tprint( 2, "Fatal error while reading from %s\n",
+                nosh->dielZpath[i]);
+          return 0;
+        }
 
-				// Read grid
-				nx = dielZMap[i]->nx;
-				ny = dielZMap[i]->ny;
-				nz = dielZMap[i]->nz;
+        // Read grid
+        nx = dielZMap[i]->nx;
+        ny = dielZMap[i]->ny;
+        nz = dielZMap[i]->nz;
 
-				// Read spacings
-				hx = dielZMap[i]->hx;
-				hy = dielZMap[i]->hy;
-				hzed = dielZMap[i]->hzed;
+        // Read spacings
+        hx = dielZMap[i]->hx;
+        hy = dielZMap[i]->hy;
+        hzed = dielZMap[i]->hzed;
 
-				// Read minimum lower corner
-				xmin = dielZMap[i]->xmin;
-				ymin = dielZMap[i]->ymin;
-				zmin = dielZMap[i]->zmin;
-				Vnm_tprint(1, "  %d x %d x %d grid\n",
-						   nx, ny, nz);
-				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
-						   hx, hy, hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
-						   xmin, ymin, zmin);
-				sum = 0;
-				for (ii=0; ii<(nx*ny*nz); ii++) sum += (dielZMap[i]->data[ii]);
-					sum = sum*hx*hy*hzed;
-				Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
-				break;
+        // Read minimum lower corner
+        xmin = dielZMap[i]->xmin;
+        ymin = dielZMap[i]->ymin;
+        zmin = dielZMap[i]->zmin;
+        Vnm_tprint(1, "  %d x %d x %d grid\n",
+               nx, ny, nz);
+        Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
+               hx, hy, hzed);
+        Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+               xmin, ymin, zmin);
+        sum = 0;
+        for (ii=0; ii<(nx*ny*nz); ii++) sum += (dielZMap[i]->data[ii]);
+          sum = sum*hx*hy*hzed;
+        Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
+        break;
             // Binary file (GZip) format
             case VDF_GZ:
                 if (Vgrid_readGZ(dielZMap[i], nosh->dielZpath[i]) != 1) {
@@ -706,30 +706,30 @@ VPUBLIC int loadKappaMaps(NOsh *nosh,
                 Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
                 break;
                 // OpenDX Binary (.dxbin) format
-				case VDF_DXBIN:
-					//TODO: write method and possible change if stmt.
-					if (Vgrid_readDXBIN(map[i], "FILE", "ASC", VNULL,
-									 nosh->kappapath[i]) != 1) {
-						Vnm_tprint( 2, "Fatal error while reading from %s\n",
-									nosh->kappapath[i]);
-						return 0;
-					}
-					Vnm_tprint(1, "  %d x %d x %d grid\n",
-							   map[i]->nx, map[i]->ny, map[i]->nz);
-					Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
-							   map[i]->hx, map[i]->hy, map[i]->hzed);
-					Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
-							   map[i]->xmin, map[i]->ymin, map[i]->zmin);
-					sum = 0;
-					for (ii = 0, len = map[i]->nx * map[i]->ny * map[i]->nz;
-						 ii < len;
-						 ii++
-						) {
-						sum += (map[i]->data[ii]);
-					}
-						sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
-					Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
-					break;
+        case VDF_DXBIN:
+          //TODO: write method and possible change if stmt.
+          if (Vgrid_readDXBIN(map[i], "FILE", "ASC", VNULL,
+                   nosh->kappapath[i]) != 1) {
+            Vnm_tprint( 2, "Fatal error while reading from %s\n",
+                  nosh->kappapath[i]);
+            return 0;
+          }
+          Vnm_tprint(1, "  %d x %d x %d grid\n",
+                 map[i]->nx, map[i]->ny, map[i]->nz);
+          Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
+                 map[i]->hx, map[i]->hy, map[i]->hzed);
+          Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+                 map[i]->xmin, map[i]->ymin, map[i]->zmin);
+          sum = 0;
+          for (ii = 0, len = map[i]->nx * map[i]->ny * map[i]->nz;
+             ii < len;
+             ii++
+            ) {
+            sum += (map[i]->data[ii]);
+          }
+            sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
+          Vnm_tprint(1, "  Volume integral = %3.2e A^3\n", sum);
+          break;
             // UHBD format
             case VDF_UHBD:
                 Vnm_tprint( 2, "UHBD input not supported yet!\n");
@@ -922,26 +922,26 @@ VPUBLIC int loadChargeMaps(NOsh *nosh,
                 Vnm_tprint(1, "  Charge map integral = %3.2e e\n", sum);
                 break;
             case VDF_DXBIN:
-            	//TODO: write Vgrid_readDXBIN and possibly change if stmt.
-				if (Vgrid_readDXBIN(map[i], "FILE", "ASC", VNULL,
-								 nosh->chargepath[i]) != 1) {
-					Vnm_tprint( 2, "Fatal error while reading from %s\n",
-								nosh->chargepath[i]);
-					return 0;
-				}
-				Vnm_tprint(1, "  %d x %d x %d grid\n",
-						   map[i]->nx, map[i]->ny, map[i]->nz);
-				Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
-						   map[i]->hx, map[i]->hy, map[i]->hzed);
-				Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
-						   map[i]->xmin, map[i]->ymin, map[i]->zmin);
-				sum = 0;
-				for (ii=0,len=map[i]->nx*map[i]->ny*map[i]->nz; ii<len; ii++) {
-					sum += (map[i]->data[ii]);
-				}
-					sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
-				Vnm_tprint(1, "  Charge map integral = %3.2e e\n", sum);
-				break;
+              //TODO: write Vgrid_readDXBIN and possibly change if stmt.
+        if (Vgrid_readDXBIN(map[i], "FILE", "ASC", VNULL,
+                 nosh->chargepath[i]) != 1) {
+          Vnm_tprint( 2, "Fatal error while reading from %s\n",
+                nosh->chargepath[i]);
+          return 0;
+        }
+        Vnm_tprint(1, "  %d x %d x %d grid\n",
+               map[i]->nx, map[i]->ny, map[i]->nz);
+        Vnm_tprint(1, "  (%g, %g, %g) A spacings\n",
+               map[i]->hx, map[i]->hy, map[i]->hzed);
+        Vnm_tprint(1, "  (%g, %g, %g) A lower corner\n",
+               map[i]->xmin, map[i]->ymin, map[i]->zmin);
+        sum = 0;
+        for (ii=0,len=map[i]->nx*map[i]->ny*map[i]->nz; ii<len; ii++) {
+          sum += (map[i]->data[ii]);
+        }
+          sum = sum*map[i]->hx*map[i]->hy*map[i]->hzed;
+        Vnm_tprint(1, "  Charge map integral = %3.2e e\n", sum);
+        break;
             case VDF_UHBD:
                 Vnm_tprint( 2, "UHBD input not supported yet!\n");
                 return 0;
@@ -1150,8 +1150,8 @@ to ");
                 Vnm_tprint(1, "%s.%s\n", pbeparm->writestem[i], "dx");
                 break;
             case VDF_DXBIN:
-				Vnm_tprint(1, "%s.%s\n", pbeparm->writestem[i], "dxbin");
-				break;
+        Vnm_tprint(1, "%s.%s\n", pbeparm->writestem[i], "dxbin");
+        break;
             case VDF_GZ:
                 Vnm_tprint(1, "%s.%s\n", pbeparm->writestem[i], "dx.gz");
                 break;
@@ -1314,15 +1314,23 @@ VPUBLIC int initMG(int icalc,
             Vnm_tprint(2, "Sorry, NRPBE isn't supported with the MG solver!\n");
             return 0;
         case PBE_SMPBE: /* SMPBE Added */
+        	/* Due to numerical issues the SMPBE is currenty disabled. (JMB)*/
+        	Vnm_tprint(2, "  ** Sorry, due to numerical stability issues SMPBE is currently disabled. We apologize for the inconvenience.\n");
+            Vnm_tprint(2, "  ** Please let us know if you would like to use it in the future.\n");
+            return 0;
+
+        	/*
             mgparm->nonlintype = NONLIN_SMPBE;
             pmgp[icalc] = Vpmgp_ctor(mgparm);
-
+			*/
             /* Copy Code */
+            /*
             pbe[icalc]->smsize = pbeparm->smsize;
             pbe[icalc]->smvolume = pbeparm->smvolume;
             pbe[icalc]->ipkey = pmgp[icalc]->ipkey;
 
             break;
+            */
         default:
             Vnm_tprint(2, "Error!  Unknown PBE type (%d)!\n", pbeparm->pbetype);
             return 0;
@@ -1851,7 +1859,7 @@ Poisson-Boltzmann operator matrix to %s...\n", outpath);
 
         Vnm_tprint(0, "  Printing operator...\n");
         //Vpmg_printColComp(pmg, outpath, outpath, mxtype,
-        //				  pbeparm->writematflag);
+        //          pbeparm->writematflag);
         return 0;
 
     }
@@ -2665,15 +2673,15 @@ VPUBLIC int writedataMG(int rank,
                 break;
 
             case VDF_DXBIN:
-				sprintf(outpath, "%s.%s", writestem, "dxbin");
-				Vnm_tprint(1, "%s\n", outpath);
-				grid = Vgrid_ctor(nx, ny, nz, hx, hy, hzed, xmin, ymin, zmin,
-								  pmg->rwork);
-				//TODO: write Vgrid_writeDXBIN method
-				Vgrid_writeDXBIN(grid, "FILE", "ASC", VNULL, outpath, title,
-							  pmg->pvec);
-				Vgrid_dtor(&grid);
-				break;
+        sprintf(outpath, "%s.%s", writestem, "dxbin");
+        Vnm_tprint(1, "%s\n", outpath);
+        grid = Vgrid_ctor(nx, ny, nz, hx, hy, hzed, xmin, ymin, zmin,
+                  pmg->rwork);
+        //TODO: write Vgrid_writeDXBIN method
+        Vgrid_writeDXBIN(grid, "FILE", "ASC", VNULL, outpath, title,
+                pmg->pvec);
+        Vgrid_dtor(&grid);
+        break;
 
             case VDF_AVS:
                 sprintf(outpath, "%s.%s", writestem, "ucd");
@@ -3627,7 +3635,7 @@ calculations %d and %d\n", nosh->apol2calc[nosh->printcalc[iprint][0]]+1,
         Vnm_tprint( 1, "    tot all -- Total force for system\n");
 
         //Vnm_tprint( 1, "    gamma, pressure, bconc are: %f %f %f\n\n",
-        //			gamma,press,bconc);
+        //      gamma,press,bconc);
 
         totforce[0] = 0.0;
         totforce[1] = 0.0;
@@ -3816,8 +3824,8 @@ VPUBLIC Vrc_Codes initFE(int icalc, /**< Index in pb, fetk to initialize (calcul
                 Vnm_tprint(2, "DX finite element mesh input not supported yet!\n");
                 return VRC_FAILURE;
             case VDF_DXBIN:
-				Vnm_tprint(2, "DXBIN finite element mesh input not supported yet!\n");
-				return VRC_FAILURE;
+        Vnm_tprint(2, "DXBIN finite element mesh input not supported yet!\n");
+        return VRC_FAILURE;
             case VDF_UHBD:
                 Vnm_tprint( 2, "UHBD finite element mesh input not supported!\n");
                 return VRC_FAILURE;
@@ -4432,11 +4440,11 @@ VPUBLIC int writedataFE(int rank, /**< Rank of processor (for parallel runs) */
                 break;
 
             case VDF_DXBIN:
-            	//TODO: probably change some or all of below.
-				sprintf(outpath, "%s.%s", writestem, "dxbin");
-				Vnm_tprint(1, "%s\n", outpath);
-				Vfetk_write(fetk, "FILE", "ASC", VNULL, outpath, vec, VDF_DXBIN);
-				break;
+              //TODO: probably change some or all of below.
+        sprintf(outpath, "%s.%s", writestem, "dxbin");
+        Vnm_tprint(1, "%s\n", outpath);
+        Vfetk_write(fetk, "FILE", "ASC", VNULL, outpath, vec, VDF_DXBIN);
+        break;
 
             case VDF_AVS:
                 sprintf(outpath, "%s.%s", writestem, "ucd");
@@ -4734,7 +4742,7 @@ VPUBLIC int forceAPOL(Vacc *acc,
     double srad, /* Probe radius */
            xF,
            yF,
-           zF,	/* Individual forces */
+           zF,  /* Individual forces */
            press,
            gamma,
            offset,
@@ -4960,11 +4968,14 @@ VPUBLIC void killBEM(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC]
 }
 
 
-void apbs2tabipb_(char**, int*, double*,double* , double*, double*, double*, double*, double*, int*, int*, double*);
+void apbs2tabipb_(TABIPBparm* tabiparm,
+                  TABIPBvars* tabivars);
 
-VPUBLIC int solveBEM(NOsh *nosh, PBEparm *pbeparm, BEMparm *bemparm,
-                    BEMparm_CalcType type
-                   ) {
+VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
+                     NOsh *nosh,
+                     PBEparm *pbeparm,
+                     BEMparm *bemparm,
+                     BEMparm_CalcType type) {
 
     int nx,
         ny,
@@ -4977,20 +4988,73 @@ VPUBLIC int solveBEM(NOsh *nosh, PBEparm *pbeparm, BEMparm *bemparm,
 
     Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
 
-//apbs2tabipb(apbs_pqr_filename, nion, ionc, ionq, ionr, pdie, sdie, sdens, temp)
-    apbs2tabipb_( (char**)&(nosh->molpath),
-                 &(pbeparm->nion),
-                 (double*)&(pbeparm->ionc),
-                 (double*)&(pbeparm->ionq),
-                 (double*)&(pbeparm->ionr),
-                 (double*)&(pbeparm->pdie),
-                 (double*)&(pbeparm->sdie),
-                 (double*)&(pbeparm->sdens),
-                 (double*)&(pbeparm->temp),
-                 &(bemparm->tree_order),
-                 &(bemparm->tree_n0),
-                 (double*)&(bemparm->mac)
-                 );
+    TABIPBparm *tabiparm = (TABIPBparm*)calloc(1,sizeof(TABIPBparm));
+
+    sprintf(tabiparm->fpath, "");
+    strncpy(tabiparm->fname, nosh->molpath[0],4);
+    tabiparm->fname[4] = '\0';
+    tabiparm->density = pbeparm->sdens;
+    tabiparm->probe_radius = pbeparm->srad;
+
+    tabiparm->epsp = pbeparm->pdie;
+    tabiparm->epsw = pbeparm->sdie;
+    tabiparm->bulk_strength = 0.0;
+    for (i=0; i<pbeparm->nion; i++)
+        tabiparm->bulk_strength += pbeparm->ionc[i]
+                                  *pbeparm->ionq[i]*pbeparm->ionq[i];
+    tabiparm->temp = pbeparm->temp;
+
+    tabiparm->order = bemparm->tree_order;
+    tabiparm->maxparnode = bemparm->tree_n0;
+    tabiparm->theta = bemparm->mac;
+
+    tabiparm->mesh_flag = bemparm->mesh;
+
+    tabiparm->number_of_lines = Valist_getNumberAtoms(molecules[0]);
+
+    tabiparm->output_datafile = bemparm->outdata;
+
+    TABIPBvars *tabivars = (TABIPBvars*)calloc(1,sizeof(TABIPBvars));
+    if ((tabivars->chrpos = (double *) malloc(3 * tabiparm->number_of_lines * sizeof(double))) == NULL) {
+            printf("Error in allocating t_chrpos!\n");
+    }
+    if ((tabivars->atmchr = (double *) malloc(tabiparm->number_of_lines * sizeof(double))) == NULL) {
+            printf("Error in allocating t_atmchr!\n");
+    }
+    if ((tabivars->atmrad = (double *) malloc(tabiparm->number_of_lines * sizeof(double))) == NULL) {
+            printf("Error in allocating t_atmrad!\n");
+    }
+
+    Vatom *atom;
+
+    for (i = 0; i < tabiparm->number_of_lines; i++){
+      atom = Valist_getAtom(molecules[0], i);
+      tabivars->chrpos[3*i] = Vatom_getPosition(atom)[0];
+      tabivars->chrpos[3*i + 1] = Vatom_getPosition(atom)[1];
+      tabivars->chrpos[3*i + 2] = Vatom_getPosition(atom)[2];
+      tabivars->atmchr[i] = Vatom_getCharge(atom);
+      tabivars->atmrad[i] = Vatom_getRadius(atom);
+    }
+
+//apbs2tabipb(TABIPBparm* tabiparm, Valist* molecules[NOSH_MAXMOL]);
+    apbs2tabipb_(tabiparm, tabivars);
+
+    free(tabiparm);
+    free(tabivars->chrpos);
+    free(tabivars->atmchr);
+    free(tabivars->atmrad);
+    free(tabivars->vert_ptl); // allocate in output_potential()
+    free(tabivars->xvct); // allocate in output_potential()
+    free_matrix(tabivars->vert); // allocate in output_potential()
+    free_matrix(tabivars->snrm); // allocate in output_potential()
+    free_matrix(tabivars->face); // allocate in output_potential()
+
+    Vnm_tprint(1, "\n\nReturning to APBS caller...\n\n");
+    Vnm_tprint(1, "Solvation energy and Coulombic energy in kJ/mol...\n\n");
+    Vnm_tprint(1, "  Global net ELEC energy = %1.12E\n", tabivars->soleng);
+    Vnm_tprint(1, "  Global net COULOMBIC energy = %1.12E\n\n", tabivars->couleng);
+
+    free(tabivars);
 
     Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
 
@@ -5093,10 +5157,10 @@ VPUBLIC int writematBEM(int rank, NOsh *nosh, PBEparm *pbeparm) {
 /**
  * Initialize a geometric flow calculation.
  */
-VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL], 
-                                NOsh *nosh, 
-                                PBEparm *pbeparm, 
-                                APOLparm *apolparm, 
+VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
+                                NOsh *nosh,
+                                PBEparm *pbeparm,
+                                APOLparm *apolparm,
                                 GEOFLOWparm *parm )
 {
    //printf("solveGeometricFlow!!!\n");
@@ -5113,7 +5177,7 @@ VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
    geoflowIn.m_grid[0] = apolparm->grid[0];
    geoflowIn.m_grid[1] = apolparm->grid[1];
    geoflowIn.m_grid[2] = apolparm->grid[2];
-   geoflowIn.m_gamma =  apolparm->gamma; 
+   geoflowIn.m_gamma =  apolparm->gamma;
    geoflowIn.m_pdie = pbeparm->pdie ;
    geoflowIn.m_sdie = pbeparm->sdie ;
    geoflowIn.m_press = apolparm->press ;
@@ -5124,9 +5188,9 @@ VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
 
    // debug
    //printGeometricFlowStruct( geoflowIn );
-  
+
    //printf("num mols: %i\n", nosh->nmol);
-   struct GeometricFlowOutput geoflowOut = 
+   struct GeometricFlowOutput geoflowOut =
       runGeometricFlowWrapAPBS( geoflowIn, molecules[0] );
 
    Vnm_tprint( 1,"  Global net energy = %1.12E\n", geoflowOut.m_totalSolvation);
@@ -5137,6 +5201,420 @@ VPUBLIC int solveGeometricFlow( Valist* molecules[NOSH_MAXMOL],
 
    return 1;
 
+}
+
+#endif
+
+#ifdef ENABLE_PBAM
+
+/**
+ * Initialize a PBAM calculation.
+ */
+VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
+                                NOsh *nosh,
+                                PBEparm *pbeparm,
+                                PBAMparm *parm )
+{
+  printf("solvePBAM!!!\n");
+  if (nosh != VNULL) {
+    if (nosh->bogus) return 1;
+  }
+
+  int i, j;
+  Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
+  PBAMInput pbamIn = getPBAMParams();
+
+  pbamIn.nmol_ = nosh->nmol;
+
+  // change any of the parameters you want...
+  pbamIn.temp_ =  pbeparm->temp;
+  if (fabs(pbamIn.temp_-0.0) < 1e-3)
+  {
+    printf("No temperature specified. Setting to 298.15K\n");
+    pbamIn.temp_ = 298.15;
+  }
+
+  // Dielectrics
+  pbamIn.idiel_ = pbeparm->pdie;
+  pbamIn.sdiel_ = pbeparm->sdie;
+
+  // Salt conc
+  pbamIn.salt_ = parm->salt;
+
+  // Runtype: can be energyforce, electrostatics etc
+  strncpy(pbamIn.runType_, parm->runtype, CHR_MAXLEN);
+  strncpy(pbamIn.runName_, parm->runname, CHR_MAXLEN);
+
+  pbamIn.randOrient_ = parm->setrandorient;
+
+  pbamIn.boxLen_ = parm->pbcboxlen;
+  pbamIn.pbcType_ = parm->setpbcs;
+
+  pbamIn.setunits_ = parm->setunits;
+  if(parm->setunits == 1) strncpy(pbamIn.units_, parm->units, CHR_MAXLEN);
+
+  // Electrostatic stuff
+  if (parm->setgridpt) pbamIn.gridPts_ = parm->gridpt;
+  strncpy(pbamIn.map3D_, parm->map3dname, CHR_MAXLEN);
+  pbamIn.grid2Dct_ = parm->grid2Dct;
+  for (i=0; i<pbamIn.grid2Dct_; i++)
+  {
+    strncpy(pbamIn.grid2D_[i], parm->grid2Dname[i], CHR_MAXLEN);
+    strncpy(pbamIn.grid2Dax_[i], parm->grid2Dax[i], CHR_MAXLEN);
+    pbamIn.grid2Dloc_[i] = parm->grid2Dloc[i];
+  }
+  strncpy(pbamIn.dxname_, parm->dxname, CHR_MAXLEN);
+
+  // Dynamics stuff
+  pbamIn.ntraj_ = parm->ntraj;
+  strncpy(pbamIn.termCombine_, parm->termcombine, CHR_MAXLEN);
+
+  pbamIn.termct_ = parm->termct;
+  pbamIn.contct_ = parm->confilct;
+
+  if (strncmp(pbamIn.runType_, "dynamics", 8)== 0)
+  {
+    if (pbamIn.nmol_ > parm->diffct)
+    {
+      Vnm_tprint(2, "You need more diffusion information!\n");
+      return 0;
+    }
+
+    for (i=0; i<pbamIn.nmol_; i++)
+    {
+      if (parm->xyzct[i] <  parm->ntraj)
+      {
+        Vnm_tprint(2, "For molecule %d, you are missing trajectory!\n", i+1);
+        return 0;
+      } else {
+        for (j=0; j<pbamIn.ntraj_; j++)
+        {
+          strncpy(pbamIn.xyzfil_[i][j], parm->xyzfil[i][j], CHR_MAXLEN);
+        }
+      }
+    }
+
+    for (i=0; i<pbamIn.nmol_; i++)
+    {
+      strncpy(pbamIn.moveType_[i], parm->moveType[i], CHR_MAXLEN);
+      pbamIn.transDiff_[i] = parm->transDiff[i];
+      pbamIn.rotDiff_[i] = parm->rotDiff[i];
+    }
+
+    for (i=0; i<pbamIn.termct_; i++)
+    {
+        strncpy(pbamIn.termnam_[i], parm->termnam[i], CHR_MAXLEN);
+        pbamIn.termnu_[i][0] = parm->termnu[i][0];
+        pbamIn.termval_[i] = parm->termVal[i];
+    }
+
+    for (i=0; i<pbamIn.contct_; i++)
+    {
+        strncpy(pbamIn.confil_[i], parm->confil[i], CHR_MAXLEN);
+    }
+
+  }
+
+  // debug
+  printPBAMStruct( pbamIn );
+
+  // Run the darn thing
+  PBAMOutput pbamOut = runPBAMWrapAPBS( pbamIn, molecules, nosh->nmol );
+
+  Vnm_tprint(1, "\n\nReturning to APBS caller...\n\n");
+
+  if (!(strncmp(pbamIn.runType_, "dynamics", 8) &&
+        strncmp(pbamIn.runType_, "energyforce", 11))) {
+
+      if (!strncmp(pbamIn.units_, "kcalmol", 7)) {  //scale to kjmol is 4.18400
+
+          Vnm_tprint(1, "Interaction energy in kCal/mol...\n\n");
+
+          for (int i = 0; i < PBAMPARM_MAXMOL; i++) {
+              Vnm_tprint(1, "  Molecule %d: Global net ELEC energy = %1.12E\n",
+                            i+1, pbamOut.energies_[i]);
+              Vnm_tprint(1, "              Force = (%1.6E, %1.6E, %1.6E)\n\n",
+                            pbamOut.forces_[i][0], pbamOut.forces_[i][1],
+                            pbamOut.forces_[i][2]);
+              if (pbamOut.energies_[i+1] == 0.) break;
+          }
+
+      } else if (!strncmp(pbamIn.units_, "jmol", 4)) {  //scale to kjmol is 0.001
+
+          Vnm_tprint(1, "Interaction energy in J/mol...\n\n");
+
+          for (int i = 0; i < PBAMPARM_MAXMOL; i++) {
+              Vnm_tprint(1, "  Molecule %d: Global net ELEC energy = %1.12E\n",
+                            i+1, pbamOut.energies_[i]);
+              Vnm_tprint(1, "              Force = (%1.6E, %1.6E, %1.6E)\n\n",
+                            pbamOut.forces_[i][0], pbamOut.forces_[i][1],
+                            pbamOut.forces_[i][2]);
+              if (pbamOut.energies_[i+1] == 0.) break;
+          }
+
+      } else { // if (!strncmp(pbamIn.units_, "kT", 2)) //scale to kjmol is 2.478 @ 298K
+                                                        // or 0.008315436242 * 298
+
+          Vnm_tprint(1, "Interaction energy in kT @ %6.2f K...\n\n", pbamIn.temp_);
+
+          for (int i = 0; i < PBAMPARM_MAXMOL; i++) {
+              Vnm_tprint(1, "  Molecule %d: Global net ELEC energy = %1.12E\n",
+                            i+1, pbamOut.energies_[i]);
+              Vnm_tprint(1, "              Force = (%1.6E, %1.6E, %1.6E)\n\n",
+                            pbamOut.forces_[i][0], pbamOut.forces_[i][1],
+                            pbamOut.forces_[i][2]);
+              if (pbamOut.energies_[i+1] == 0.) break;
+          }
+      }
+  }
+  Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
+
+  return 1;
+
+}
+
+#endif
+
+#ifdef ENABLE_PBSAM
+
+/**
+ * Initialize a PBSAM calculation.
+ */
+VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
+                                NOsh *nosh,
+                                PBEparm *pbeparm,
+                                PBAMparm *parm,
+                                PBSAMparm *samparm )
+{
+  printf("solvePBSAM!!!\n");
+  char fname_tp[VMAX_ARGLEN];
+  if (nosh != VNULL) {
+    if (nosh->bogus) return 1;
+  }
+
+  int i, j, k, ierr;
+  Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
+  PBSAMInput pbsamIn = getPBSAMParams();
+  PBAMInput pbamIn;// = getPBAMParams();
+
+  pbamIn.nmol_ = nosh->nmol;
+
+  // change any of the parameters you want...
+  pbamIn.temp_ =  pbeparm->temp;
+  if (fabs(pbamIn.temp_-0.0) < 1e-3)
+  {
+    printf("No temperature specified. Setting to 298.15K\n");
+    pbamIn.temp_ = 298.15;
+  }
+
+  // Dielectrics
+  pbamIn.idiel_ = pbeparm->pdie;
+  pbamIn.sdiel_ = pbeparm->sdie;
+
+  // Salt conc
+  pbamIn.salt_ = parm->salt;
+
+  // Runtype: can be energyforce, electrostatics etc
+  strncpy(pbamIn.runType_, parm->runtype, CHR_MAXLEN);
+  strncpy(pbamIn.runName_, parm->runname, CHR_MAXLEN);
+
+  pbamIn.setunits_ = parm->setunits;
+  if(parm->setunits == 1) strncpy(pbamIn.units_, parm->units, CHR_MAXLEN);
+  pbamIn.randOrient_ = parm->setrandorient;
+
+  pbamIn.boxLen_ = parm->pbcboxlen;
+  pbamIn.pbcType_ = parm->setpbcs;
+
+  // Electrostatic stuff
+  if (parm->setgridpt) pbamIn.gridPts_ = parm->gridpt;
+  strncpy(pbamIn.map3D_, parm->map3dname, CHR_MAXLEN);
+  pbamIn.grid2Dct_ = parm->grid2Dct;
+  for (i=0; i<pbamIn.grid2Dct_; i++)
+  {
+    strncpy(pbamIn.grid2D_[i], parm->grid2Dname[i], CHR_MAXLEN);
+    strncpy(pbamIn.grid2Dax_[i], parm->grid2Dax[i], CHR_MAXLEN);
+    pbamIn.grid2Dloc_[i] = parm->grid2Dloc[i];
+  }
+  strncpy(pbamIn.dxname_, parm->dxname, CHR_MAXLEN);
+
+  // Dynamics stuff
+  pbamIn.ntraj_ = parm->ntraj;
+  strncpy(pbamIn.termCombine_, parm->termcombine, CHR_MAXLEN);
+
+  pbamIn.termct_ = parm->termct;
+  pbamIn.contct_ = parm->confilct;
+
+  if (strncmp(pbamIn.runType_, "dynamics", 8)== 0)
+  {
+    if (pbamIn.nmol_ > parm->diffct)
+    {
+      Vnm_tprint(2, "You need more diffusion information!\n");
+      return 0;
+    }
+
+    for (i=0; i<pbamIn.nmol_; i++)
+    {
+      if (parm->xyzct[i] <  parm->ntraj)
+      {
+        Vnm_tprint(2, "For molecule %d, you are missing trajectory!\n", i+1);
+        return 0;
+      } else {
+        for (j=0; j<pbamIn.ntraj_; j++)
+        {
+          strncpy(pbamIn.xyzfil_[i][j], parm->xyzfil[i][j], CHR_MAXLEN);
+        }
+      }
+    }
+
+    for (i=0; i<pbamIn.nmol_; i++)
+    {
+      strncpy(pbamIn.moveType_[i], parm->moveType[i], CHR_MAXLEN);
+      pbamIn.transDiff_[i] = parm->transDiff[i];
+      pbamIn.rotDiff_[i] = parm->rotDiff[i];
+    }
+
+    for (i=0; i<pbamIn.termct_; i++)
+    {
+        strncpy(pbamIn.termnam_[i], parm->termnam[i], CHR_MAXLEN);
+        pbamIn.termnu_[i][0] = parm->termnu[i][0];
+        pbamIn.termval_[i] = parm->termVal[i];
+    }
+
+    for (i=0; i<pbamIn.contct_; i++)
+    {
+        strncpy(pbamIn.confil_[i], parm->confil[i], CHR_MAXLEN);
+    }
+  }
+
+  
+  // SAM details
+  pbsamIn.tolsp_  = samparm->tolsp;
+  pbsamIn.imatct_ = samparm->imatct;
+  pbsamIn.expct_  = samparm->expct;
+  for (i=0; i<samparm->surfct; i++)
+  {
+      strncpy(pbsamIn.surffil_[i], samparm->surffil[i], CHR_MAXLEN);
+  }
+  for (i=0; i<samparm->imatct; i++)
+  {
+      strncpy(pbsamIn.imatfil_[i], samparm->imatfil[i], CHR_MAXLEN);
+  }
+  for (i=0; i<samparm->expct; i++)
+  {
+      strncpy(pbsamIn.expfil_[i], samparm->expfil[i], CHR_MAXLEN);
+  }
+
+  // Running MSMS if the MSMS flag is used
+  if (samparm->setmsms == 1) {
+    for (i=0; i<pbamIn.nmol_; i++) {
+    // find a clever way to use prefix of molecule name for msms outputs
+    for (j=0; j < VMAX_ARGLEN; j++) 
+       if (nosh->molpath[i][j] == '\0') break;
+     
+    // assume terminated by '.pqr' -> 4 char, want to term w/ '.xyzr'
+    char xyzr[j+2], surf[j+2], outname[j-4]; 
+    for( k=0; k < j - 4; k++) 
+    {
+        xyzr[k] = nosh->molpath[i][k];
+        outname[k] = nosh->molpath[i][k];
+        surf[k] = nosh->molpath[i][k];
+    }
+    outname[k] = '\0';
+    xyzr[k]   = '.';  surf[k]   = '.';
+    xyzr[k+1] = 'x';  surf[k+1] = 'v';
+    xyzr[k+2] = 'y';  surf[k+2] = 'e';
+    xyzr[k+3] = 'z';  surf[k+3] = 'r';
+    xyzr[k+4] = 'r';  surf[k+4] = 't';
+    xyzr[k+5] = '\0'; surf[k+5] = '\0';;
+
+    // write an XYZR file from xyzr data
+    FILE *fp;
+    fp=fopen(xyzr, "w");
+    Vatom *atom;
+    for(k=0; k< Valist_getNumberAtoms(molecules[i]); k++)
+    {
+       atom = Valist_getAtom(molecules[i],k);
+       fprintf(fp, "%.4f  %.4f  %.4f  %.4f\n", Vatom_getPosition(atom)[0],
+                                               Vatom_getPosition(atom)[1],
+                                               Vatom_getPosition(atom)[2],
+                                               Vatom_getRadius(atom));
+    }
+    fclose(fp);
+
+    #ifdef _WIN32
+       sprintf(fname_tp, "msms.exe -if %s -prob %f -dens %f -of %s",
+               xyzr, samparm->probe_radius,samparm->density, outname);
+    #else
+       sprintf(fname_tp, "msms -if %s -prob %f -dens %f -of %s",
+               xyzr, samparm->probe_radius,samparm->density, outname);
+    #endif
+ 
+      printf("%s\n", fname_tp);
+ 
+      printf("Running MSMS...\n");
+      ierr = system(fname_tp);
+
+      strncpy(pbsamIn.surffil_[i], surf, CHR_MAXLEN);
+    }
+  }
+
+
+  // debug
+  printPBSAMStruct( pbamIn, pbsamIn );
+
+  // Run the darn thing
+  PBAMOutput pbamOut = runPBSAMWrapAPBS(pbamIn, pbsamIn, molecules, nosh->nmol);
+
+  Vnm_tprint(1, "\n\nReturning to APBS caller...\n\n");
+
+  if (!(strncmp(pbamIn.runType_, "dynamics", 8) &&
+        strncmp(pbamIn.runType_, "energyforce", 11))) {
+
+      if (!strncmp(pbamIn.units_, "kcalmol", 7)) {  //scale to kjmol is 4.18400
+
+          Vnm_tprint(1, "Interaction energy in kCal/mol...\n\n");
+
+          for (int i = 0; i < PBAMPARM_MAXMOL; i++) {
+              Vnm_tprint(1, "  Molecule %d: Global net ELEC energy = %1.12E\n",
+                            i+1, pbamOut.energies_[i]);
+              Vnm_tprint(1, "              Force = (%1.6E, %1.6E, %1.6E)\n\n",
+                            pbamOut.forces_[i][0], pbamOut.forces_[i][1],
+                            pbamOut.forces_[i][2]);
+              if (pbamOut.energies_[i+1] == 0.) break;
+          }
+
+      } else if (!strncmp(pbamIn.units_, "jmol", 4)) {  //scale to kjmol is 0.001
+
+          Vnm_tprint(1, "Interaction energy in J/mol...\n\n");
+
+          for (int i = 0; i < PBAMPARM_MAXMOL; i++) {
+              Vnm_tprint(1, "  Molecule %d: Global net ELEC energy = %1.12E\n",
+                            i+1, pbamOut.energies_[i]);
+              Vnm_tprint(1, "              Force = (%1.6E, %1.6E, %1.6E)\n\n",
+                            pbamOut.forces_[i][0], pbamOut.forces_[i][1],
+                            pbamOut.forces_[i][2]);
+              if (pbamOut.energies_[i+1] == 0.) break;
+          }
+
+      } else { // if (!strncmp(pbamIn.units_, "kT", 2)) //scale to kjmol is 2.478 @ 298K
+                                                        // or 0.008315436242 * 298
+
+          Vnm_tprint(1, "Interaction energy in kT @ %6.2f K...\n\n", pbamIn.temp_);
+
+          for (int i = 0; i < PBAMPARM_MAXMOL; i++) {
+              Vnm_tprint(1, "  Molecule %d: Global net ELEC energy = %1.12E\n",
+                            i+1, pbamOut.energies_[i]);
+              Vnm_tprint(1, "              Force = (%1.6E, %1.6E, %1.6E)\n\n",
+                            pbamOut.forces_[i][0], pbamOut.forces_[i][1],
+                            pbamOut.forces_[i][2]);
+              if (pbamOut.energies_[i+1] == 0.) break;
+          }
+      }
+  }
+
+  Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
+
+  return 1;
 }
 
 #endif

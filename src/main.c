@@ -97,6 +97,13 @@ int main(
     PBEparm *pbeparm = VNULL;
     APOLparm *apolparm = VNULL;
     Vparam *param = VNULL;
+#if defined(ENABLE_PBAM) || defined(ENABLE_PBSAM)
+    PBAMparm *pbamparm = VNULL;
+#endif
+
+#ifdef ENABLE_PBSAM
+    PBSAMparm *pbsamparm = VNULL;
+#endif
 
     Vmem *mem = VNULL;
     Vcom *com = VNULL;
@@ -354,6 +361,7 @@ int main(
     /* *************** PARSE INPUT FILE ******************* */
     nosh = NOsh_ctor(rank, size);
     Vnm_tprint( 1, "Parsing input file %s...\n", input_path);
+    Vnm_tprint( 1, "rank %d size %d...\n", rank, size);
     sock = Vio_ctor("FILE", "ASC", VNULL, input_path, "r");
     if (sock == VNULL) {
         Vnm_tprint(2, "Error while opening input file %s!\n", input_path);
@@ -642,7 +650,7 @@ int main(
                     VJMPERR1(0);
                 }
                 break;
-                
+
         /* Boundary Element (tabi) */
             case NCT_BEM:
 #ifdef ENABLE_BEM
@@ -676,7 +684,7 @@ int main(
                 printPBEPARM(pbeparm);
 
                 /* Solve PDE */
-                if (solveBEM(nosh, pbeparm, bemparm, bemparm->type) != 1) {
+                if (solveBEM(alist, nosh, pbeparm, bemparm, bemparm->type) != 1) {
                     Vnm_tprint(2, "Error solving PDE!\n");
                     VJMPERR1(0);
                 }
@@ -734,7 +742,7 @@ int main(
                 /* Set up problem */
                 Vnm_tprint( 1, "  Setting up problem...\n");
 
-                
+
                 /* Solve PDE */
                 if (solveGeometricFlow(alist, nosh, pbeparm, apolparm, geoflowparm) != 1) {
                     Vnm_tprint(2, "Error solving GEOFLOW!\n");
@@ -748,13 +756,89 @@ int main(
                     Vnm_print(2, "Error!  APBS not compiled with GEOFLOW!\n");
                 exit(2);
 #endif
-                
+
+ 		        /* Poisson-boltzmann analytical method */
+            case NCT_PBAM:
+#ifdef ENABLE_PBAM
+                /* What is this?  This seems like a very awkward way to find
+                the right ELEC statement... */
+                Vnm_tprint( 1, "Made it to start\n");
+                for (k=0; k<nosh->nelec; k++) {
+                    if (nosh->elec2calc[k] >= i) {
+                        break;
+                    }
+                }
+                if (Vstring_strcasecmp(nosh->elecname[k], "") == 0) {
+                    Vnm_tprint( 1, "CALCULATION #%d: PBAM\n", i+1);
+                } else {
+                    Vnm_tprint( 1, "CALCULATION #%d (%s): PBAM\n",
+                                i+1, nosh->elecname[k]);
+                }
+                /* Useful local variables */
+                pbamparm = nosh->calc[i]->pbamparm;
+                pbeparm = nosh->calc[i]->pbeparm;
+
+                /* Set up problem */
+                Vnm_tprint( 1, "  Setting up problem...\n");
+
+
+                /* Solve LPBE with PBAM method */
+                if (solvePBAM(alist, nosh, pbeparm, pbamparm) != 1) {
+                    Vnm_tprint(2, "Error solving PBAM!\n");
+                    VJMPERR1(0);
+                }
+
+                fflush(stdout);
+                fflush(stderr);
+                break;
+#else /* ifdef ENABLE_PBAM*/
+                    Vnm_print(2, "Error!  APBS not compiled with PBAM!\n");
+                exit(2);
+#endif
+
+            case NCT_PBSAM:
+#ifdef ENABLE_PBSAM
+                Vnm_tprint( 1, "Made it to start\n");
+                for (k=0; k<nosh->nelec; k++) {
+                    if (nosh->elec2calc[k] >= i) {
+                        break;
+                    }
+                }
+                if (Vstring_strcasecmp(nosh->elecname[k], "") == 0) {
+                    Vnm_tprint( 1, "CALCULATION #%d: PBSAM\n", i+1);
+                } else {
+                    Vnm_tprint( 1, "CALCULATION #%d (%s): PBSAM\n",
+                                i+1, nosh->elecname[k]);
+                }
+                /* Useful local variables */
+                pbamparm = nosh->calc[i]->pbamparm;
+                pbsamparm = nosh->calc[i]->pbsamparm;
+                pbeparm = nosh->calc[i]->pbeparm;
+
+                /* Set up problem */
+                Vnm_tprint( 1, "  Setting up problem...\n");
+
+
+                /* Solve LPBE with PBSAM method */
+                if (solvePBSAM(alist, nosh, pbeparm, pbamparm, pbsamparm) != 1) {
+                    Vnm_tprint(2, "Error solving PBSAM!\n");
+                    VJMPERR1(0);
+                }
+
+                fflush(stdout);
+                fflush(stderr);
+                break;
+#else /* ifdef ENABLE_PBSAM*/
+                    Vnm_print(2, "Error!  APBS not compiled with PBSAM!\n");
+                exit(2);
+#endif
+
             default:
                 Vnm_tprint(2, "  Unknown calculation type (%d)!\n", nosh->calc[i]->calctype);
                 exit(2);
                 break;
             }
-              
+
     }
 
     //Clear out the parameter file memory

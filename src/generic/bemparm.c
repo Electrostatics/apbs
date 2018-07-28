@@ -93,6 +93,12 @@ VPUBLIC Vrc_Codes BEMparm_ctor2(BEMparm *thee, BEMparm_CalcType type) {
     thee->mac = 0.8;
     thee->setmac = 0;
 
+    thee->mesh = 0;
+    thee->setmesh = 0;
+
+    thee->outdata = 0;
+    thee->setoutdata = 0;
+
     /* *** TYPE 1 & 2 PARAMETERS *** */
 
     /* *** TYPE 2 PARAMETERS *** */
@@ -139,16 +145,26 @@ VPUBLIC Vrc_Codes BEMparm_check(BEMparm *thee) {
     }
 
     /* Check treecode setting*/
-    if (thee->tree_order<1) {
-        Vnm_print(2,"BEMparm_check: treecode order is less than 1");
+    if (thee->tree_order < 1) {
+        Vnm_print(2, "BEMparm_check: treecode order is less than 1");
         rc = VRC_FAILURE;
     }
-    if (thee->tree_n0<1) {
-        Vnm_print(2,"BEMparm_check: treecode leaf size is less than 1");
+    if (thee->tree_n0 < 1) {
+        Vnm_print(2, "BEMparm_check: treecode leaf size is less than 1");
         rc = VRC_FAILURE;
     }
-    if (thee->mac>1 || thee->mac <=0 ) {
-        Vnm_print(2,"BEMparm_check: MAC criterion fails");
+    if (thee->mac > 1 || thee->mac <= 0) {
+        Vnm_print(2, "BEMparm_check: MAC criterion fails");
+        rc = VRC_FAILURE;
+    }
+
+    if (thee->mesh > 2 || thee->mesh < 0) {
+        Vnm_print(2, "BEMparm_check: mesh must be 0 (msms) or 1 and 2 (NanoShaper)");
+        rc = VRC_FAILURE;
+    }
+
+    if (thee->outdata > 2 || thee->outdata < 0) {
+        Vnm_print(2, "BEMparm_check: outdata must be 0, 1 (vtk), or 2 (not specified)");
         rc = VRC_FAILURE;
     }
 
@@ -176,6 +192,12 @@ VPUBLIC void BEMparm_copy(BEMparm *thee, BEMparm *parm) {
     thee->settree_n0 = parm->settree_n0;
     thee->mac = parm->mac;
     thee->setmac = parm->setmac;
+
+    thee->mesh = parm->mesh;
+    thee->setmesh = parm->setmesh;
+
+    thee->outdata = parm->outdata;
+    thee->setoutdata = parm->setoutdata;
 
     /* *** TYPE 1 & 2 PARMS *** */
 
@@ -254,6 +276,54 @@ keyword!\n", tok);
 }
 
 
+VPRIVATE Vrc_Codes BEMparm_parseMESH(BEMparm *thee, Vio *sock) {
+
+    char tok[VMAX_BUFSIZE];
+    int ti;
+
+    VJMPERR1(Vio_scanf(sock, "%s", tok) == 1);
+    if (sscanf(tok, "%d", &ti) == 0) {
+        Vnm_print(2, "NOsh:  Read non-integer (%s) while parsing MESH \
+                      keyword!\n", tok);
+        return VRC_WARNING;
+    } else if (ti < 0 || ti > 2) {
+        Vnm_print(2, "parseBEM:  mesh must be 0 (msms), 1 (NanoShaper_ses), \
+                      or 2 (NanoShaper_Skin)!\n");
+        return VRC_WARNING;
+    } else thee->mesh = ti;
+    thee->setmesh = 1;
+    return VRC_SUCCESS;
+
+    VERROR1:
+        Vnm_print(2, "parseBEM:  ran out of tokens!\n");
+        return VRC_WARNING;
+}
+
+
+VPRIVATE Vrc_Codes BEMparm_parseOUTDATA(BEMparm *thee, Vio *sock) {
+
+    char tok[VMAX_BUFSIZE];
+    int ti;
+
+    VJMPERR1(Vio_scanf(sock, "%s", tok) == 1);
+    if (sscanf(tok, "%d", &ti) == 0) {
+        Vnm_print(2, "NOsh:  Read non-integer (%s) while parsing OUTDATA \
+                      keyword!\n", tok);
+        return VRC_WARNING;
+    } else if (ti < 0 || ti > 2) {
+        Vnm_print(2, "parseBEM:  outdata must be 0, 1 (vtk), \
+                      or 2 (unspecified)!\n");
+        return VRC_WARNING;
+    } else thee->outdata = ti;
+    thee->setoutdata = 1;
+    return VRC_SUCCESS;
+
+    VERROR1:
+        Vnm_print(2, "parseBEM:  ran out of tokens!\n");
+        return VRC_WARNING;
+}
+
+
 VPUBLIC Vrc_Codes BEMparm_parseToken(BEMparm *thee, char tok[VMAX_BUFSIZE],
   Vio *sock) {
 
@@ -275,6 +345,10 @@ VPUBLIC Vrc_Codes BEMparm_parseToken(BEMparm *thee, char tok[VMAX_BUFSIZE],
         return BEMparm_parseTREE_N0(thee, sock);
     } else if (Vstring_strcasecmp(tok, "mac") == 0) {
         return BEMparm_parseMAC(thee, sock);
+    } else if (Vstring_strcasecmp(tok, "mesh") == 0) {
+        return BEMparm_parseMESH(thee, sock);
+    } else if (Vstring_strcasecmp(tok, "outdata") == 0) {
+        return BEMparm_parseOUTDATA(thee, sock);
     } else {
         Vnm_print(2, "parseBEM:  Unrecognized keyword (%s)!\n", tok);
         return VRC_WARNING;

@@ -2,6 +2,22 @@ The example input files in this directory calculate nonpolar solvation energies 
 
 This example was contributed by Nathan Baker and Jason Wagoner.
 
+
+APBS Version|Alkane|SASA (Å<sup>2</sup>)|SASA energy (kJ/mol)|SAV (Å<sup>3</sup>)|SAV energy (kJ/mol)|WCA energy (kJ/mol)|Total nonpolar solvation energy (kJ/mol)
+---|---|---|---|---|---|---|---
+**1.5**|2-methylbutane|214.202|1.82072|253.665|60.7274|-48.1507|1.439739455792E+01
+||butane|193.855|1.64777|217.863|52.1564|-41.7207|1.208346456826E+01
+||cyclohexane|221.799|1.88529|267.435|64.0239|-52.3691|1.354016672221E+01
+||cyclopentane|193.638|1.64593|217.998|52.1887|-44.471|9.363673200142E+00
+||ethane|139.427|1.18513|140.346|33.5988|-25.3612|9.422717598546E+00
+||hexane|250.291|2.12748|298.053|71.3539|-57.0807|1.640068943201E+01
+||isobutane|192.744|1.63832|218.943|52.415|-40.8218|1.323144287435E+01
+||methane|105.42|0.896066|95.985|22.9788|-15.9805|7.894367190329E+00
+||neopentane|210.755|1.79141|251.127|60.1198|-47.4149|1.449633815052E+01
+||pentane|222.524|1.89145|258.93|61.9878|-49.4003|1.447900211546E+01
+||propane|170.391|1.44832|183.573|43.9474|-33.4721|1.192358496286E+01
+
+
 APBS Version|Alkane|SASA (Å<sup>2</sup>)|SASA energy (kJ/mol)|SAV (Å<sup>3</sup>)|SAV energy (kJ/mol)|WCA energy (kJ/mol)|Total nonpolar solvation energy (kJ/mol)
 ---|---|---|---|---|---|---|---
 **1.4.2**|2-methylbutane|214.202|1.82072|253.665|60.7274|-48.1507|1.439740000000e+01

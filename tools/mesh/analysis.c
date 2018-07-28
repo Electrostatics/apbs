@@ -5,6 +5,12 @@
  *  @version $Id$
  */
 
+/*
+ *  Last update: 08/29/2016 by Leighton Wilson
+ *  Description: Added ability to read in binary DX files as input
+ */
+
+
 #include "apbs.h"
 
 VEMBED(rcsid="$Id$")
@@ -19,7 +25,8 @@ A program to calculate various metrics for a scalar field\n\
   Usage:  analysis <req args> [opts]\n\
 where <req args> are the required arguments:\n\
   --format=<format>  The input file format.  Acceptable values include\n\
-       dx  OpenDX format\n\
+       dx: standard OpenDX format\n\
+       dxbin: binary OpenDX format\n\
   --scalar=<path>  The path to the scalar data file\n\
 and where [opts] are the options:\n\
   --help  Print this message\n\
@@ -49,6 +56,9 @@ int readGrid(Vgrid **grid, char *path, Vdata_Format format) {
     switch (format) {
         case VDF_DX:
             return Vgrid_readDX(*grid, "FILE", "ASC", VNULL, path);
+            break;
+        case VDF_DXBIN:
+            return Vgrid_readDXBIN(*grid, "FILE", "ASC", VNULL, path);
             break;
         case VDF_UHBD:
             Vnm_print(2, "Sorry, UHBD input not supported yet!\n");
@@ -98,6 +108,9 @@ int main(int argc, char **argv) {
             if (strcmp(tstr, "dx") == 0) {
                 format = VDF_DX;
                 gotFormat = 1;
+            } else if (strcmp(tstr, "dxbin") == 0) {
+                format = VDF_DXBIN;
+                gotFormat = 1;
             } else {
                 Vnm_print(2, "Error!  Unknown format (%s)!\n", tstr);
                 usage(2);
@@ -128,7 +141,10 @@ int main(int argc, char **argv) {
     } else {
         switch (format) {
             case VDF_DX:
-                Vnm_print(1, "format:  OpenDX\n");
+                Vnm_print(1, "format:  standard OpenDX\n");
+                break;
+            case VDF_DXBIN:
+                Vnm_print(1, "format:  binary OpenDX\n");
                 break;
             case VDF_UHBD:
                 Vnm_print(1, "format:  UHBD\n");

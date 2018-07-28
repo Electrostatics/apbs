@@ -1,0 +1,13 @@
+--- install.com.orig	2017-05-25 12:52:55.869131654 -0700
++++ install.com	2017-05-25 12:53:20.324903548 -0700
+@@ -867,8 +867,8 @@
+ # setup for APBS
+   if ( $apbs == 1 && $chm_host == gnu ) then
+       setenv APBS Y
+-      if ( ! $?APBS_LIB || ! $?IAPBS_LIB || ! $?APBS_BLAS ) then
+-        echo "APBS_LIB, IAPBS_LIB and APBS_BLAS variables must be set!"
++      if ( ! $?APBS_LIB ) then
++        echo "APBS_LIB variable must be set!"
+ 	exit
+       endif           
+   endif

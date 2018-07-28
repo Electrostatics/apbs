@@ -37,7 +37,7 @@ def test_binary():
 
     # Next, looks for the apbs binary in the apbs bin directory
     try:
-        binary = os.path.abspath( "../bin/apbs" )
+        binary = os.path.abspath( "../build/bin/apbs" )
         subprocess.call( [binary, "--version"] )
         return binary
     except OSError:
@@ -165,7 +165,7 @@ def run_test( binary, test_files, test_name, test_directory, setup, logger, ocd 
             start_time = datetime.datetime.now()
 
             computed_results = None
-            
+
             # Determine if this is a parallel run
             match = re.search( r'\s*pdime((\s+\d+)+)', open( input_file, 'r' ).read() )
             
@@ -269,6 +269,7 @@ def main():
 
     # Read the test cases file
     config = ConfigParser()
+    config.optionxform = str
     config.read( options.test_config )
 
     # Make sure that the apbs binary can be found
@@ -295,13 +296,12 @@ def main():
         # Verify that the test is described in the test cases file
         if test_name not in config.sections():
             print "  " + test_name + " section not found in " + options.test_config
-            print "  skipping..."
-            continue
+            return 1
 
         # Grab the test directory
         test_directory = config.get( test_name, 'input_dir' )
         config.remove_option( test_name, 'input_dir' )
-        
+
         # Check if there is a setup step.
         test_setup = None
         try:
@@ -313,9 +313,11 @@ def main():
         # Run the test!
         run_test( binary, config.items( test_name ), test_name, test_directory, test_setup, logger, options.ocd )
 
+    return 0
+
 
 
 # If this file is executed as a script, call the main function
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
 

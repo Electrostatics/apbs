@@ -1,0 +1,15 @@
+--- build/UNX/Makefile_gnu.orig	2017-05-25 13:41:52.443960116 -0700
++++ build/UNX/Makefile_gnu	2017-05-25 13:43:42.846445704 -0700
+@@ -41,10 +41,8 @@
+ 
+ # options for compilation with APBS
+ ifdef APBS
+-# these must be defined: APBS_LIB, IAPBS_LIB and APBS_BLAS
+-ADDLIB := $(ADDLIB) -L$(IAPBS_LIB) -liapbs \
+-        -L$(APBS_LIB) -lapbsmainroutines -lapbs -lmaloc $(APBS_BLAS) -lz
+-
++# this must be defined: APBS_LIB
++ADDLIB := $(ADDLIB) $(APBS_LIB)
+ endif
+ 
+ RANLIB = ranlib

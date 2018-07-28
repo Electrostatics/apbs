@@ -1,6 +1,8 @@
 #!/bin/sh
 
-CHARMM=../../../../c35b2/exec/gnu/charmm
+if [ -z "$CHARMM_EXE" ] ; then
+    CHARMM_EXE=../../../../../../../../charmm/exec/gnu/charmm
+fi
 
 tests="apbs_elstat_auto apbs_elstat apbs_maps apbs_maps_read \
 apbs_md_auto apbs_md apbs_vis"
@@ -9,6 +11,6 @@ apbs_md_auto apbs_md apbs_vis"
 for i in $tests
 do
     echo ${i}.inp ...
-    $CHARMM < ${i}.inp > ${i}.out
+    $CHARMM_EXE < ${i}.inp > ${i}.out
 done
 
