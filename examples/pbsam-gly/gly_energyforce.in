@@ -5,7 +5,7 @@ read
     mol pqr gly_cg2.pqr
 end
 elec name comp_solv        # Gly
-    pbsam-auto
+    pbsam
 
     runtype energyforce     # Can be energyforce, electrostatics etc
     runname enfo_gly        # Output name for files created by program
