@@ -545,7 +545,11 @@ VPRIVATE Vrc_Codes PBAMparm_parseTerm(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
     }else {
-       strncpy(thee->termnam[thee->termct], tok, CHR_MAXLEN);
+       if(strncmp(tok, "position", 8)==0){
+    	   return PBAMparm_parseTerm(thee, sock);
+       }else{
+    	   strncpy(thee->termnam[thee->termct], tok, CHR_MAXLEN);
+       }
     }
 
     if (strncmp(thee->termnam[thee->termct], "contact", 7) == 0)
@@ -583,7 +587,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseTerm(PBAMparm *thee, Vio *sock){
           thee->termVal[thee->termct] = tf;
           thee->termnu[thee->termct][0] = 0;
       }
-    } else
+    } else //if (strncmp(thee->termnam[thee->termct], "position", 8) == 0)
     {
       if(Vio_scanf(sock, "%s", tok) == 0) {
           Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
