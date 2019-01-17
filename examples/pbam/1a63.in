@@ -2,7 +2,7 @@ read
     mol pqr 1a63.pqr
 end
 elec name comp_solv        # Toy charges
-    pbam-auto
+    pbam
 
     runtype electrostatics  # Can be energyforce, electrostatics etc
     runname elec_1a63       # Output name for files created by program

@@ -3,7 +3,7 @@ read
     mol pqr neg_charge.pqr
 end
 elec name comp_solv        # Toy charges
-    pbam-auto
+    pbam
     
     runtype energyforce     # Can be energyforce, electrostatics etc
     runname enfor_test      # Output name for files created by program

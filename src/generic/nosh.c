@@ -1291,13 +1291,13 @@ ELEC section!\n");
             (thee->nelec)++;
             calc->geoflowparm->type = GFCT_AUTO;
             return NOsh_parseGEOFLOW(thee, sock, calc);
-        } else if (Vstring_strcasecmp(tok, "pbam-auto") == 0) {
+        } else if (Vstring_strcasecmp(tok, "pbam") == 0) {
             thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_PBAM);
             calc = thee->elec[thee->nelec];
             (thee->nelec)++;
             calc->pbamparm->type = PBAMCT_AUTO;
             return NOsh_parsePBAM(thee, sock, calc);
-        } else if (Vstring_strcasecmp(tok, "pbsam-auto") == 0) {
+        } else if (Vstring_strcasecmp(tok, "pbsam") == 0) {
             thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_PBSAM);
             calc = thee->elec[thee->nelec];
             (thee->nelec)++;
