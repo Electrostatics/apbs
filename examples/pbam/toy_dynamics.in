@@ -16,7 +16,7 @@ elec name comp_solv        # Toy charges
 
     termcombine or
     term time 550.0
-    term r>= 81.8 1
+    term position r>= 81.8 1
     ntraj 3
 
     diff 1 move 0.01 0.001
