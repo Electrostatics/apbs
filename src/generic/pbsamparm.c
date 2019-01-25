@@ -164,7 +164,7 @@ VPUBLIC void PBSAMparm_copy(PBSAMparm *thee, PBSAMparm *parm) {
 
 //Parsing vertex file
 VPRIVATE Vrc_Codes PBSAMparm_parseSurf(PBSAMparm *thee, Vio *sock){
-    const char* name = "surf";
+    const char* name = "usemesh";
     char tok[VMAX_BUFSIZE];
 
     if(Vio_scanf(sock, "%s", tok) == 0) {
@@ -248,7 +248,7 @@ VPUBLIC Vrc_Codes PBSAMparm_parseToken(PBSAMparm *thee, char tok[VMAX_BUFSIZE],
     Vnm_print(0, "PBSAMparm_parseToken:  trying %s...\n", tok);
 
     // Molecule terms
-    if (Vstring_strcasecmp(tok, "surf") == 0) {
+    if (Vstring_strcasecmp(tok, "usemesh") == 0) {
         return PBSAMparm_parseSurf(thee, sock);
     }else if (Vstring_strcasecmp(tok, "msms") == 0) {
         return PBSAMparm_parseMSMS(thee, sock);

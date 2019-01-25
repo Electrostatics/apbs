@@ -14,8 +14,8 @@ elec name comp_solv        # Gly
     tolsp 4.5
     msms  #comment if the system has been coarse-grained
 
-   #surf barstar.vert # uncomment if system needs to be CGed
-   #surf barnase.vert # uncomment if system needs to be CGed
+   #usemesh barstar.vert # uncomment if system needs to be CGed
+   #usemesh barnase.vert # uncomment if system needs to be CGed
 
    #imat  imat/mol0sph  # For barstar, when imat is gen
    #imat  imat/mol1sph  # For barnase, when imat is gen
