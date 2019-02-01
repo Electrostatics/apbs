@@ -275,6 +275,9 @@ VPRIVATE Vrc_Codes PBAMparm_parseRunType(PBAMparm *thee, Vio *sock){
     if(Vio_scanf(sock, "%s", tok) == 0) {
       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
       return VRC_WARNING;
+    } else if(Vstring_strcasecmp(tok, "dynamics") == 0){
+      Vnm_print(2, "parsePBAM:  Dynamics has been moved out of the ELEC section!\n");
+      return VRC_WARNING;
     } else {
       strncpy(thee->runtype, tok, CHR_MAXLEN);
       thee->setruntype=1;
