@@ -12,10 +12,10 @@ elec name comp_solv        # Gly
     msms
     tolsp 2.5
 
-    temp 298.15             # System temperature (K)
-    pdie 4.0                # Solute dielectric                 
-    sdie 78.0               # Solvent dielectric                
-    salt 0.10               # Monovalent salt conc in M
+    temp 298.15                                       # System temperature (K)
+    pdie 4.0                                          # Solute dielectric                 
+    sdie 78.0                                         # Solvent dielectric                
+    ion charge 0.0 conc 0.10 radius 0.0               # Monovalent salt conc in M
 
     gridpts 20
     dx gly_0.1M.dx

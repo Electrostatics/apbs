@@ -58,12 +58,10 @@ add_sublibrary(routines)
 message(STATUS ${EXTERNAL_HEADERS})
 
 add_executable(apbs main.c apbs.h routines.c routines.h)
-message(***************************)
 message(STATUS " ")
 message(STATUS "APBS Libraries: ${APBS_LIBS}")
 message(STATUS "Internal Libraries: ${APBS_INTERNAL_LIBS}")
 message(STATUS " ")
-message(***************************)
 
 #add_dependencies(apbs ${BEM_LIB})
 target_link_libraries(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})

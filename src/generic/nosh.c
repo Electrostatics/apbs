@@ -3101,7 +3101,7 @@ VPUBLIC int NOsh_parsePBAM(
         }
 
         if (Vstring_strcasecmp(tok, "ion") == 0) {
-            Vnm_print(2, "parsePBAM: WARNING! ion not implemented for PBAM!\n");
+            Vnm_print(2, "parsePBAM: WARNING! PBAM only uses the conc parameter of ion!\n");
         }
 
         /* Pass the token through a series of parsers */
@@ -3130,6 +3130,12 @@ VPUBLIC int NOsh_parsePBAM(
     pbeparm->setbcfl=1;  // unneeded bcfl
     pbeparm->setsdens=1;
 
+    //This is a hacky fix at best for issue 501. This is so we don't need to change PBAM's
+    //external code.
+    if(pbeparm->setnion){
+    	parm->salt = pbeparm->ionc[pbeparm->nion-1];
+    	parm->setsalt = 1;
+    }
 
     /* Handle various errors arising in the token-snarfing loop -- these all
         just result in simple returns right now */
@@ -3202,7 +3208,7 @@ VPUBLIC int NOsh_parsePBSAM(
         }
 
         if (Vstring_strcasecmp(tok, "ion") == 0) {
-            Vnm_print(2, "parsePBSAM: WARNING! ion not implemented for PBSAM!\n");
+            Vnm_print(2, "parsePBSAM: WARNING! PBAM only uses the conc parameter of ion!\n");
         }
 
         /* Pass the token through a series of parsers */
@@ -3236,6 +3242,13 @@ VPUBLIC int NOsh_parsePBSAM(
     pbeparm->setpbetype=1; // unneeded pbe type
     pbeparm->setbcfl=1;  // unneeded bcfl
     pbeparm->setsdens=1;
+
+    //This is a hacky fix at best for issue 501. This is so we don't need to change PBAM's
+    //external code.
+	if(pbeparm->setnion){
+		parm->salt = pbeparm->ionc[pbeparm->nion-1];
+		parm->setsalt = 1;
+	}
 
     /* Handle various errors arising in the token-snarfing loop -- these all
         just result in simple returns right now */

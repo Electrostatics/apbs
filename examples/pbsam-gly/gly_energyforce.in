@@ -21,10 +21,10 @@ elec name comp_solv        # Gly
    #exp exp/mol0
    #exp exp/mol1
 
-    temp 298.15             # System temperature (K)
-    pdie 4.0                # Solute dielectric                 
-    sdie 80.0               # Solvent dielectric                
-    salt 0.05               # Monovalent salt conc in M
+    temp 298.15                                       # System temperature (K)
+    pdie 4.0                                          # Solute dielectric                 
+    sdie 80.0                                         # Solvent dielectric                
+    ion charge 0.0 conc 0.05 radius 0.0               # Monovalent salt conc in M
 
 end
 
