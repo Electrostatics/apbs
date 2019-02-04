@@ -9,7 +9,7 @@ elec name comp_solv        # Gly
 
     units jmol
     ## info for molecule
-    msms
+    mesh 0
     tolsp 2.5
 
     temp 298.15                                       # System temperature (K)
