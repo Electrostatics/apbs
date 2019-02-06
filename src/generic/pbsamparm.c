@@ -189,22 +189,14 @@ VPRIVATE Vrc_Codes PBSAMparm_parseMSMS(PBSAMparm *thee, Vio *sock){
 		return VRC_WARNING;
 	}
 
-	if(sscanf(tok, "%d", &td) == 0){
-		Vnm_print(2, "NOsh:  Read non-integer (%s) while parsing %s keyword!\n", tok, name);
-		return VRC_WARNING;
+	if(strcmp(tok, "msms") == 0){
+	  thee->setmsms = 1;
 	}
 	else{
-		switch(td){
-		case 0:
-			thee->setmsms = 1;
-			break;
-		default:
-			Vnm_print(2, "parsePBSAM: PBSAM currently only supports msms(0) for the mesh option");
-			return VRC_WARNING;
-		}
+	  Vnm_print(2, "parsePBSAM: %s is not currently supported in PBSAM! Change to msms\n", tok);
+	  return VRC_WARNING;
 	}
-
-	//thee->setmsms = 1;
+	
     return VRC_SUCCESS;
 }
 //Parsing imat prefix file

@@ -21,7 +21,7 @@ elec name comp_solv        # Solvated complex
     tree_n0 500            # maxium particle per leaf
     mac 0.8                # multipole acceptance criterion
 
-    mesh 0                 # mesh (0 - MSMS, 1 - NanoShaper SES, 2 - NanoShaper Skin)
+    mesh msms              # mesh options: msms, ses, skin. Options ses and skin require nonoshaper.
 
     outdata 1              # outdata (0 - dat file, 1 - dat and VTK file) 
 end

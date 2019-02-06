@@ -12,7 +12,7 @@ elec name comp_solv        # Gly
     units kT
     ## info for molecule
     tolsp 4.5
-    mesh 0  #comment if the system has been coarse-grained
+    mesh msms  #comment if the system has been coarse-grained
 
    #usemesh barstar.vert # uncomment if system needs to be CGed
    #usemesh barnase.vert # uncomment if system needs to be CGed

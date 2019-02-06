@@ -12,7 +12,7 @@ elec name comp_solv        # Gly
 
     units kT
     ## info for molecule
-   #mesh 0
+    #mesh msms
     tolsp 2.5
 
    #imat imat/mol0sph
