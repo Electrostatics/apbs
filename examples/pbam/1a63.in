@@ -11,7 +11,7 @@ elec name comp_solv        # Toy charges
     sdie 80.0                                        # Solvent dielectric                
     ion charge 0.0 conc 0.10 radius 0.0              # Monovalent salt conc in M
 
-    gridpts 110
+    dime 110
 
     dx 1a63_0.1M.dx
     3dmap  1a63_0.1M.map

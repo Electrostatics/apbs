@@ -349,7 +349,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseUnits(PBAMparm *thee, Vio *sock){
 }
 
 VPRIVATE Vrc_Codes PBAMparm_parseGridPts(PBAMparm *thee, Vio *sock){
-    const char* name = "gridpts";
+    const char* name = "dime";
     char tok[VMAX_BUFSIZE];
     int td;
     if(Vio_scanf(sock, "%s", tok) == 0) {
@@ -361,7 +361,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseGridPts(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "NOsh:  Read non-integer (%s) while parsing %s keyword!\n", tok, name);
         return VRC_WARNING;
     }else{
-        printf("Found a pts flag in parse: %d\n", td);
+        printf("Found a dime flag in parse: %d\n", td);
         thee->gridpt = td;
     }
     thee->setgridpt = 1;
@@ -680,7 +680,7 @@ VPUBLIC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
     }
 
     // Electrostatic parsing
-    else if (Vstring_strcasecmp(tok, "gridpts") == 0) {
+    else if (Vstring_strcasecmp(tok, "dime") == 0) {
         return PBAMparm_parseGridPts(thee, sock);
     }else if (Vstring_strcasecmp(tok, "3dmap") == 0) {
         return PBAMparm_parse3Dmap(thee, sock);
