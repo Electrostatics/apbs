@@ -1275,17 +1275,12 @@ ELEC section!\n");
             calc->bemparm->type = BCT_MANUAL;
             return NOsh_parseBEM(thee, sock, calc);
         } else if (Vstring_strcasecmp(tok, "geoflow-manual") == 0) {
-//            thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_GEOFLOW);
-//            calc = thee->elec[thee->nelec];
-//            (thee->nelec)++;
-//            calc->geoflowparm->type = GFCT_MANUAL;
-//        	return NOsh_parseGEOFLOW(thee, sock, calc);
-        	Vnm_print(2, "Geoflow currently does not support geoflow-manual please use geoflow-auto instead!\n");
+        	Vnm_print(2, "Geoflow currently does not support geoflow-manual please use geoflow instead!\n");
         	return 0;
         } else if(Vstring_strcasecmp(tok, "geoflow-none") == 0) {
-        	Vnm_print(2, "Geoflow currently does not support geoflow-none please use geoflow-auto instead!\n");
+        	Vnm_print(2, "Geoflow currently does not support geoflow-none please use geoflow instead!\n");
         	return 0;
-        } else if (Vstring_strcasecmp(tok, "geoflow-auto") == 0) {
+        } else if (Vstring_strcasecmp(tok, "geoflow") == 0) {
             thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_GEOFLOW);
             calc = thee->elec[thee->nelec];
             (thee->nelec)++;

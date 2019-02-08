@@ -2,7 +2,7 @@ read
     mol pqr imidazole_zap.pqr
 end
 elec name comp_solv        # Solvated complex
-    geoflow-auto
+    geoflow
 
     lpbe
     bcfl mdh                # only supported boundary condition
