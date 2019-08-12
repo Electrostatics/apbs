@@ -227,15 +227,40 @@ if(ENABLE_BEM)
     set(GET_MSMS ON) #CACHE BOOL "Grabbing msms path"
     set(GET_NanoShaper ON) #CACHE BOOL "Grabbing NanoShaper path"
 
-    ExternalProject_add(
+	if(WIN32)
+		ExternalProject_add(
+		${TABI}
+        SOURCE_DIR ${TABI_PATH}
+        CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+		BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target TABIPBlib
+    	INSTALL_COMMAND ""
+		)
+	else()
+		ExternalProject_add(
         ${TABI}
         SOURCE_DIR ${TABI_PATH}
         CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
-		#if building in Windows
-		#BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target TABIPBlib
+		BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
     	INSTALL_COMMAND ""
     )
+	endif()
+
+#    ExternalProject_add(
+#        ${TABI}
+#        SOURCE_DIR ${TABI_PATH}
+#        CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+#        if(WIN32)
+#			message(STATUS "Gets in win32...")
+#			BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target TABIPBlib
+#		else()
+#			message(STATUS "didn't get in win32...")
+#			BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
+#		endif()
+#		#if building in Windows
+#		#BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target TABIPBlib
+#   	INSTALL_COMMAND ""
+#		
+#    )
 
     ExternalProject_Get_Property(${TABI} binary_dir)
     list(APPEND APBS_LIB_DIRS "${binary_dir}")
@@ -372,15 +397,35 @@ option(ENABLE_GEOFLOW "geoflow method" OFF)
 if(ENABLE_GEOFLOW)
   message(STATUS "Building GEOFLOW")
   add_definitions(-DGEOFLOW_APBS)
-  ExternalProject_Add(
+
+  if(WIN32)
+	ExternalProject_Add(
+    geoflow
+    SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
+    CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target GeometricFlowLib
+    INSTALL_COMMAND ""
+  )
+  else()
+	ExternalProject_Add(
     geoflow
     SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
     CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} 
     BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
-    #if building in Windows
-    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target GeometricFlowLib
     INSTALL_COMMAND ""
   )
+  endif()
+
+#  ExternalProject_Add(
+#    geoflow
+#    SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
+#    CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} 
+#    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
+#    #if building in Windows
+#    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target GeometricFlowLib
+#    INSTALL_COMMAND ""
+#  )
+
   ExternalProject_Get_Property(geoflow binary_dir)
   add_definitions(-DENABLE_GEOFLOW)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
@@ -400,15 +445,35 @@ option(ENABLE_PBAM "pbam method" OFF)
 if(ENABLE_PBAM)
   message(STATUS "Building PBAM")
   add_definitions(-DPBAM_APBS)
-  ExternalProject_Add(
+
+  if(WIN32)
+	ExternalProject_Add(
+    pbam
+    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+    CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBAMLib
+    INSTALL_COMMAND ""
+  )
+  else()
+	ExternalProject_Add(
     pbam
     SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
     CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
     BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
-    #if building on Windows
-    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBAMLib
     INSTALL_COMMAND ""
   )
+  endif()
+
+#  ExternalProject_Add(
+#    pbam
+#    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+#    CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+#    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
+#    #if building on Windows
+#    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBAMLib
+#    INSTALL_COMMAND ""
+#  )
+
   ExternalProject_Get_Property(pbam binary_dir)
   add_definitions(-DENABLE_PBAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
@@ -417,7 +482,7 @@ if(ENABLE_PBAM)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
 endif()
-
+	
 
 
 ################################################################################
@@ -436,15 +501,34 @@ if(ENABLE_PBSAM)
   include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
   include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
 
-  ExternalProject_Add(
+  if(WIN32)
+	ExternalProject_Add(
+    pbsam
+    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+    CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBSAMLib
+    INSTALL_COMMAND ""
+    )
+  else()
+	ExternalProject_Add(
     pbsam
     SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
     CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
     BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
-    #if building on windows
-    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBSAMLib
     INSTALL_COMMAND ""
     )
+  endif()
+
+#  ExternalProject_Add(
+#    pbsam
+#    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+#    CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+#    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
+#    #if building on windows
+#    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBSAMLib
+#    INSTALL_COMMAND ""
+#    )
+
   ExternalProject_Get_Property(pbsam binary_dir)
   add_definitions(-DENABLE_PBSAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/pbsam/src")
