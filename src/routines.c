@@ -5215,7 +5215,6 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
                                 PBEparm *pbeparm,
                                 PBAMparm *parm )
 {
-  printf("solvePBAM!!!\n");
   if (nosh != VNULL) {
     if (nosh->bogus) return 1;
   }

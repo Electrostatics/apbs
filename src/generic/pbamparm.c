@@ -419,7 +419,10 @@ VPRIVATE Vrc_Codes PBAMparm_parseGrid2D(PBAMparm *thee, Vio *sock){
 }
 
 VPRIVATE Vrc_Codes PBAMparm_parseDX(PBAMparm *thee, Vio *sock){
-    const char* name = "dx";
+	Vnm_print(2, "PBAM's dx keyword is deprecated. Please use the write keyword!\n");
+	return VRC_FAILURE;
+	/*
+	const char* name = "dx";
     char tok[VMAX_BUFSIZE];
 
     if(Vio_scanf(sock, "%s", tok) == 0) {
@@ -430,6 +433,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseDX(PBAMparm *thee, Vio *sock){
       thee->setdxname=1;
     }
     return VRC_SUCCESS;
+	*/
 }
 
 VPRIVATE Vrc_Codes PBAMparm_parseTermcombine(PBAMparm *thee, Vio *sock){
