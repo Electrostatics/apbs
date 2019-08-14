@@ -3257,6 +3257,17 @@ VPUBLIC int NOsh_parsePBSAM(
 		parm->setsalt = 1;
 	}
 
+	//This is also a hacky fix for issue 488
+	if (pbeparm->writefmt[pbeparm->numwrite - 1] == VDF_DX) {
+		strncpy(parm->dxname, pbeparm->writestem[pbeparm->numwrite - 1], CHR_MAXLEN);
+		parm->setdxname = 1;
+	}
+	else {
+		Vnm_print(2, "NOsh: PBSAM only prints in dx format!\n");
+		return 0;
+	}
+
+
     /* Handle various errors arising in the token-snarfing loop -- these all
         just result in simple returns right now */
     if (rc == -1) return 0;
