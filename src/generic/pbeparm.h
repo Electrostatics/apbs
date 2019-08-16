@@ -198,6 +198,10 @@ struct sPBEparm {
                         * \li 1 => Poisson-Boltzmann operator linearized around
                         * solution (if applicable) */
 
+	/*Added for issue 482*/
+	char pbam_3dmapstem[VMAX_ARGLEN];
+	int pbam_3dmapflag;
+
     int parsed;  /**< Has this been filled with anything other
                   * than the default values? */
 };

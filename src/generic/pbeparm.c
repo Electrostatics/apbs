@@ -1117,11 +1117,17 @@ VPRIVATE int PBEparm_parseWRITE(PBEparm *thee, Vio *sock) {
         writetype = VDT_NDENS;
     } else if (Vstring_strcasecmp(tok, "qdens") == 0) {
         writetype = VDT_QDENS;
-    } else {
+    } else if (Vstring_strcasecmp(tok, "3dmap") == 0) {
+		VJMPERR1(Vio_scanf(sock, "%s", tok) == 1);
+		strcpy(thee->pbam_3dmapstem, tok);
+		thee->pbam_3dmapflag = 1;
+		return 1;
+	} else {
         Vnm_print(2, "PBEparm_parse:  Invalid data type (%s) to write!\n",
            tok);
         return -1;
     }
+
     VJMPERR1(Vio_scanf(sock, "%s", tok) == 1);
     if (Vstring_strcasecmp(tok, "dx") == 0) {
         writefmt = VDF_DX;

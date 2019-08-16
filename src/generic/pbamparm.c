@@ -372,6 +372,10 @@ VPRIVATE Vrc_Codes PBAMparm_parse3Dmap(PBAMparm *thee, Vio *sock){
     const char* name = "3dmap";
     char tok[VMAX_BUFSIZE];
 
+	Vnm_print(2, "PBAM: 3dmap keyword has been deprecated! Please use in conjuction with the write keyword.");
+	return VRC_FAILURE;
+
+	/*
     if(Vio_scanf(sock, "%s", tok) == 0) {
       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
       return VRC_WARNING;
@@ -379,8 +383,9 @@ VPRIVATE Vrc_Codes PBAMparm_parse3Dmap(PBAMparm *thee, Vio *sock){
       strncpy(thee->map3dname, tok, CHR_MAXLEN);
       thee->set3dmap=1;
     }
-
+	
     return VRC_SUCCESS;
+	*/
 }
 
 VPRIVATE Vrc_Codes PBAMparm_parseGrid2D(PBAMparm *thee, Vio *sock){

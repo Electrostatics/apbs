@@ -3144,6 +3144,12 @@ VPUBLIC int NOsh_parsePBAM(
 		return 0;
 	}
 
+	//Another hacky fix for issue 482
+	if (pbeparm->pbam_3dmapflag == 1) {
+		strcpy(parm->map3dname, pbeparm->pbam_3dmapstem);
+		parm->set3dmap = 1;
+	}
+
     /* Handle various errors arising in the token-snarfing loop -- these all
         just result in simple returns right now */
     if (rc == -1) return 0;
