@@ -228,46 +228,36 @@ if(ENABLE_BEM)
     set(GET_MSMS ON) #CACHE BOOL "Grabbing msms path"
     set(GET_NanoShaper ON) #CACHE BOOL "Grabbing NanoShaper path"
 
-	if(WIN32)
-		ExternalProject_add(
+    if(WIN32)
+	ExternalProject_add(
 		${TABI}
-        SOURCE_DIR ${TABI_PATH}
-        CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+        	SOURCE_DIR ${TABI_PATH}
+        	CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
 		BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target TABIPBlib
-    	INSTALL_COMMAND ""
-		)
-	else()
-		ExternalProject_add(
-        ${TABI}
-        SOURCE_DIR ${TABI_PATH}
-        CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+    		INSTALL_COMMAND ""
+	)
+    else()
+	ExternalProject_add(
+		${TABI}
+        	SOURCE_DIR ${TABI_PATH}
+        	CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
 		BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
-    	INSTALL_COMMAND ""
-    )
-	endif()
-
-#    ExternalProject_add(
-#        ${TABI}
-#        SOURCE_DIR ${TABI_PATH}
-#        CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-#        if(WIN32)
-#			message(STATUS "Gets in win32...")
-#			BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target TABIPBlib
-#		else()
-#			message(STATUS "didn't get in win32...")
-#			BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
-#		endif()
-#		#if building in Windows
-#		#BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target TABIPBlib
-#   	INSTALL_COMMAND ""
-#		
-#    )
+    		INSTALL_COMMAND ""
+    	)
+    endif()
 
     ExternalProject_Get_Property(${TABI} binary_dir)
     list(APPEND APBS_LIB_DIRS "${binary_dir}")
     list(APPEND APBS_LIBS TABIPBlib)
     include_directories(${EXTERNALS_PATH}/${TABI})
     include_directories(${EXTERNALS_PATH}/${TABI}/src)
+
+    if(BUILD_SHARED_LIBS)
+	install(
+	  FILES ${binary_dir}/libTABIPBlib.so
+	  DESTINATION ${LIBRARY_INSTALL_PATH}
+        )
+    endif()
 
 endif() # ENABLE_BEM
 
@@ -381,6 +371,13 @@ if(ENABLE_FETK)
       list(APPEND APBS_LIBS maloc amd punc mc gamer superlu umfpack
   blas vf2c tetgen triangle readline termcap)
 
+  if(BUILD_SHARED_LIBS)
+    install(
+      DIRECTORY ${install_dir}/lib/
+      DESTINATION ${LIBRARY_INSTALL_PATH}
+    )
+  endif()
+
       SET(HAVE_MC_H 1)
     SET(HAVE_PUNC_H 1)
     SET(HAVE_BIOM_H 1)
@@ -417,21 +414,19 @@ if(ENABLE_GEOFLOW)
   )
   endif()
 
-#  ExternalProject_Add(
-#    geoflow
-#    SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-#    CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} 
-#    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
-#    #if building in Windows
-#    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target GeometricFlowLib
-#    INSTALL_COMMAND ""
-#  )
-
   ExternalProject_Get_Property(geoflow binary_dir)
   add_definitions(-DENABLE_GEOFLOW)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
   list(APPEND APBS_LIBS GeometricFlowLib)
   include_directories(${EXTERNALS_PATH}/geoflow_c/src)
+
+  if(BUILD_SHARED_LIBS)
+    install(
+      FILES ${binary_dir}/lib/libGeometricFlowLib.so
+      DESTINATION ${LIBRARY_INSTALL_PATH}
+    )
+  endif()
+
 endif()
 
 
@@ -464,17 +459,7 @@ if(ENABLE_PBAM)
     INSTALL_COMMAND ""
   )
   endif()
-
-#  ExternalProject_Add(
-#    pbam
-#    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-#    CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-#    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
-#    #if building on Windows
-#    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBAMLib
-#    INSTALL_COMMAND ""
-#  )
-
+  
   ExternalProject_Get_Property(pbam binary_dir)
   add_definitions(-DENABLE_PBAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
@@ -482,6 +467,14 @@ if(ENABLE_PBAM)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
+
+  if(BUILD_SHARED_LIBS)
+    install(
+      FILES ${binary_dir}/pbam/src/libPBAMLib.so
+      DESTINATION ${LIBRARY_INSTALL_PATH}
+    )
+  endif()
+
 endif()
 	
 
@@ -520,16 +513,6 @@ if(ENABLE_PBSAM)
     )
   endif()
 
-#  ExternalProject_Add(
-#    pbsam
-#    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-#    CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-#    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
-#    #if building on windows
-#    #BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config Release --target PBSAMLib
-#    INSTALL_COMMAND ""
-#    )
-
   ExternalProject_Get_Property(pbsam binary_dir)
   add_definitions(-DENABLE_PBSAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/pbsam/src")
@@ -544,6 +527,15 @@ if(ENABLE_PBSAM)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pbsam/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
   include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
+
+  if(BUILD_SHARED_LIBS)
+    install(
+      FILES ${binary_dir}/pbsam/src/libPBSAMLib.so
+      DESTINATION ${LIBRARY_INSTALL_PATH}
+    )
+  endif()
+
+
 endif()
 
 
@@ -573,6 +565,19 @@ if(GET_MSMS)
                 file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_win32_2.6.1/msms.exe
                           DESTINATION ${EXECUTABLE_OUTPUT_PATH})
         endif()
+
+	if(WIN32)
+	  install(
+	    PROGRAMS ${EXECUTABLE_OUTPUT_PATH/msms.exe
+	    DESTINATION ${EXECUTABLE_INSTALL_PATH}
+	  )
+	else()
+	  install(
+	    PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/msms
+	    DESTINATION ${EXECUTABLE_INSTALL_PATH}
+	  )
+	endif()
+	
 endif()
 
 
@@ -594,6 +599,19 @@ if(GET_NanoShaper)
                 file(RENAME ${EXECUTABLE_OUTPUT_PATH}/NanoShaper32.exe
                             ${EXECUTABLE_OUTPUT_PATH}/NanoShaper.exe)
         endif()
+
+	if(WIN32)
+	  install(
+	    PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/Nanoshaper.exe
+	    DESTINATION ${EXECUTABLE_INSTALL_PATH}
+	  )
+	else()
+	  install(
+	    PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/NanoShaper
+	    DESTINATION ${EXECUTABLE_INSTALL_PATH}
+	  )
+	endif()
+	
 endif()
 
 

@@ -1122,7 +1122,7 @@ VPRIVATE int PBEparm_parseWRITE(PBEparm *thee, Vio *sock) {
 		strcpy(thee->pbam_3dmapstem, tok);
 		thee->pbam_3dmapflag = 1;
 		return 1;
-	} else {
+    } else {
         Vnm_print(2, "PBEparm_parse:  Invalid data type (%s) to write!\n",
            tok);
         return -1;
