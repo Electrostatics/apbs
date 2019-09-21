@@ -13,8 +13,8 @@ elec name comp_solv        # Toy charges
 
     dime 110
 
-    dx 1a63_0.1M.dx
-    3dmap  1a63_0.1M.map
+    write pot dx 1a63_0.1M.dx
+    write 3dmap  1a63_0.1M.map
     grid2d 1a63_0.1M.x0.dat x 0.0
 
 end
