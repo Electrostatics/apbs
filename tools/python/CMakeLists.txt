@@ -4,22 +4,19 @@ CMAKE_POLICY(SET CMP0086 OLD)
 FIND_PACKAGE(SWIG REQUIRED)
 INCLUDE(${SWIG_USE_FILE})
 
-FIND_PACKAGE(PythonLibs)
-set(PYTHON_INCLUDE_DIRS C:\\Python35\\include)
-set(PYTHON_LIBRARIES C:\\Python35\\libs\\python35.lib)
+FIND_PACKAGE(Python COMPONENTS Interpreter Development)
 
-INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
-message(STATUS "Python include path is: ${PYTHON_INCLUDE_DIRS}")
+INCLUDE_DIRECTORIES(${Python_INCLUDE_DIRS})
+message(STATUS "Python include path is: ${Python_INCLUDE_DIRS}")
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(CMAKE_SWIG_FLAGS "")
 
-# SWIG_ADD_MODULE(apbslib python apbslib.i)
 SWIG_ADD_LIBRARY(apbslib
-				TYPE USE_BUILD_SHARED_LIBS
-				LANGUAGE python
-				SOURCES apbslib.i)
+		TYPE USE_BUILD_SHARED_LIBS
+		LANGUAGE python
+		SOURCES apbslib.i)
 
 # Hack to get the correct shared library extensions.  Why does Python suck so hard wrt to this?
 if(APPLE)
