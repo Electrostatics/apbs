@@ -24,10 +24,13 @@ if(Doxygen_FOUND)
 	add_custom_target(
 	    doc
 	    ALL
-	    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/programmer/Doxyfile
+	    #COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/programmer/Doxyfile
+	    COMMAND doxygen ${CMAKE_CURRENT_BINARY_DIR}/programmer/Doxyfile
 	    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/programmer
 	    COMMENT "Generating documentation with Doxygen" VERBATIM
-	)
+	  )
+
+	#file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/programmer/latex)
 	
 	add_custom_target(
 	    doc-pdf
@@ -35,6 +38,7 @@ if(Doxygen_FOUND)
 	    COMMAND make
 	    COMMAND cp refman.pdf ../programmer.pdf
 	    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/programmer/latex
+	    DEPENDS doc
 	    COMMENT "Generating pdf documentation" VERBATIM
 	)
 endif(Doxygen_FOUND)
