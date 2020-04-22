@@ -15,8 +15,8 @@ else()
 	find_package(PythonLibs REQUIRED)
 endif()
 
-INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
-message(STATUS "Python include path is: ${PYTHON_INCLUDE_DIRS}")
+INCLUDE_DIRECTORIES(${Python_INCLUDE_DIRS})
+message(STATUS "Python include path is: ${Python_INCLUDE_DIRS}")
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -35,7 +35,7 @@ endif(APPLE)
 # Another hack to get SWIG to use the the correct library extension!
 SET_TARGET_PROPERTIES(${SWIG_MODULE_apbslib_REAL_NAME} PROPERTIES SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
 
-SWIG_LINK_LIBRARIES(apbslib ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${PYTHON_LIBRARIES})
+SWIG_LINK_LIBRARIES(apbslib ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${Python_LIBRARIES})
 
 if(WIN32)
 	add_custom_command(TARGET _apbslib POST_BUILD
