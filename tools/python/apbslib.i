@@ -5,28 +5,28 @@
         swig -python -module apbslib -o apbslib.c apbslib.i
 */
 
-/* 
+/*
 Header files:
 -----------------------
-*/ 
+*/
 
 %module apbslib
 
 %{
 #define APBS_SWIG 1
 #include "maloc/maloc.h"
-#include "apbscfg.h" 
+#include "apbscfg.h"
 #include "routines.h"
 #include "generic/valist.h"
 #include "generic/vatom.h"
-%} 
+%}
 
-/* 
+/*
 Structures and functions to be wrapped:
 --------------------------------------
 */
 
-#define VEXTERNC extern  
+#define VEXTERNC extern
 
 // Functions and Constructors from valist.h:
 
@@ -51,19 +51,19 @@ extern double Vatom_getCharge(Vatom *thee);
 extern double Vatom_getRadius(Vatom *thee);
 
 // Functions and Constructors from mgparm.h:
-  
+
 typedef struct {
 	MGparm();
 	~MGparm();
-	MGparm_CalcType type;                                           
-} MGparm; 
+	MGparm_CalcType type;
+} MGparm;
 extern void MGparm_setCenterX(MGparm *thee, double x);
 extern void MGparm_setCenterY(MGparm *thee, double y);
 extern void MGparm_setCenterZ(MGparm *thee, double z);
-      
+
 // Functions and Constructors from pbeparm.h:
-  
-typedef struct {  
+
+typedef struct {
 	PBEparm();
 	~PBEparm();
 	double temp;
@@ -106,20 +106,20 @@ typedef struct {
 
 // Functions and Constructors from nosh.h:
 
-typedef struct { 
+typedef struct {
 	NOsh_calc();
 	~NOsh_calc();
-	MGparm *mgparm;         
-	FEMparm *femparm;       
-	PBEparm *pbeparm;       
-	int calctype;           
+	MGparm *mgparm;
+	FEMparm *femparm;
+	PBEparm *pbeparm;
+	int calctype;
 } NOsh_calc;
 
 typedef struct {
     NOsh();
     ~NOsh();
 	int ncalc;
-	int nprint;             
+	int nprint;
     	int nelec;
 	int nmol;
     NOsh_PrintType printwhat[NOSH_MAXPRINT];
@@ -141,7 +141,7 @@ extern NOsh_calc* NOsh_getCalc(NOsh *thee, int icalc);
 
 extern char* NOsh_elecname(NOsh *thee, int ielec);
 extern int NOsh_elec2calc(NOsh *thee, int icalc);
-extern NOsh_PrintType NOsh_printWhat(NOsh *thee, int iprint); 
+extern NOsh_PrintType NOsh_printWhat(NOsh *thee, int iprint);
 extern int NOsh_parseInputFile(NOsh *thee, char *filename);
 extern NOsh* NOsh_ctor(int rank, int size);
 
@@ -187,7 +187,7 @@ Vpbe **new_pbelist(int maxargs) {
    return (Vpbe **) malloc(maxargs*sizeof(Vpbe *));
 }
 
-Vpbe *get_Vpbe(Vpbe **args, int n) { 
+Vpbe *get_Vpbe(Vpbe **args, int n) {
    return (Vpbe *)args[n];
 }
 
@@ -197,16 +197,16 @@ AtomForce **new_atomforcelist(int maxargs) {
 
 void delete_atomforcelist(AtomForce **a) {
     free(a);
-  } 
+  }
 void delete_valist(Valist **a) {
     free(a);
-  } 
+  }
 void delete_gridlist(Vgrid **a) {
     free(a);
-  } 
+  }
 void delete_pmglist(Vpmg **a) {
     free(a);
-  } 
+  }
 void delete_pmgplist(Vpmgp **a) {
     free(a);
   }
@@ -231,7 +231,7 @@ AtomForce **get_AtomForce(AtomForce **aforce, int n){
 }
 
 Valist *make_Valist(Valist **args, int n){
-    args[n] = Valist_ctor();    
+    args[n] = Valist_ctor();
     return args[n];
 }
 
@@ -253,11 +253,11 @@ int *int_array(int size){
 
 void delete_double_array(double *d) {
     free(d);
-  } 
+  }
 
 void delete_int_array(int *i) {
     free(i);
-  } 
+  }
 
 double get_entry(double *array, int i){
 	    return array[i];
@@ -276,7 +276,7 @@ int parseInputFromString(NOsh *nosh, PyObject *string){
 
     int ret, bufsize;
     Vio *sock;
-    
+
     startVio();
     bufsize = PyString_Size(string);
 
@@ -285,19 +285,19 @@ int parseInputFromString(NOsh *nosh, PyObject *string){
 
     Vio_bufTake(sock, PyString_AsString(string), bufsize);
 
-    ret = NOsh_parseInput(nosh, sock); 
+    ret = NOsh_parseInput(nosh, sock);
     sock->VIObuffer = VNULL;
     Vio_dtor(&sock);
     return ret;
 }
 
-void Valist_load(Valist *thee, int size, PyObject *x, PyObject *y, PyObject *z, PyObject *chg, PyObject *rad){ 
-   
+void Valist_load(Valist *thee, int size, PyObject *x, PyObject *y, PyObject *z, PyObject *chg, PyObject *rad){
+
     int i,j;
     double pos[3];
 
     Vatom *atom;
-   
+
     VASSERT(thee != VNULL);
 
     thee->atoms = Vmem_malloc(thee->vmem, size, sizeof(Vatom));
@@ -310,7 +310,7 @@ void Valist_load(Valist *thee, int size, PyObject *x, PyObject *y, PyObject *z, 
         Vatom_setRadius(&(thee->atoms[i]), PyFloat_AsDouble(PyList_GetItem(rad,i)));
         Vatom_setPosition(&(thee->atoms[i]), pos);
         Vatom_setAtomID(&(thee->atoms[i]), i);
-    }   
+    }
 
     thee->center[0] = 0.0;
     thee->center[1] = 0.0;
@@ -324,19 +324,19 @@ void Valist_load(Valist *thee, int size, PyObject *x, PyObject *y, PyObject *z, 
         thee->maxcrd[i] = thee->mincrd[i] = atom->position[i];
     }
     thee->maxrad = atom->radius;
-   
+
     for (i=0; i<thee->number; i++) {
         atom = &(thee->atoms[i]);
         for (j=0; j<3; j++) {
-            if (atom->position[j] < thee->mincrd[j]) 
+            if (atom->position[j] < thee->mincrd[j])
               thee->mincrd[j] = atom->position[j];
-            if (atom->position[j] > thee->maxcrd[j]) 
+            if (atom->position[j] > thee->maxcrd[j])
               thee->maxcrd[j] = atom->position[j];
         }
         if (atom->radius > thee->maxrad) thee->maxrad = atom->radius;
         thee->charge = thee->charge + atom->charge;
-    } 
-  
+    }
+
     thee->center[0] = 0.5*(thee->maxcrd[0] + thee->mincrd[0]);
     thee->center[1] = 0.5*(thee->maxcrd[1] + thee->mincrd[1]);
     thee->center[2] = 0.5*(thee->maxcrd[2] + thee->mincrd[2]);
@@ -347,7 +347,7 @@ extern int NOsh_setupElecCalc(NOsh *nosh, Valist *alist[NOSH_MAXMOL]);
 extern int NOsh_setupApolCalc(NOsh *nosh, Valist *alist[NOSH_MAXMOL]);
 
 int wrap_forceMG(Vmem *mem, NOsh *nosh, PBEparm *pbeparm, MGparm *mgparm,
- Vpmg *pmg, AtomForce *atomForce[NOSH_MAXCALC], Valist *alist[NOSH_MAXMOL], 
+ Vpmg *pmg, AtomForce *atomForce[NOSH_MAXCALC], Valist *alist[NOSH_MAXMOL],
  int forcearray[NOSH_MAXCALC], int calcid)
 {
     int *nforce;
@@ -363,25 +363,25 @@ PyObject *getAtomPosition(Vatom *atom){
     double *position;
     int i;
     PyObject *values;
-    
+
     values = PyList_New(3);
     for (i=0; i<3; i++){
 	position = Vatom_getPosition(atom);
 	PyList_SetItem(values, i, PyFloat_FromDouble(position[i]));
     }
-    
+
     return values;
 }
 
 PyObject *getPotentials(NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg, Valist *alist){
     Vgrid *grid;
-    Vatom *atom; 
+    Vatom *atom;
     int i, rc, nx, ny, nz;
     double hx, hy, hzed, xcent, ycent, zcent, xmin, ymin, zmin;
     double value;
     double *position;
     PyObject *values;
-    
+
     values = PyList_New(Valist_getNumberAtoms(alist));
     nx = pmg->pmgp->nx;
     ny = pmg->pmgp->ny;
@@ -395,32 +395,32 @@ PyObject *getPotentials(NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg, Valist *alist){
     xmin = xcent - 0.5*(nx-1)*hx;
     ymin = ycent - 0.5*(ny-1)*hy;
     zmin = zcent - 0.5*(nz-1)*hzed;
-   
+
     Vpmg_fillArray(pmg, pmg->rwork, VDT_POT, 0.0, pbeparm->pbetype, pbeparm);
     grid = Vgrid_ctor(nx, ny, nz, hx, hy, hzed, xmin, ymin, zmin,
                   pmg->rwork);
     for (i=0;i<Valist_getNumberAtoms(alist);i++){
         atom = Valist_getAtom(alist, i);
-        position = Vatom_getPosition(atom); 
+        position = Vatom_getPosition(atom);
         Vgrid_value(grid, position, &value);
-        PyList_SetItem(values, i, PyFloat_FromDouble(value)); 
-    } 
-    Vgrid_dtor(&grid);    
+        PyList_SetItem(values, i, PyFloat_FromDouble(value));
+    }
+    Vgrid_dtor(&grid);
     return values;
 }
 
 PyObject *getEnergies(Vpmg *pmg, Valist *alist){
-    Vatom *atom; 
+    Vatom *atom;
     int i;
     double energy;
     PyObject *values;
-    
-    values = PyList_New(Valist_getNumberAtoms(alist)); 
+
+    values = PyList_New(Valist_getNumberAtoms(alist));
     for (i=0;i<Valist_getNumberAtoms(alist);i++){
         atom = Valist_getAtom(alist, i);
         energy = Vpmg_qfAtomEnergy(pmg, atom);
         PyList_SetItem(values, i, PyFloat_FromDouble(energy));
-    } 
+    }
     return values;
 }
 
@@ -431,16 +431,16 @@ PyObject *getForces(AtomForce **atomForce, Valist *alist){
     PyObject *ibvalues, *ib, *ibholder;
     PyObject *dbvalues, *db, *dbholder;
     PyObject *npvalues, *np, *npholder;
-    
-    dict = PyDict_New(); 
+
+    dict = PyDict_New();
     qfvalues = PyList_New(Valist_getNumberAtoms(alist));
-    dbvalues = PyList_New(Valist_getNumberAtoms(alist)); 
-    ibvalues = PyList_New(Valist_getNumberAtoms(alist)); 
-    
+    dbvalues = PyList_New(Valist_getNumberAtoms(alist));
+    ibvalues = PyList_New(Valist_getNumberAtoms(alist));
+
     qfholder = PyList_New(3);
     dbholder = PyList_New(3);
     ibholder = PyList_New(3);
-    
+
     qf = PyString_FromString("qf");
     db = PyString_FromString("db");
     ib = PyString_FromString("ib");
@@ -478,9 +478,9 @@ extern void printPBEPARM(PBEparm *pbeparm);
 extern void printMGPARM(MGparm *mgparm, double realCenter[3]);
 extern int initMG(int i, NOsh *nosh, MGparm *mgparm,
   PBEparm *pbeparm, double realCenter[3], Vpbe *pbe[NOSH_MAXCALC],
-  Valist *alist[NOSH_MAXMOL], Vgrid *dielXMap[NOSH_MAXMOL], 
-  Vgrid *dielYMap[NOSH_MAXMOL], Vgrid *dielZMap[NOSH_MAXMOL], 
-  Vgrid *kappaMap[NOSH_MAXMOL], Vgrid *chargeMap[NOSH_MAXMOL], 
+  Valist *alist[NOSH_MAXMOL], Vgrid *dielXMap[NOSH_MAXMOL],
+  Vgrid *dielYMap[NOSH_MAXMOL], Vgrid *dielZMap[NOSH_MAXMOL],
+  Vgrid *kappaMap[NOSH_MAXMOL], Vgrid *chargeMap[NOSH_MAXMOL],
   Vpmgp *pmgp[NOSH_MAXCALC], Vpmg *pmg[NOSH_MAXCALC],
   Vgrid *potMap[NOSH_MAXMOL]);
 extern void killMG(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC],
@@ -496,9 +496,9 @@ extern int writedataMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg);
 extern int writematMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg);
 extern int printForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC],
   AtomForce *atomForce[NOSH_MAXCALC], int i);
-extern int printElecForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC], 
+extern int printElecForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC],
   AtomForce *atomForce[NOSH_MAXCALC], int i);
-extern int printApolForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC], 
+extern int printApolForce(Vcom *com, NOsh *nosh, int nforce[NOSH_MAXCALC],
   AtomForce *atomForce[NOSH_MAXCALC], int i);
 extern void startVio();
 extern double Vacc_molAcc(Vacc *thee, double center[3], double radius);
@@ -537,7 +537,7 @@ extern int energyMG(NOsh* nosh, int icalc, Vpmg *pmg,
 
 extern int printEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC],
     int i);
-extern int printElecEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC], 
+extern int printElecEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC],
     int i);
 extern int printApolEnergy(NOsh *nosh, int i);
 extern double returnEnergy(Vcom *com, NOsh *nosh, double totEnergy[NOSH_MAXCALC], int i);
