@@ -55,7 +55,7 @@ OPTION (BUILD_SHARED_LIBS "Build shared libraries." OFF)
 
 message(STATUS "Setting project paths")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fpermissive")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fpermissive -fPIC")
 
 set(APBS_ROOT ${PROJECT_SOURCE_DIR})
 set(APBS_BUILD ${PROJECT_BINARY_DIR})
@@ -408,7 +408,7 @@ if(ENABLE_GEOFLOW)
 	ExternalProject_Add(
     geoflow
     SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-    CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} 
+    CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
     BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
     INSTALL_COMMAND ""
   )
@@ -459,7 +459,7 @@ if(ENABLE_PBAM)
     INSTALL_COMMAND ""
   )
   endif()
-  
+
   ExternalProject_Get_Property(pbam binary_dir)
   add_definitions(-DENABLE_PBAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
@@ -476,7 +476,7 @@ if(ENABLE_PBAM)
   endif()
 
 endif()
-	
+
 
 
 ################################################################################
@@ -489,7 +489,7 @@ if(ENABLE_PBSAM)
   add_definitions(-DPBSAM_APBS)
   set(GET_MSMS ON) #CACHE BOOL "Grabbing msms path")
   message(STATUS "copying msms ${GET_MSMS}")
-  
+
   list(APPEND CMAKE_MODULE_PATH ${EXTERNALS_PATH}/pb_s_am/cmake/modules)
   include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
   include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
@@ -568,7 +568,7 @@ if(GET_MSMS)
 
 	if(WIN32)
 	  install(
-	    PROGRAMS ${EXECUTABLE_OUTPUT_PATH/msms.exe
+	    PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/msms.exe
 	    DESTINATION ${EXECUTABLE_INSTALL_PATH}
 	  )
 	else()
@@ -577,7 +577,7 @@ if(GET_MSMS)
 	    DESTINATION ${EXECUTABLE_INSTALL_PATH}
 	  )
 	endif()
-	
+
 endif()
 
 
@@ -611,7 +611,7 @@ if(GET_NanoShaper)
 	    DESTINATION ${EXECUTABLE_INSTALL_PATH}
 	  )
 	endif()
-	
+
 endif()
 
 
