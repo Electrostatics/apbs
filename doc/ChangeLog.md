@@ -1,7 +1,7 @@
-APBS 1.5 CHANGELOG
+APBS 3.0 CHANGELOG
 ==================
 
-These are notes for APBS version 1.5
+These are notes for APBS version 3.o
 ------------------------------------
 
 * Binary releases may be found on [GitHub](https://github.com/Electrostatics/apbs-pdb2pqr/releases) and on [SourceForge](http://sourceforge.net/projects/apbs/files/apbs).
@@ -23,11 +23,19 @@ These are notes for APBS version 1.5
 
 * PBSAM not building in windows due to C standard restrictions in the Microsoft compiler implementation.
 
-### Bug Fixes
+### Minor Updates
 
-* Build an iAPBS build bug.
+* PB(S)AM now requires the key work 'pos' for the term argument.
+* PB(S)AM 'surf' keyword has been replaced with the 'usemesh' keyword.
+* PB(S)AM 'salt' keyword has been replaced with the 'ion' keyword.
+* PB(S)AM dynamics parameters are no longer accepted in the ELEC section.
+* PB(S)AM now has only one type of ELEC method: pb(s)am_auto.
+* PB(S)AM 'gridpts' keyword has been replaced with 'dime' keyword.
+* PB(S)AM 'dx' and '3dmap' keywords are deprecated to use the 'write' one instead.
+* BEM mesh keyword now requires method names instead of just integer values.
+* GEOFLOW ELEC type has been change from 'geoflow-auto' to 'geoflow'.
 * Fixed miscellaneous Windows build issues.
-* OS X bundle problem on El Capitan.
+* Update the build configurations for the Pythons libraries.
 
 ### Notes
 
@@ -36,4 +44,3 @@ These are notes for APBS version 1.5
 - FETk ([link](https://github.com/Electrostatics/FETK/tree/0c6fdeabe8929acea7481cb1480b5706b343b7e0))
 - PBAM/PBSAM ([link](https://github.com/davas301/pb_solvers/tree/4805cbec02b30e9bae927f03ac2fecd3217c4dad))
 - TABI-PB ([link](https://github.com/lwwilson1/TABIPB/tree/941eff91acd4153a06764e34d29b633c6e3b980f))
-* To build on Windows from source, the root CMakeLists.txt file needs to be modified by un-commenting out the lines after "#if building on Windows" and commenting out the corresponding lines above.

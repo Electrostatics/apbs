@@ -7,31 +7,8 @@ cmake_minimum_required (VERSION 2.8.7)
 #        (configure.ac:1306)
 ################################################################################
 
-################################################################################
-# Future Enchancements
-# --------------------
-# [ ] Adding a profiling mode set by a flag
-# [ ] Add functionality for creating rpm and deb packages
-################################################################################
-
-
-################################################################################
-# Test platforms
-# --------------
-# [x] Ubuntu x86_64
-# [x] Ubuntu i386
-# [ ] Redhat 5
-# [x] Redhat 6
-# [x] Mac OSX
-# [ ] Windows 7 x86_64
-# [ ] Windows 7 i386
-# [x] Windows 7 with Cygwin
-# [ ] Windows 7 with Mingw
-################################################################################
-
 set(CMAKE_VERBOSE_MAKEFILE true)
 cmake_policy(SET CMP0054 OLD)
-
 
 ################################################################################
 # Set up basic project stuff                                                   #
@@ -41,7 +18,7 @@ include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(ExternalProject)
 
-set(APBS_VERSION "1.6")
+set(APBS_VERSION "3.0")
 set(PACKAGE_STRING ${APBS_VERSION})
 set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
 
