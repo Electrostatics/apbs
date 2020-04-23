@@ -23,7 +23,7 @@
  *
  *  Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2010-2014 Battelle Memorial Institute. Developed at the
+ * Copyright (c) 2010-2020 Battelle Memorial Institute. Developed at the
  * Pacific Northwest National Laboratory, operated by Battelle Memorial
  * Institute, Pacific Northwest Division for the U.S. Department of Energy.
  *
