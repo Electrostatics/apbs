@@ -14,12 +14,12 @@
  *
  *  Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2010-2014 Battelle Memorial Institute. Developed at the
+ * Copyright (c) 2010-2020 Battelle Memorial Institute. Developed at the
  * Pacific Northwest National Laboratory, operated by Battelle Memorial
  * Institute, Pacific Northwest Division for the U.S. Department of Energy.
  *
  * Portions Copyright (c) 2002-2010, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2010, Nathan A. Baker.
+ * Portions Copyright (c) 2002-2020, Nathan A. Baker.
  * Portions Copyright (c) 1999-2002, The Regents of the University of
  * California.
  * Portions Copyright (c) 1995, Michael Holst.
@@ -154,7 +154,7 @@ VPUBLIC void PBSAMparm_copy(PBSAMparm *thee, PBSAMparm *parm) {
     for (i=0; i<PBSAMPARM_MAXWRITE; i++)
     {
         for (j=0; j<CHR_MAXLEN; j++)
-        { 
+        {
             thee->surffil[i][j] = parm->surffil[i][j];
             thee->imatfil[i][j] = parm->imatfil[i][j];
             thee->expfil[i][j] = parm->expfil[i][j];
@@ -196,7 +196,7 @@ VPRIVATE Vrc_Codes PBSAMparm_parseMSMS(PBSAMparm *thee, Vio *sock){
 	  Vnm_print(2, "parsePBSAM: %s is not currently supported in PBSAM! Change to msms\n", tok);
 	  return VRC_WARNING;
 	}
-	
+
     return VRC_SUCCESS;
 }
 //Parsing imat prefix file
@@ -232,18 +232,18 @@ VPRIVATE Vrc_Codes PBSAMparm_parseExp(PBSAMparm *thee, Vio *sock){
 VPRIVATE Vrc_Codes PBSAMparm_parseTolsp(PBSAMparm *thee, Vio *sock){
     const char* name = "tolsp";
     char tok[VMAX_BUFSIZE];
-    double tf; 
+    double tf;
     if(Vio_scanf(sock, "%s", tok) == 0) {
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
-    }   
-    
-    if (sscanf(tok, "%lf", &tf) == 0){ 
+    }
+
+    if (sscanf(tok, "%lf", &tf) == 0){
         Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
         return VRC_WARNING;
     }else{
-        thee->tolsp = tf; 
-    }   
+        thee->tolsp = tf;
+    }
     thee->settolsp = 1;
     return VRC_SUCCESS;
 }
