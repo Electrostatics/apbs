@@ -6,7 +6,7 @@
 ### syntax help.
 ##########################################################################
 
-read 
+read
     mol pqr mol1.pqr
     mol pqr mol2.pqr
     mol pqr complex.pqr
@@ -80,7 +80,7 @@ elec name complex
     npbe
     bcfl sdh
     ion charge 1 conc 0.050 radius 2.0
-    ion charge -1 conc 0.050 radius 2.0 
+    ion charge -1 conc 0.050 radius 2.0
     pdie 2.0
     sdie 78.54
     srfm mol

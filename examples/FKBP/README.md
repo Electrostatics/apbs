@@ -12,7 +12,8 @@ This example was contributed by Jung-Hsin Lin.
 
 Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 ---|---|---|---|---
-[1d7h-dmso/apbs-mol.in](1d7h-dmso/apbs-mol.in)|1d7h-dmso, 2-level focusing to 0.225 A, VdW surface, srfm mol|**1.5**|**15.0081**|19.097
+[1d7h-dmso/apbs-mol.in](1d7h-dmso/apbs-mol.in)|1d7h-dmso, 2-level focusing to 0.225 A, VdW surface, srfm mol|**3.0**|**15.0081**|**19.097**
+|||1.5|15.0081
 |||1.4.2|15.0081
 |||1.4.1|15.0081
 |||1.4|15.0081<sup>[4](#4)</sup>
@@ -24,7 +25,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.5.1|15.0089
 |||0.5.0|15.0089
 |||0.4.0|15.0089
-[1d7h-dmso/apbs-smol.in](1d7h-dmso/apbs-smol.in)|1d7h-dmso, 2-level focusing to 0.225 A, VdW surface, srfm smol|**1.5**|**16.2445**|19.097
+[1d7h-dmso/apbs-smol.in](1d7h-dmso/apbs-smol.in)|1d7h-dmso, 2-level focusing to 0.225 A, VdW surface, srfm smol|**3.0**|**16.2445**|**19.097**
+|||1.5|16.2445
 |||1.4.2|16.2445
 |||1.4.1|16.2445
 |||1.4|16.2445<sup>[4](#4)</sup>
@@ -47,7 +49,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.2.1|14.589
 |||0.2.0|14.589
 |||0.1.8|14.591
-[1d7i-dss/apbs-mol.in](1d7i-dss/apbs-mol.in)|1d7i-dss, 2-level focusing to 0.225 A, VdW surface, srfm mol|**1.5**|**14.4250**|16.231
+[1d7i-dss/apbs-mol.in](1d7i-dss/apbs-mol.in)|1d7i-dss, 2-level focusing to 0.225 A, VdW surface, srfm mol|**3.0**|**14.4250**|**16.231**
+|||1.5|14.4250
 |||1.4.2|14.4250
 |||1.4.1|14.4250
 |||1.4|14.4250
@@ -59,7 +62,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.5.1|14.4254
 |||0.5.0|14.4254
 |||0.4.0|14.4254
-[1d7i-dss/apbs-smol.in](1d7i-dss/apbs-smol.in)|1d7i-dss, 2-level focusing to 0.225 A, VdW surface, srfm smol|**1.5**|**15.4515**|16.231
+[1d7i-dss/apbs-smol.in](1d7i-dss/apbs-smol.in)|1d7i-dss, 2-level focusing to 0.225 A, VdW surface, srfm smol|**3.0**|**15.4515**|**16.231**
+|||1.5|15.4515
 |||1.4.2|15.4515
 |||1.4.1|15.4515
 |||1.4|15.4515
@@ -102,5 +106,3 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 -   Small margins due to these round-off discrepencies acumulate in the computations
 
 Please see the ChangeLog or the [APBS website](http://www.poissonboltzmann.org/) for more information.
-
-

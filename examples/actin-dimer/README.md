@@ -7,7 +7,8 @@ This example was contributed by Dave Sept.
 
 Input File                          | Description | APBS Version | Results (kJ/mol) | UHBD (kJ/mol)
 ------------------------------------|-------------|--------------|------------------|--------------
-[apbs-mol-auto.in](apbs-mol-auto.in)| Sequential, 2-level focusing to ≤ 0.725 A, NPBE, srfm mol| **1.5** | **104.868** | 106.7 (1.00 A res., NPBE)
+[apbs-mol-auto.in](apbs-mol-auto.in)| Sequential, 2-level focusing to ≤ 0.725 A, NPBE, srfm mol| **3.0** | **104.868** | 106.7 (1.00 A res., NPBE)
+| | |1.5 | 104.868 |
 | | |1.4.2 |104.868
 | | |1.4.1 |104.8683
 | | |1.4   |104.8683
@@ -19,13 +20,14 @@ Input File                          | Description | APBS Version | Results (kJ/m
 | | |0.5.1 |104.868<sup>[3](#3)</sup>
 | | |0.5.0 | 105.0338<sup>[2](#2)</sup>
 | | |0.4.0 |104.8895
-[apbs-smol-auto.in](apbs-smol-auto.in) | Sequential, 2-level focusing to ≤ 0.725 A, NPBE, srfm smol | **1.5** | **109.5841** | 106.7 (1.00 A res., NPBE)
+[apbs-smol-auto.in](apbs-smol-auto.in) | Sequential, 2-level focusing to ≤ 0.725 A, NPBE, srfm smol | **3.0** | **109.5841** | 106.7 (1.00 A res., NPBE)
+| | |1.5   |109.5841
 | | |1.4.2 |109.5841
 | | |1.4.1 |109.5841
-| | |1.4 |109.5841
-| | |1.3 |109.5841<sup>[8](#8)</sup>
+| | |1.4   |109.5841
+| | |1.3   |109.5841<sup>[8](#8)</sup>
 | | |1.2.1 |109.5829
-| | |1.2 |109.5829
+| | |1.2   |109.5829
 | | |1.1.0 |109.5829<sup>[5](#5)</sup>
 | | |1.0.0 |109.5841
 | | |0.5.1 |109.5841<sup>[3](#3)</sup>
@@ -43,40 +45,40 @@ Input File                          | Description | APBS Version | Results (kJ/m
 | | |0.2.0 |90.829
 | | |0.1.8 |90.84
 [apbs-mol-parallel.in](apbs-mol-parallel.in) |Parallel with 8 processors, focusing to \~0.9 A, LPBE, srfm mol |**1.5**|**98.1746**|106.7 (1.00 A res., NPBE)
-|||1.4.2|98.1746
-|||1.4.1|98.1746
-|||1.4|98.1746
-|||1.3|98.1746<sup>[8](#8)</sup>
-|||1.2.1|98.1733<sup>[7](#7)</sup>
-|||1.2|98.1635<sup>[6](#6)</sup>
-|||1.1.0|98.1630<sup>[5](#5)</sup>
-|||1.0.0|98.1643<sup>[4](#4)</sup>
-|||0.5.1|98.1654<sup>[3](#3)</sup>
-|||0.5.0|98.3530<sup>[2](#2)</sup>
-|||0.4.0|98.1834
+| | |1.4.2 |98.1746
+| | |1.4.1 |98.1746
+| | |1.4   |98.1746
+| | |1.3   |98.1746<sup>[8](#8)</sup>
+| | |1.2.1 |98.1733<sup>[7](#7)</sup>
+| | |1.2   |98.1635<sup>[6](#6)</sup>
+| | |1.1.0 |98.1630<sup>[5](#5)</sup>
+| | |1.0.0 |98.1643<sup>[4](#4)</sup>
+| | |0.5.1 |98.1654<sup>[3](#3)</sup>
+| | |0.5.0 |98.3530<sup>[2](#2)</sup>
+| | |0.4.0 |98.1834
 [apbs-smol-parallel.in](apbs-smol-parallel.in)|Parallel with 8 processors, focusing to \~0.9 A, LPBE, srfm smol|**1.5**|**115.542**|106.7 (1.00 A res., NPBE)
-|||1.4.2|115.542
-|||1.4.1|115.5421
-|||1.4|115.5421<sup>[9](#9)</sup>
-|||1.3|115.5422<sup>[8](#8)</sup>
-|||1.2.1|115.5409<sup>[7](#7)</sup>
-|||1.2|115.5563<sup>[6](#6)</sup>
-|||1.1.0|115.5560<sup>[5](#5)</sup>
-|||1.0.0|115.5573<sup>[4](#4)</sup>
-|||0.5.1|115.5584<sup>[3](#3)</sup>
-|||0.5.0|115.7492<sup>[2](#2)</sup>
-|||0.4.0|115.5751<sup>[1](#1)</sup>
-|||0.3.2|87.1121
-|||0.3.1|87.1121
-|||0.3.0|90.2573
-|||0.2.6|90.2573
-|||0.2.5|90.2573
-|||0.2.4|90.2573
-|||0.2.3|90.2543
-|||0.2.2|91.9450
-|||0.2.1|91.945
-|||0.2.0|91.939
-|||0.1.8|91.67
+| | |1.4.2 |115.542
+| | |1.4.1 |115.5421
+| | |1.4   |115.5421<sup>[9](#9)</sup>
+| | |1.3   |115.5422<sup>[8](#8)</sup>
+| | |1.2.1 |115.5409<sup>[7](#7)</sup>
+| | |1.2   |115.5563<sup>[6](#6)</sup>
+| | |1.1.0 |115.5560<sup>[5](#5)</sup>
+| | |1.0.0 |115.5573<sup>[4](#4)</sup>
+| | |0.5.1 |115.5584<sup>[3](#3)</sup>
+| | |0.5.0 |115.7492<sup>[2](#2)</sup>
+| | |0.4.0 |115.5751<sup>[1](#1)</sup>
+| | |0.3.2 |87.1121
+| | |0.3.1 |87.1121
+| | |0.3.0 |90.2573
+| | |0.2.6 |90.2573
+| | |0.2.5 |90.2573
+| | |0.2.4 |90.2573
+| | |0.2.3 |90.2543
+| | |0.2.2 |91.9450
+| | |0.2.1 |91.945
+| | |0.2.0 |91.939
+| | |0.1.8 |91.67
 
 <a name=1></a><sup>1</sup> The discrepancy in values between versions 0.4.0 and 0.3.2 is most likely due to three factors:
 
@@ -113,4 +115,3 @@ Input File                          | Description | APBS Version | Results (kJ/m
 -   Small margins due to these round-off discrepencies acumulate in the computations
 
 Please see the ChangeLog or the [APBS website](http://www.poissonboltzmann.org/) for more information.
-

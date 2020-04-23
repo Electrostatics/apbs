@@ -7,7 +7,8 @@ This example was contributed by Dave Sept.
 
 Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 ---|---|---|---|---|
-[apbs-mol-pdiel2.in](apbs-mol-pdiel2.in)|0.53 A resolution, pdie 2, srfm mol|**1.5**|**15.5916**|23.58
+[apbs-mol-pdiel2.in](apbs-mol-pdiel2.in)|0.53 A resolution, pdie 2, srfm mol|**3.0**|**15.5916**|**23.58**
+|||1.5|15.5916
 |||1.4.2|15.5916
 |||1.4.1|15.5916
 |||1.4|15.5916
@@ -19,7 +20,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.5.1|15.5916
 |||0.5.0|15.5916
 |||0.4.0|15.5916
-[apbs-smol-pdiel2.in](apbs-smol-pdiel2.in)|0.53 A resolution, pdie 2, srfm smol|**1.5**|**23.5554**|23.58
+[apbs-smol-pdiel2.in](apbs-smol-pdiel2.in)|0.53 A resolution, pdie 2, srfm smol|**3.0**|**23.5554**|**23.58**
+|||1.5|23.5554
 |||1.4.2|23.5554
 |||1.4.1|23.5554
 |||1.4|23.5554
@@ -42,7 +44,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.2.1|21.453
 |||0.2.0|21.453
 |||0.1.8|21.45
-[apbs-mol-pdiel12.in](apbs-mol-pdiel12.in)|0.53 A resolution, pdie 12, srfm mol|**1.5**|**18.0272**|23.58
+[apbs-mol-pdiel12.in](apbs-mol-pdiel12.in)|0.53 A resolution, pdie 12, srfm mol|**3.0**|**18.0272**|**23.58**
+|||1.5|18.0272
 |||1.4.2|18.0272
 |||1.4.1|18.0272
 |||1.4|18.0272
@@ -54,7 +57,8 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 |||0.5.1|18.0272
 |||0.5.0|18.0272
 |||0.4.0|18.0272
-[apbs-smol-pdiel12.in](apbs-smol-pdiel12.in)|0.53 A resolution, pdie 12, srfm smol|**1.5**|**19.2825**|23.58
+[apbs-smol-pdiel12.in](apbs-smol-pdiel12.in)|0.53 A resolution, pdie 12, srfm smol|**3.0**|**19.2825**|**23.58**
+|||1.5|19.2825
 |||1.4.2|19.2825
 |||1.4.1|19.2825
 |||1.4|19.2825
@@ -91,4 +95,3 @@ Input File|Description|APBS Version|Results (kJ/mol)|UHBD (kJ/mol)
 -   Fixed a bug in Vpmg.c which causes zero potential values on boundaries in non-focusing calculations.
 
 Please see the ChangeLog or the [APBS website](http://www.poissonboltzmann.org/) for more information.
-

@@ -2,7 +2,7 @@ README for TABI-PB (Boundary Element Method) Examples
 =====================================================
 
 The example input files included in this folder uses a boundary element approach called
-TABI-PB to solve the PBE. BEMs have the characteristic that only the boundary of the 
+TABI-PB to solve the PBE. BEMs have the characteristic that only the boundary of the
 domain has to be discretized. This is particularly useful for problems in which the data
 of interest is at the boundary of the solution.
 
@@ -20,7 +20,9 @@ Two examples calculate surface potentials for 451c in a 0.15 M salt solution:
 Additionally, more pqr files are available in the test_proteins directory.
 More details on TABI-PB are available on the APBS website contributions section.
 
-Input File| APBS Version| Result (kCal/mol) | Expected (kCal/mol)
+Input File| APBS Version| Result (kJ/mol) | Expected (kJ/mol)
 ---|---|---|---
-[451c_order1.in](451c_order1.in)| **1.5**| **-1172.910**| -1172.907
-[451c_order5.in](451c_order5.in)| **1.5**| **-1175.930**| -1175.940
+[451c_order1.in](451c_order1.in)| **3.0**| **-4907.470**| -4907.443
+| | 1.5| -4907.455|
+[451c_order5.in](451c_order5.in)| **3.0**| **-4920.112**| -4920.133
+| | 1.5| -4920.091|
