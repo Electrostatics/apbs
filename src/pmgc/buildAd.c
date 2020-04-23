@@ -14,7 +14,12 @@
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2010-2014 Battelle Memorial Institute. Developed at the Pacific Northwest National Laboratory, operated by Battelle Memorial Institute, Pacific Northwest Division for the U.S. Department Energy.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
+ * Copyright (c) 2010-2020 Battelle Memorial Institute.
+ * Developed at the Pacific Northwest National Laboratory, operated by Battelle Memorial Institute, Pacific Northwest Division for the U.S. Department Energy.
+ * Portions Copyright (c) 2002-2010, Washington University in St. Louis.
+ * Portions Copyright (c) 2002-2020, Nathan A. Baker.
+ * Portions Copyright (c) 1999-2002, The Regents of the University of California.
+ * Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
  *
  *
@@ -223,7 +228,7 @@ VPUBLIC void VbuildA_fv(int *nx, int *ny, int *nz,
                 //fprintf(data, "%19.12E\n", VAT3(cc, i, j, k));
 
                 // Calculate the diagonal for matvecs and smoothings
-                
+
                 VAT3(oC, i, j, k) = coef_oE   * VAT3(a1cf,   i,   j,   k) +
                               coef_oEm1 * VAT3(a1cf, i-1,   j,   k) +
                               coef_oN   * VAT3(a2cf,   i,   j,   k) +

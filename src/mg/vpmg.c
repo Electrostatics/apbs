@@ -14,12 +14,12 @@
  *
  *  Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2010-2014 Battelle Memorial Institute. Developed at the
+ * Copyright (c) 2010-2020 Battelle Memorial Institute. Developed at the
  * Pacific Northwest National Laboratory, operated by Battelle Memorial
  * Institute, Pacific Northwest Division for the U.S. Department of Energy.
  *
  * Portions Copyright (c) 2002-2010, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2010, Nathan A. Baker.
+ * Portions Copyright (c) 2002-2020, Nathan A. Baker.
  * Portions Copyright (c) 1999-2002, The Regents of the University of
  * California.
  * Portions Copyright (c) 1995, Michael Holst.
@@ -1100,7 +1100,7 @@ VPUBLIC int Vpmg_fillArray(Vpmg *thee, double *vec, Vdata_Type type,
                                 if (pbetype == PBE_NPBE || pbetype == PBE_SMPBE /*  SMPBE Added */) {
                                     vec[IJK(i,j,k)] += pbe->ionConc[l]*Vcap_exp(-q*u, &ichop);
                                 } else if (pbetype == PBE_LPBE){
-                                    vec[IJK(i,j,k)] += pbe->ionConc[l]*(1 - q*u + 0.5*q*q*u*u); 
+                                    vec[IJK(i,j,k)] += pbe->ionConc[l]*(1 - q*u + 0.5*q*q*u*u);
                                 }
                             }
                         }

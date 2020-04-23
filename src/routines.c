@@ -12,12 +12,12 @@
  *
  *  Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2010-2014 Battelle Memorial Institute. Developed at the
+ * Copyright (c) 2010-2020 Battelle Memorial Institute. Developed at the
  * Pacific Northwest National Laboratory, operated by Battelle Memorial
  * Institute, Pacific Northwest Division for the U.S. Department of Energy.
  *
  * Portions Copyright (c) 2002-2010, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2010, Nathan A. Baker.
+ * Portions Copyright (c) 2002-2020, Nathan A. Baker.
  * Portions Copyright (c) 1999-2002, The Regents of the University of
  * California.
  * Portions Copyright (c) 1995, Michael Holst.
@@ -5485,7 +5485,7 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
     }
   }
 
-  
+
   // SAM details
   pbsamIn.tolsp_  = samparm->tolsp;
   pbsamIn.imatct_ = samparm->imatct;
@@ -5507,13 +5507,13 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
   if (samparm->setmsms == 1) {
     for (i=0; i<pbamIn.nmol_; i++) {
     // find a clever way to use prefix of molecule name for msms outputs
-    for (j=0; j < VMAX_ARGLEN; j++) 
+    for (j=0; j < VMAX_ARGLEN; j++)
        if (nosh->molpath[i][j] == '\0') break;
-     
+
     // assume terminated by '.pqr' -> 4 char, want to term w/ '.xyzr'
-	//char xyzr[j+2], surf[j+2], outname[j-4]; 
+	//char xyzr[j+2], surf[j+2], outname[j-4];
 	char xyzr[VMAX_ARGLEN], surf[VMAX_ARGLEN], outname[VMAX_ARGLEN];
-    for( k=0; k < j - 4; k++) 
+    for( k=0; k < j - 4; k++)
     {
         xyzr[k] = nosh->molpath[i][k];
         outname[k] = nosh->molpath[i][k];
@@ -5548,9 +5548,9 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
        sprintf(fname_tp, "msms -if %s -prob %f -dens %f -of %s",
                xyzr, samparm->probe_radius,samparm->density, outname);
     #endif
- 
+
       printf("%s\n", fname_tp);
- 
+
       printf("Running MSMS...\n");
       ierr = system(fname_tp);
 

@@ -14,12 +14,12 @@
  *
  *  Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2010-2014 Battelle Memorial Institute. Developed at the
+ * Copyright (c) 2010-2020 Battelle Memorial Institute. Developed at the
  * Pacific Northwest National Laboratory, operated by Battelle Memorial
  * Institute, Pacific Northwest Division for the U.S. Department of Energy.
  *
  * Portions Copyright (c) 2002-2010, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2010, Nathan A. Baker.
+ * Portions Copyright (c) 2002-2020, Nathan A. Baker.
  * Portions Copyright (c) 1999-2002, The Regents of the University of
  * California.
  * Portions Copyright (c) 1995, Michael Holst.
@@ -3119,7 +3119,7 @@ VPUBLIC int NOsh_parsePBAM(
 
 
 
-    pbeparm->setsrfm=1; 
+    pbeparm->setsrfm=1;
     pbeparm->setsrad=1;
     pbeparm->settemp=1; // do need temp, but have default, incase
     pbeparm->setmolid=1; // for unneeded mol flag
@@ -3248,7 +3248,7 @@ VPUBLIC int NOsh_parsePBSAM(
         }
     }
 
-    pbeparm->setsrfm=1; 
+    pbeparm->setsrfm=1;
     pbeparm->setsrad=1;
     pbeparm->settemp=1; // do need temp, but have default, incase
     pbeparm->setmolid=1; // for unneeded mol flag
@@ -3281,7 +3281,7 @@ VPUBLIC int NOsh_parsePBSAM(
 
     /* Check the status of the parameter objects */
     if ((PBSAMparm_check(samparm)==VRC_FAILURE) ||
-         (PBAMparm_check(parm) == VRC_FAILURE) || 
+         (PBAMparm_check(parm) == VRC_FAILURE) ||
          (!PBEparm_check(pbeparm))) {
         Vnm_print(2, "NOsh:  PBSAM parameters not set correctly!\n");
         return 0;

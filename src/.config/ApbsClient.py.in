@@ -13,12 +13,12 @@ code from Sriram Krishnan
 
       Additional contributing authors listed in the code documentation.
 
-    Copyright (c) 2010-2014 Battelle Memorial Institute. Developed at the Pacific
+    Copyright (c) 2010-2020 Battelle Memorial Institute. Developed at the Pacific
     Northwest National Laboratory, operated by Battelle Memorial Institute, Pacific
     Northwest Division for the U.S. Department of Energy.
 
     Portions Copyright (c) 2002-2010, Washington University in St. Louis.
-    Portions Copyright (c) 2002-2010, Nathan A. Baker.
+    Portions Copyright (c) 2002-2020, Nathan A. Baker.
     Portions Copyright (c) 1999-2002, The Regents of the University of California.
     Portions Copyright (c) 1995, Michael Holst.
     All rights reserved.
@@ -101,18 +101,18 @@ helpString = """
 
     This driver program calculates electrostatic potentials, energies, and forces
     using both multigrid and finite element methods.  It is invoked as:
-    
+
 	ApbsClient.py [options] apbs.in
-    
+
     where apbs.in is a formatted input file and [options] are:
-    
+
     --output-file=<name>     Enables output logging to the path listed in <name>.
     --output-format=<type>   Specifies format for logging.  Options for type are
       either "xml" or "flat".   Uses flat-file format if --output-format is not used.\
     --help                   Display this help information.
-    
+
     Options specific to the Opal web client are:
-    
+
     --fetch=<output file location>
                              Used to specify the location to which the files should be
                              downloaded. Files are downloaded to current directory if

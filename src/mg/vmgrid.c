@@ -14,7 +14,7 @@
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
+ * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2020, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2020, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

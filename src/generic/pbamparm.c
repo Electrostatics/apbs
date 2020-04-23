@@ -14,12 +14,12 @@
  *
  *  Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2010-2014 Battelle Memorial Institute. Developed at the
+ * Copyright (c) 2010-2020 Battelle Memorial Institute. Developed at the
  * Pacific Northwest National Laboratory, operated by Battelle Memorial
  * Institute, Pacific Northwest Division for the U.S. Department of Energy.
  *
  * Portions Copyright (c) 2002-2010, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2010, Nathan A. Baker.
+ * Portions Copyright (c) 2002-2020, Nathan A. Baker.
  * Portions Copyright (c) 1999-2002, The Regents of the University of
  * California.
  * Portions Copyright (c) 1995, Michael Holst.
@@ -80,10 +80,10 @@ VPUBLIC Vrc_Codes PBAMparm_ctor2(PBAMparm *thee, PBAMparm_CalcType type) {
 
     if (thee == VNULL) return VRC_FAILURE;
 
-    thee->parsed = 0; 
+    thee->parsed = 0;
     thee->type = type;
     thee->salt = 0;
-    
+
     thee->setsalt = 0;
     thee->setruntype = 0;
     thee->setrunname = 0;
@@ -189,7 +189,7 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
     for (i=0; i<PBAMPARM_MAXWRITE; i++)
     {
         for (j=0; j<CHR_MAXLEN; j++)
-        { 
+        {
             thee->grid2Dname[i][j] = parm->grid2Dname[i][j];
             thee->grid2Dax[i][j] = parm->grid2Dax[i][j];
         }
@@ -211,7 +211,7 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
     for (i=0; i<PBAMPARM_MAXMOL; i++)
     {
         for (j=0; j<CHR_MAXLEN; j++)
-        { 
+        {
             thee->moveType[i][j] = parm->moveType[i][j];
         }
         thee->transDiff[i] = parm->transDiff[i];
@@ -225,7 +225,7 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
     for (i=0; i<PBAMPARM_MAXWRITE; i++)
     {
         for (j=0; j<CHR_MAXLEN; j++)
-        { 
+        {
             thee->termnam[i][j] = parm->termnam[i][j];
             thee->confil[i][j] = parm->confil[i][j];
         }
@@ -234,12 +234,12 @@ VPUBLIC void PBAMparm_copy(PBAMparm *thee, PBAMparm *parm) {
     }
 
     thee->setxyz = parm->setxyz;
-    for (i = 0; i<PBAMPARM_MAXMOL; i++) 
+    for (i = 0; i<PBAMPARM_MAXMOL; i++)
     {
         thee->xyzct[i] = parm->xyzct[i];
-        for (j = 0; j<PBAMPARM_MAXWRITE; j++) 
+        for (j = 0; j<PBAMPARM_MAXWRITE; j++)
         {
-            for (k = 0; k<CHR_MAXLEN; k++) 
+            for (k = 0; k<CHR_MAXLEN; k++)
             {
                 thee->xyzfil[i][j][k] = parm->xyzfil[i][j][k];
             }
@@ -257,7 +257,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseSalt(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
     }
-    
+
     if (sscanf(tok, "%lf", &tf) == 0){
         Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
         return VRC_WARNING;
@@ -316,7 +316,7 @@ VPRIVATE Vrc_Codes PBAMparm_parsePBCS(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
     }
-    
+
     if (sscanf(tok, "%d", &td) == 0) {
         Vnm_print(2, "parsePBAM:  Read non-int (%s) while parsing pbc keyword!\n", tok);
         return VRC_FAILURE;
@@ -356,7 +356,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseGridPts(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
     }
-    
+
     if (sscanf(tok, "%d", &td) == 0){
         Vnm_print(2, "NOsh:  Read non-integer (%s) while parsing %s keyword!\n", tok, name);
         return VRC_WARNING;
@@ -383,7 +383,7 @@ VPRIVATE Vrc_Codes PBAMparm_parse3Dmap(PBAMparm *thee, Vio *sock){
       strncpy(thee->map3dname, tok, CHR_MAXLEN);
       thee->set3dmap=1;
     }
-	
+
     return VRC_SUCCESS;
 	*/
 }
@@ -400,7 +400,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseGrid2D(PBAMparm *thee, Vio *sock){
       strncpy(thee->grid2Dname[thee->grid2Dct], tok, CHR_MAXLEN);
       thee->setgrid2Dname=1;
     }
-    
+
     if(Vio_scanf(sock, "%s", tok) == 0) {
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
@@ -463,7 +463,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseNtraj(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
     }
-    
+
     if (sscanf(tok, "%d", &td) == 0){
         Vnm_print(2, "NOsh:  Read non-integer (%s) while parsing %s keyword!\n", tok, name);
         return VRC_WARNING;
@@ -483,14 +483,14 @@ VPRIVATE Vrc_Codes PBAMparm_parseDiff(PBAMparm *thee, Vio *sock){
     if(Vio_scanf(sock, "%s", tok) == 0) {
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
-    } 
+    }
 
     // // looking for index
     if (sscanf(tok, "%d", &molind) == 0){
         Vnm_print(2, "NOsh:  Read non-int (%s) while parsing %s keyword!\n", tok, name);
         return VRC_WARNING;
     }
-    
+
     molind -= 1;
     // looking for move type = move, stat, rot
     if(Vio_scanf(sock, "%s", tok) == 0) {
@@ -591,7 +591,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseTerm(PBAMparm *thee, Vio *sock){
       if(Vio_scanf(sock, "%s", tok) == 0) {
           Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
           return VRC_WARNING;
-      } 
+      }
       if (sscanf(tok, "%lf", &tf) == 0){
           Vnm_print(2, "NOsh:  Read non-float (%s) while parsing %s keyword!\n", tok, name);
           return VRC_WARNING;
@@ -624,7 +624,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseTerm(PBAMparm *thee, Vio *sock){
       }
     }
 
-    thee->setterm = 1;    
+    thee->setterm = 1;
     thee->termct += 1;
     return VRC_SUCCESS;
 }
@@ -637,7 +637,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseXYZ(PBAMparm *thee, Vio *sock){
     if(Vio_scanf(sock, "%s", tok) == 0) {
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
-    } 
+    }
 
     // // looking for index
     if (sscanf(tok, "%d", &td) == 0){
@@ -647,7 +647,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseXYZ(PBAMparm *thee, Vio *sock){
         printf("This is my mol in parseXYZ: %d", td);
         mol = td-1;
     }
-    
+
     // looking for move type = move, stat, rot
     if(Vio_scanf(sock, "%s", tok) == 0) {
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
@@ -715,7 +715,7 @@ VPUBLIC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
 
     else
      return 0;
-  
+
   /*else {
         Vnm_print(2, "parsePBAM:  Unrecognized keyword (%s)!\n", tok);
         return VRC_WARNING;
