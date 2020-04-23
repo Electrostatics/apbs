@@ -2,19 +2,19 @@ read
     mol pqr 1a63.pqr
 end
 elec name comp_solv        # Toy charges
-    pbam-auto
+    pbam
 
-    runtype electrostatics  # Can be energyforce, electrostatics etc
-    runname elec_1a63       # Output name for files created by program
-    temp 298.15             # System temperature (K)
-    pdie 2.0                # Solute dielectric                 
-    sdie 80.0               # Solvent dielectric                
-    salt 0.10               # Monovalent salt conc in M
+    runtype electrostatics                           # Can be energyforce, electrostatics etc
+    runname elec_1a63                                # Output name for files created by program
+    temp 298.15                                      # System temperature (K)
+    pdie 2.0                                         # Solute dielectric                 
+    sdie 80.0                                        # Solvent dielectric                
+    ion charge 0.0 conc 0.10 radius 0.0              # Monovalent salt conc in M
 
-    gridpts 110
+    dime 110
 
-    dx 1a63_0.1M.dx
-    3dmap  1a63_0.1M.map
+    write pot dx 1a63_0.1M.dx
+    write 3dmap  1a63_0.1M.map
     grid2d 1a63_0.1M.x0.dat x 0.0
 
 end

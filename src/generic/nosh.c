@@ -1275,29 +1275,24 @@ ELEC section!\n");
             calc->bemparm->type = BCT_MANUAL;
             return NOsh_parseBEM(thee, sock, calc);
         } else if (Vstring_strcasecmp(tok, "geoflow-manual") == 0) {
-//            thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_GEOFLOW);
-//            calc = thee->elec[thee->nelec];
-//            (thee->nelec)++;
-//            calc->geoflowparm->type = GFCT_MANUAL;
-//        	return NOsh_parseGEOFLOW(thee, sock, calc);
-        	Vnm_print(2, "Geoflow currently does not support geoflow-manual please use geoflow-auto instead!\n");
+        	Vnm_print(2, "Geoflow currently does not support geoflow-manual please use geoflow instead!\n");
         	return 0;
         } else if(Vstring_strcasecmp(tok, "geoflow-none") == 0) {
-        	Vnm_print(2, "Geoflow currently does not support geoflow-none please use geoflow-auto instead!\n");
+        	Vnm_print(2, "Geoflow currently does not support geoflow-none please use geoflow instead!\n");
         	return 0;
-        } else if (Vstring_strcasecmp(tok, "geoflow-auto") == 0) {
+        } else if (Vstring_strcasecmp(tok, "geoflow") == 0) {
             thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_GEOFLOW);
             calc = thee->elec[thee->nelec];
             (thee->nelec)++;
             calc->geoflowparm->type = GFCT_AUTO;
             return NOsh_parseGEOFLOW(thee, sock, calc);
-        } else if (Vstring_strcasecmp(tok, "pbam-auto") == 0) {
+        } else if (Vstring_strcasecmp(tok, "pbam") == 0) {
             thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_PBAM);
             calc = thee->elec[thee->nelec];
             (thee->nelec)++;
             calc->pbamparm->type = PBAMCT_AUTO;
             return NOsh_parsePBAM(thee, sock, calc);
-        } else if (Vstring_strcasecmp(tok, "pbsam-auto") == 0) {
+        } else if (Vstring_strcasecmp(tok, "pbsam") == 0) {
             thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_PBSAM);
             calc = thee->elec[thee->nelec];
             (thee->nelec)++;
@@ -3101,7 +3096,7 @@ VPUBLIC int NOsh_parsePBAM(
         }
 
         if (Vstring_strcasecmp(tok, "ion") == 0) {
-            Vnm_print(2, "parsePBAM: WARNING! ion not implemented for PBAM!\n");
+            Vnm_print(2, "parsePBAM: WARNING! PBAM only uses the conc parameter of ion!\n");
         }
 
         /* Pass the token through a series of parsers */
@@ -3122,6 +3117,8 @@ VPUBLIC int NOsh_parsePBAM(
         }
     }
 
+
+
     pbeparm->setsrfm=1; 
     pbeparm->setsrad=1;
     pbeparm->settemp=1; // do need temp, but have default, incase
@@ -3130,6 +3127,28 @@ VPUBLIC int NOsh_parsePBAM(
     pbeparm->setbcfl=1;  // unneeded bcfl
     pbeparm->setsdens=1;
 
+    //This is a hacky fix at best for issue 501. This is so we don't need to change PBAM's
+    //external code.
+    if(pbeparm->setnion){
+    	parm->salt = pbeparm->ionc[pbeparm->nion-1];
+    	parm->setsalt = 1;
+    }
+
+	//This is also a hacky fix for issue 488
+	if (pbeparm->writefmt[pbeparm->numwrite - 1] == VDF_DX) {
+		strncpy(parm->dxname, pbeparm->writestem[pbeparm->numwrite -1], CHR_MAXLEN);
+		parm->setdxname = 1;
+	}
+	else {
+		Vnm_print(2, "NOsh: PBAM only prints in dx format!\n");
+		return 0;
+	}
+
+	//Another hacky fix for issue 482
+	if (pbeparm->pbam_3dmapflag == 1) {
+		strcpy(parm->map3dname, pbeparm->pbam_3dmapstem);
+		parm->set3dmap = 1;
+	}
 
     /* Handle various errors arising in the token-snarfing loop -- these all
         just result in simple returns right now */
@@ -3202,7 +3221,7 @@ VPUBLIC int NOsh_parsePBSAM(
         }
 
         if (Vstring_strcasecmp(tok, "ion") == 0) {
-            Vnm_print(2, "parsePBSAM: WARNING! ion not implemented for PBSAM!\n");
+            Vnm_print(2, "parsePBSAM: WARNING! PBAM only uses the conc parameter of ion!\n");
         }
 
         /* Pass the token through a series of parsers */
@@ -3236,6 +3255,24 @@ VPUBLIC int NOsh_parsePBSAM(
     pbeparm->setpbetype=1; // unneeded pbe type
     pbeparm->setbcfl=1;  // unneeded bcfl
     pbeparm->setsdens=1;
+
+    //This is a hacky fix at best for issue 501. This is so we don't need to change PBAM's
+    //external code.
+	if(pbeparm->setnion){
+		parm->salt = pbeparm->ionc[pbeparm->nion-1];
+		parm->setsalt = 1;
+	}
+
+	//This is also a hacky fix for issue 488
+	if (pbeparm->writefmt[pbeparm->numwrite - 1] == VDF_DX) {
+		strncpy(parm->dxname, pbeparm->writestem[pbeparm->numwrite - 1], CHR_MAXLEN);
+		parm->setdxname = 1;
+	}
+	else {
+		Vnm_print(2, "NOsh: PBSAM only prints in dx format!\n");
+		return 0;
+	}
+
 
     /* Handle various errors arising in the token-snarfing loop -- these all
         just result in simple returns right now */

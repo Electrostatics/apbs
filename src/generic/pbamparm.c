@@ -275,6 +275,9 @@ VPRIVATE Vrc_Codes PBAMparm_parseRunType(PBAMparm *thee, Vio *sock){
     if(Vio_scanf(sock, "%s", tok) == 0) {
       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
       return VRC_WARNING;
+    } else if(Vstring_strcasecmp(tok, "dynamics") == 0){
+      Vnm_print(2, "parsePBAM:  Dynamics has been moved out of the ELEC section!\n");
+      return VRC_WARNING;
     } else {
       strncpy(thee->runtype, tok, CHR_MAXLEN);
       thee->setruntype=1;
@@ -346,7 +349,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseUnits(PBAMparm *thee, Vio *sock){
 }
 
 VPRIVATE Vrc_Codes PBAMparm_parseGridPts(PBAMparm *thee, Vio *sock){
-    const char* name = "gridpts";
+    const char* name = "dime";
     char tok[VMAX_BUFSIZE];
     int td;
     if(Vio_scanf(sock, "%s", tok) == 0) {
@@ -358,7 +361,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseGridPts(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "NOsh:  Read non-integer (%s) while parsing %s keyword!\n", tok, name);
         return VRC_WARNING;
     }else{
-        printf("Found a pts flag in parse: %d\n", td);
+        printf("Found a dime flag in parse: %d\n", td);
         thee->gridpt = td;
     }
     thee->setgridpt = 1;
@@ -369,6 +372,10 @@ VPRIVATE Vrc_Codes PBAMparm_parse3Dmap(PBAMparm *thee, Vio *sock){
     const char* name = "3dmap";
     char tok[VMAX_BUFSIZE];
 
+	Vnm_print(2, "PBAM: 3dmap keyword has been deprecated! Please use in conjuction with the write keyword.");
+	return VRC_FAILURE;
+
+	/*
     if(Vio_scanf(sock, "%s", tok) == 0) {
       Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
       return VRC_WARNING;
@@ -376,8 +383,9 @@ VPRIVATE Vrc_Codes PBAMparm_parse3Dmap(PBAMparm *thee, Vio *sock){
       strncpy(thee->map3dname, tok, CHR_MAXLEN);
       thee->set3dmap=1;
     }
-
+	
     return VRC_SUCCESS;
+	*/
 }
 
 VPRIVATE Vrc_Codes PBAMparm_parseGrid2D(PBAMparm *thee, Vio *sock){
@@ -416,7 +424,10 @@ VPRIVATE Vrc_Codes PBAMparm_parseGrid2D(PBAMparm *thee, Vio *sock){
 }
 
 VPRIVATE Vrc_Codes PBAMparm_parseDX(PBAMparm *thee, Vio *sock){
-    const char* name = "dx";
+	Vnm_print(2, "PBAM's dx keyword is deprecated. Please use the write keyword!\n");
+	return VRC_FAILURE;
+	/*
+	const char* name = "dx";
     char tok[VMAX_BUFSIZE];
 
     if(Vio_scanf(sock, "%s", tok) == 0) {
@@ -427,6 +438,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseDX(PBAMparm *thee, Vio *sock){
       thee->setdxname=1;
     }
     return VRC_SUCCESS;
+	*/
 }
 
 VPRIVATE Vrc_Codes PBAMparm_parseTermcombine(PBAMparm *thee, Vio *sock){
@@ -545,7 +557,11 @@ VPRIVATE Vrc_Codes PBAMparm_parseTerm(PBAMparm *thee, Vio *sock){
         Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
         return VRC_WARNING;
     }else {
-       strncpy(thee->termnam[thee->termct], tok, CHR_MAXLEN);
+       if(strncmp(tok, "position", 8)==0){
+    	   return PBAMparm_parseTerm(thee, sock);
+       }else{
+    	   strncpy(thee->termnam[thee->termct], tok, CHR_MAXLEN);
+       }
     }
 
     if (strncmp(thee->termnam[thee->termct], "contact", 7) == 0)
@@ -583,7 +599,7 @@ VPRIVATE Vrc_Codes PBAMparm_parseTerm(PBAMparm *thee, Vio *sock){
           thee->termVal[thee->termct] = tf;
           thee->termnu[thee->termct][0] = 0;
       }
-    } else
+    } else //if (strncmp(thee->termnam[thee->termct], "position", 8) == 0)
     {
       if(Vio_scanf(sock, "%s", tok) == 0) {
           Vnm_print(2, "parsePBAM:  ran out of tokens on %s!\n", name);
@@ -673,7 +689,7 @@ VPUBLIC Vrc_Codes PBAMparm_parseToken(PBAMparm *thee, char tok[VMAX_BUFSIZE],
     }
 
     // Electrostatic parsing
-    else if (Vstring_strcasecmp(tok, "gridpts") == 0) {
+    else if (Vstring_strcasecmp(tok, "dime") == 0) {
         return PBAMparm_parseGridPts(thee, sock);
     }else if (Vstring_strcasecmp(tok, "3dmap") == 0) {
         return PBAMparm_parse3Dmap(thee, sock);

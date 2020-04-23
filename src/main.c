@@ -762,7 +762,7 @@ int main(
 #ifdef ENABLE_PBAM
                 /* What is this?  This seems like a very awkward way to find
                 the right ELEC statement... */
-                Vnm_tprint( 1, "Made it to start\n");
+                //Vnm_tprint( 1, "Made it to start\n");
                 for (k=0; k<nosh->nelec; k++) {
                     if (nosh->elec2calc[k] >= i) {
                         break;
@@ -781,9 +781,8 @@ int main(
                 /* Set up problem */
                 Vnm_tprint( 1, "  Setting up problem...\n");
 
-
                 /* Solve LPBE with PBAM method */
-                if (solvePBAM(alist, nosh, pbeparm, pbamparm) != 1) {
+				if (solvePBAM(alist, nosh, pbeparm, pbamparm) != 1) {
                     Vnm_tprint(2, "Error solving PBAM!\n");
                     VJMPERR1(0);
                 }

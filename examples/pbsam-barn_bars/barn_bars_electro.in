@@ -1,10 +1,10 @@
-read
+g20read
     mol pqr barstar.pqr
     mol pqr barnase.pqr
 
 end
 elec name comp_solv        # Gly
-    pbsam-auto
+    pbsam
 
     runtype electrostatics  # Can be energyforce, electrostatics etc
     runname elec_barn_bars  # Output name for files created by program
@@ -12,10 +12,10 @@ elec name comp_solv        # Gly
     units kT
     ## info for molecule
     tolsp 4.5
-    msms  #comment if the system has been coarse-grained
+    mesh msms  #comment if the system has been coarse-grained
 
-   #surf barstar.vert # uncomment if system needs to be CGed
-   #surf barnase.vert # uncomment if system needs to be CGed
+   #usemesh barstar.vert # uncomment if system needs to be CGed
+   #usemesh barnase.vert # uncomment if system needs to be CGed
 
    #imat  imat/mol0sph  # For barstar, when imat is gen
    #imat  imat/mol1sph  # For barnase, when imat is gen
@@ -23,14 +23,14 @@ elec name comp_solv        # Gly
    #exp   exp/mol0      # For barstar, when exp are gen
    #exp   exp/mol1      # For barnase, when exp files gen
 
-    temp 298.15             # System temperature (K)
-    pdie 4.0                # Solute dielectric                 
-    sdie 78.0               # Solvent dielectric                
-    salt 0.10               # Monovalent salt conc in M
+    temp 298.15                                       # System temperature (K)
+    pdie 4.0                                          # Solute dielectric                 
+    sdie 78.0                                         # Solvent dielectric                
+    ion charge 0.0 conc 0.10 radius 0.0               # Monovalent salt conc in M
 
-    gridpts 150
-    dx barn_bars_0.1M.dx
-    3dmap  barn_bars_0.1M.map
+    dime 150
+    write pot dx barn_bars_0.1M.dx
+    write 3dmap  barn_bars_0.1M.map
     grid2d barn_bars_0.1M.x0.dat x 0.0
     grid2d barn_bars_0.1M.y0.dat y 0.0
     grid2d barn_bars_0.1M.z0.dat z 0.0

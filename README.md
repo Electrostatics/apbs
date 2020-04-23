@@ -11,7 +11,7 @@ We are using Git submodules to manage various pieces of code.  To build the mast
  * `git submodule update`
 
 # Build flags for CMake
-* `cmake <apbs src location>`
+* `cmake <path to apbs directory>`
 
 ## Using geometric flow
 If you want to use the geometric flow implementation, when invoking CMake, set ENABLE_GEOFLOW to ON, e.g., `-DENABLE_GEOFLOW=ON`.

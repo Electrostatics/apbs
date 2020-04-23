@@ -5,14 +5,14 @@ read
     mol pqr gly_cg2.pqr
 end
 elec name comp_solv        # Gly
-    pbsam-auto
+    pbsam
 
     runtype dynamics        # Can be energyforce, electrostatics etc
     runname dyn_gly         # Output name for files created by program
 
     units kT
     ## info for molecule
-   #msms
+    #mesh msms
     tolsp 2.5
 
    #imat imat/mol0sph
@@ -34,10 +34,10 @@ elec name comp_solv        # Gly
     xyz 2 traj_2_1.xyz
     xyz 2 traj_2_2.xyz
 
-    temp 298.15             # System temperature (K)
-    pdie 4.0                # Solute dielectric                 
-    sdie 80.0               # Solvent dielectric                
-    salt 0.05               # Monovalent salt conc in M
+    temp 298.15                                       # System temperature (K)
+    pdie 4.0                                          # Solute dielectric                 
+    sdie 80.0                                         # Solvent dielectric                
+    ion charge 0.0 conc 0.05 radius 0.0               # Monovalent salt conc in M
 
 end
 

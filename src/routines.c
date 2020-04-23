@@ -5215,7 +5215,6 @@ VPUBLIC int solvePBAM( Valist* molecules[NOSH_MAXMOL],
                                 PBEparm *pbeparm,
                                 PBAMparm *parm )
 {
-  printf("solvePBAM!!!\n");
   if (nosh != VNULL) {
     if (nosh->bogus) return 1;
   }
@@ -5512,7 +5511,8 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
        if (nosh->molpath[i][j] == '\0') break;
      
     // assume terminated by '.pqr' -> 4 char, want to term w/ '.xyzr'
-    char xyzr[j+2], surf[j+2], outname[j-4]; 
+	//char xyzr[j+2], surf[j+2], outname[j-4]; 
+	char xyzr[VMAX_ARGLEN], surf[VMAX_ARGLEN], outname[VMAX_ARGLEN];
     for( k=0; k < j - 4; k++) 
     {
         xyzr[k] = nosh->molpath[i][k];

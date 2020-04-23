@@ -9,7 +9,11 @@ coefficients, system temperature and salt concentration.
 More information can be found here in [Cite!]() and 
 [Lotan and Head-Gordon](http://pubs.acs.org/doi/full/10.1021/ct050263p).
 
-**Input File(s)**|**APBS Version**|**Result Mol 1**|**Expected Mol 1**|**Result Mol 2**|**Expected Mol2**
+**toy_energyforce.in**|**APBS Version**|**Result Energy Mol 1**|**Expected Energy Mol 1**|**Result Force Mol 1**|**Expected Force Mol 1**
 ---|---|---|---|---|---
-toy_energyforce.in|1.5|-4.965018552290E+01|-4.965019E+01|-4.965018552290E+01|-4.965019E+01
+---|1.5|-4.965018552290E+01|-4.965019E+01|(-7.018534E-16, -1.074613E+01, -5.196457E-16)|(-7.018534E-16, -1.074613E+01, -5.196457E-16)
+
+**toy_energyforce.in**|**APBS Version**|**Result Energy Mol 2**|**Expected Energy Mol 2**|**Result Force Mol 2**|**Expected Force Mol 2**
+---|---|---|---|---|---
+---|1.5|-4.965018552290E+01|-4.965019E+01|(7.018535E-16, 1.074613E+01, 5.137566E-16)|(7.018535E-16, 1.074613E+01, 5.137566E-16)
 
