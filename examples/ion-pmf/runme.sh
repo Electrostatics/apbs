@@ -14,7 +14,7 @@ for i in $coord; do
 	echo "ATOM      1  ION   ION     1      -3.000   0.000   0.000  1.00 2.00" > complex.pdb
 	echo "ATOM      1  ION   ION     1      $i    0.000   0.000  1.00 2.00" >> complex.pdb
 	outfile=OUTPUT_${i}
-	apbs apbs.in > ${outfile} 2>&1
+	apbs ion-pmf.in > ${outfile} 2>&1
 	echo "x = ${i}"
 	grep "^  sasa " ${outfile}
 	grep "^  qf" ${outfile}

@@ -2,7 +2,7 @@ README for TABI-PB (Boundary Element Method) Binding Energy Examples
 ====================================================================
 
 The example input files included in this folder uses a boundary element approach called
-TABI-PB to solve the PBE. BEMs have the characteristic that only the boundary of the 
+TABI-PB to solve the PBE. BEMs have the characteristic that only the boundary of the
 domain has to be discretized. This is particularly useful for problems in which the data
 of interest is at the boundary of the solution.
 
@@ -14,8 +14,11 @@ This directory contains three example .in files:
 These files provide an example to demonstrate the calculation of binding energy on 1d30.
 More details are available on the APBS website contributions section.
 
-Input File| APBS Version| Result (kCal/mol)| Expected (kCal/mol)
+Input File| APBS Version| Result (kJ/mol)| Expected (kJ/mol)
 ---|---|---|---
-[1d30.in](1d30.in)| **1.5**| **-5249.040**| -5249.030
-[1d30_monomer1.in](1d30_monomer1.in)| **1.5**| **-6232.160**| -6232.150
-[1d30_monomer2.in](1d30_monomer2.in)| **1.5**| **-182.1470**| -182.1471
+[1d30.in](1d30.in)| **3.0**| **-21961.965**| **-21961.946**
+| | 1.5| -21961.983|
+[1d30_monomer1.in](1d30_monomer1.in)| **3.0**| **-26075.345**| **-26075.316**
+| | 1.5| -26075.357|
+[1d30_monomer2.in](1d30_monomer2.in)| **3.0**| **-762.105**| **-762.103**
+| | 1.5| -762.103|

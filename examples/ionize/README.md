@@ -6,7 +6,8 @@ The example input files in this directory calculate electrostatic contributions 
 Input File|Description|APBS Version|Results (kJ/mol)||||UHBD (kJ/mol)||||
 ---|---|---|---|---|---|---|---|---|---|---
 ||||Acetic Acid|Acetate|Proton|Ionization Energy|Acetic Acid|Acetate|Proton|Ionization Energy
-[apbs-mol.in](apbs-mol.in)|3-level focusing to 0.094 A, srfm mol|**1.5**|**-22.6788**|**-199.746**|**-297.46**|**-474.527**|-22.22|-198.04|-295.79|-471.61
+[apbs-mol.in](apbs-mol.in)|3-level focusing to 0.094 A, srfm mol|**3.0**|**-22.6788**|**-199.746**|**-297.46**|**-474.527**|**-22.22**|**-198.04**|**-295.79**|**-471.61**
+|||1.5|-22.6788|-199.746|-297.46|-474.527|
 |||1.4.2|-22.6788|-199.746|-297.46|-474.527
 |||1.4.1|-22.6788|-199.7463|-297.4598|-474.5273
 |||1.4|-22.6788|-199.7463|-297.4598|-474.5273
@@ -29,7 +30,8 @@ Input File|Description|APBS Version|Results (kJ/mol)||||UHBD (kJ/mol)||||
 |||0.2.1|-22.627|-195.305|-290.859|-463.537
 |||0.2.0|-22.627|-195.305|-290.859|-463.537
 |||0.1.8|-22.63|-195.31|-290.86|-463.54
-[apbs-smol.in](apbs-smol.in)|3-level focusing to 0.094 A, srfm smol|**1.5**|**-22.3305**|**-198.488**|**-295.967**|**-472.125**|-22.22|-198.04|-295.79|-471.61
+[apbs-smol.in](apbs-smol.in)|3-level focusing to 0.094 A, srfm smol|**3.0**|**-22.3305**|**-198.488**|**-295.967**|**-472.125**|**-22.22**|**-198.04**|**-295.79**|**-471.61**
+|||1.5|-22.3305|-198.488|-295.967|-472.125
 |||1.4.2|-22.3305|-198.488|-295.967|-472.125
 |||1.4.1|-22.3305|-198.4883|-295.9669|-472.1247
 |||1.4|-22.3305|-198.4883|-295.9669|-472.1247
@@ -45,5 +47,3 @@ Input File|Description|APBS Version|Results (kJ/mol)||||UHBD (kJ/mol)||||
 <a name=1></a><sup>1</sup> APBS 1.2 has switched the multigrid smoothing algorithm from standard Gauss-Seidel to Gauss-Seidel red/black in order to facilitate parallelization. This switch has caused small differences in individual calculation energies which, when combined to the final answer, create larger errors (up to 0.04%). These errors can be reduced by resetting the APBS error tolerance to 1e-9 or smaller values. For a more detailed explanation, please see the APBS FAQ, [here](http://www.poissonboltzmann.org/docs/apbs-faq/#sources error calculation).
 
 Please see the ChangeLog or the [APBS website](http://www.poissonboltzmann.org/) for more information.
-
-
