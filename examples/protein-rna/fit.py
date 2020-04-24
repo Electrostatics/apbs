@@ -24,7 +24,7 @@ def fit(data):
 	ymean = ymean/float(ndata)
 	outdict["x mean"] = xmean
 	outdict["y mean"] = ymean
-	
+
 	# Get variances
 	sxx = 0
 	syy = 0
@@ -42,7 +42,7 @@ def fit(data):
 	outdict["xy covariance"] = covxy
 	outdict["yy covariance"] = covyy
 
-	# Slope 
+	# Slope
 	b = sxy/sxx
 	outdict["slope"] = b
 
