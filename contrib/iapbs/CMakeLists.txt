@@ -10,11 +10,8 @@ include(CheckTypeSize)
 include(ExternalProject)
 
 set(iAPBS_VERSION "3.0.0")
-#set(PACKAGE_STRING ${iAPBS_VERSION})
 
 PROJECT(iAPBS)
-#PROJECT(iAPBS C Fortran)
-#ENABLE_LANGUAGE(Fortran)
 ################################################################################
 # Set project paths                                                            #
 ################################################################################
