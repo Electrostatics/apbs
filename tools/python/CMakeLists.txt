@@ -6,19 +6,22 @@ endif()
 FIND_PACKAGE(SWIG REQUIRED)
 INCLUDE(${SWIG_USE_FILE})
 
-SET(Python_ADDITIONAL_VERSIONS 2.7 2.7.12 2.7.10 2.7.3 2.7.17)
 
 if(${CMAKE_VERSION} VERSION_GREATER  "3.13")
-	FIND_PACKAGE(Python COMPONENTS Interpreter Development)
+	find_package (Python3 COMPONENTS Interpreter Development)
 else()
 	find_package(PythonInterp REQUIRED)
 	find_package(PythonLibs REQUIRED)
 endif()
 
-INCLUDE_DIRECTORIES(${Python_INCLUDE_DIRS})
-message(STATUS "Python include path is: ${Python_INCLUDE_DIRS}")
-message(STATUS "Python library path is: ${Python_LIBRARIES}")
-message(STATUS "Python library dir is: ${Python_LIBRARY_DIRS}")
+if(${Python3_FOUND})
+    #message(STATUS "******* Python3 FOUND")
+endif()
+
+INCLUDE_DIRECTORIES(${Python3_INCLUDE_DIRS})
+message(STATUS "Python include path is: ${Python3_INCLUDE_DIRS}")
+message(STATUS "Python library path is: ${Python3_LIBRARIES}")
+message(STATUS "Python library dir is: ${Python3_LIBRARY_DIRS}")
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -38,7 +41,7 @@ endif(APPLE)
 # Another hack to get SWIG to use the the correct library extension!
 #SET_TARGET_PROPERTIES(${SWIG_MODULE_apbslib_REAL_NAME} PROPERTIES SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
 
-SWIG_LINK_LIBRARIES(apbslib ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${Python_LIBRARIES})
+SWIG_LINK_LIBRARIES(apbslib ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${Python3_LIBRARIES})
 
 if(WIN32)
 	add_custom_command(TARGET _apbslib POST_BUILD
@@ -55,19 +58,3 @@ else()
 			copy ${LIBRARY_OUTPUT_PATH}/_apbslib${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_SOURCE_DIR}/../pdb2pqr/pdb2pka
 	)
 endif()
-
-#if(WIN32)
-#	add_custom_command(TARGET _apbslib POST_BUILD
-#	COMMAND ${CMAKE_COMMAND} -E
-#		copy ${CMAKE_CURRENT_BINARY_DIR}/apbslib.py ${CMAKE_SOURCE_DIR}/../pdb2pqr/pdb2pka
-#	COMMAND ${CMAKE_COMMAND} -E
-#		copy ${LIBRARY_OUTPUT_PATH}/$<CONFIG>/_apbslib${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_SOURCE_DIR}/../pdb2pqr/pdb2pka
-#	)
-#else()
-#	add_custom_command(TARGET _apbslib POST_BUILD
-#		COMMAND ${CMAKE_COMMAND} -E
-#			copy ${CMAKE_CURRENT_BINARY_DIR}/apbslib.py ${CMAKE_SOURCE_DIR}/../pdb2pqr/pdb2pka
-#		COMMAND ${CMAKE_COMMAND} -E
-#			copy ${LIBRARY_OUTPUT_PATH}/_apbslib${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_SOURCE_DIR}/../pdb2pqr/pdb2pka
-#	)
-#endif()
