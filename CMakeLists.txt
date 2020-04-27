@@ -1,3 +1,5 @@
+cmake_minimum_required (VERSION 3.13)
+
 ################################################################################
 # TODO:  Add licensing and authorship information
 # TODO:  Test with FEtk build
@@ -5,7 +7,7 @@
 #        (configure.ac:1306)
 ################################################################################
 
-#set(CMAKE_VERBOSE_MAKEFILE true)
+set(CMAKE_VERBOSE_MAKEFILE true)
 cmake_policy(SET CMP0054 OLD)
 
 ################################################################################
@@ -269,15 +271,27 @@ endif()
 # to add CMake support to MALOC, and that FETK has no such support, in general.#
 ################################################################################
 
-if(NOT ENABLE_FETK)
+#if(NOT ENABLE_FETK)
   # We'll use autotools to build MALOC if FETK is enabled.
   set(MALOC_ROOT ${EXTERNALS_PATH}/fetk/maloc)
   add_subdirectory(${MALOC_ROOT})
-  include_directories(${MALOC_ROOT}/src/base ${MALOC_ROOT}/src/vsys
-    ${MALOC_ROOT}/src/vsh ${MALOC_ROOT}/src/psh)
+  include_directories(
+    ${EXTERNALS_PATH}/fetk/mc/src/aaa_inc
+    ${EXTERNALS_PATH}/fetk/mc/src/aprx
+    ${EXTERNALS_PATH}/fetk/mc/src/bam
+    ${EXTERNALS_PATH}/fetk/mc/src/base
+    ${EXTERNALS_PATH}/fetk/mc/src/gem
+    ${EXTERNALS_PATH}/fetk/mc/src/pde
+    ${EXTERNALS_PATH}/fetk/punc/src/aaa_inc
+    ${EXTERNALS_PATH}/fetk/punc/src/base
+    ${MALOC_ROOT}/src/base
+    ${MALOC_ROOT}/src/psh
+    ${MALOC_ROOT}/src/vsh
+    ${MALOC_ROOT}/src/vsys
+  )
   list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
   list(APPEND APBS_LIBS maloc)
-endif()
+#endif()
 
 
 
