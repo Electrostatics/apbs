@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+
 macro(add_items TYPE)
 
     # Make sure the TYPE argument is valid
@@ -22,8 +24,6 @@ macro(add_items TYPE)
 
 endmacro()
 
-
-
 macro(add_sublibrary LIBRARY)
     set(LIBRARY_NAME "apbs_${LIBRARY}")
     set(LIBRARY_DEPENDENCIES ${APBS_LIBS} ${ARGN})
@@ -42,8 +42,6 @@ macro(add_sublibrary LIBRARY)
     message(STATUS "Added ${LIBRARY_NAME}")
 endmacro()
 
-
-
 add_subdirectory(generic)
 add_subdirectory(pmgc)
 add_subdirectory(mg)
@@ -55,8 +53,9 @@ endif(ENABLE_FETK)
 add_items(SOURCES routines.c)
 add_sublibrary(routines)
 
-message(STATUS ${EXTERNAL_HEADERS})
+message(STATUS "External Headers: ${EXTERNAL_HEADERS}")
 
+#add_executable(apbs main.c routines.c)
 add_executable(apbs main.c apbs.h routines.c routines.h)
 message(STATUS " ")
 message(STATUS "APBS Libraries: ${APBS_LIBS}")
@@ -64,6 +63,7 @@ message(STATUS "Internal Libraries: ${APBS_INTERNAL_LIBS}")
 message(STATUS " ")
 
 #add_dependencies(apbs ${BEM_LIB})
+#target_include_directories(apbs PRIVATE apbs.h routines.h)
 target_link_libraries(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
 #add_dependencies(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
 

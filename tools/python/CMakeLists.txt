@@ -7,15 +7,16 @@ FIND_PACKAGE(SWIG REQUIRED)
 INCLUDE(${SWIG_USE_FILE})
 
 
+set(CMAKE_FIND_FRAMEWORK NEVER)
 find_package(Python3 COMPONENTS Interpreter Development)
 if(${Python3_FOUND})
-    #message(STATUS "******* Python3 FOUND")
+    message(STATUS "******* Python3 FOUND")
 endif()
 
 INCLUDE_DIRECTORIES(${Python3_INCLUDE_DIRS})
-message(STATUS "***** Python include path is: ${Python3_INCLUDE_DIRS}")
-message(STATUS "***** Python library path is: ${Python3_LIBRARIES}")
-message(STATUS "***** Python library dir  is: ${Python3_LIBRARY_DIRS}")
+message(STATUS "***** Python3 include path is: ${Python3_INCLUDE_DIRS}")
+message(STATUS "***** Python3 library path is: ${Python3_LIBRARIES}")
+message(STATUS "***** Python3 library dir  is: ${Python3_LIBRARY_DIRS}")
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
