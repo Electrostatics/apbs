@@ -1,5 +1,3 @@
-cmake_minimum_required (VERSION 3.13)
-
 ################################################################################
 # TODO:  Add licensing and authorship information
 # TODO:  Test with FEtk build
