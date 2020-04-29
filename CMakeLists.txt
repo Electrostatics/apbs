@@ -282,6 +282,7 @@ endif()
     ${EXTERNALS_PATH}/fetk/mc/src/base
     ${EXTERNALS_PATH}/fetk/mc/src/gem
     ${EXTERNALS_PATH}/fetk/mc/src/pde
+    ${EXTERNALS_PATH}/fetk/mc/src/whb
     ${EXTERNALS_PATH}/fetk/punc/src/aaa_inc
     ${EXTERNALS_PATH}/fetk/punc/src/base
     ${MALOC_ROOT}/src/base
