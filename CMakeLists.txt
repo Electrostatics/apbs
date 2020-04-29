@@ -280,7 +280,10 @@ endif()
     ${EXTERNALS_PATH}/fetk/mc/src/aprx
     ${EXTERNALS_PATH}/fetk/mc/src/bam
     ${EXTERNALS_PATH}/fetk/mc/src/base
+    ${EXTERNALS_PATH}/fetk/mc/src/dyn
     ${EXTERNALS_PATH}/fetk/mc/src/gem
+    ${EXTERNALS_PATH}/fetk/mc/src/mcsh
+    ${EXTERNALS_PATH}/fetk/mc/src/nam
     ${EXTERNALS_PATH}/fetk/mc/src/pde
     ${EXTERNALS_PATH}/fetk/mc/src/whb
     ${EXTERNALS_PATH}/fetk/punc/src/aaa_inc
