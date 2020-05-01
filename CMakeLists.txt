@@ -1,7 +1,5 @@
 cmake_minimum_required (VERSION 3.12)
 
-project(abps)
-
 ################################################################################
 # TODO:  Add licensing and authorship information
 # TODO:  Test with FEtk build
@@ -78,7 +76,6 @@ endif()
 file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}/temp)
 
 
-
 ################################################################################
 # Set the lookup paths for external library dependencies                       #
 ################################################################################
@@ -88,7 +85,6 @@ message(STATUS "Setting lookup paths for headers and libraries")
 set(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}")
 list(APPEND CMAKE_INCLUDE_PATH /usr/include)
 list(APPEND CMAKE_INCLUDE_PATH /usr/local/include)
-
 
 
 ################################################################################
@@ -101,7 +97,6 @@ if(ENABLE_PEDANTIC)
     ADD_DEFINITIONS("-Wall -pedantic -ansi")
     message(STATUS "Pedantic compilation enabled")
 endif()
-
 
 
 ################################################################################
@@ -147,7 +142,6 @@ else()
 endif()
 
 
-
 ################################################################################
 # Check for a few required functions                                           #
 ################################################################################
@@ -159,7 +153,6 @@ if(NOT HAVE_TIME_FUNC)
 endif()
 
 
-
 CHECK_FUNCTION_EXISTS(rand HAVE_RAND_FUNC)
 
 if(NOT HAVE_RAND_FUNC)
@@ -167,13 +160,11 @@ if(NOT HAVE_RAND_FUNC)
 endif()
 
 
-
 CHECK_FUNCTION_EXISTS(srand HAVE_SRAND_FUNC)
 
 if(NOT HAVE_SRAND_FUNC)
     message(FATAL_ERROR "Required srand function not found")
 endif()
-
 
 
 ################################################################################
@@ -300,7 +291,6 @@ endif()
 #endif()
 
 
-
 ################################################################################
 # Handle the finite element solver dependencies                                #
 ################################################################################
@@ -380,7 +370,6 @@ if(ENABLE_FETK)
 endif()
 
 
-
 ################################################################################
 # Optionally build geoflow (git submodule)
 ################################################################################
@@ -423,8 +412,6 @@ if(ENABLE_GEOFLOW)
   endif()
 
 endif()
-
-
 
 
 ################################################################################
@@ -471,7 +458,6 @@ if(ENABLE_PBAM)
   endif()
 
 endif()
-
 
 
 ################################################################################
@@ -529,11 +515,7 @@ if(ENABLE_PBSAM)
       DESTINATION ${LIBRARY_INSTALL_PATH}
     )
   endif()
-
-
 endif()
-
-
 
 
 ################################################################################
@@ -572,7 +554,6 @@ if(GET_MSMS)
 	    DESTINATION ${EXECUTABLE_INSTALL_PATH}
 	  )
 	endif()
-
 endif()
 
 
@@ -606,9 +587,7 @@ if(GET_NanoShaper)
 	    DESTINATION ${EXECUTABLE_INSTALL_PATH}
 	  )
 	endif()
-
 endif()
-
 
 
 ################################################################################
@@ -650,7 +629,6 @@ try_compile(
 # TODO: Determine if the EMBED macro is even used
 
 
-
 ################################################################################
 # Handle conditional debug building                                            #
 ################################################################################
@@ -662,7 +640,6 @@ if(ENABLE_DEBUG)
     set(DEBUG 1)
     message(STATUS "Debugging compilation enabled")
 endif()
-
 
 
 ################################################################################
@@ -677,7 +654,6 @@ if(ENABLE_INLINE)
 endif()
 
 
-
 ################################################################################
 # Handle conditional building with quiet mode                                  #
 ################################################################################
@@ -690,7 +666,6 @@ if(ENABLE_QUIET)
 endif()
 
 
-
 ################################################################################
 # Handle conditional building with verbose debugging information printouts     #
 ################################################################################
@@ -701,7 +676,6 @@ if(ENABLE_VERBOSE_DEBUG)
     set(VERBOSE_DEBUG 1)
     message(STATUS "Verbose debugging mode enabled")
 endif()
-
 
 
 ################################################################################
@@ -741,7 +715,6 @@ if(ENABLE_OPENMP)
 endif()
 
 
-
 ################################################################################
 # Handle library checks for embedded unix environments in windows              #
 ################################################################################
@@ -761,7 +734,6 @@ if(MINGW)
         message(FATAL_ERROR "The wsock32 library was not fond")
     endif()
 endif()
-
 
 
 if(CYGWIN)
@@ -789,7 +761,6 @@ if(NOT CYGWIN AND NOT MINGW AND WIN32)
 endif()
 
 
-
 ################################################################################
 # Build APBS sources                                                           #
 ################################################################################
@@ -797,7 +768,6 @@ endif()
 link_directories(${APBS_LIB_DIRS})
 include_directories(${APBS_ROOT}/src ${APBS_BUILD}/src ${APBS_ROOT}/include)
 add_subdirectory(src)
-
 
 
 ################################################################################
@@ -812,7 +782,6 @@ if(BUILD_DOC)
 endif()
 
 
-
 ################################################################################
 # Handle conditional building with verbose debugging information printouts     #
 ################################################################################
@@ -823,7 +792,6 @@ if(BUILD_TOOLS)
     message(STATUS "Supplemental tools enabled")
     add_subdirectory(tools)
 endif()
-
 
 
 ################################################################################
