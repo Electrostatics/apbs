@@ -9,7 +9,8 @@ cmake_minimum_required (VERSION 3.12)
 
 set(CMAKE_VERBOSE_MAKEFILE true)
 cmake_policy(SET CMP0054 OLD)
-
+cmake_policy(SET CMP0042 NEW)
+set(CMAKE_MACOSX_RPATH 1)
 ################################################################################
 # Set up basic project stuff                                                   #
 ################################################################################
@@ -264,31 +265,34 @@ endif()
 # to add CMake support to MALOC, and that FETK has no such support, in general.#
 ################################################################################
 
-#if(NOT ENABLE_FETK)
+if(NOT ENABLE_FETK)
   # We'll use autotools to build MALOC if FETK is enabled.
-  set(MALOC_ROOT ${EXTERNALS_PATH}/fetk/maloc)
-  add_subdirectory(${MALOC_ROOT})
-  include_directories(
-    ${EXTERNALS_PATH}/fetk/mc/src/aaa_inc
-    ${EXTERNALS_PATH}/fetk/mc/src/aprx
-    ${EXTERNALS_PATH}/fetk/mc/src/bam
-    ${EXTERNALS_PATH}/fetk/mc/src/base
-    ${EXTERNALS_PATH}/fetk/mc/src/dyn
-    ${EXTERNALS_PATH}/fetk/mc/src/gem
-    ${EXTERNALS_PATH}/fetk/mc/src/mcsh
-    ${EXTERNALS_PATH}/fetk/mc/src/nam
-    ${EXTERNALS_PATH}/fetk/mc/src/pde
-    ${EXTERNALS_PATH}/fetk/mc/src/whb
-    ${EXTERNALS_PATH}/fetk/punc/src/aaa_inc
-    ${EXTERNALS_PATH}/fetk/punc/src/base
-    ${MALOC_ROOT}/src/base
-    ${MALOC_ROOT}/src/psh
-    ${MALOC_ROOT}/src/vsh
-    ${MALOC_ROOT}/src/vsys
-  )
+  #set(MALOC_ROOT ${EXTERNALS_PATH}/fetk/maloc)
+  #add_subdirectory(${MALOC_ROOT})
+  add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
+  include_directories(${EXTERNALS_PATH}/fetk/maloc/src/base ${EXTERNALS_PATH}/fetk/maloc/src/vsys
+	${EXTERNALS_PATH}/fetk/maloc/src/vsh/ ${EXTERNALS_PATH}/fetk/maloc/src/psh)
+  #include_directories(
+  #  ${EXTERNALS_PATH}/fetk/mc/src/aaa_inc
+  #  ${EXTERNALS_PATH}/fetk/mc/src/aprx
+  #  ${EXTERNALS_PATH}/fetk/mc/src/bam
+  #  ${EXTERNALS_PATH}/fetk/mc/src/base
+  #  ${EXTERNALS_PATH}/fetk/mc/src/dyn
+  #  ${EXTERNALS_PATH}/fetk/mc/src/gem
+  #  ${EXTERNALS_PATH}/fetk/mc/src/mcsh
+  #  ${EXTERNALS_PATH}/fetk/mc/src/nam
+  #  ${EXTERNALS_PATH}/fetk/mc/src/pde
+  #  ${EXTERNALS_PATH}/fetk/mc/src/whb
+  #  ${EXTERNALS_PATH}/fetk/punc/src/aaa_inc
+  #  ${EXTERNALS_PATH}/fetk/punc/src/base
+  #  ${MALOC_ROOT}/src/base
+  #  ${MALOC_ROOT}/src/psh
+  #  ${MALOC_ROOT}/src/vsh
+  #  ${MALOC_ROOT}/src/vsys
+  #)
   list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
   list(APPEND APBS_LIBS maloc)
-#endif()
+endif()
 
 
 ################################################################################
