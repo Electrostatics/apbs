@@ -11,7 +11,7 @@ echo $2
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$1/../fetk/lib
 #fi
 
-PATH=$PATH:$1 python apbs_tester.py -t $2
+PATH=$PATH:$1 python3 apbs_tester.py -t $2
 let result=$?
 
 if [ "$result" -eq 0 ]; then
