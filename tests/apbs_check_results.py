@@ -7,6 +7,7 @@ Provides functions for verifying results from a test run
 import sys
 from math import log10, floor
 from apbs_logger import Logger
+
 ERROR_TOLERANCE = 1e-4
 
 
@@ -54,6 +55,5 @@ def check_results(computed_result, expected_result, input_file, logger, ocd):
 
 
 if __name__ == '__main__':
-    #print >> sys.stderr, "The python source file %s is a module and not runnable" % sys.argv[0]
-    print("The python source file %s is a module and not runnable" % sys.argv[0])
+    sys.stderr.write("The python source file %s is a module and not runnable" % sys.argv[0])
     sys.exit(1)

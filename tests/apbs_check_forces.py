@@ -118,6 +118,9 @@ def extract_forces(force_class, lines, start_pattern):
 
 
 def parse_forces(force_class, lines):
+    """
+    parse forces into a dictionary
+    """
     force_dict = {}
     for line in lines:
         force_item = force_class(line)
@@ -189,13 +192,15 @@ def check_forces(input_file, polar_file, apolar_file, logger):
     compare_force_dicts(test_apolar_force_dict, true_apolar_force_dict)
 
 
-
 def test():
+    """
+    test
+    """
     l = open('forces.log', 'w')
     logger = Logger(sys.stderr, l)
     check_forces('apbs-forces.out', 'polarforces', 'apolarforces', logger)
 
 
 if __name__ == '__main__':
-    print >> sys.stderr, "The python source file %s is a module and not runnable" % sys.argv[0]
+    sys.stderr.write("The python source file %s is a module and not runnable" % sys.argv[0])
     sys.exit(1)

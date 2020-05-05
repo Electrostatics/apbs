@@ -183,9 +183,13 @@ def run_test(binary, test_files, test_name, test_directory, setup, logger, ocd):
                 computed_results = process_serial(binary, input_file)
 
             # Split the expected results into a list of text values
-            print("EXPECTED COMPUTED: %i" % (len(computed_results)))
-            print("EXPECTED EXPECTED: %i" % (len(expected_results)))
+            # print("EXPECTED COMPUTED: %i" % (len(computed_results)))
+            # print("EXPECTED EXPECTED: %i" % (len(expected_results)))
+            # print("COMPUTED: %s" %computed_results)
+            # print("EXPECTED: %s" %expected_results)
             expected_results = expected_results.split()
+            for result in computed_results:
+                print("RESULT %s" % result)
             for i in range(len(expected_results)):
                 # If the expected result is a star, it means ignore that result
                 if expected_results[i] == '*':

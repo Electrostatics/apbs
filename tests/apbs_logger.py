@@ -18,7 +18,6 @@ class Logger:
         self.message_fd.write(message)
         
     def log(self, message):
-        #print >> self.logfile_fd, message
         self.logfile_fd.write(message)
         
     def both(self, message):
