@@ -10,17 +10,15 @@ import re
 import datetime
 import subprocess
 import operator
-from optparse import OptionParser
-from ConfigParser import ConfigParser, NoOptionError
-
-# The inputgen utility needs to be accessible, so we add its path
-sys.path.insert(0, "../tools/manip")
-from inputgen import splitInput
-
+from configparser import ConfigParser, NoOptionError
 from apbs_check_forces import check_forces
 from apbs_check_results import check_results
 from apbs_check_intermediate_energies import check_energies
 from apbs_logger import Logger
+
+# The inputgen utility needs to be accessible, so we add its path
+sys.path.insert(0, "../tools/manip")
+from inputgen import splitInput
 
 # Matches a floating point number such as -1.23456789E-20
 FLOAT_PATTERN = r'([+-]?\d+\.\d+E[+-]\d+)'
