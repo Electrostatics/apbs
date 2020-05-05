@@ -338,8 +338,8 @@ def main():
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], shortOptList, longOptList)
-    except getopt.GetoptError, details:
-        sys.stderr.write("Option error (%s)!\n" % details)
+    except getopt.GetoptError as err:
+        sys.stderr.write("Option error (%s)!\n" % err)
         usage()
 
     if len(args) != 1:

@@ -10,7 +10,9 @@ import re
 import datetime
 import subprocess
 import operator
+from optparse import OptionParser
 from configparser import ConfigParser, NoOptionError
+from functools import reduce
 from apbs_check_forces import check_forces
 from apbs_check_results import check_results
 from apbs_check_intermediate_energies import check_energies
@@ -63,11 +65,15 @@ def process_serial(binary, input_file):
 
     # Construct the system command and make the call
     command = [binary, input_file]
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in proc.stdout:
+    #proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    #for line in proc.stdout:
+    #    sys.stdout.write(line)
+    #    output_file.write(line)
+    #proc.wait()
+    with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as proc:
+        line = str(proc.communicate())
         sys.stdout.write(line)
         output_file.write(line)
-    proc.wait()
 
     # Look for the results in the output file
     output_file = open(output_name, 'r')
@@ -172,12 +178,13 @@ def run_test(binary, test_files, test_name, test_directory, setup, logger, ocd):
             if match:
                 procs = reduce(operator.mul, [int(p) for p in match.group(1).split()])
                 computed_results = process_parallel(binary, input_file, procs, logger)
-
             # Otherwise, just do a serial run
             else:
                 computed_results = process_serial(binary, input_file)
 
             # Split the expected results into a list of text values
+            print("EXPECTED COMPUTED: %i" % (len(computed_results)))
+            print("EXPECTED EXPECTED: %i" % (len(expected_results)))
             expected_results = expected_results.split()
             for i in range(len(expected_results)):
                 # If the expected result is a star, it means ignore that result

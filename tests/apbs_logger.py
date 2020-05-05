@@ -15,10 +15,11 @@ class Logger:
         self.logfile_fd = logfile_fd
         
     def message(self, message):
-        print >> self.message_fd, message
+        self.message_fd.write(message)
         
     def log(self, message):
-        print >> self.logfile_fd, message
+        #print >> self.logfile_fd, message
+        self.logfile_fd.write(message)
         
     def both(self, message):
         self.message(message)
@@ -26,6 +27,5 @@ class Logger:
         
         
 if __name__ == '__main__':
-    #print >> sys.stderr, "The python source file %s is a module and not runnable" % sys.argv[ 0 ]
-    print("The python source file %s is a module and not runnable" % sys.argv[0])
+    sys.stderr.write("The python source file %s is a module and not runnable" % sys.argv[0])
     sys.exit(1)

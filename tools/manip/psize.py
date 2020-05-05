@@ -359,8 +359,8 @@ def main():
 	longOptList = ["help", "cfac=", "fadd=", "space=", "gmemfac=", "gmemceil=", "ofrac=", "redfac=" ]
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], shortOptList, longOptList)
-	except getopt.GetoptError, details:
-		stderr.write("Option error (%s)!\n" % details)
+	except getopt.GetoptError as err:
+		stderr.write("Option error (%s)!\n" % err)
 		usage(2)
 	if len(args) != 1: 
 		stderr.write("Invalid argument list!\n")
