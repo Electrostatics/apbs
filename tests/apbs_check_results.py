@@ -38,20 +38,20 @@ def check_results(computed_result, expected_result, input_file, logger, ocd):
 
     # An exact match after rounding to specifiec precision means the test passed
     if computed_result == expected_result:
-        logger.message("*** PASSED ***")
-        logger.log("PASSED %.12e" % computed_result)
+        logger.message("*** PASSED ***\n")
+        logger.log("PASSED %.12e\n" % computed_result)
 
     # Otherwise, test that the error is below error tolerance
     elif error < ERROR_TOLERANCE*100:
-        logger.message("*** PASSED (with rounding error - see log) ***")
-        logger.log("PASSED within error (%.12e; expected %.12e; %g%% error)" % (computed_result, expected_result, error))
+        logger.message("*** PASSED (with rounding error - see log) ***\n")
+        logger.log("PASSED within error (%.12e; expected %.12e; %g%% error)\n" % (computed_result, expected_result, error))
 
     # If neither is true, the test failed
     else:
-        logger.message("*** FAILED ***")
-        logger.message("   APBS returned      %.12e" % computed_result)
-        logger.message("   Expected result is %.12e (%g%% error)" % (expected_result, error))
-        logger.log("FAILED (%.12e; expected %.12e; %g%% error)" % (computed_result, expected_result, error))
+        logger.message("*** FAILED ***\n")
+        logger.message("   APBS returned      %.12e\n" % computed_result)
+        logger.message("   Expected result is %.12e (%g%% error)\n" % (expected_result, error))
+        logger.log("FAILED (%.12e; expected %.12e; %g%% error)\n" % (computed_result, expected_result, error))
 
 
 if __name__ == '__main__':

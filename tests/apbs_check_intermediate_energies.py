@@ -55,8 +55,7 @@ def extract_energy(energy_class, lines, start_pattern):
     """
     energy_list = []
 
-    for line_text in enumerate(lines):
-        line = str(line_text)
+    for line in lines:
         if line.lstrip().startswith(start_pattern):
             if re.search(energy_class.pattern, line):
                 energy_list.append(parse_energy(energy_class, line))

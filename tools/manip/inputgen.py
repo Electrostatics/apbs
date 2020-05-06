@@ -270,7 +270,7 @@ def splitInput(filename):
         text += line
         line = line.strip()
         if line.startswith("pdime"): # Get # Procs
-            words = string.split(line)
+            words = line.split()
             nproc = int(words[1]) * int(words[2]) * int(words[3])
 
     if nproc == 0:
@@ -278,10 +278,10 @@ def splitInput(filename):
         sys.stderr.write("The inputgen script was unable to asynchronize this file!\n")
         sys.exit(2)
 
-    period = string.find(filename,".")
+    period = filename.find('.')
     for i in range(nproc):
         outname = filename[0:period] + "-PE%i.in" % i
-        outtext = string.replace(text, "mg-para\n","mg-para\n    async %i\n" % i)
+        outtext = text.replace("mg-para\n","mg-para\n    async %i\n" % i)
         outfile = open(outname, "w")
         outfile.write(outtext)
         outfile.close()
