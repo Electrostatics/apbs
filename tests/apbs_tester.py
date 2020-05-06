@@ -20,7 +20,7 @@ from apbs_logger import Logger
 
 # The inputgen utility needs to be accessible, so we add its path
 sys.path.insert(0, "../tools/manip")
-from inputgen import splitInput
+from inputgen import split_input
 
 # Matches a floating point number such as -1.23456789E-20
 FLOAT_PATTERN = r'([+-]?\d+\.\d+E[+-]\d+)'
@@ -106,9 +106,9 @@ def process_parallel(binary, input_file, procs, logger):
 
     logger.message("Splitting the input file into %d separate files using the inputgen utility\n\n" % procs)
 
-    # Get the base name, and split the input file using inputgen's splitInput
+    # Get the base name, and split the input file using inputgen's split_input
     base_name = input_file.split('.')[0]
-    splitInput(input_file)
+    split_input(input_file)
 
     results = None
     for proc in range(procs):

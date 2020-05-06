@@ -28,9 +28,9 @@
 # redfac = 0.25               # The maximum factor by which a domain
                               # dimension can be reduced during focusing
 
-import string, sys
-import psize
+import sys
 import pickle
+import psize
 
 class Elec:
     """
@@ -49,8 +49,10 @@ class Elec:
         self.dime = size.getFineGridPoints()
         gmem = 200.0 * self.dime[0] * self.dime[1] * self.dime[2] / 1024.0 / 1024.0
         if method == "": # method not named - use ceiling
-            if gmem > size.getConstant("gmemceil"): method = "mg-para"
-            else: method = "mg-auto"
+            if gmem > size.getConstant("gmemceil"):
+                method = "mg-para"
+            else:
+                method = "mg-auto"
 
         if method == "mg-para":
             self.dime = size.getSmallest()
@@ -65,7 +67,7 @@ class Elec:
         self.label = ""
         self.nlev = 4
         self.ofrac = 0.1
-        self.async = 0
+        self.async_val = 0
         self.asyncflag = asyncflag
         self.cgcent = "mol 1"
         self.fgcent = "mol 1"
@@ -74,7 +76,7 @@ class Elec:
         self.lpbe = 1
         self.npbe = 0
         self.bcfl = "sdh"
-        self.ion = [[-1,1.815],[1,1.875]] # Multiple ions possible
+        self.ion = [[-1, 1.815], [1, 1.875]] # Multiple ions possible
         self.pdie = 2.0
         self.sdie = 78.54
         self.srfm = "smol"
@@ -116,10 +118,12 @@ class Elec:
             text += "    cgcent %s\n" % self.cgcent
             text += "    fgcent %s\n" % self.fgcent
             if self.asyncflag == 1:
-                text += "    async %i\n" % self.async
+                text += "    async %i\n" % self.async_val
         text += "    mol %i\n" % self.mol
-        if self.lpbe: text += "    lpbe\n"
-        else: text += "    npbe\n"
+        if self.lpbe:
+            text += "    lpbe\n"
+        else:
+            text += "    npbe\n"
         text += "    bcfl %s\n" % self.bcfl
         if self.istrng > 0:
             for ion in self.ion:
@@ -157,8 +161,8 @@ class Input:
             This assumes you have already run psize, either by
                  size.runPsize(/path/to/pqr) or
 
-                 size.parseString(string)
-                 size.setAll()
+                 size.parse_string(string)
+                 size.set_all()
 
             Parameters
                 pqrpath:   The path to the PQR file (string)
@@ -181,7 +185,7 @@ class Input:
             elec2 = ""
         self.elecs = [elec1, elec2]
 
-        i = string.rfind(pqrpath, "/") + 1
+        i = pqrpath.rfind("/") + 1
         self.pqrname = pqrpath[i:]
 
         if potdx == 0:
@@ -193,7 +197,7 @@ class Input:
         """
             Return the text of the input file
         """
-        text  = "read\n"
+        text = "read\n"
         text += "    mol pqr %s\n" % self.pqrname
         text += "end\n"
         for elec in self.elecs:
@@ -203,11 +207,11 @@ class Input:
         text += "\nquit\n"
         return text
 
-    def printInputFiles(self):
+    def print_input_files(self):
         """
             Make the input file(s) associated with this object
         """
-        period = string.find(self.pqrpath,".")
+        period = self.pqrpath.find(".")
         if self.asyncflag == 1:
             outname = self.pqrpath[0:period] + "-para.in"
 
@@ -226,7 +230,7 @@ class Input:
                 outname = self.pqrpath[0:period] + "-PE%i.in" % i
                 for elec in self.elecs:
                     elec.asyncflag = 1
-                    elec.async = i
+                    elec.async_val = i
                 file = open(outname, "w")
                 file.write(str(self))
                 file.close()
@@ -240,11 +244,11 @@ class Input:
             file.write(str(self))
             file.close()
 
-    def dumpPickle(self):
+    def dump_pickle(self):
         """
             Make a Python pickle associated with the APBS input parameters
         """
-        period = string.find(self.pqrpath,".")
+        period = self.pqrpath.find(".")
         if period > 0:
             outname = self.pqrpath[0:period] + "-input.p"
         else:
@@ -253,7 +257,7 @@ class Input:
         pickle.dump(self, pfile)
         pfile.close()
 
-def splitInput(filename):
+def split_input(filename):
     """
         Split the parallel input file into multiple async file names
 
@@ -266,7 +270,8 @@ def splitInput(filename):
     text = ""
     while 1:
         line = file.readline()
-        if line == "": break
+        if line == "":
+            break
         text += line
         line = line.strip()
         if line.startswith("pdime"): # Get # Procs
@@ -281,7 +286,7 @@ def splitInput(filename):
     period = filename.find('.')
     for i in range(nproc):
         outname = filename[0:period] + "-PE%i.in" % i
-        outtext = text.replace("mg-para\n","mg-para\n    async %i\n" % i)
+        outtext = text.replace("mg-para\n", "mg-para\n    async %i\n" % i)
         outfile = open(outname, "w")
         outfile.write(outtext)
         outfile.close()
@@ -291,53 +296,56 @@ def usage():
         Display the usage information for this script
     """
     size = psize.Psize()
-    usage = "\n"
-    usage = usage + "Use this script to generate new APBS input files or split an existing\n"
-    usage = usage + "parallel input file into multiple async files.\n\n"
-    usage = usage + "Usage: inputgen.py [opts] <filename>\n"
-    usage = usage + "Optional Arguments:\n"
-    usage = usage + "  --help               : Display this text\n"
-    usage = usage + "  --split              : Split an existing parallel input file to multiple\n"
-    usage = usage + "                         async input files.\n"
-    usage = usage + "  --potdx              : Create an input to compute an electrostatic potential map.\n"
-    usage = usage + "  --method=<value>     : Force output file to write a specific APBS ELEC\n"
-    usage = usage + "                         method.  Options are para (parallel), auto\n"
-    usage = usage + "                         (automatic), manual (manual), or async (asynchronous).\n"
-    usage = usage + "                         solve.  async will result in multiple input files.\n"
-    usage = usage + "  --cfac=<value>       : Factor by which to expand molecular dimensions to\n"
-    usage = usage + "                         get coarse grid dimensions.\n"
-    usage = usage + "                         [default = %g]\n" % size.getConstant("cfac")
-    usage = usage + "  --fadd=<value>       : Amount to add to molecular dimensions to get fine\n"
-    usage = usage + "                         grid dimensions.\n"
-    usage = usage + "                         [default = %g]\n" % size.getConstant("fadd")
-    usage = usage + "  --space=<value>      : Desired fine mesh resolution\n"
-    usage = usage + "                         [default = %g]\n" % size.getConstant("space")
-    usage = usage + "  --gmemfac=<value>    : Number of bytes per grid point required\n"
-    usage = usage + "                         for sequential MG calculation\n"
-    usage = usage + "                         [default = %g]\n" % size.getConstant("gmemfac")
-    usage = usage + "  --gmemceil=<value>   : Max MB allowed for sequential MG\n"
-    usage = usage + "                         calculation.  Adjust this to force the\n"
-    usage = usage + "                         script to perform faster calculations (which\n"
-    usage = usage + "                         require more parallelism).\n"
-    usage = usage + "                         [default = %g]\n" % size.getConstant("gmemceil")
-    usage = usage + "  --ofrac=<value>      : Overlap factor between mesh partitions\n"
-    usage = usage + "                         [default = %g]\n" % size.getConstant("ofrac")
-    usage = usage + "  --redfac=<value>     : The maximum factor by which a domain\n"
-    usage = usage + "                         dimension can be reduced during focusing\n"
-    usage = usage + "                         [default = %g]\n" % size.getConstant("redfac")
-    usage = usage + "  --istrng=<value>     : Ionic strength (M). Na+ anc Cl- ions will be used\n"
-    sys.stderr.write(usage)
+    msg = "\n"
+    msg += "Use this script to generate new APBS input files or split an existing\n"
+    msg += "parallel input file into multiple async files.\n\n"
+    msg += "Usage: inputgen.py [opts] <filename>\n"
+    msg += "Optional Arguments:\n"
+    msg += "  --help               : Display this text\n"
+    msg += "  --split              : Split an existing parallel input file to multiple\n"
+    msg += "                         async input files.\n"
+    msg += "  --potdx              : Create an input to compute an electrostatic potential map.\n"
+    msg += "  --method=<value>     : Force output file to write a specific APBS ELEC\n"
+    msg += "                         method.  Options are para (parallel), auto\n"
+    msg += "                         (automatic), manual (manual), or async (asynchronous).\n"
+    msg += "                         solve.  async will result in multiple input files.\n"
+    msg += "  --cfac=<value>       : Factor by which to expand molecular dimensions to\n"
+    msg += "                         get coarse grid dimensions.\n"
+    msg += "                         [default = %g]\n" % size.getConstant("cfac")
+    msg += "  --fadd=<value>       : Amount to add to molecular dimensions to get fine\n"
+    msg += "                         grid dimensions.\n"
+    msg += "                         [default = %g]\n" % size.getConstant("fadd")
+    msg += "  --space=<value>      : Desired fine mesh resolution\n"
+    msg += "                         [default = %g]\n" % size.getConstant("space")
+    msg += "  --gmemfac=<value>    : Number of bytes per grid point required\n"
+    msg += "                         for sequential MG calculation\n"
+    msg += "                         [default = %g]\n" % size.getConstant("gmemfac")
+    msg += "  --gmemceil=<value>   : Max MB allowed for sequential MG\n"
+    msg += "                         calculation.  Adjust this to force the\n"
+    msg += "                         script to perform faster calculations (which\n"
+    msg += "                         require more parallelism).\n"
+    msg += "                         [default = %g]\n" % size.getConstant("gmemceil")
+    msg += "  --ofrac=<value>      : Overlap factor between mesh partitions\n"
+    msg += "                         [default = %g]\n" % size.getConstant("ofrac")
+    msg += "  --redfac=<value>     : The maximum factor by which a domain\n"
+    msg += "                         dimension can be reduced during focusing\n"
+    msg += "                         [default = %g]\n" % size.getConstant("redfac")
+    msg += "  --istrng=<value>     : Ionic strength (M). Na+ anc Cl- ions will be used\n"
+    sys.stderr.write(msg)
     sys.exit(2)
 
 def main():
+    """
+    Main
+    """
 
     import getopt
     filename = ""
-    shortOptList = ""
-    longOptList = ["help","split","potdx","method=","cfac=","space=","gmemceil=","gmemfac=","ofrac=","redfac=","istrng=","fadd="]
+    short_opt_list = ""
+    long_opt_list = ["help", "split", "potdx", "method=", "cfac=", "space=", "gmemceil=", "gmemfac=", "ofrac=", "redfac=", "istrng=", "fadd="]
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], shortOptList, longOptList)
+        opts, args = getopt.getopt(sys.argv[1:], short_opt_list, long_opt_list)
     except getopt.GetoptError as err:
         sys.stderr.write("Option error (%s)!\n" % err)
         usage()
@@ -350,55 +358,58 @@ def main():
 
     method = ""
     size = psize.Psize()
-    async = 0
+    async_val = 0
     split = 0
     istrng = 0
     potdx = 0
 
-    for o, a in opts:
-        if o == "--help":
+    for opt, arg in opts:
+        if opt == "--help":
             usage()
-        if o == "--split": split = 1
-        if o == "--potdx": potdx = 1
-        if o == "--method":
-            if a == "para":
+        if opt == "--split":
+            split = 1
+        if opt == "--potdx":
+            potdx = 1
+        if opt == "--method":
+            if arg == "para":
                 sys.stdout.write("Forcing a parallel calculation\n")
                 method = "mg-para"
-            elif a == "auto":
+            elif arg == "auto":
                 sys.stdout.write("Forcing a sequential calculation\n")
                 method = "mg-auto"
-            elif a == "async":
+            elif arg == "async":
                 sys.stdout.write("Forcing an asynchronous calculation\n")
                 method = "mg-para"
-                async = 1
-            elif a == "manual":
+                async_val = 1
+            elif arg == "manual":
                 sys.stdout.write("Forcing a manual calculation\n")
                 method = "mg-manual"
             else:
-                sys.stdout.write("Incorrect method argument: %s\n" % a)
+                sys.stdout.write("Incorrect method argument: %s\n" % arg)
                 sys.stdout.write("Defaulting to memory dependent result\n")
-        if o == "--cfac":
-            size.setConstant("cfac", float(a))
-        if o == "--space":
-            size.setConstant("space", float(a))
-        if o == "--gmemfac":
-            size.setConstant("gmemfac", int(a))
-        if o == "--gmemceil":
-            size.setConstant("gmemceil",  int(a))
-        if o == "--ofrac":
-            size.setConstant("ofrac", float(a))
-        if o == "--redfac":
-            size.setConstant("redfac", float(a))
-        if o == "--fadd":
-            size.setConstant("fadd", int(a))
-        if o == "--istrng":
-            istrng = float(a)
+        if opt == "--cfac":
+            size.setConstant("cfac", float(arg))
+        if opt == "--space":
+            size.setConstant("space", float(arg))
+        if opt == "--gmemfac":
+            size.setConstant("gmemfac", int(arg))
+        if opt == "--gmemceil":
+            size.setConstant("gmemceil", int(arg))
+        if opt == "--ofrac":
+            size.setConstant("ofrac", float(arg))
+        if opt == "--redfac":
+            size.setConstant("redfac", float(arg))
+        if opt == "--fadd":
+            size.setConstant("fadd", int(arg))
+        if opt == "--istrng":
+            istrng = float(arg)
 
     if split == 1:
-        splitInput(filename)
+        split_input(filename)
     else:
         size.runPsize(filename)
-        input = Input(filename, size, method, async, istrng, potdx)
-        input.printInputFiles()
+        data = Input(filename, size, method, async_val, istrng, potdx)
+        data.print_input_files()
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()
