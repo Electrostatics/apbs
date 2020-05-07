@@ -8,7 +8,7 @@ fi
 if [[ "$3" = "ocd" ]]; then
     ocd='ocd'
 else
-	ocd='noocd'
+    ocd='noocd'
 fi
 
 logfile=TESTRESULTS.log
