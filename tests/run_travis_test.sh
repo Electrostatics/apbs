@@ -15,8 +15,8 @@ PATH=$PATH:$1 python3 apbs_tester.py -t $2
 let result=$?
 
 if [ "$result" -eq 0 ]; then
-	! grep FAILED test.log
-	exit $?
-else
-	exit $result
+    ! grep FAILED test.log
+    exit $?
 fi
+
+exit $result
