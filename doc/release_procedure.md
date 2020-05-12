@@ -4,9 +4,9 @@ APBS Release Procedures
  1. Change Version Number
    - Navigate to the apbs root folder
      $ cd ~/apbs
-   - Edit CMakeLists.txt
+   - Edit [CMakeLists.txt](../CMakeLists.txt)
    - Go to the "Set up basic project stuff" section (around line 45)
-   - Change the value for the APBS_VERSION variable:
+   - Increment the value for the APBS_VERSION variable:
      set(APBS_VERSION "X.X")
      
      
@@ -129,5 +129,5 @@ APBS Release Procedures
 
  * Update http://www.poissonboltzmann.org/apbs/release-history with new release information.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEyNzE5MDgwNzJdfQ==
+eyJoaXN0b3J5IjpbLTE5NzMxMzU4MDNdfQ==
 -->
