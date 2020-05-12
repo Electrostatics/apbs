@@ -1,7 +1,7 @@
 APBS Release Procedures
 -----------------------
 
- * Change Version Number
+ 1. Change Version Number
    - Navigate to the apbs root folder
      $ cd ~/apbs
    - Edit CMakeLists.txt
@@ -128,3 +128,6 @@ APBS Release Procedures
      https://sourceforge.net/projects/apbs/files/apbs/
 
  * Update http://www.poissonboltzmann.org/apbs/release-history with new release information.
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTEyNzE5MDgwNzJdfQ==
+-->
