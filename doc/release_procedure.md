@@ -2,10 +2,7 @@ APBS Release Procedures
 -----------------------
 
  1. Change Version Number
-   - Navigate to the apbs root folder
-     $ cd ~/apbs
    - Edit [CMakeLists.txt]([https://github.com/Electrostatics/apbs-pdb2pqr/blob/master/apbs/CMakeLists.txt)
-   - Go to the "Set up basic project stuff" section (around line 45)
    - Increment the value for the APBS_VERSION variable:
      set(APBS_VERSION "M.m.u")
      Where 
@@ -130,5 +127,5 @@ APBS Release Procedures
 
  * Update http://www.poissonboltzmann.org/apbs/release-history with new release information.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbODAxMzEwMzI0XX0=
+eyJoaXN0b3J5IjpbMTg2NDI3NjE4MV19
 -->
