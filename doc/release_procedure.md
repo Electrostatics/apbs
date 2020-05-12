@@ -1,131 +1,143 @@
-APBS Release Procedures
+APBS Release Procedure
 -----------------------
  1. Change Version Number
- - [ ] Edit [CMakeLists.txt]([https://github.com/Electrostatics/apbs-pdb2pqr/blob/master/apbs/CMakeLists.txt)
- - Increment the value for the APBS_VERSION variable:
-     set(APBS_VERSION "M.m.u")
-     Where:
- - M is the Major version - increment if there are breaking changes or dropping support for previous features
-     
-     
-     
- * Update the ChangeLog
-   - Navigate to the apbs root folder
-     $ cd ~/apbs
-   - Edit ChangeLog
-   - Docmument major changes for this release
+	 - [ ] Edit [apbs/CMakeLists.txt]([https://github.com/Electrostatics/apbs-pdb2pqr/blob/master/apbs/CMakeLists.txt)
+		Increment the value for the APBS_VERSION variable:
+	     set(APBS_VERSION "M.m.u")
+	     Where:
+		 - M is the Major version - increment if there are breaking changes or dropping support for previous features
+		 - m is the Minor version - increment for new features added
+		 - u is the Micro version - increment for adding small changes like new tests or fixing small bugs
+
+ 2. Update the ChangeLog
+	 - [ ] Edit [apbs/doc/ChangeLog]([https://github.com/Electrostatics/apbs-pdb2pqr/blob/master/apbs/doc/ChangeLog.md)
+	   - Document major/minor changes for this release
    
-   
-   
- * Update License info
-   - Update license dates and information in source files
-   - In apbs/src edit all .c source files and all .h header files, update dates
-   
-   
-   
+  3. Update License info
+	   - [ ] Update license dates and information in source files
+	   - In apbs/src edit all .c source files and all .h header files, update dates
+  
  * Test release
- 
-   - Set up seperate machines or virtual machines for target deploy platforms:
-     Ubuntu x86_64
-     Ubuntu i386
-     Redhat
-     Mac OSX
-     Windows 7 x86_64
-     Windows 7 i386
-     Windows 7 with Cygwin
-     Windows 7 with Mingw
+   - Set up separate machines or virtual machines for target deploy platforms:
+	 - [ ] Ubuntu-latest 
+	 - [ ] MacOSX-latest
+	 - [ ] Windows-latest (Windows Subsystem Linux)
      
    - On testing platforms install or verify presence of required tools:
-     Essential compile toolchain 
-     python
-     git
-     CMake
-     Doxygen
-     LaTeX builder like texlive, tetex (usually already available in linux)
+	 - [ ] Essential compile toolchain 
+     - [ ] Python 3.6 or newer
+     - [ ] git
+     - [ ] CMake 3.12 or newer
+     - [ ] Doxygen
+     - [ ] LaTeX builder like texlive, tetex (usually already available in linux)
      
-   - Clone apbs git repository from sourceforge to testing machines:
-     $ mkdir ~/apbs
-     $ cd ~/apbs
-     $ git init .
-     $ git remote add apbs \
-     > ssh://tuckerbeck@apbs.git.sourceforge.net/gitroot/apbs/apbs 
-     $ git pull apbs master
-       
+   - Clone apbs github repository to testing machines:
+```bash
+            #!/bin/bash
+            mkdir ~/git
+            cd ~/git
+            git clone https://github.com/Electrostatics/apbs-pdb2pqr.git
+            cd apbs-pdb2pqr
+            git submodule init
+            git submodule update
+```
    - Build testing
-     > On each platform test machine
-     > Navigate to apbs root folder
-       $ cd ~/apbs
-     > Run CMake selecting an install target with open permissions
-       $ cmake -DCMAKE_INSTALL_PREFIX=~/apbs-install
-     > Make and install to target apbs location
-       $ make install
-     > Ensure that build progresses without any errors.
+     - On each platform test machine us the script below to build APBS
+     - Ensure that all tests run without segmentation faults and results are acceptable
+
+```bash
+		#!/bin/bash
+		
+		export INSTALL_DIR=$HOME/apbs-install
+		cd ~/git/apbs-pdb2pqr
+		rm -rf build                                    || exit 1
+		mkdir build                                     || exit 1
+		cd build                                        || exit 1
+		#  Configure the software to be built
+		cmake                                     \
+		      -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+		      -DENABLE_GEOFLOW=ON                 \
+		      -DENABLE_BEM=ON -DGET_MSMS=ON       \
+		      -DENABLE_FETK=ON                    \
+		      -DENABLE_PBSAM=OFF                  \
+		      -DENABLE_PBAM=OFF                   \
+		      -DENABLE_PYTHON=OFF                 \
+		      -DBUILD_SHARED_LIBS=OFF             \
+		      -DCMAKE_C_FLAGS="-fPIC"             \
+		      -DBUILD_DOC=ON                      \
+		      ..                                        || exit 1
+		#  Build and install the software
+		VERBOSE=1 make -j 1 install                     || exit 1
+		#  Test the software
+		cd ../tests                                     || exit 1
+		TESTNAMES="actin-dimer-auto     \
+		           actin-dimer-parallel \
+		           alkanes              \
+		           born                 \
+		           FKBP                 \
+		           geoflow              \
+		           hca-bind             \
+		           ion-pmf              \
+		           ion-protein          \
+		           ionize               \
+		           pka-lig              \
+		           point-pmf            \
+		           solv                 \
+		           protein-rna"
+		for testname in `echo $TESTNAMES`
+		do
+		  pushd .
+		  echo bash run_travis_test.sh $INSTALL_DIR/bin $testname
+		       bash run_travis_test.sh $INSTALL_DIR/bin $testname
+		  popd
+		done
+```
      
-   - Run testing
-     > Navigate to apbs testing folder
-       $ cd ~/apbs/tests
-     > run standard testing suite on test platforms
-       $ python apbs_tester.py
-     > Ensure that all tests run without seg fault and results are acceptable
+ * Upload Binary Packages
+   - On the following test platforms:
+	 - [ ] Ubuntu-latest 
+	 - [ ] MacOSX-latest
+	 - [ ] Windows-latest (Windows Subsystem Linux)
      
+   - Add entire install structure to archive file
+```bash
+	     #!/bin/bash
+	     VERSION=`cat ~/git/apbs-pdb2pqr/VERSION | sed -e "s/_/./g"`
+	     PLATFORM=`uname -s`
+	     ARCHITECTURE=`uname -m`
+	     tar -czf APBS-${VERSION}-${PLATFORM}-${ARCHITECTURE}.tgz ~/apbs-install
+```
+   - Upload the archive to apbs project on https://sourceforge.net/projects/apbs/files/apbs/
      
-     
- * Build and upload Binary Packages
- 
-   - On the following test plotforms:
-     Ubuntu x86_64
-     Ubuntu i386
-     Mac OSX
-     Windows 7 x86_64
-     Windows 7 i386
-     
-   - Add entire install structure to archive file named in the following way
-     APBS-X.X-PLATFORM-ARCHITECTURE.ARCHIVE_EXTENSION
-     $ tar -czvf APBS-1.4-linux-x86_64.tar.gz ~/apbs-install
-     
-   - Upload the archive to apbs project on sourceforge
-     https://sourceforge.net/projects/apbs/files/apbs/
-     
-     
-     
- * Upload Source Package
- 
-   - On development machine, Navigate to apbs directory
-     $ cd ~/apbs
-   
-   - Use git to remove all non-versioned files and directories
-     Use -dfn flags first for a dry run and make sure right files are rm'ed
-     $ git clean -dfq
-     
-   - Add the whole apbs directory to an arcive
-     $ tar -czvf APBS-1.4-source.tar.gz ~/apbs/
-     
-   - Upload the archive to apbs project on sourceforge
-     https://sourceforge.net/projects/apbs/files/apbs/
-     
-     
+ * Upload Source Packages
+```bash
+	     #!/bin/bash
+	     VERSION=`cat ~/git/apbs-pdb2pqr/VERSION | sed -e "s/_/./g"`
+	     cd ~/git/apbs-pdb2pqr/apbs
+	     #  Use git to remove all non-versioned files and directories
+	     #  NOTE: Use -dfn flags first for a dry run and make sure right files are rm'ed
+	     git clean -dfq
+	     #  NOTE: Add the whole apbs directory to an arcive
+	     tar -czf APBS-${VERSION}-source.tar.gz ~/git/apbs-pdb2pqr
+```
+   - Upload the archive to apbs project on https://sourceforge.net/projects/apbs/files/apbs/
      
  * Upload Package Programmer Guide Package
- 
    - Build documentation
-     > Navigate to apbs build folder
-       $ cd ~/apbs/build
-     > Run CMake with documentation building option
-       $ cmake .. -DBUILD_DOC=YES
-     > Build everything
-       $ make
-     > LaTeX and html output are generated in apbs doc folder
+```bash
+	     #!/bin/bash
+	     VERSION=`cat ~/git/apbs-pdb2pqr/VERSION | sed -e "s/_/./g"`
+	     cd ~/git/apbs-pdb2pqr/apbs/doc
+	     #  Use git to remove all non-versioned files and directories
+	     #  NOTE: Use -dfn flags first for a dry run and make sure right files are rm'ed
+	     git clean -dfq
+	     #  NOTE: Add the whole apbs directory to an arcive
+	     tar -czf APBS-${VERSION}-programmer_guide.tgz
+```
      
-   - Navigate to the apbs documentation guide folder
-     $ cd ~/apbs/doc
-     
-   - Add the whole programmer guide directory to an archive
-     $ tar -czvf APBS-1.4-programmer_guide.tar.gz
-     
-   - Upload the archive to apbs project on sourceforge
-     https://sourceforge.net/projects/apbs/files/apbs/
+   - Upload the archive to apbs project on https://sourceforge.net/projects/apbs/files/apbs/
 
  * Update http://www.poissonboltzmann.org/apbs/release-history with new release information.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTExNTUyMTk3OF19
+eyJoaXN0b3J5IjpbNTk4MzY2NDQ1XX0=
 -->
