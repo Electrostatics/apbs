@@ -1,11 +1,12 @@
 APBS Release Procedures
 -----------------------
 
- 1. Change Version Number
-   - Edit [CMakeLists.txt]([https://github.com/Electrostatics/apbs-pdb2pqr/blob/master/apbs/CMakeLists.txt)
-   - Increment the value for the APBS_VERSION variable:
+ - Change Version Number
+ - Edit [CMakeLists.txt]([https://github.com/Electrostatics/apbs-pdb2pqr/blob/master/apbs/CMakeLists.txt)
+ - Increment the value for the APBS_VERSION variable:
      set(APBS_VERSION "M.m.u")
-     Where 
+     Where:
+ - M is the Major version - increment if there are breaking changes or dropping support for previous features
      
      
      
@@ -127,5 +128,5 @@ APBS Release Procedures
 
  * Update http://www.poissonboltzmann.org/apbs/release-history with new release information.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTg2NDI3NjE4MV19
+eyJoaXN0b3J5IjpbNzgzNTk3NTYwXX0=
 -->
