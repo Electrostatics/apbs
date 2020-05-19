@@ -219,15 +219,13 @@ if(ENABLE_BEM)
     set(GET_NanoShaper ON) #CACHE BOOL "Grabbing NanoShaper path"
 
     if(WIN32)
-	      ExternalProject_add(
-		        ${TABI}
+	      ExternalProject_add(${TABI}
         	  SOURCE_DIR ${TABI_PATH}
         	  CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
 		        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target TABIPBlib
     		    INSTALL_COMMAND "")
     else()
-	      ExternalProject_add(
-		        ${TABI}
+	      ExternalProject_add(${TABI}
         	  SOURCE_DIR ${TABI_PATH}
         	  CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
 		        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
@@ -285,11 +283,10 @@ if(NOT ENABLE_FETK)
   add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
   include_directories(${EXTERNALS_PATH}/fetk/maloc/src/base
                       ${EXTERNALS_PATH}/fetk/maloc/src/vsys
-                      ${EXTERNALS_PATH}/fetk/maloc/src/vsh/
+                      ${EXTERNALS_PATH}/fetk/maloc/src/vsh
                       ${EXTERNALS_PATH}/fetk/maloc/src/psh)
   list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
   list(APPEND APBS_LIBS maloc)
-  #  TODO: This does not build libmaloc.* which is needed for PBSAM and others
 endif()
 
 
