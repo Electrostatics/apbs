@@ -69,12 +69,12 @@ set(SHARE_INSTALL_PATH share/apbs)
 set(APBS_LIBS)
 set(APBS_LIB_DIRS)
 
-find_file(CONTRIB_PATH "contrib" PATHS "${APBS_ROOT}"
-    DOC "The path to contributed modules for apbs"
-    )
-find_file(EXTERNALS_PATH "externals" PATHS "${APBS_ROOT}"
-  DOC "The path to the external git submodules"
-  )
+find_file(CONTRIB_PATH "contrib"
+          PATHS "${APBS_ROOT}"
+          DOC "The path to contributed modules for apbs")
+find_file(EXTERNALS_PATH "externals"
+          PATHS "${APBS_ROOT}"
+          DOC "The path to the external git submodules")
 
 set(SYS_LIBPATHS /usr/lib64)
 #list(APPEND SYS_LIBPATHS /usr/lib64)
@@ -157,8 +157,8 @@ if(CHECK_EPSILON)
         message(FATAL_ERROR "Couldn't compute double precision machine epsilon")
     endif()
 else()
-        set(FLOAT_EPSILON "1.19209290e-7")
-        set(DOUBLE_EPSILON "2.2204460492503131e-16")
+  set(FLOAT_EPSILON "1.19209290e-7")
+  set(DOUBLE_EPSILON "2.2204460492503131e-16")
 endif()
 
 
@@ -219,21 +219,19 @@ if(ENABLE_BEM)
     set(GET_NanoShaper ON) #CACHE BOOL "Grabbing NanoShaper path"
 
     if(WIN32)
-	ExternalProject_add(
-		${TABI}
-        	SOURCE_DIR ${TABI_PATH}
-        	CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-		BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target TABIPBlib
-    		INSTALL_COMMAND ""
-	)
+	      ExternalProject_add(
+		        ${TABI}
+        	  SOURCE_DIR ${TABI_PATH}
+        	  CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+		        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target TABIPBlib
+    		    INSTALL_COMMAND "")
     else()
-	ExternalProject_add(
-		${TABI}
-        	SOURCE_DIR ${TABI_PATH}
-        	CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-		BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
-    		INSTALL_COMMAND ""
-    	)
+	      ExternalProject_add(
+		        ${TABI}
+        	  SOURCE_DIR ${TABI_PATH}
+        	  CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+		        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
+    		    INSTALL_COMMAND "")
     endif()
 
     ExternalProject_Get_Property(${TABI} binary_dir)
@@ -243,12 +241,10 @@ if(ENABLE_BEM)
     include_directories(${EXTERNALS_PATH}/${TABI}/src)
 
     if(BUILD_SHARED_LIBS)
-	install(
-	  FILES ${binary_dir}/libTABIPBlib.so
-	  DESTINATION ${LIBRARY_INSTALL_PATH}
-        )
+	      install(
+	          FILES ${binary_dir}/libTABIPBlib${CMAKE_SHARED_LIBRARY_SUFFIX}
+	          DESTINATION ${LIBRARY_INSTALL_PATH})
     endif()
-
 endif() # ENABLE_BEM
 
 
@@ -266,7 +262,7 @@ if(ENABLE_MPI)
         find_package(MPI)
         if(MPI_FOUND)
             message(STATUS "MPI support enabled")
-      set(HAVE_MPI_H 1)
+            set(HAVE_MPI_H 1)
             include_directories(${MPI_C_INCLUDE_PATH})
             list(APPEND APBS_LIBS ${MPI_C_LIBRARIES})
         else()
@@ -286,31 +282,14 @@ endif()
 
 if(NOT ENABLE_FETK)
   # We'll use autotools to build MALOC if FETK is enabled.
-  #set(MALOC_ROOT ${EXTERNALS_PATH}/fetk/maloc)
-  #add_subdirectory(${MALOC_ROOT})
   add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
-  include_directories(${EXTERNALS_PATH}/fetk/maloc/src/base ${EXTERNALS_PATH}/fetk/maloc/src/vsys
-	${EXTERNALS_PATH}/fetk/maloc/src/vsh/ ${EXTERNALS_PATH}/fetk/maloc/src/psh)
-  #include_directories(
-  #  ${EXTERNALS_PATH}/fetk/mc/src/aaa_inc
-  #  ${EXTERNALS_PATH}/fetk/mc/src/aprx
-  #  ${EXTERNALS_PATH}/fetk/mc/src/bam
-  #  ${EXTERNALS_PATH}/fetk/mc/src/base
-  #  ${EXTERNALS_PATH}/fetk/mc/src/dyn
-  #  ${EXTERNALS_PATH}/fetk/mc/src/gem
-  #  ${EXTERNALS_PATH}/fetk/mc/src/mcsh
-  #  ${EXTERNALS_PATH}/fetk/mc/src/nam
-  #  ${EXTERNALS_PATH}/fetk/mc/src/pde
-  #  ${EXTERNALS_PATH}/fetk/mc/src/whb
-  #  ${EXTERNALS_PATH}/fetk/punc/src/aaa_inc
-  #  ${EXTERNALS_PATH}/fetk/punc/src/base
-  #  ${MALOC_ROOT}/src/base
-  #  ${MALOC_ROOT}/src/psh
-  #  ${MALOC_ROOT}/src/vsh
-  #  ${MALOC_ROOT}/src/vsys
-  #)
+  include_directories(${EXTERNALS_PATH}/fetk/maloc/src/base
+                      ${EXTERNALS_PATH}/fetk/maloc/src/vsys
+                      ${EXTERNALS_PATH}/fetk/maloc/src/vsh/
+                      ${EXTERNALS_PATH}/fetk/maloc/src/psh)
   list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
   list(APPEND APBS_LIBS maloc)
+  #  TODO: This does not build libmaloc.* which is needed for PBSAM and others
 endif()
 
 
@@ -375,18 +354,30 @@ if(ENABLE_FETK)
     ExternalProject_Get_Property(fetk-maloc install_dir)
     include_directories(${install_dir}/include)
 
-      list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
-      list(APPEND APBS_LIBS maloc amd punc mc gamer superlu umfpack
-  blas vf2c tetgen triangle readline termcap)
+    list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
+    list(APPEND APBS_LIBS
+                          maloc
+                          amd
+                          punc
+                          mc
+                          gamer
+                          superlu
+                          umfpack
+                          blas
+                          vf2c
+                          tetgen
+                          triangle
+                          readline
+                          termcap)
 
-  if(BUILD_SHARED_LIBS)
-    install(
-      DIRECTORY ${install_dir}/lib/
-      DESTINATION ${LIBRARY_INSTALL_PATH}
-    )
-  endif()
+    if(BUILD_SHARED_LIBS)
+      install(
+        DIRECTORY ${install_dir}/lib/
+        DESTINATION ${LIBRARY_INSTALL_PATH}
+      )
+    endif()
 
-      SET(HAVE_MC_H 1)
+    SET(HAVE_MC_H 1)
     SET(HAVE_PUNC_H 1)
     SET(HAVE_BIOM_H 1)
   endif()
@@ -404,21 +395,17 @@ if(ENABLE_GEOFLOW)
   add_definitions(-DGEOFLOW_APBS)
 
   if(WIN32)
-	ExternalProject_Add(
-    geoflow
-    SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-    CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target GeometricFlowLib
-    INSTALL_COMMAND ""
-  )
+	  ExternalProject_Add(geoflow
+        SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
+        CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target GeometricFlowLib
+        INSTALL_COMMAND "")
   else()
-	ExternalProject_Add(
-    geoflow
-    SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-    CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
-    INSTALL_COMMAND ""
-  )
+	  ExternalProject_Add(geoflow
+        SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
+        CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
+        INSTALL_COMMAND "")
   endif()
 
   ExternalProject_Get_Property(geoflow binary_dir)
@@ -429,11 +416,10 @@ if(ENABLE_GEOFLOW)
 
   if(BUILD_SHARED_LIBS)
     install(
-      FILES ${binary_dir}/lib/libGeometricFlowLib.so
+      FILES ${binary_dir}/lib/libGeometricFlowLib${CMAKE_SHARED_LIBRARY_SUFFIX}
       DESTINATION ${LIBRARY_INSTALL_PATH}
     )
   endif()
-
 endif()
 
 
@@ -448,21 +434,17 @@ if(ENABLE_PBAM)
   add_definitions(-DPBAM_APBS)
 
   if(WIN32)
-	ExternalProject_Add(
-    pbam
-    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-    CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBAMLib
-    INSTALL_COMMAND ""
-  )
+	  ExternalProject_Add(pbam
+        SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+        CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBAMLib
+        INSTALL_COMMAND "")
   else()
-	ExternalProject_Add(
-    pbam
-    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-    CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
-    INSTALL_COMMAND ""
-  )
+	  ExternalProject_Add(pbam
+        SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+        CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
+        INSTALL_COMMAND "")
   endif()
 
   ExternalProject_Get_Property(pbam binary_dir)
@@ -475,7 +457,7 @@ if(ENABLE_PBAM)
 
   if(BUILD_SHARED_LIBS)
     install(
-      FILES ${binary_dir}/pbam/src/libPBAMLib.so
+      FILES ${binary_dir}/pbam/src/libPBAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
       DESTINATION ${LIBRARY_INSTALL_PATH}
     )
   endif()
@@ -500,21 +482,17 @@ if(ENABLE_PBSAM)
   include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
 
   if(WIN32)
-	ExternalProject_Add(
-    pbsam
-    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-    CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBSAMLib
-    INSTALL_COMMAND ""
-    )
+	  ExternalProject_Add(pbsam
+        SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+        CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBSAMLib
+        INSTALL_COMMAND "")
   else()
-	ExternalProject_Add(
-    pbsam
-    SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-    CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-    BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
-    INSTALL_COMMAND ""
-    )
+	  ExternalProject_Add(pbsam
+        SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+        CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
+        INSTALL_COMMAND "")
   endif()
 
   ExternalProject_Get_Property(pbsam binary_dir)
@@ -522,7 +500,7 @@ if(ENABLE_PBSAM)
   list(APPEND APBS_LIB_DIRS "${binary_dir}/pbsam/src")
 
   if(WIN32)
-	list(APPEND APBS_LIBS PBSAMLib ${PBSAM_LINKER_LIBS})
+	  list(APPEND APBS_LIBS PBSAMLib ${PBSAM_LINKER_LIBS})
   else()
     list(APPEND APBS_LIBS stdc++ PBSAMLib ${PBSAM_LINKER_LIBS})
   endif()
@@ -534,7 +512,7 @@ if(ENABLE_PBSAM)
 
   if(BUILD_SHARED_LIBS)
     install(
-      FILES ${binary_dir}/pbsam/src/libPBSAMLib.so
+      FILES ${binary_dir}/pbsam/src/libPBSAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
       DESTINATION ${LIBRARY_INSTALL_PATH}
     )
   endif()
