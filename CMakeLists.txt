@@ -24,6 +24,12 @@ set(APBS_VERSION "3.0")
 set(PACKAGE_STRING ${APBS_VERSION})
 set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
 
+################################################################################
+#  NOTE: Overwrite the RPATH information during the install from
+#  https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
+################################################################################
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+
 project(apbs)
 
 set_package_properties(APBS PROPERTIES
@@ -41,7 +47,7 @@ set_package_properties(APBS PROPERTIES
              biomedical community.")
 
 
-OPTION (BUILD_SHARED_LIBS "Build shared libraries." OFF)
+OPTION(BUILD_SHARED_LIBS "Build shared libraries." OFF)
 
 ################################################################################
 # Set project paths                                                            #
@@ -49,6 +55,7 @@ OPTION (BUILD_SHARED_LIBS "Build shared libraries." OFF)
 
 message(STATUS "Setting project paths")
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -fpermissive -fPIC")
 if(APPLE AND BUILD_SHARED_LIBS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -undefined dynamic_lookup")
