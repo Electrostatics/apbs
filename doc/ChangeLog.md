@@ -1,7 +1,7 @@
 APBS 3.0 CHANGELOG
 ==================
 
-These are notes for APBS version 3.o
+These are notes for APBS version 3.0
 ------------------------------------
 
 * Binary releases may be found on [GitHub](https://github.com/Electrostatics/apbs-pdb2pqr/releases) and on [SourceForge](http://sourceforge.net/projects/apbs/files/apbs).
