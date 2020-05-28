@@ -18,9 +18,13 @@ include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(ExternalProject)
 include(FeatureSummary)
- 
-set(APBS_VERSION "3.0")
-set(PACKAGE_STRING ${APBS_VERSION})
+
+set(CMAKE_MAJOR_VERSION "3")
+set(CMAKE_MINOR_VERSION "0")
+set(CMAKE_MICRO_VERSION "0")
+
+set(APBS_VERSION     "${CMAKE_MAJOR_VERSION}.${CMAKE_MICRO_VERSION}")
+set(PACKAGE_STRING   "${APBS_VERSION}")
 set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
  
 ################################################################################
@@ -29,7 +33,7 @@ set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
 ################################################################################
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
  
-project(apbs)
+project("APBS" VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_MICRO_VERSION})
  
 set_package_properties(APBS PROPERTIES
     URL "http://www.poissonboltzmann.org/"
@@ -830,24 +834,42 @@ file(REMOVE_RECURSE ${EXECUTABLE_OUTPUT_PATH}/temp)
 ###############################################################################
 #####  Generate Packages
 ###############################################################################
-string(TOLOWER ${PROJECT_NAME} PACKAGE_NAME)
- 
+#string(TOLOWER ${PROJECT_NAME} PACKAGE_NAME)
+set(PACKAGE_NAME                       "${PROJECT_NAME}")
 set(CPACK_PACKAGE_NAME                 "${PACKAGE_NAME}")
 set(CPACK_PACKAGE_DESCRIPTION          "APBS - Adaptive Poisson Boltzmann Solver")
- 
+
 set(CPACK_RESOURCE_FILE_LICENSE        "${PROJECT_SOURCE_DIR}/../LICENSE.md")
 set(CPACK_PACKAGE_DESCRIPTION_FILE     "${PROJECT_SOURCE_DIR}/README.md")
  
 set(CPACK_SOURCE_IGNORE_FILES          "${PROJECT_BINARY_DIR};/.git/;.gitignore;/tools/matlab/")
-set(CPACK_PACKAGING_INSTALL_PREFIX     "${PACKAGE_NAME}")
-set(CPACK_PACKAGE_VERSION_MAJOR        "${MAJOR_VERSION}")
-set(CPACK_PACKAGE_VERSION_MINOR        "${MINOR_VERSION}")
-set(CPACK_PACKAGE_VERSION_PATCH        "${MICRO_VERSION}")
+set(CPACK_PACKAGE_VERSION_MAJOR        "${CMAKE_MAJOR_VERSION}")
+set(CPACK_PACKAGE_VERSION_MINOR        "${CMAKE_MINOR_VERSION}")
+set(CPACK_PACKAGE_VERSION_PATCH        "${CMAKE_MICRO_VERSION}")
+#  NOTE: The following is tempting but does not work!
+# set(FULL_PACKAGE_NAME                  "${PACKAGE_NAME}-${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION}")
 set(CPACK_PACKAGE_VENDOR               "PNNL")
 set(CPACK_PACKAGE_CONTACT              "APBS - https://github.com/Electrostatics/apbs-pdb2pqr")
-set(CPACK_PACKAGE_FILE_NAME            "${PACKAGE_NAME}-${APBS_VERSION}-${CMAKE_SYSTEM_PROCESSOR}")
-set(CPACK_STRIP_FILES                  ON)
- 
+set(CPACK_PACKAGE_FILE_NAME            "${PACKAGE_NAME}-${APBS_VERSION}")
+set(CPACK_STRIP_FILES                   ON)
+
+if(WIN32)
+    # From: https://martinrotter.github.io/it-programming/2014/05/09/integrating-nsis-cmake/
+    SET(CPACK_NSIS_PACKAGE_NAME              "${PACKAGE_NAME}-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_MICRO_VERSION}")
+    SET(CPACK_NSIS_DISPLAY_NAME              "${PACKAGE_NAME}-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_MICRO_VERSION}")
+    SET(CPACK_PACKAGE_INSTALL_DIRECTORY      "${PACKAGE_NAME}-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_MICRO_VERSION}")
+    SET(CPACK_NSIS_INSTALL_ROOT              "C:")
+    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY   "${PACKAGE_NAME}-${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION}")
+    # set(CPACK_NSIS_HELP_LINK                 "${APP_URL}")
+    # set(CPACK_NSIS_URL_INFO_ABOUT            "${APP_URL}")
+    # set(CPACK_NSIS_CONTACT                   "${APP_EMAIL}")
+    list(APPEND CPACK_GENERATOR              "NSIS")
+endif()
+
+if(CPACK_GENERATOR MATCHES "^(7Z|TBZ2|TGZ|TXZ|TZ|TZST|ZIP)$")
+    set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY YES)
+endif()
+
 if(UNIX)
   if(CMAKE_SYSTEM_NAME MATCHES Linux)
     if(CMAKE_OS_NAME MATCHES ubuntu)
@@ -867,14 +889,5 @@ if(APPLE)
     set(CPACK_PACKAGING_INSTALL_PREFIX       "${PACKAGE_NAME}-${APBS_VERSION}")
 endif()
 
-if(WIN32)
-    list(APPEND CPACK_GENERATOR              "NSIS")
-    set(CPACK_PACKAGING_INSTALL_PREFIX       "\\\\${PACKAGE_NAME}-${APBS_VERSION}")
-endif()
-
-if(CPACK_GENERATOR MATCHES "^(7Z|TBZ2|TGZ|TXZ|TZ|TZST|ZIP)$")
-    set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY YES)
-endif()
- 
 include (CTest)
 include (CPack)
