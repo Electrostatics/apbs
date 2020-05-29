@@ -26,14 +26,14 @@ from inputgen import split_input
 FLOAT_PATTERN = r'([+-]?\d+\.\d+E[+-]\d+)'
 
 
-def test_binary():
+def test_binary(binary_name):
     """
     Ensures that the apbs binary is available
     """
 
     # Attempts to find apbs in the system path first
     try:
-        binary = "apbs"
+        binary = binary_name
         command = [binary, "--version"]
         with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as proc:
             line = str(proc.stdout.read())
@@ -43,7 +43,7 @@ def test_binary():
 
     # Next, looks for the apbs binary in the apbs bin directory
     try:
-        binary = os.path.abspath("../build/bin/apbs")
+        binary = os.path.abspath("../build/bin/%s" % binary_name)
         command = [binary, "--version"]
         with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as proc:
             line = str(proc.stdout.read())
@@ -236,6 +236,12 @@ def main():
 
     #Describes the available options.
     parser.add_option(
+        '-e', '--executable', dest='executable',
+        type='string', default='apbs',
+        help="Set the apbs executable to FILE", metavar="FILE"
+        )
+
+    parser.add_option(
         '-c', '--test_config', dest='test_config',
         type='string', default='test_cases.cfg',
         help="Set the test configuration file to FILE", metavar="FILE"
@@ -285,7 +291,7 @@ def main():
     config.read(options.test_config)
 
     # Make sure that the apbs binary can be found
-    binary = test_binary()
+    binary = test_binary(options.executable)
     if binary == '':
         parser.error("Coulnd't detect an apbs binary in the path or local bin directory")
 
