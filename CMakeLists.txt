@@ -25,7 +25,7 @@ set(CMAKE_MICRO_VERSION "0")
 
 set(APBS_VERSION     "${CMAKE_MAJOR_VERSION}.${CMAKE_MICRO_VERSION}")
 set(PACKAGE_STRING   "${APBS_VERSION}")
-set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
+set(CMAKE_BUILD_TYPE "Release")
 
 ################################################################################
 #  NOTE: Overwrite the RPATH information during the install from
@@ -856,10 +856,14 @@ endif()
 
 find_package(Python3 COMPONENTS Interpreter)
 if(${Python3_FOUND})
+    set(APBS_BINARY "apbs")
+    if(CMAKE_HOST_WIN32)
+      set(APBS_BINARY "${CMAKE_BUILD_TYPE}/apbs.exe")
+    endif()
     message(STATUS "******* Python3 FOUND ${Python3_EXECUTABLE}")
     foreach(_test ${TEST_CASES})
-        message(STATUS "FOUND TEST CASE ${_test}")
-        add_test(NAME ${_test}_test COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/apbs_tester.py -c ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg -t ${_test})
+        message(STATUS "TEST ${_test}_test COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/apbs_tester.py -c ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg -e ${CMAKE_BINARY_DIR}/${APBS_BINARY} -t ${_test}")
+        add_test(NAME ${_test}_test COMMAND "${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/apbs_tester.py -c ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg -e ${CMAKE_BINARY_DIR}/${APBS_BINARY} -t ${_test}")
     endforeach()
 else()
     message(FATAL "******* Python3 NOT FOUND *****************")
