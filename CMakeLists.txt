@@ -534,60 +534,49 @@ endif()
 ################################################################################
 # Getting msms and /or nanoshaper
 ################################################################################
+set(MESH_ROOT_URL_PATH "https://github.com/lwwilson1/mesh_routines/tree/ddb75cb13318714de1d72d3658da372c9b5488d0")
+
 if(GET_MSMS)
+    set(MSMS_FULL_URL_PATH)
+    set(MSMS_RAW_BINARY_NAME "msms")
     message(STATUS "Copying MSMS exectuable")
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-        # Mac OS X specific code
-        file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_MacOSX_2.6.1/msms.MacOSX.2.6.1
-             DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-        file(RENAME ${EXECUTABLE_OUTPUT_PATH}/msms.MacOSX.2.6.1
-             ${EXECUTABLE_OUTPUT_PATH}/msms)
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-        # Linux specific code
-        file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_i86_64Linux2_2.6.1/msms.x86_64Linux2.2.6.1.staticgcc
-             DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-        file(RENAME ${EXECUTABLE_OUTPUT_PATH}/msms.x86_64Linux2.2.6.1.staticgcc
-             ${EXECUTABLE_OUTPUT_PATH}/msms)
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-        # Windows specific code
-        file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_win32_2.6.1/msms.exe
-             DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
+        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms/msms_MacOSX_2.6.1/msms.MacOSX.2.6.1")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
+        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms/msms_i86_64Linux2_2.6.1/msms.x86_64Linux2.2.6.1.staticgcc")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
+        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms/msms_win32_2.6.1/msms.exe")
+        set(MSMS_RAW_BINARY_NAME "msms.exe")
     endif()
 
-    if(WIN32)
-        install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/msms.exe
-                DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    else()
-        install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/msms
-                DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    endif()
+    file(DOWNLOAD ${MSMS_FULL_URL_PATH} "${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}")
+    message(STATUS "MSMS Download: ${MSMS_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}")
+
+    install(PROGRAMS "${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}"
+            DESTINATION ${EXECUTABLE_INSTALL_PATH})
+    message(STATUS "MSMS install: ${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
 endif()
 
 
 if(GET_NanoShaper)
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-        # Mac OS X specific code
-        file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/OSX/NanoShaper
-             DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-        # Linux specific code
-        file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/Linux64/NanoShaper
-             DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-        # Windows specific code
-        file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/win32/NanoShaper32.exe
-             DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-        file(RENAME ${EXECUTABLE_OUTPUT_PATH}/NanoShaper32.exe
-             ${EXECUTABLE_OUTPUT_PATH}/NanoShaper.exe)
+    set(NANOSHAPER_FULL_URL_PATH)
+    set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper")
+    message(STATUS "Copying NanoShaper exectuable")
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper/OSX/NanoShaper")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper/Linux64/NanoShaper")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper/win32/NanoShaper32.exe")
+        set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper.exe")
     endif()
 
-    if(WIN32)
-        install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/Nanoshaper.exe
-                DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    else()
-        install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/NanoShaper
-                DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    endif()
+    file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME})
+    message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+
+    install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}
+            DESTINATION ${EXECUTABLE_INSTALL_PATH})
+    message(STATUS "NanoShaper install: ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
 endif()
 
 
