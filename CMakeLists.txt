@@ -532,7 +532,7 @@ endif()
 
 
 ################################################################################
-# Getting msms and /or nanoshaper
+# Getting msms and /or nanoshaper binaries
 ################################################################################
 set(MESH_ROOT_URL_PATH "https://github.com/lwwilson1/mesh_routines/tree/ddb75cb13318714de1d72d3658da372c9b5488d0")
 
