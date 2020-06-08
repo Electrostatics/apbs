@@ -534,18 +534,18 @@ endif()
 ################################################################################
 # Getting msms and /or nanoshaper binaries
 ################################################################################
-set(MESH_ROOT_URL_PATH "https://github.com/lwwilson1/mesh_routines/tree/ddb75cb13318714de1d72d3658da372c9b5488d0")
+set(MESH_ROOT_URL_PATH "https://github.com/lwwilson1/mesh_routines/releases/download/v1.5")
 
 if(GET_MSMS)
     set(MSMS_FULL_URL_PATH)
     set(MSMS_RAW_BINARY_NAME "msms")
     message(STATUS "Copying MSMS exectuable")
     if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
-        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms/msms_MacOSX_2.6.1/msms.MacOSX.2.6.1")
+        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms.MacOSX.2.6.1")
     elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
-        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms/msms_i86_64Linux2_2.6.1/msms.x86_64Linux2.2.6.1.staticgcc")
+        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms.x86_64Linux2.2.6.1.staticgcc")
     elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
-        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms/msms_win32_2.6.1/msms.exe")
+        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms.exe")
         set(MSMS_RAW_BINARY_NAME "msms.exe")
     endif()
 
@@ -563,11 +563,11 @@ if(GET_NanoShaper)
     set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper")
     message(STATUS "Copying NanoShaper exectuable")
     if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
-        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper/OSX/NanoShaper")
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_OSX")
     elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
-        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper/Linux64/NanoShaper")
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_Linux64")
     elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
-        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper/win32/NanoShaper32.exe")
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper32.exe")
         set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper.exe")
     endif()
 
@@ -851,8 +851,8 @@ if(${Python3_FOUND})
     endif()
     message(STATUS "******* Python3 FOUND ${Python3_EXECUTABLE}")
     foreach(_test ${TEST_CASES})
-        message(STATUS "TEST ${_test}_test COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/apbs_tester.py -c ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg -e ${CMAKE_BINARY_DIR}/${APBS_BINARY} -t ${_test}")
-        add_test(NAME ${_test}_test COMMAND "${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/apbs_tester.py -c ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg -e ${CMAKE_BINARY_DIR}/${APBS_BINARY} -t ${_test}")
+        message(STATUS "TEST ${_test}_test COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/apbs_tester.py -c ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg -e ${CMAKE_BINARY_DIR}/bin/${APBS_BINARY} -t ${_test}")
+        add_test(NAME ${_test}_test COMMAND       "${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/apbs_tester.py -c ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg -e ${CMAKE_BINARY_DIR}/bin/${APBS_BINARY} -t ${_test}")
     endforeach()
 else()
     message(FATAL "******* Python3 NOT FOUND *****************")
