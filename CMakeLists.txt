@@ -549,8 +549,10 @@ if(GET_MSMS)
         set(MSMS_RAW_BINARY_NAME "msms.exe")
     endif()
 
-    file(DOWNLOAD ${MSMS_FULL_URL_PATH} "${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}")
-    message(STATUS "MSMS Download: ${MSMS_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}")
+    if (NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}")
+        file(DOWNLOAD ${MSMS_FULL_URL_PATH} "${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}")
+        message(STATUS "MSMS Download: ${MSMS_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}")
+    endif()
 
     install(PROGRAMS "${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}"
             DESTINATION ${EXECUTABLE_INSTALL_PATH})
@@ -571,8 +573,10 @@ if(GET_NanoShaper)
         set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper.exe")
     endif()
 
-    file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME})
-    message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+    if (NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+        file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME})
+        message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+    endif()
 
     install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}
             DESTINATION ${EXECUTABLE_INSTALL_PATH})
@@ -827,38 +831,8 @@ file(REMOVE_RECURSE ${EXECUTABLE_OUTPUT_PATH}/temp)
 option(ENABLE_TESTS "Enable tests" ON)
 if(${ENABLE_TESTS})
   enable_testing()
-  #add_subdirectory(tests)
+  add_subdirectory(tests)
 endif()
-
-set(TEST_CASES)
-if(EXISTS ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg)
-    file(READ ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg TEST_CASES_FILE)
-    string(REPLACE "\n" ";" TEST_CASES_LINES ${TEST_CASES_FILE}) 
-    foreach(_line ${TEST_CASES_LINES})
-        if(${_line} MATCHES "^\\[")
-            string(REPLACE "[" "" _line ${_line})
-            string(REPLACE "]" "" _line ${_line})
-            list(APPEND TEST_CASES ${_line})
-        endif()
-    endforeach()
-endif()
-
-find_package(Python3 COMPONENTS Interpreter)
-if(${Python3_FOUND})
-    set(APBS_BINARY "apbs")
-    if(CMAKE_HOST_WIN32)
-      set(APBS_BINARY "${CMAKE_BUILD_TYPE}/apbs.exe")
-    endif()
-    message(STATUS "******* Python3 FOUND ${Python3_EXECUTABLE}")
-    foreach(_test ${TEST_CASES})
-        message(STATUS "TEST ${_test}_test WORKING_DIRECTORY  ${CMAKE_SOURCE_DIR}/tests  COMMAND  ${Python3_EXECUTABLE} apbs_tester.py -e ${CMAKE_BUILD_DIR}/bin/${APBS_BINARY} -t ${_test}")
-        add_test(NAME        ${_test}_test WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/tests" COMMAND "${Python3_EXECUTABLE} apbs_tester.py -e ${CMAKE_BUILD_DIR}/bin/${APBS_BINARY} -t ${_test}")
-    endforeach()
-else()
-    message(FATAL "******* Python3 NOT FOUND *****************")
-endif()
-
-include (CTest)
 
 
 ###############################################################################
@@ -883,8 +857,8 @@ set(CPACK_PACKAGE_CONTACT              "APBS - https://github.com/Electrostatics
 set(CPACK_PACKAGE_FILE_NAME            "${PACKAGE_NAME}-${APBS_VERSION}.${CMAKE_HOST_SYSTEM_NAME}")
 set(CPACK_STRIP_FILES                   True)
 
-list(APPEND CPACK_GENERATOR              "ZIP")
-set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY      True)
+list(APPEND CPACK_GENERATOR            "ZIP")
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY    True)
 
 if(CPACK_GENERATOR MATCHES "^(7Z|TBZ2|TGZ|TXZ|TZ|TZST|ZIP)$")
     set(CPACK_TOPLEVEL_TAG ${CPACK_PACKAGE_NAME})

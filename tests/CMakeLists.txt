@@ -1,0 +1,37 @@
+cmake_minimum_required (VERSION 3.12)
+
+project("APBSTESTS")
+
+include (CTest)
+enable_testing()
+
+message(STATUS "******* TESTING ADDED *****************")
+find_package(Python3 COMPONENTS Interpreter)
+if(${Python3_FOUND})
+    message(STATUS "******* Python3 FOUND ${Python3_EXECUTABLE}")
+else()
+    message(FATAL  "******* Python3 NOT FOUND *****************")
+endif()
+
+set(APBS_BINARY "apbs")
+if(CMAKE_HOST_WIN32)
+  set(APBS_BINARY "${CMAKE_BUILD_TYPE}/apbs.exe")
+endif()
+
+set(TESTS_CFG_FILE ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg)
+
+if(EXISTS ${TESTS_CFG_FILE})
+    file(READ ${TESTS_CFG_FILE} TEST_CASES_FILE)
+    string(REPLACE "\n" ";" TEST_CASES_LINES ${TEST_CASES_FILE}) 
+    foreach(_line ${TEST_CASES_LINES})
+        if(${_line} MATCHES "^\\[")
+            string(REPLACE "[" "" _line ${_line})
+            string(REPLACE "]" "" _line ${_line})
+            message(STATUS "******* FOUND TEST CASE ${_line}")
+            message(STATUS "TEST  ${_line}_test  WORKING_DIRECTORY  ${CMAKE_SOURCE_DIR}/tests  COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/apbs_tester.py -e ${CMAKE_BINARY_DIR}/bin/${APBS_BINARY} -t ${_line}")
+            add_test(NAME        "${_line}_test" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/tests" COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/apbs_tester.py -e ${CMAKE_BINARY_DIR}/bin/${APBS_BINARY} -t ${_line})
+        endif()
+    endforeach()
+else()
+    message(FATAL  "******* MISSING Test Config (${TESTS_CFG_FILE})")
+endif()
