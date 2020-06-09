@@ -32,7 +32,7 @@ cmake                                           \
 VERBOSE=1 make -j 1                             || exit 1
 #VERBOSE=1 make -j 1 install                     || exit 1
 #      -DCMAKE_C_FLAGS="-fPIC"             \
-ctest -C Release #                               || exit 1
+ctest -C Release --output-on-failure #           || exit 1
 
 cd ../$BUILD_DIR
 cpack -C Release -G ZIP                         || exit 
