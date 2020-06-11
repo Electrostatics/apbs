@@ -34,6 +34,5 @@ VERBOSE=1 make -j 1                             || exit 1
 #      -DCMAKE_C_FLAGS="-fPIC"             \
 ctest -C Release --output-on-failure #           || exit 1
 
-cd ../$BUILD_DIR
 cpack -C Release -G ZIP                         || exit 
 unzip -l APBS*.zip

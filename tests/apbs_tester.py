@@ -187,20 +187,23 @@ def run_test(binary, test_files, test_name, test_directory, setup, logger, ocd):
                 computed_results = process_serial(binary, input_file)
 
             # Split the expected results into a list of text values
-            # print("EXPECTED COMPUTED: %i" % (len(computed_results)))
-            # print("EXPECTED EXPECTED: %i" % (len(expected_results)))
-            # print("COMPUTED: %s" %computed_results)
-            # print("EXPECTED: %s" %expected_results)
+            print("EXPECTED COMPUTED: %i" % (len(computed_results)))
+            print("EXPECTED EXPECTED: %i" % (len(expected_results)))
+            print("COMPUTED: %s" %computed_results)
+            print("EXPECTED: %s" %expected_results)
             expected_results = expected_results.split()
             for result in computed_results:
-                print("RESULT %s" % result)
+                print("COMPUTED RESULT %s" % result)
             for i in range(len(expected_results)):
                 # If the expected result is a star, it means ignore that result
                 if expected_results[i] == '*':
                     continue
 
                 # Compare the expected to computed results
-                computed_result = computed_results[i]
+                try:
+                    computed_result = computed_results[i]
+                except IndexError as error:
+                    logger.message("Computed result for index, %i, does not exist: %s" % (i, error))
                 expected_result = float(expected_results[i])
                 logger.message("Testing computed result %.12E against expected result %12E\n" % (computed_result, expected_result))
                 check_results(computed_result, expected_result, input_file, logger, ocd)
@@ -273,8 +276,8 @@ def main():
     (options, args) = parser.parse_args()
 
     # Messages will go to stdout, log messages will go to the supplied log file
-    message_fd = sys.stdout
-    logfile_fd = None
+    message_fd = sys.stderr
+    logfile_fd = sys.stderr
 
     # Verify that the log file is writable
     try:
