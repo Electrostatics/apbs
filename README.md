@@ -9,7 +9,3 @@ For more information about APBS, please see
 
 * Home page:  http://www.poissonboltzmann.org/
 * Documentation: http://apbs.readthedocs.io
-
-
-
-

@@ -26,6 +26,30 @@ Installing from pre-compiled binaries
 
 The best way to install APBS is via download of a pre-compiled binary from `SourceForge`_ or `GitHub releases`_ (after `registering`_, of course).
 
+^^^^^^^^^^^^^^^^^^
+What's in the box?
+^^^^^^^^^^^^^^^^^^
+
+The binary distributions typically provide the following contents:
+
+bin
+  contains the main APBS executable
+share/apbs
+  contains additional APBS-related files
+doc
+  the APBS programmer guide
+examples
+  APBS examples
+tests
+  the APBS test suite
+tools
+  useful programs to help process APBS input and output
+include
+  header files for building software that calls APBS
+lib
+  libraries for building software that calls APBS
+
+
 ---------------------------
 Installing from source code
 ---------------------------

@@ -31,6 +31,9 @@ Contents
    :maxdepth: 2
 
    getting/index
+   using/index
+   background
+   formats/index
 
 
 ------------------
