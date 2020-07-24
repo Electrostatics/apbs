@@ -33,6 +33,15 @@ Command line use
 where the list of ``[options]`` can be obtained by running APBS with the ``--help`` option.
 The input file format is described in :doc:`input/index`.
 
+-------------------
+Tools and utilities
+-------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   tools
+
 ----------------
 More information
 ----------------
