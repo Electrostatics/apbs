@@ -41,4 +41,5 @@ More information
    :maxdepth: 2
 
    input/index.rst
+   tools
    other-software
