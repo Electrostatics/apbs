@@ -33,6 +33,7 @@ Contents
    getting/index
    using/index
    background
+   releases
    formats/index
 
 
