@@ -33,8 +33,11 @@ Contents
    getting/index
    using/index
    background
-   releases
+   supporting
+   help
+   reading
    formats/index
+   releases
 
 
 ------------------

@@ -2,7 +2,7 @@
 Protein-RNA binding linked equilibria
 =====================================
 
-Before reading this example, please review :doc:`/apbs/errors` for relevant caveats.
+Before reading this example, please review :ref:`errors` for relevant caveats.
 
 ------------
 Introduction
@@ -41,7 +41,7 @@ which roughly equals
 which is approximately 2.479 kJ/mol or 0.593 kcal/mol.
 
 García-García and Draper used nonlinear Poisson-Boltzmann equation calculations to estimate the electrostatic contributions to the binding free energy as a function of the monovalent salt concentration.
-As :doc:`discussed elsewhere </apbs/errors>`, the Poisson-Boltzmann equation is only able to describe non-specific interactions of ions with solutes, including the effects of ion size and charge but otherwise ignoring the important differences between ionic species.
+As :ref:`discussed elsewhere <errors>`, the Poisson-Boltzmann equation is only able to describe non-specific interactions of ions with solutes, including the effects of ion size and charge but otherwise ignoring the important differences between ionic species.
 Interestingly (and perhaps surprisingly), they find excellent agreement between the experimental binding energy dependence on KCl and their Poisson-Boltzmann calculations with equivalent concentrations of monovalent ions.
 This agreement strongly suggests that the binding of RNA and the peptide is primarily determined by electrostatic interactions.
 It also suggests that the primary interaction of the KCl with this system is through non-specific screening interactions.
@@ -157,7 +157,7 @@ As used in the template file, the READ command, our calculation will have three 
 The calculations themselves will not be overly demanding, since we will use relatively coarse grids.
 This grid coarseness has a significant impact on the absolute electrostatic binding energy we obtain from this particular calculation: the calculated energy isn't converged with respect to grid spacing.
 However, the overall slope of binding energy with respect to monovalent ion concentration is rather insensitive with respect to the grid spacing, allowing us to save computational time and effort during the calculations.
-The calculation will conclude with a :doc:`/apbs/input/print` command which will combine the total energies from the three parts to obtain our approximate absolute electrostatic binding energy for the complex at 0.225 M monovalent salt concentration.
+The calculation will conclude with a :doc:`/using/input/print` command which will combine the total energies from the three parts to obtain our approximate absolute electrostatic binding energy for the complex at 0.225 M monovalent salt concentration.
 It is very important to note that this absolute energy no meaning in isolation for several reasons:  
 
 * It is not converged with respect to grid spacing  
@@ -174,7 +174,7 @@ You will also have to create a :file:`dxmath.txt` file which contains the follow
    qdens-rna-IONSTR.dx -
    qdens-diff-IONSTR.dx = 
 
-:doc:`/apbs/utilities/dxmath` will subtract the dx maps of the individual peptide and RNA from the overall structure (and prints to the :file:`qdens-diff-IONSTR.dx` file.
+:ref:`dxmath` will subtract the dx maps of the individual peptide and RNA from the overall structure (and prints to the :file:`qdens-diff-IONSTR.dx` file.
 
 ----------------------
 Automation with Python

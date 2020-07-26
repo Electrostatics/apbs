@@ -86,6 +86,8 @@ coulomb
 Calculate Coulomb forces and energies.
 Found in :file:`tools/manip`
 
+.. _dxmath:
+
 ^^^^^^
 dxmath
 ^^^^^^
@@ -111,7 +113,7 @@ Found in :file:`tools/mesh`
 inputgen.py
 ^^^^^^^^^^^
 
-Create an APBS input file using :doc:`psize` data.
+Create an APBS input file using :ref:`psize` data.
 Found in :file:`tools/manip`
 
 ^^^^^^^^^^^^^^^^^^^^
@@ -140,6 +142,8 @@ multivalue
 
 This program evaluates OpenDX scalar data at a series of user-specified points and returns the value of the data at each point.
 Found in :file:`tools/mesh`
+
+.. _psize:
 
 ^^^^^^^^
 psize.py

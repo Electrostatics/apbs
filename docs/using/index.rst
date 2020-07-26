@@ -13,7 +13,7 @@ APBS is often used together with the `PDB2PQR software <https://github.com/Elect
 #. Start with a `PDB ID`_ or locally generated PDB file (see :doc:`/formats/pdb`).
 #. Assign titration states and parameters with :program:`pdb2pqr` to convert the protein and ligands to PQR format (see :doc:`/formats/pqr`).
 #. Perform electrostatics calculations with :program:`apbs` (can be done from within the `PDB2PQR web server <web-server>`_).
-#. Visualize results from within PDB2PQR web server or with :doc:`other-software`.
+#. Visualize results from within PDB2PQR web server or with :ref:`other-software`.
 
 --------------
 Web server use
@@ -31,7 +31,7 @@ Command line use
    apbs [options] input-file
 
 where the list of ``[options]`` can be obtained by running APBS with the ``--help`` option.
-The input file format is described in :doc:`input/index`.
+The input file format is described below.
 
 -----------------
 Input file syntax
@@ -43,7 +43,7 @@ These files are whitespace- or linefeed-delimited.
 Comments can be added to the input files via the ``#`` character; all text between the ``#`` and the end of the line is not parsed by APBS.
 If pathnames used in the input file contain spaces, then the entire pathname must be enclosed in quotes.
 For example, if you wanted to refer to the file :file:`foo` which resides in a directory with spaces in its name, then you should refer to :file:`foo` as :file:`"/path with spaces/foo"`.
-Specific examples of APBS input are provided in :doc:`/examples/index`.
+Specific examples of APBS input are provided in :ref:`examples`.
 
 APBS input files contain three basic sections which can be repeated any number of times:
 
@@ -101,6 +101,7 @@ In the absence of this argument, sections are assigned numerical IDs.
    input/apolar/index
    input/print
 
+.. _examples:
 
 --------
 Examples
@@ -132,9 +133,11 @@ APBS is distributed with utilities designed to simplify typical tasks associated
 
    tools
 
-----------------
-More information
-----------------
+.. _other-software:
+
+--------------
+Other software
+--------------
 
 A variety of other software can be used to visualize and process the results of PDB2PQR and APBS calculations.
 

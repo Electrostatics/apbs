@@ -29,6 +29,8 @@ PB methods provide polar solvation energies and therefore must be complemented b
 This model has been implemented in APBS and can also be easily transformed into simpler popular non-polar models (e.g., solvent-accessible surface area).
 While this model can be used separately from PB to analyze non-polar contributions to solvation energy, its preferred use is coupled to the PB equation through a geometric flow model [Chen2010]_ which treats polar and non-polar interactions in the same framework and reduces the number of user-specified empirical parameters.
 
+.. _errors:
+
 ----------------------------
 Caveats and sources of error
 ----------------------------
