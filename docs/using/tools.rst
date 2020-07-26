@@ -1,9 +1,3 @@
-================
-Supporting tools
-================
-
-APBS is distributed with utilities designed to simplify typical tasks associated with electrostatics calculations.
-
 --------------------
 Conversion utilities
 --------------------
