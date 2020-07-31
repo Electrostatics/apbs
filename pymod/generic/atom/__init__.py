@@ -1,9 +1,12 @@
+from .. import Coordinate
+from apbs_types import *
 import numpy as np
 
 import sys
+import os
 sys.path.insert(0, '..')
-from coordinate import Coordinate
-from apbs_types import *
+sys.path.insert(0, os.path.join('..', '..'))
+
 
 class Atom:
     '''
@@ -19,7 +22,7 @@ class Atom:
     '''
 
     def __init__(self, *vals: List[float]):
-        if len(vals) == 3:
+        if len(vals) > 0:
             self.position = Coordinate(*vals)
         else:
             self.position = Coordinate()
@@ -32,10 +35,12 @@ class Atom:
         self.name: str = ''
 
     def __str__(self):
-        return 'Atom< %s >' % self.position
+        return 'Atom< name< %s >, %s, radius< %s >, charge< %s >>' \
+            % (self.name, self.position, self.radius, self.charge)
 
     def __repr__(self):
-        return str(self)
+        return 'Atom< name< %s >, %s  radius< %s >, charge< %s >>' \
+            % (self.name, self.position, self.radius, self.charge)
 
     @property
     def x(self) -> float:

@@ -1,9 +1,10 @@
-from unittest import TestCase, main as unittest_main
-import os
-import sys
-import tempfile
-sys.path.insert(0, '..')
-from atom_list import AtomList
+import os # noqa
+import sys # noqa
+sys.path.insert(0, '..') # noqa
+from generic import Coordinate # noqa
+from generic import AtomList # noqa
+from unittest import TestCase # noqa
+
 
 class TestAtomList(TestCase):
     '''
@@ -14,12 +15,16 @@ class TestAtomList(TestCase):
 
     def setUp(self) -> None:
         with open(self.__class__.fn, 'w') as f:
-            f.write('HETATM    1  C    ALK    1       1.000   4.000   7.000 0.000 1.000\n')
-            f.write('HETATM    1  C    ALK    1       2.000   5.000   8.000 0.000 1.000\n')
-            f.write('HETATM    1  C    ALK    1       3.000   6.000   9.000 0.000 1.000\n')
+            f.write('HETATM    1  C    ALK    1       '
+                    '1.000   4.000   7.000 0.000 1.000\n')
+            f.write('HETATM    1  C    ALK    1       '
+                    '2.000   5.000   8.000 0.000 1.000\n')
+            f.write('HETATM    1  C    ALK    1       '
+                    '3.000   6.000   9.000 0.000 1.000\n')
 
     def tearDown(self) -> None:
-        ...
+        if os.path.exists(self.__class__.fn):
+            os.remove(self.__class__.fn)
 
     def test_read_pdb(self) -> None:
 

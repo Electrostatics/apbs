@@ -1,17 +1,21 @@
-from point import Point
-from vtypes import *
+# flake8: noqa
 from typing import List, Optional
+from apbs_types import *
+from generic.coordinate import Coordinate
 import numpy as np
 import math
 
 import sys
-sys.path.insert('..')
+import os
+sys.path.insert(0, '..')
+sys.path.insert(0, os.path.join('..', '..'))
 
 '''
 
 Likely never used. Ported for no reason...
 
 '''
+
 
 class CurvatureFlag:
     ReducedMaximalCurvature = 0
@@ -44,20 +48,20 @@ class Grid:
             maxs:   Initializes member variable with the same name.
             data:   Optionally sets the data for the grid (may leave None if will be set later)
         '''
-        self.dims:   Point[int] = dims
-        self.spaces: Point[int] = spaces
-        self.mins:   Point[int] = mins
-        self.maxs:   Point[int] = maxs
+        self.dims:   Coordinate[int] = dims
+        self.spaces: Coordinate[int] = spaces
+        self.mins:   Coordinate[int] = mins
+        self.maxs:   Coordinate[int] = maxs
         self.data:   Optional[FloatVec] = data
 
-    def value(self, pt: Point[float]) -> float:
+    def value(self, pt: Coordinate[float]) -> float:
         '''Get potential value (from mesh or approximation) at a point
 
         :note: Previously returned by pointer, using return code as an error code.
                 This has been replaced by returning the value and raising an
                 exception on error.
 
-        :param   x    : Point at which to evaluate potential
+        :param   x    : Coordinate at which to evaluate potential
         :returns      : value of grid
         '''
 
@@ -66,20 +70,20 @@ class Grid:
 
         ret_value = float(0)
 
-        tmp = Point(
+        tmp = Coordinate(
             (pt.x - mins.x)/spaces.x,
             (pt.y - mins.y)/spaces.y,
-            (pt.z - mins.z)/spaces.z,
+            (pt.z - mins.z)/spaces.z
         )
 
-        hi = Point(
-            int(math.ceil(tmp.x))
-            int(math.ceil(tmp.y))
+        hi = Coordinate(
+            int(math.ceil(tmp.x)),
+            int(math.ceil(tmp.y)),
             int(math.ceil(tmp.z))
         )
-        lo = Point(
-            int(math.floor(tmp.x))
-            int(math.floor(tmp.y))
+        lo = Coordinate(
+            int(math.floor(tmp.x)),
+            int(math.floor(tmp.y)),
             int(math.floor(tmp.z))
         )
 
@@ -117,11 +121,11 @@ class Grid:
                 raise RuntimeError('Value routine failed to converge with the following coordinates:\n'
                                    f'\tLow: {lo}\n'
                                    f'\tHigh: {hi}\n'
-                                   f'\tPoint: {pt}\n')
+                                   f'\tCoordinate: {pt}\n')
 
         return ret_value
 
-    def curvature(self, pt: Point[float], cflag: CurvatureFlag):
+    def curvature(self, pt: Coordinate[float], cflag: CurvatureFlag):
         '''Get second derivative values at a point
 
         :param   pt   : Location to evaluate second derivative
@@ -131,7 +135,7 @@ class Grid:
         '''
         ...
 
-    def gradient(self, pt: Point[float], grad: FloatVec):
+    def gradient(self, pt: Coordinate[float], grad: FloatVec):
         '''Get first derivative values at a point
 
         :param   pt  : Location to evaluate gradient
@@ -166,6 +170,7 @@ class Grid:
         This returns the integral:
           \f[ | u |_{H_1} = \left( \int_\Omega |\nabla u(x)|^2 dx \right)^{1/2} \f]
         '''
+        ...
 
     def normH1(self) -> float:
         '''Integral of data
@@ -174,6 +179,7 @@ class Grid:
           \f[ \| u \|_{H_1} = \left( \int_\Omega |\nabla u(x)|^2 dx
                             +        \int_\Omega |u(x)|^2 dx \right)^{1/2} \f]
         '''
+        ...
 
     def read_dx(self, fn: str) -> None:
         lines = open(fn, 'r').readlines()
