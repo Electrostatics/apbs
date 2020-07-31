@@ -16,14 +16,14 @@ cd build                                        || exit 1
 #      -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
 cmake                                     \
       -DCMAKE_BUILD_TYPE=Release          \
-      -DENABLE_GEOFLOW=ON                 \
-      -DENABLE_BEM=ON                     \
-      -DENABLE_FETK=ON                    \
-      -DENABLE_OPENMP=ON                  \
-      -DENABLE_PBAM=ON                    \
-      -DENABLE_PBSAM=ON                   \
-      -DENABLE_PYTHON=ON                  \
-      -DENABLE_TESTS=ON                   \
+      -DENABLE_GEOFLOW=OFF                 \
+      -DENABLE_BEM=OFF                     \
+      -DENABLE_FETK=OFF                    \
+      -DENABLE_OPENMP=OFF                  \
+      -DENABLE_PBAM=OFF                    \
+      -DENABLE_PBSAM=OFF                   \
+      -DENABLE_PYTHOFF=OFF                  \
+      -DENABLE_TESTS=OFF                   \
       -DBUILD_SHARED_LIBS=ON              \
       -DBUILD_DOC=OFF                     \
       ..                                        || exit 1
