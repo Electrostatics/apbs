@@ -1,8 +1,4 @@
 from typing import Generic, TypeVar, Callable
-import sys
-import os
-sys.path.insert(0, '..')
-sys.path.insert(0, os.path.join('..', '..'))
 
 '''
 Using Coordinate as a lower-level abstraction over len==3 generic container,

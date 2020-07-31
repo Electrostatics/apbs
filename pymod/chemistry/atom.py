@@ -1,12 +1,10 @@
-from . import Coordinate
 from typing import List
-import numpy as np
 
-import sys
-import os
-sys.path.insert(0, '..')
-sys.path.insert(0, os.path.join('..', '..'))
-
+import sys # noqa
+import os # noqa
+sys.path.insert(0, '..') # noqa
+sys.path.insert(0, os.path.join('..', '..')) # noqa
+from geometry import Coordinate # noqa
 
 class Atom:
     '''

@@ -1,7 +1,7 @@
 from .test_coordinate import TestCoordinate
 import sys # noqa
 sys.path.insert(0, '..') # noqa
-from generic import SurfacePoint # noqa
+from geometry import SurfacePoint # noqa
 
 class TestSurfacePoint(TestCoordinate):
     def test_is_on_surf(self) -> None:

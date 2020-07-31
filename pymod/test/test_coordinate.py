@@ -1,4 +1,4 @@
-from generic import Coordinate
+from geometry import Coordinate
 from unittest import TestCase
 import unittest
 

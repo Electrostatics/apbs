@@ -1,10 +1,10 @@
+from math import inf
 import sys  # noqa
 import os  # noqa
 sys.path.insert(0, '..')  # noqa
-sys.path.insert(0, os.path.join('..', '..'))  # noqa
-from math import inf
+from . import Atom
+from geometry import Coordinate
 from typing import Tuple
-from . import Atom, Coordinate
 
 
 class AtomList:
@@ -68,6 +68,16 @@ class AtomList:
             self._dp['max'] = Coordinate(x, y, z)
 
         return self._dp['max']
+
+    @property
+    def max_radius(self) -> float:
+        if 'max_radius' not in self._dp.keys():
+            m = 0.
+            for a in self._atoms:
+                m = max(m, a.radius)
+            self._dp['max_radius'] = m
+
+        return self._dp['max_radius']
 
     @property
     def count(self) -> int:

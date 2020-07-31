@@ -1,5 +1,5 @@
 from typing import TypeVar, List, Dict
-from .surface_point import SurfacePoint
+from . import SurfacePoint
 
 class Surface:
     '''

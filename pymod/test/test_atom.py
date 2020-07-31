@@ -1,4 +1,4 @@
-from generic import Atom
+from chemistry import Atom
 import unittest
 import sys
 sys.path.insert(0, '..')

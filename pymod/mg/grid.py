@@ -1,13 +1,12 @@
 # flake8: noqa
 from typing import List, Optional
-from generic.coordinate import Coordinate
+from geometry.coordinate import Coordinate
 import numpy as np
 import math
 
 import sys
 import os
 sys.path.insert(0, '..')
-sys.path.insert(0, os.path.join('..', '..'))
 
 '''
 

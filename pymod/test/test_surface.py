@@ -1,7 +1,7 @@
 import sys # noqa
 import os # noqa
 sys.path.insert(0, '..') # noqa
-from generic import Surface
+from geometry import Surface
 from unittest import TestCase
 import unittest
 

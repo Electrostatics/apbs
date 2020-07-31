@@ -1,8 +1,8 @@
 import os # noqa
 import sys # noqa
 sys.path.insert(0, '..') # noqa
-from generic import Coordinate # noqa
-from generic import AtomList # noqa
+from geometry import Coordinate # noqa
+from chemistry import AtomList, CellList # noqa
 from unittest import TestCase # noqa
 
 
@@ -66,3 +66,7 @@ class TestAtomList(TestCase):
         self.assertEqual(mi.x, 2.)
         self.assertEqual(mi.y, 5.)
         self.assertEqual(mi.z, 8.)
+
+    def test_max_radius(self):
+        sut = CellList(self.__class__.fn)
+        self.assertEqual(sut.max_radius, 3.)

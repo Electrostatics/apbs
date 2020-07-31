@@ -1,7 +1,7 @@
 import sys # noqa
 import os # noqa
 sys.path.insert(0, '..') # noqa
-from generic import AtomComplexCalc
+from chemistry import AtomComplexCalc
 from unittest import TestCase
 import unittest
 
