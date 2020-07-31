@@ -1,9 +1,9 @@
+import sys # noqa
+sys.path.insert(0, '..') # noqa
+
 from geometry import Coordinate
 from unittest import TestCase
 import unittest
-
-import sys
-sys.path.insert(0, '..')
 
 
 class TestCoordinate(TestCase):

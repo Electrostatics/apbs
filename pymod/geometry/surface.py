@@ -11,8 +11,16 @@ class Surface:
     def __init__(self, probe_radius: float, npoints: int):
         self.probe_radius = probe_radius
         self.npoints = npoints
-        self.coords: List[SurfacePoint] = []
+        self.coords: List[SurfacePoint] = [ SurfacePoint() for _ in range(npoints) ]
         self._dp: Dict[str, float] = dict()
+
+    def __getitem__(self, idx: int) -> SurfacePoint:
+        if idx >= self.npoints:
+            raise IndexError('Requested surface point does not exists.')
+        return self.coords[idx]
+
+    def __setitem__(self, idx: int, other: SurfacePoint) -> None:
+        self.coords[idx] = other
 
     @property
     def area(self) -> float:
