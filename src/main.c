@@ -279,7 +279,7 @@ int main(
     Vnm_tprint( 1, "%s", header);
 
 #ifdef APBS_FAST
-    Vnm_tprint(, 2"WARNING: APBS was compiled with the --enable-fast option.\n"
+    Vnm_tprint(2, "WARNING: APBS was compiled with the --enable-fast option.\n"
            "WARNING: This mode is experimental and subject to change in future releases.\n"
            "WARNING: The fast mode enables: Gauess-Seidel Smoothing and \n"
            "WARNING:   Conjugate Gradient Multigrid methods.\n\n");

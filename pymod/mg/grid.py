@@ -1,6 +1,5 @@
 # flake8: noqa
 from typing import List, Optional
-from apbs_types import *
 from generic.coordinate import Coordinate
 import numpy as np
 import math
@@ -38,7 +37,7 @@ class Grid:
 
     eps = 1e-6
 
-    def __init__(self, dims, spaces, mins, maxs, data: Optional[FloatVec]):
+    def __init__(self, dims, spaces, mins, maxs, data: Optional[List[float]]):
         '''Grid constructor
 
         Parameters
@@ -52,7 +51,7 @@ class Grid:
         self.spaces: Coordinate[int] = spaces
         self.mins:   Coordinate[int] = mins
         self.maxs:   Coordinate[int] = maxs
-        self.data:   Optional[FloatVec] = data
+        self.data:   Optional[List[float]] = data
 
     def value(self, pt: Coordinate[float]) -> float:
         '''Get potential value (from mesh or approximation) at a point
@@ -135,7 +134,7 @@ class Grid:
         '''
         ...
 
-    def gradient(self, pt: Coordinate[float], grad: FloatVec):
+    def gradient(self, pt: Coordinate[float], grad: List[float]):
         '''Get first derivative values at a point
 
         :param   pt  : Location to evaluate gradient

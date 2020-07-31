@@ -83,3 +83,15 @@ class TestCoordinate(TestCase):
         lo = Coordinate(0, 0, 0)
         hi = Coordinate(1, 1, 1)
         self.assertLessEqual(lo, hi)
+
+        c = Coordinate(0, 0, 0)
+        self.assertEqual(c + 1, Coordinate(1, 1, 1))
+
+        c = Coordinate(1, 1, 1)
+        self.assertEqual(c - 1, Coordinate(0, 0, 0))
+
+        c = Coordinate(1, 1, 1)
+        self.assertEqual(c * 2, Coordinate(2, 2, 2))
+
+        c = Coordinate(2, 2, 2)
+        self.assertEqual(c / 2, Coordinate(1, 1, 1))

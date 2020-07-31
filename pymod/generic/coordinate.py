@@ -1,4 +1,3 @@
-from apbs_types import *
 from typing import Generic, TypeVar
 import sys
 import os
@@ -65,6 +64,26 @@ class Coordinate(Generic[T]):
 
     def __repr__(self):
         return f'Coordinate <{self.x}, {self.y}, {self.z}>'
+
+    def __add__(self, other: 'Coordinate') -> 'Coordinate':
+        if isinstance(other, int):
+            return Coordinate(self.x + other, self.y + other, self.z + other)
+        return Coordinate(self.x + other.x, self.y + other.y, self.z + other.z)
+
+    def __sub__(self, other: 'Coordinate') -> 'Coordinate':
+        if isinstance(other, int):
+            return Coordinate(self.x - other, self.y - other, self.z - other)
+        return Coordinate(self.x - other.x, self.y - other.y, self.z - other.z)
+
+    def __mul__(self, other: 'Coordinate') -> 'Coordinate':
+        if isinstance(other, int):
+            return Coordinate(self.x * other, self.y * other, self.z * other)
+        return Coordinate(self.x * other.x, self.y * other.y, self.z * other.z)
+
+    def __truediv__(self, other: 'Coordinate') -> 'Coordinate':
+        if isinstance(other, int):
+            return Coordinate(self.x / other, self.y / other, self.z / other)
+        return Coordinate(self.x / other.x, self.y / other.y, self.z / other.z)
 
     @property
     def x(self) -> T:

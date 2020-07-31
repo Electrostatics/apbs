@@ -4,7 +4,7 @@ sys.path.insert(0, '..')  # noqa
 sys.path.insert(0, os.path.join('..', '..'))  # noqa
 from math import inf
 from typing import Tuple
-from ..atom import Atom, Coordinate
+from . import Atom, Coordinate
 
 
 class AtomList:

@@ -1,5 +1,5 @@
-from .. import Coordinate
-from apbs_types import *
+from . import Coordinate
+from typing import List
 import numpy as np
 
 import sys

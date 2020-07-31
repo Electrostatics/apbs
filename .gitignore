@@ -139,3 +139,10 @@ cython_debug/
 
 # IDE config files
 .vscode
+
+# Vim temp files
+*.swp
+*.swo
+
+# Data files for reference
+examples
