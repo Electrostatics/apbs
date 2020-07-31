@@ -59,6 +59,9 @@ message(STATUS "Setting project paths")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -fpermissive -fPIC")
+if(WIN32)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:100000000")
+endif()
 if(APPLE AND BUILD_SHARED_LIBS)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -undefined dynamic_lookup")
 endif()
@@ -532,62 +535,55 @@ endif()
 
 
 ################################################################################
-# Getting msms and /or nanoshaper
+# Getting msms and /or nanoshaper binaries
 ################################################################################
+set(MESH_ROOT_URL_PATH "https://github.com/lwwilson1/mesh_routines/releases/download/v1.5")
+
 if(GET_MSMS)
+    set(MSMS_FULL_URL_PATH)
+    set(MSMS_RAW_BINARY_NAME "msms")
     message(STATUS "Copying MSMS exectuable")
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-        # Mac OS X specific code
-        file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_MacOSX_2.6.1/msms.MacOSX.2.6.1
-             DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-        file(RENAME ${EXECUTABLE_OUTPUT_PATH}/msms.MacOSX.2.6.1
-             ${EXECUTABLE_OUTPUT_PATH}/msms)
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-        # Linux specific code
-        file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_i86_64Linux2_2.6.1/msms.x86_64Linux2.2.6.1.staticgcc
-             DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-        file(RENAME ${EXECUTABLE_OUTPUT_PATH}/msms.x86_64Linux2.2.6.1.staticgcc
-             ${EXECUTABLE_OUTPUT_PATH}/msms)
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-        # Windows specific code
-        file(COPY ${EXTERNALS_PATH}/mesh_routines/msms/msms_win32_2.6.1/msms.exe
-             DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
+        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms.MacOSX.2.6.1")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
+        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms.x86_64Linux2.2.6.1.staticgcc")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
+        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms.exe")
+        set(MSMS_RAW_BINARY_NAME "msms.exe")
     endif()
 
-    if(WIN32)
-        install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/msms.exe
-                DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    else()
-        install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/msms
-                DESTINATION ${EXECUTABLE_INSTALL_PATH})
+    if (NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}")
+        file(DOWNLOAD ${MSMS_FULL_URL_PATH} "${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}")
+        message(STATUS "MSMS Download: ${MSMS_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}")
     endif()
+
+    install(PROGRAMS "${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}"
+            DESTINATION ${EXECUTABLE_INSTALL_PATH})
+    message(STATUS "MSMS install: ${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
 endif()
 
 
 if(GET_NanoShaper)
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-        # Mac OS X specific code
-        file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/OSX/NanoShaper
-             DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-        # Linux specific code
-        file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/Linux64/NanoShaper
-             DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-        # Windows specific code
-        file(COPY ${EXTERNALS_PATH}/mesh_routines/NanoShaper/win32/NanoShaper32.exe
-             DESTINATION ${EXECUTABLE_OUTPUT_PATH})
-        file(RENAME ${EXECUTABLE_OUTPUT_PATH}/NanoShaper32.exe
-             ${EXECUTABLE_OUTPUT_PATH}/NanoShaper.exe)
+    set(NANOSHAPER_FULL_URL_PATH)
+    set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper")
+    message(STATUS "Copying NanoShaper exectuable")
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_OSX")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_Linux64")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper32.exe")
+        set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper.exe")
     endif()
 
-    if(WIN32)
-        install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/Nanoshaper.exe
-                DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    else()
-        install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/NanoShaper
-                DESTINATION ${EXECUTABLE_INSTALL_PATH})
+    if (NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+        file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME})
+        message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
     endif()
+
+    install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}
+            DESTINATION ${EXECUTABLE_INSTALL_PATH})
+    message(STATUS "NanoShaper install: ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
 endif()
 
 
@@ -838,35 +834,8 @@ file(REMOVE_RECURSE ${EXECUTABLE_OUTPUT_PATH}/temp)
 option(ENABLE_TESTS "Enable tests" ON)
 if(${ENABLE_TESTS})
   enable_testing()
-  #add_subdirectory(tests)
+  add_subdirectory(tests)
 endif()
-
-set(TEST_CASES)
-if(EXISTS ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg)
-    file(READ ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg TEST_CASES_FILE)
-    string(REPLACE "\n" ";" TEST_CASES_LINES ${TEST_CASES_FILE}) 
-    foreach(_line ${TEST_CASES_LINES})
-        if(${_line} MATCHES "^\\[")
-            string(REPLACE "[" "" _line ${_line})
-            string(REPLACE "]" "" _line ${_line})
-            list(APPEND TEST_CASES ${_line})
-        endif()
-    endforeach()
-endif()
-
-find_package(Python3 COMPONENTS Interpreter)
-if(${Python3_FOUND})
-    message(STATUS "******* Python3 FOUND ${Python3_EXECUTABLE}")
-    foreach(_test ${TEST_CASES})
-        message(STATUS "FOUND TEST CASE ${_test}")
-        add_test(NAME ${_test}_test COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/apbs_tester.py -c ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg -t ${_test})
-    endforeach()
-else()
-    message(FATAL "******* Python3 NOT FOUND *****************")
-endif()
-
-include (CTest)
-
 
 ###############################################################################
 #####  Generate Packages
@@ -876,7 +845,7 @@ set(PACKAGE_NAME                       "${PROJECT_NAME}")
 set(CPACK_PACKAGE_NAME                 "${PACKAGE_NAME}")
 set(CPACK_PACKAGE_DESCRIPTION          "APBS - Adaptive Poisson Boltzmann Solver")
 
-set(CPACK_RESOURCE_FILE_LICENSE        "${PROJECT_SOURCE_DIR}/../LICENSE.md")
+set(CPACK_RESOURCE_FILE_LICENSE        "${PROJECT_SOURCE_DIR}/../COPYING")
 set(CPACK_PACKAGE_DESCRIPTION_FILE     "${PROJECT_SOURCE_DIR}/README.md")
 
 set(CPACK_SOURCE_IGNORE_FILES          "${PROJECT_BINARY_DIR};/.git/;.gitignore;/tools/matlab/")
@@ -890,39 +859,8 @@ set(CPACK_PACKAGE_CONTACT              "APBS - https://github.com/Electrostatics
 set(CPACK_PACKAGE_FILE_NAME            "${PACKAGE_NAME}-${APBS_VERSION}.${CMAKE_HOST_SYSTEM_NAME}")
 set(CPACK_STRIP_FILES                   True)
 
-if(CMAKE_HOST_WIN32)
-    # From: https://martinrotter.github.io/it-programming/2014/05/09/integrating-nsis-cmake/
-    SET(CPACK_NSIS_PACKAGE_NAME              "${PACKAGE_NAME}-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_MICRO_VERSION}")
-    SET(CPACK_NSIS_DISPLAY_NAME              "${PACKAGE_NAME}-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_MICRO_VERSION}")
-    SET(CPACK_PACKAGE_INSTALL_DIRECTORY      "${PACKAGE_NAME}-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_MICRO_VERSION}")
-    SET(CPACK_NSIS_INSTALL_ROOT              "C:")
-    set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY   "${PACKAGE_NAME}-${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION}")
-    # set(CPACK_NSIS_HELP_LINK                 "${APP_URL}")
-    # set(CPACK_NSIS_URL_INFO_ABOUT            "${APP_URL}")
-    # set(CPACK_NSIS_CONTACT                   "${APP_EMAIL}")
-    list(APPEND CPACK_GENERATOR              "NSIS")
-endif()
-
-#if(UNIX)
-#  if(CMAKE_SYSTEM_NAME MATCHES Linux)
-#    if(CMAKE_OS_NAME MATCHES ubuntu)
-#      list(APPEND CPACK_GENERATOR            "DEB")
-#      set(CPACK_DEBIAN_PACKAGE_MAINTAINER    "${CPACK_PACKAGE_CONTACT}")
-#      set(CPACK_DEBIAN_PACKAGE_SECTION       "other")
-#      set(CPACK_DEBIAN_PACKAGE_PRIORITY      "optional")
-#    elseif(CMAKE_OS_NAME MATCHES centos)
-#      list(APPEND CPACK_GENERATOR            "RPM")
-#      set(CPACK_RPM_PACKAGE_RELEASE          "1")
-#    endif()
-#  endif()
-#endif()
-
-if(CMAKE_HOST_UNIX)
-    list(APPEND CPACK_GENERATOR              "ZIP")
-    set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY      True)
-    #list(APPEND CPACK_GENERATOR              "DragNDrop")
-    #set(CPACK_DMG_VOLUME_NAME                "${PACKAGE_NAME}-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_MICRO_VERSION}")
-endif()
+list(APPEND CPACK_GENERATOR            "ZIP")
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY    True)
 
 if(CPACK_GENERATOR MATCHES "^(7Z|TBZ2|TGZ|TXZ|TZ|TZST|ZIP)$")
     set(CPACK_TOPLEVEL_TAG ${CPACK_PACKAGE_NAME})
