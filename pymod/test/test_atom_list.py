@@ -18,9 +18,9 @@ class TestAtomList(TestCase):
             f.write('HETATM    1  C    ALK    1       '
                     '1.000   4.000   7.000 0.000 1.000\n')
             f.write('HETATM    1  C    ALK    1       '
-                    '2.000   5.000   8.000 0.000 1.000\n')
+                    '2.000   5.000   8.000 0.000 2.000\n')
             f.write('HETATM    1  C    ALK    1       '
-                    '3.000   6.000   9.000 0.000 1.000\n')
+                    '3.000   6.000   9.000 0.000 3.000\n')
 
     def tearDown(self) -> None:
         if os.path.exists(self.__class__.fn):

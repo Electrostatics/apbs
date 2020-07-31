@@ -1,5 +1,6 @@
 from generic import Coordinate
 from unittest import TestCase
+import unittest
 
 import sys
 sys.path.insert(0, '..')
@@ -95,3 +96,18 @@ class TestCoordinate(TestCase):
 
         c = Coordinate(2, 2, 2)
         self.assertEqual(c / 2, Coordinate(1, 1, 1))
+
+    def test_any(self):
+        c = Coordinate(3, 2, 2)
+        self.assertTrue(c.any(lambda x: x > 2))
+
+        c = Coordinate(-1, 2, 2)
+        self.assertTrue(c.any(lambda x: x < 0))
+        self.assertTrue(c.any(lambda x: x == -1))
+
+    def test_all(self):
+        c = Coordinate(2, 2, 2)
+        self.assertTrue(c.all(lambda x: x == 2))
+
+        c = Coordinate(-1, 2, 2)
+        self.assertTrue(c.all(lambda x: x < 3))

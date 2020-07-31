@@ -22,3 +22,12 @@ class TestAtom(unittest.TestCase):
         self.assertTrue(sut.x == 1)
         self.assertTrue(sut.y == 2)
         self.assertTrue(sut.z == 3)
+
+    def test_euclidian_distance(self):
+        a = Atom(1, 1, 1)
+        b = Atom(2, 2, 2)
+        self.assertEqual(a.euclidian_dist(b), 3)
+
+        a = Atom(0, 0, 0)
+        b = Atom(2, 2, 2)
+        self.assertEqual(a.euclidian_dist(b), 12)

@@ -42,6 +42,11 @@ class Atom:
         return 'Atom< name< %s >, %s  radius< %s >, charge< %s >>' \
             % (self.name, self.position, self.radius, self.charge)
 
+    def euclidian_dist(self, other: 'Atom') -> float:
+        return (self.x - other.x)**2 + \
+            (self.y - other.y)**2 + \
+            (self.z - other.z)**2
+
     @property
     def x(self) -> float:
         return self.position.x

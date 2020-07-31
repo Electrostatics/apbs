@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Callable
 import sys
 import os
 sys.path.insert(0, '..')
@@ -30,6 +30,18 @@ class Coordinate(Generic[T]):
             self._data = list(vals)
         else:
             self._data = [0, 0, 0]
+
+    def any(self, predicate: Callable[[float], bool]) -> bool:
+        for i in self._data:
+            if predicate(i):
+                return True
+        return False
+
+    def all(self, predicate: Callable[[float], bool]) -> bool:
+        for i in self._data:
+            if not predicate(i):
+                return False
+        return True
 
     def __getitem__(self, idx: int) -> T:
         if idx > 2 or idx < -2:
