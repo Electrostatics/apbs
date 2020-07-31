@@ -25,7 +25,7 @@ set(CMAKE_MICRO_VERSION "0")
 
 set(APBS_VERSION     "${CMAKE_MAJOR_VERSION}.${CMAKE_MICRO_VERSION}")
 set(PACKAGE_STRING   "${APBS_VERSION}")
-set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
 
 ################################################################################
 #  NOTE: Overwrite the RPATH information during the install from
@@ -836,7 +836,6 @@ if(${ENABLE_TESTS})
   enable_testing()
   add_subdirectory(tests)
 endif()
-
 
 ###############################################################################
 #####  Generate Packages
