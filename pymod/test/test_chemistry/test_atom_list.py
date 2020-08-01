@@ -4,23 +4,23 @@ sys.path.insert(0, '..')  # noqa
 from geometry import Coordinate  # noqa
 from chemistry import AtomList, CellList  # noqa
 import pytest
-
+import tempfile
 
 @pytest.yield_fixture
 def fn():
-    _fn = 'tmp.pdb'
+    _fn = tempfile.NamedTemporaryFile(delete=False)
 
-    with open(_fn, 'w') as f:
+    with open(_fn.name, 'w') as f:
         f.write('HETATM    1  C    ALK    1       '
                 '1.000   4.000   7.000 0.000 1.000\n')
         f.write('HETATM    1  C    ALK    1       '
                 '2.000   5.000   8.000 0.000 2.000\n')
         f.write('HETATM    1  C    ALK    1       '
                 '3.000   6.000   9.000 0.000 3.000\n')
-    yield _fn
+    yield _fn.name
 
-    if os.path.exists(_fn):
-        os.remove(_fn)
+    _fn.close()
+    os.unlink(_fn.name)
 
 
 class TestAtomList:
