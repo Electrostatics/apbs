@@ -1,4 +1,5 @@
 from typing import List
+import numpy as np
 
 import sys # noqa
 import os # noqa
@@ -40,10 +41,18 @@ class Atom:
         return 'Atom< name< %s >, %s  radius< %s >, charge< %s >>' \
             % (self.name, self.position, self.radius, self.charge)
 
-    def euclidian_dist(self, other: 'Atom') -> float:
-        return (self.x - other.x)**2 + \
-            (self.y - other.y)**2 + \
-            (self.z - other.z)**2
+    def euclidian_dist2(self, other: 'Atom') -> float:
+        '''
+        Euclidian distance without the square root
+        '''
+        if isinstance(other, Atom):
+            return np.sum((self.position._data - other.position._data) ** 2)
+        if isinstance(other, Coordinate):
+            return np.sum((self.position._data - other._data) ** 2)
+        elif isinstance(other, np.ndarray):
+            return np.sum((self.position._data - other) ** 2)
+        else:
+            raise RuntimeError('Incorrect data type passed into euclidian_dist2')
 
     @property
     def x(self) -> float:
