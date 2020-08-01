@@ -22,7 +22,7 @@ class AtomComplexCalc:
 
     def __init__(self, alist: AtomList, clist: CellList, surface_density: float):
         '''
-        Note: This is not just a port of the ctor for Vacc, but also replaces
+        .. note:: This is not just a port of the ctor for Vacc, but also replaces
         Vacc_storeParms. Vacc_storeParms seems to be simply an extension to the
         constructor, so it's job is replicated here.
 
@@ -42,8 +42,10 @@ class AtomComplexCalc:
     def stride(self) -> Coordinate:
         return self.clist.stride
 
-    def accessable_outside_inflated_venderwalls_rad(self, center: Coordinate,
-                                                    radius: float, atom_id_to_ignore: int) -> bool:
+    def accessable_outside_inflated_venderwalls(self, center: Coordinate,
+                                                radius: float,
+                                                atom_id_to_ignore: int
+                                                ) -> bool:
         '''
         Determines if a point is within the union of the spheres centered
         at the atomic centers with radii equal to the sum of their van der
@@ -52,7 +54,7 @@ class AtomComplexCalc:
 
         :returns: None if not found
 
-        Note: port of Vacc::ivdwAccExclus
+        .. note:: port of Vacc::ivdwAccExclus
         '''
         if radius > self.clist.max_radius:
             raise RuntimeError(f'Got radius %f greater than max radius %f from'
@@ -80,7 +82,10 @@ class AtomComplexCalc:
         '''Create a new surface from the points that do fall on the reference
         surface.
 
-        Note: Although this seems like a candidate for a static method, the
+        :param atom: Atom from which surface will be constructed.
+        :return: Returns surface generated from the atom.
+
+        .. note:: Although this seems like a candidate for a static method, the
         `accessable_outside_inflated_venderwalls_rad` method of this class
         *is* called from this function, and therefore must be a regular method.
 

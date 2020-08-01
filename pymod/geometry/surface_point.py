@@ -1,4 +1,3 @@
-from typing import TypeVar, List, Dict
 from . import Coordinate
 
 
