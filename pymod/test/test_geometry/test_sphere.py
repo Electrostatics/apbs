@@ -1,16 +1,15 @@
 import sys # noqa
 sys.path.insert(0, '..') # noqa
-import unittest
-from unittest import TestCase
 from geometry import Sphere
+import pytest
 
-class TestSphere(TestCase):
-    '''
-    Tests for static class Sphere, which handles complex geometrical
-    calculations for spheres.
-    '''
 
-    @unittest.skip('Needs testing')
-    def test_spherical_distribution(self):
-        for npoints in [ 1e2, 1e4, 1e6 ]:
-            sut: Surface = Sphere.spherical_distribution(npoints)
+class TestSphere:
+    @pytest.mark.skip(reason="Needs to be implemented.")
+    @pytest.mark.parametrize('npoints,expected', [ 
+        (1e2, 0.),
+        (1e4, 0.),
+        (1e6, 0.),
+    ])
+    def test_spherical_distribution(self, npoints, expected):
+        sut: Surface = Sphere.spherical_distribution(npoints)

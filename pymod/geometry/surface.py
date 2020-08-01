@@ -15,11 +15,13 @@ class Surface:
         self._dp: Dict[str, float] = dict()
 
     def __getitem__(self, idx: int) -> SurfacePoint:
-        if idx >= self.npoints:
+        if idx >= self.npoints or idx < -self.npoints:
             raise IndexError('Requested surface point does not exists.')
         return self.coords[idx]
 
     def __setitem__(self, idx: int, other: SurfacePoint) -> None:
+        if idx >= self.npoints or idx < -self.npoints:
+            raise IndexError('Requested surface point does not exists.')
         self.coords[idx] = other
 
     @property
