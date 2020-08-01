@@ -52,22 +52,22 @@ class Coordinate(Generic[T]):
         self._data[idx] = value
 
     def __lt__(self, other: 'Coordinate[T]') -> bool:
-        return ( self._data < other._data ).all()
+        return (self._data < other._data).all()
 
     def __le__(self, other: 'Coordinate[T]') -> bool:
-        return ( self._data <= other._data ).all()
+        return (self._data <= other._data).all()
 
     def __gt__(self, other: 'Coordinate[T]') -> bool:
-        return ( self._data > other._data ).all()
+        return (self._data > other._data).all()
 
     def __ge__(self, other: 'Coordinate[T]') -> bool:
-        return ( self._data >= other._data ).all()
+        return (self._data >= other._data).all()
 
     def __eq__(self, other: 'Coordinate[T]') -> bool:
-        return ( self._data == other._data ).all()
+        return (self._data == other._data).all()
 
     def __ne__(self, other: 'Coordinate[T]') -> bool:
-        return not ( self._data == other._data ).all()
+        return not (self._data == other._data).all()
 
     def __str__(self):
         return f'Coordinate <{self.x}, {self.y}, {self.z}>'

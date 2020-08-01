@@ -1,5 +1,5 @@
-import sys # noqa
-sys.path.insert(0, '..') # noqa
+import sys  # noqa
+sys.path.insert(0, '..')  # noqa
 
 import numpy as np
 from geometry import Coordinate
@@ -15,9 +15,9 @@ class TestCoordinate:
     ])
     def test_ctor(self, args, expect):
         sut = Coordinate(*args)
-        assert ( sut._data == expect ).all()
+        assert (sut._data == expect).all()
 
-    @pytest.mark.parametrize('args',[
+    @pytest.mark.parametrize('args', [
         range(1),
         range(2),
         range(4),

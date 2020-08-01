@@ -1,10 +1,11 @@
 from collections import namedtuple
-from geometry import Coordinate # noqa
-from . import AtomList # noqa
+from geometry import Coordinate  # noqa
+from . import AtomList  # noqa
 
 # Alias for coordinate in cases where 'stride' makes more sense as the type,
 # though all the methods may remain the same.
 Stride = Coordinate
+
 
 class CellList(AtomList):
     def __init__(self, *args, **kwargs):

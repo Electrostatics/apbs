@@ -1,15 +1,15 @@
-import os # noqa
-import sys # noqa
-sys.path.insert(0, '..') # noqa
-from geometry import Coordinate # noqa
-from chemistry import AtomList, CellList # noqa
+import os  # noqa
+import sys  # noqa
+sys.path.insert(0, '..')  # noqa
+from geometry import Coordinate  # noqa
+from chemistry import AtomList, CellList  # noqa
 import pytest
 
 
 @pytest.yield_fixture
 def fn():
     _fn = 'tmp.pdb'
-    
+
     with open(_fn, 'w') as f:
         f.write('HETATM    1  C    ALK    1       '
                 '1.000   4.000   7.000 0.000 1.000\n')
@@ -21,6 +21,7 @@ def fn():
 
     if os.path.exists(_fn):
         os.remove(_fn)
+
 
 class TestAtomList:
     def test_read_pdb(self, fn: str):

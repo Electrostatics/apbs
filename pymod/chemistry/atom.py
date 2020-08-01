@@ -1,11 +1,12 @@
 from typing import List
 import numpy as np
 
-import sys # noqa
-import os # noqa
-sys.path.insert(0, '..') # noqa
-sys.path.insert(0, os.path.join('..', '..')) # noqa
-from geometry import Coordinate # noqa
+import sys  # noqa
+import os  # noqa
+sys.path.insert(0, '..')  # noqa
+sys.path.insert(0, os.path.join('..', '..'))  # noqa
+from geometry import Coordinate  # noqa
+
 
 class Atom:
     '''
@@ -52,7 +53,8 @@ class Atom:
         elif isinstance(other, np.ndarray):
             return np.sum((self.position._data - other) ** 2)
         else:
-            raise RuntimeError('Incorrect data type passed into euclidian_dist2')
+            raise RuntimeError(
+                'Incorrect data type passed into euclidian_dist2')
 
     @property
     def x(self) -> float:

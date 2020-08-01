@@ -1,11 +1,12 @@
-import sys # noqa
-import os # noqa
-sys.path.insert(0, '..') # noqa
+import sys  # noqa
+import os  # noqa
+sys.path.insert(0, '..')  # noqa
 from geometry import Surface
 import pytest
 
+
 class TestSurface:
-    @pytest.mark.parametrize('npoints,idx', [ 
+    @pytest.mark.parametrize('npoints,idx', [
         (1, 1),
         (1, -2),
         (0, 0),
@@ -15,7 +16,7 @@ class TestSurface:
         with pytest.raises(IndexError):
             tmp = sut[idx]
 
-    @pytest.mark.parametrize('npoints,idx', [ 
+    @pytest.mark.parametrize('npoints,idx', [
         (1, 1),
         (1, -2),
         (0, 0),

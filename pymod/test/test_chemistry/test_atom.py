@@ -1,7 +1,7 @@
-import sys # noqa
-sys.path.insert(0, '..') # noqa
-from chemistry import Atom # noqa
-from geometry import Coordinate # noqa
+import sys  # noqa
+sys.path.insert(0, '..')  # noqa
+from chemistry import Atom  # noqa
+from geometry import Coordinate  # noqa
 import numpy as np
 import pytest
 
@@ -10,7 +10,7 @@ class TestAtom:
 
     def test_ctor(self):
         sut = Atom(0, 0, 0)
-        assert ( sut.position._data == np.array((0, 0, 0)) ).all()
+        assert (sut.position._data == np.array((0, 0, 0))).all()
 
     def test_property_get(self):
         sut = Atom(1, 2, 3)

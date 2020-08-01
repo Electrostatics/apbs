@@ -1,6 +1,7 @@
 from typing import TypeVar, List, Dict
 from . import SurfacePoint
 
+
 class Surface:
     '''
     Attributes:
@@ -11,7 +12,8 @@ class Surface:
     def __init__(self, probe_radius: float, npoints: int):
         self.probe_radius = probe_radius
         self.npoints = npoints
-        self.coords: List[SurfacePoint] = [ SurfacePoint() for _ in range(npoints) ]
+        self.coords: List[SurfacePoint] = [SurfacePoint()
+                                           for _ in range(npoints)]
         self._dp: Dict[str, float] = dict()
 
     def __getitem__(self, idx: int) -> SurfacePoint:
@@ -28,10 +30,9 @@ class Surface:
     def area(self) -> float:
         '''Lazily calculate the area of the surface'''
 
-        #TODO: figure out how this is calculated
+        # TODO: figure out how this is calculated
         # or if it is a straight attribute
         if 'area' not in self._dp.keys():
             self._dp['area'] = -1.
 
         return self._dp['area']
-

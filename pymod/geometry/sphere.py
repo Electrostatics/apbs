@@ -1,5 +1,6 @@
 from . import Surface
 
+
 class Sphere:
     '''
     Static class to hold geometric calculates on spheres.
@@ -12,10 +13,10 @@ class Sphere:
         Shamelessly copied over from the vacc routine.
         '''
         s: Surface
-        
+
         frac = npoints / 4.
         ntheta = math.ceil(math.sqrt(math.pi * frac))
-        dtheta = math.pi / float( ntheta )
+        dtheta = math.pi / float(ntheta)
         nphimax = 2 * ntheta
 
         # Count number of points to be used
@@ -38,14 +39,14 @@ class Sphere:
                 dphi = 2 * math.pi / float(nphi)
                 for j in range(nphi):
                     phi = dphi * float(j)
-                    sinphi = math.sin(phi);
-                    cosphi = math.cos(phi);
+                    sinphi = math.sin(phi)
+                    cosphi = math.cos(phi)
                     s[nactual] = SurfacePoint(
-                            cosphi * sintheta,
-                            sinphi * sintheta,
-                            costheta,
-                            is_on_surf = True
-                        )
+                        cosphi * sintheta,
+                        sinphi * sintheta,
+                        costheta,
+                        is_on_surf=True
+                    )
                     nactual += 1
 
         s.npoints = nactual
