@@ -1,4 +1,5 @@
 from typing import Generic, TypeVar, Callable
+import numpy as np
 
 '''
 Using Coordinate as a lower-level abstraction over len==3 generic container,
@@ -17,15 +18,16 @@ class Coordinate(Generic[T]):
             type-hinted type.
     '''
 
-    def __init__(self, *vals):
+    def __init__(self, *vals, array: np.ndarray = None):
         if len(vals) not in (0, 3):
             raise RuntimeError("Can only pass in 3 values for a Point.")
-        self._data: Array[T]
 
         if len(vals) == 3:
-            self._data = list(vals)
+            self._data = np.array(vals, dtype=np.float32)
+        elif array is not None:
+            self._data = np.array(array, dtype=np.float32)
         else:
-            self._data = [0, 0, 0]
+            self._data = np.zeros(3, dtype=np.float32)
 
     def any(self, predicate: Callable[[float], bool]) -> bool:
         for i in self._data:
@@ -50,22 +52,22 @@ class Coordinate(Generic[T]):
         self._data[idx] = value
 
     def __lt__(self, other: 'Coordinate[T]') -> bool:
-        return self.x < other.x and self.y < other.y and self.z < other.z
+        return ( self._data < other._data ).all()
 
     def __le__(self, other: 'Coordinate[T]') -> bool:
-        return self.x <= other.x and self.y <= other.y and self.z <= other.z
+        return ( self._data <= other._data ).all()
 
     def __gt__(self, other: 'Coordinate[T]') -> bool:
-        return self.x > other.x and self.y > other.y and self.z > other.z
+        return ( self._data > other._data ).all()
 
     def __ge__(self, other: 'Coordinate[T]') -> bool:
-        return self.x >= other.x and self.y >= other.y and self.z >= other.z
+        return ( self._data >= other._data ).all()
 
     def __eq__(self, other: 'Coordinate[T]') -> bool:
-        return self.x == other.x and self.y == other.y and self.z == other.z
+        return ( self._data == other._data ).all()
 
     def __ne__(self, other: 'Coordinate[T]') -> bool:
-        return not self == other
+        return not ( self._data == other._data ).all()
 
     def __str__(self):
         return f'Coordinate <{self.x}, {self.y}, {self.z}>'
@@ -74,24 +76,32 @@ class Coordinate(Generic[T]):
         return f'Coordinate <{self.x}, {self.y}, {self.z}>'
 
     def __add__(self, other: 'Coordinate') -> 'Coordinate':
-        if isinstance(other, (float, int)):
-            return Coordinate(self.x + other, self.y + other, self.z + other)
-        return Coordinate(self.x + other.x, self.y + other.y, self.z + other.z)
+        if isinstance(other, Coordinate):
+            return Coordinate(array=self._data + other._data)
+        elif isinstance(other, (float, int)):
+            return Coordinate(array=self._data + other)
+        raise RuntimeError('Unexpected data type for this operation.')
 
     def __sub__(self, other: 'Coordinate') -> 'Coordinate':
-        if isinstance(other, (float, int)):
-            return Coordinate(self.x - other, self.y - other, self.z - other)
-        return Coordinate(self.x - other.x, self.y - other.y, self.z - other.z)
+        if isinstance(other, Coordinate):
+            return Coordinate(array=self._data - other._data)
+        elif isinstance(other, (float, int)):
+            return Coordinate(array=self._data - other)
+        raise RuntimeError('Unexpected data type for this operation.')
 
     def __mul__(self, other: 'Coordinate') -> 'Coordinate':
-        if isinstance(other, (float, int)):
-            return Coordinate(self.x * other, self.y * other, self.z * other)
-        return Coordinate(self.x * other.x, self.y * other.y, self.z * other.z)
+        if isinstance(other, Coordinate):
+            return Coordinate(array=self._data * other._data)
+        elif isinstance(other, (float, int)):
+            return Coordinate(array=self._data * other)
+        raise RuntimeError('Unexpected data type for this operation.')
 
     def __truediv__(self, other: 'Coordinate') -> 'Coordinate':
-        if isinstance(other, (float, int)):
-            return Coordinate(self.x / other, self.y / other, self.z / other)
-        return Coordinate(self.x / other.x, self.y / other.y, self.z / other.z)
+        if isinstance(other, Coordinate):
+            return Coordinate(array=self._data / other._data)
+        elif isinstance(other, (float, int)):
+            return Coordinate(array=self._data / other)
+        raise RuntimeError('Unexpected data type for this operation.')
 
     @property
     def x(self) -> T:

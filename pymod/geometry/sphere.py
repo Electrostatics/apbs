@@ -40,10 +40,12 @@ class Sphere:
                     phi = dphi * float(j)
                     sinphi = math.sin(phi);
                     cosphi = math.cos(phi);
-                    s[nactual].x = cosphi * sintheta;
-                    s[nactual].y = sinphi * sintheta;
-                    s[nactual].z = costheta;
-                    s[nactual].is_on_surf = True
+                    s[nactual] = SurfacePoint(
+                            cosphi * sintheta,
+                            sinphi * sintheta,
+                            costheta,
+                            is_on_surf = True
+                        )
                     nactual += 1
 
         s.npoints = nactual

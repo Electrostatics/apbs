@@ -1,21 +1,21 @@
 import sys # noqa
 sys.path.insert(0, '..') # noqa
 
+import numpy as np
 from geometry import Coordinate
 import pytest
 
 
 class TestCoordinate:
-    def test_ctor(self):
-        sut = Coordinate(0, 0, 0)
-        assert sut.x == 0
-        assert sut.y == 0
-        assert sut.z == 0
 
-        sut = Coordinate()
-        assert sut.x == 0
-        assert sut.y == 0
-        assert sut.z == 0
+    @pytest.mark.parametrize('args,expect', [
+        ((0, 0, 0), np.array([0, 0, 0], dtype=np.float32)),
+        ((1, 2, 3), np.array([1, 2, 3], dtype=np.float32)),
+        (tuple(), np.array([0, 0, 0], dtype=np.float32)),
+    ])
+    def test_ctor(self, args, expect):
+        sut = Coordinate(*args)
+        assert ( sut._data == expect ).all()
 
     @pytest.mark.parametrize('args',[
         range(1),
