@@ -1,5 +1,5 @@
 from apbs.chemistry import CellList
-from apbs.test.test_chemistry.test_atom_list import TestAtomList, fn
+from apbs.test.test_chemistry.test_atom_list import TestAtomList, pdb_file
 import pytest
 
 
