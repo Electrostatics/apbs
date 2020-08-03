@@ -1,1 +1,1 @@
-from .multigrid import MultiGrid
+from .multigrid import MultiGrid  # noqa F401

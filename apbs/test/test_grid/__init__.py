@@ -3,8 +3,8 @@ from apbs.grid import Grid, CurvatureFlag
 from typing import List
 import pytest
 
-class TestGrid:
 
+class TestGrid:
     def test_value(self, pt: Coordinate[float]):
         pass
 
@@ -34,4 +34,3 @@ class TestGrid:
 
     def test_read_dx(self, fn: str):
         pass
-

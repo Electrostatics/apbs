@@ -1,22 +1,22 @@
 from typing import Generic, TypeVar, Callable
 import numpy as np
 
-'''
+"""
 Using Coordinate as a lower-level abstraction over len==3 generic container,
 with class Point potentially having more associated data/behavior to come.
-'''
+"""
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class Coordinate(Generic[T]):
-    '''
+    """
     Attributes:
         data (Array[T]): data to be stored in the point (max three values)
 
     NOTE: initializes values to 0 if none are passed in. Will not cast to
             type-hinted type.
-    '''
+    """
 
     def __init__(self, *vals, array: np.ndarray = None):
         if len(vals) not in (0, 3):
@@ -51,57 +51,57 @@ class Coordinate(Generic[T]):
             raise IndexError("Point has only 3 dimensions.")
         self._data[idx] = value
 
-    def __lt__(self, other: 'Coordinate[T]') -> bool:
+    def __lt__(self, other: "Coordinate[T]") -> bool:
         return (self._data < other._data).all()
 
-    def __le__(self, other: 'Coordinate[T]') -> bool:
+    def __le__(self, other: "Coordinate[T]") -> bool:
         return (self._data <= other._data).all()
 
-    def __gt__(self, other: 'Coordinate[T]') -> bool:
+    def __gt__(self, other: "Coordinate[T]") -> bool:
         return (self._data > other._data).all()
 
-    def __ge__(self, other: 'Coordinate[T]') -> bool:
+    def __ge__(self, other: "Coordinate[T]") -> bool:
         return (self._data >= other._data).all()
 
-    def __eq__(self, other: 'Coordinate[T]') -> bool:
+    def __eq__(self, other: "Coordinate[T]") -> bool:
         return (self._data == other._data).all()
 
-    def __ne__(self, other: 'Coordinate[T]') -> bool:
+    def __ne__(self, other: "Coordinate[T]") -> bool:
         return not (self._data == other._data).all()
 
     def __str__(self):
-        return f'Coordinate <{self.x}, {self.y}, {self.z}>'
+        return f"Coordinate <{self.x}, {self.y}, {self.z}>"
 
     def __repr__(self):
-        return f'Coordinate <{self.x}, {self.y}, {self.z}>'
+        return f"Coordinate <{self.x}, {self.y}, {self.z}>"
 
-    def __add__(self, other: 'Coordinate') -> 'Coordinate':
+    def __add__(self, other: "Coordinate") -> "Coordinate":
         if isinstance(other, Coordinate):
             return Coordinate(array=self._data + other._data)
         elif isinstance(other, (float, int)):
             return Coordinate(array=self._data + other)
-        raise RuntimeError('Unexpected data type for this operation.')
+        raise RuntimeError("Unexpected data type for this operation.")
 
-    def __sub__(self, other: 'Coordinate') -> 'Coordinate':
+    def __sub__(self, other: "Coordinate") -> "Coordinate":
         if isinstance(other, Coordinate):
             return Coordinate(array=self._data - other._data)
         elif isinstance(other, (float, int)):
             return Coordinate(array=self._data - other)
-        raise RuntimeError('Unexpected data type for this operation.')
+        raise RuntimeError("Unexpected data type for this operation.")
 
-    def __mul__(self, other: 'Coordinate') -> 'Coordinate':
+    def __mul__(self, other: "Coordinate") -> "Coordinate":
         if isinstance(other, Coordinate):
             return Coordinate(array=self._data * other._data)
         elif isinstance(other, (float, int)):
             return Coordinate(array=self._data * other)
-        raise RuntimeError('Unexpected data type for this operation.')
+        raise RuntimeError("Unexpected data type for this operation.")
 
-    def __truediv__(self, other: 'Coordinate') -> 'Coordinate':
+    def __truediv__(self, other: "Coordinate") -> "Coordinate":
         if isinstance(other, Coordinate):
             return Coordinate(array=self._data / other._data)
         elif isinstance(other, (float, int)):
             return Coordinate(array=self._data / other)
-        raise RuntimeError('Unexpected data type for this operation.')
+        raise RuntimeError("Unexpected data type for this operation.")
 
     @property
     def x(self) -> T:

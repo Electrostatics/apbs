@@ -4,22 +4,19 @@ import pytest
 
 
 class TestCoordinate:
-
-    @pytest.mark.parametrize('args,expect', [
-        ((0, 0, 0), np.array([0, 0, 0], dtype=np.float32)),
-        ((1, 2, 3), np.array([1, 2, 3], dtype=np.float32)),
-        (tuple(), np.array([0, 0, 0], dtype=np.float32)),
-    ])
+    @pytest.mark.parametrize(
+        "args,expect",
+        [
+            ((0, 0, 0), np.array([0, 0, 0], dtype=np.float32)),
+            ((1, 2, 3), np.array([1, 2, 3], dtype=np.float32)),
+            (tuple(), np.array([0, 0, 0], dtype=np.float32)),
+        ],
+    )
     def test_ctor(self, args, expect):
         sut = Coordinate(*args)
         assert (sut._data == expect).all()
 
-    @pytest.mark.parametrize('args', [
-        range(1),
-        range(2),
-        range(4),
-        range(5),
-    ])
+    @pytest.mark.parametrize("args", [range(1), range(2), range(4), range(5)])
     def test_exceptions(self, args):
         with pytest.raises(RuntimeError):
             sut = Coordinate(*args)

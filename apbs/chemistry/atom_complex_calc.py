@@ -15,24 +15,26 @@ from . import (
 
 
 class AtomComplexCalc:
-    '''
+    """
     Port of Vacc
-    '''
+    """
 
-    def __init__(self, alist: AtomList, clist: CellList, surface_density: float):
-        '''
-        .. note:: This is not just a port of the ctor for Vacc, but also replaces
-        Vacc_storeParms. Vacc_storeParms seems to be simply an extension to the
-        constructor, so it's job is replicated here.
+    def __init__(
+        self, alist: AtomList, clist: CellList, surface_density: float
+    ):
+        """
+        .. note:: This is not just a port of the ctor for Vacc, but also
+        replaces Vacc_storeParms. Vacc_storeParms seems to be simply an
+        extension to the constructor, so it's job is replicated here.
 
-        If it is found that Vacc_storeParms is not just an extension for the 
+        If it is found that Vacc_storeParms is not just an extension for the
         constructor, it should be moved to another method.
-        '''
+        """
         self.clist = clist
         self.alist = alist
         self.surface_density = surface_density
         max_radius = alist.max_radius + clist.max_radius
-        max_area = 4. * (max_radius ** 2) * math.pi
+        max_area = 4.0 * (max_radius ** 2) * math.pi
         nsphere = math.ceil(max_area * surface_density)
 
         # TODO: calculate reference shpere (see VaccSurf_refSphere)
@@ -41,11 +43,10 @@ class AtomComplexCalc:
     def stride(self) -> Coordinate:
         return self.clist.stride
 
-    def accessable_outside_inflated_venderwalls(self, center: Coordinate,
-                                                radius: float,
-                                                atom_id_to_ignore: int
-                                                ) -> bool:
-        '''
+    def accessable_outside_inflated_venderwalls(
+        self, center: Coordinate, radius: float, atom_id_to_ignore: int
+    ) -> bool:
+        """
         Determines if a point is within the union of the spheres centered
         at the atomic centers with radii equal to the sum of their van der
         Waals radii and the probe radius.  Does not include contributions
@@ -54,12 +55,14 @@ class AtomComplexCalc:
         :returns: None if not found
 
         .. note:: port of Vacc::ivdwAccExclus
-        '''
+        """
         if radius > self.clist.max_radius:
-            raise RuntimeError(f'Got radius %f greater than max radius %f from'
-                               ' cell list.' % (radius, self.clist.max_radius))
+            raise RuntimeError(
+                "Got radius %f greater than max radius %f from"
+                " cell list." % (radius, self.clist.max_radius)
+            )
 
-        c = (pos - self.lower_corner) / self.stride
+        c = (center - self.lower_corner) / self.stride
 
         # Get cell and ensure exists in the cell list
         for i in range(3):
@@ -72,13 +75,13 @@ class AtomComplexCalc:
             if atom.id == atom_id_to_ignore:
                 continue
 
-            if atom.euclidian_dist(center) > (atom.radius + radius)**2:
+            if atom.euclidian_dist(center) > (atom.radius + radius) ** 2:
                 return True
 
         return False
 
     def atom_surface(self, atom: Atom, ref: Surface, prad: float) -> Surface:
-        '''Create a new surface from the points that do fall on the reference
+        """Create a new surface from the points that do fall on the reference
         surface.
 
         :param atom: Atom from which surface will be constructed.
@@ -88,7 +91,7 @@ class AtomComplexCalc:
         `accessable_outside_inflated_venderwalls_rad` method of this class
         *is* called from this function, and therefore must be a regular method.
 
-        '''
+        """
 
         arad = atom.radius
         apos = atom.position
@@ -109,7 +112,9 @@ class AtomComplexCalc:
             pos.z = rad(ref.zs[i]) + apos.z
 
             # need to implement
-            if self.accessable_outside_inflated_venderwalls_rad(pos, prad, atomID):
+            if self.accessable_outside_inflated_venderwalls_rad(
+                pos, prad, atomID
+            ):
                 npoints += 1
                 ref.is_on_surf[i] = True
             else:
@@ -121,7 +126,13 @@ class AtomComplexCalc:
                 surf.coords.append((rad * ref.coords[i] + apos))
                 surf.coords[-1].is_on_surf = True
 
-        surf.area = 4. * math.pi * rad * rad * \
-            float(surf.npoints) / float(ref.npoints)
+        surf.area = (
+            4.0
+            * math.pi
+            * rad
+            * rad
+            * float(surf.npoints)
+            / float(ref.npoints)
+        )
 
         return surf

@@ -1,4 +1,3 @@
-from collections import namedtuple
 from apbs.geometry import Coordinate
 from . import AtomList
 
@@ -12,4 +11,4 @@ class CellList(AtomList):
         super().__init__(*args, **kwargs)
         self.lower_bound = Coordinate()
         self.upper_bound = Coordinate()
-        self.stride = Stride(0., 0., 0.)
+        self.stride = Stride(0.0, 0.0, 0.0)

@@ -1,2 +1,3 @@
-mmcif-pdbx=1.1.1
-click=7.1.2
+click==7.1.2
+mmcif-pdbx==1.1.2
+numpy==1.19.1

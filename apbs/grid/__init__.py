@@ -1,1 +1,1 @@
-from .grid import Grid, CurvatureFlag
+from .grid import Grid, CurvatureFlag  # noqa 401

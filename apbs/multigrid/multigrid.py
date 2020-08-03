@@ -1,6 +1,6 @@
 from apbs.geometry import Coordinate
 
-'''
+"""
 /** @brief   Set partition information which restricts the calculation of
  *           observables to a (rectangular) subset of the problem domain
  *  @ingroup Vpmg
@@ -15,10 +15,11 @@ VEXTERNC void Vpmg_setPart(
                          face is not bounded (next to) another partition, and
                          1 otherwise. */
         );
-'''
+"""
+
+
 class MultiGrid:
-
-    def set_part(self, lower_corner: Coordinate, upper_corner: Coordinate
-                 ) -> None:
+    def set_part(
+        self, lower_corner: Coordinate, upper_corner: Coordinate
+    ) -> None:
         pass
-
