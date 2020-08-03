@@ -1,21 +1,13 @@
-# flake8: noqa
 from typing import List, Optional
-from geometry.coordinate import Coordinate
+from apbs.geometry import Coordinate, Constants
 import numpy as np
 import math
 
-import sys
-import os
-sys.path.insert(0, '..')
-
-'''
-
-Likely never used. Ported for no reason...
-
-'''
 
 
 class CurvatureFlag:
+    '''Enum class to replace curvature flags in original source
+    '''
     ReducedMaximalCurvature = 0
     MeanCurvature = 1
     GaussCurvature = 2
@@ -33,8 +25,6 @@ class Grid:
         maxs       : Maximums in a given direction. Previously xmax, ymax, zmax.
         data       : nx*ny*nz array of data 
     '''
-
-    eps = 1e-6
 
     def __init__(self, dims, spaces, mins, maxs, data: Optional[List[float]]):
         '''Grid constructor
@@ -96,21 +86,21 @@ class Grid:
         if hi < dims:
             dx, dy, dz = tmp.x - lo.x, tmp.y - lo.y, tmp.z - lo.z
             ret_value = list()
-            ret_value[0] = float(dx * dy * dz * self.data[hi.x, hi.y, hi.z])
-            ret_value[1] = float(dx * (1.0-dy)*dz *
-                                 self.data[hi.x, lo.y, hi.z])
-            ret_value[2] = float(dx * dy * (1.0-dz) *
-                                 self.data[hi.x, hi.y, lo.z])
-            ret_value[3] = float(dx * (1.0-dy)*(1.0-dz) *
-                                 self.data[hi.x, lo.y, lo.z])
-            ret_value[4] = float((1.0-dx)*dy * dz *
-                                 self.data[lo.x, hi.y, hi.z])
-            ret_value[5] = float((1.0-dx)*(1.0-dy)*dz *
-                                 self.data[lo.x, lo.y, hi.z])
-            ret_value[6] = float((1.0-dx)*dy * (1.0-dz) *
-                                 self.data[lo.x, hi.y, lo.z])
-            ret_value[7] = float((1.0-dx)*(1.0-dy)*(1.0-dz)
-                                 * self.data[lo.x, lo.y, lo.z])
+            ret_value.append(float(dx * dy * dz * self.data[hi.x, hi.y, hi.z]))
+            ret_value.append(float(dx * (1.0-dy)*dz *
+                                   self.data[hi.x, lo.y, hi.z]))
+            ret_value.append(float(dx * dy * (1.0-dz) *
+                                   self.data[hi.x, hi.y, lo.z]))
+            ret_value.append(float(dx * (1.0-dy)*(1.0-dz) *
+                                   self.data[hi.x, lo.y, lo.z]))
+            ret_value.append(float((1.0-dx)*dy * dz *
+                                   self.data[lo.x, hi.y, hi.z]))
+            ret_value.append(float((1.0-dx)*(1.0-dy)*dz *
+                                   self.data[lo.x, lo.y, hi.z]))
+            ret_value.append(float((1.0-dx)*dy * (1.0-dz) *
+                                   self.data[lo.x, hi.y, lo.z]))
+            ret_value.append(float((1.0-dx)*(1.0-dy)*(1.0-dz)
+                                 * self.data[lo.x, lo.y, lo.z]))
 
             ret_value = sum(ret_value)
 
@@ -158,7 +148,7 @@ class Grid:
         '''
         ...
 
-    def normlInf(self) -> float:
+    def norml_inf(self) -> float:
         '''Computes the \f$L_\infty\f$ norm of the data.
         '''
         ...

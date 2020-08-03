@@ -1,7 +1,4 @@
-import sys  # noqa
-import os  # noqa
-sys.path.insert(0, '..')  # noqa
-from geometry import Surface
+from apbs.geometry import Surface
 import pytest
 
 

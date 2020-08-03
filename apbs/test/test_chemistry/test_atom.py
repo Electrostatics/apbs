@@ -1,7 +1,5 @@
-import sys  # noqa
-sys.path.insert(0, '..')  # noqa
-from chemistry import Atom  # noqa
-from geometry import Coordinate  # noqa
+from apbs.chemistry import Atom
+from apbs.geometry import Coordinate
 import numpy as np
 import pytest
 

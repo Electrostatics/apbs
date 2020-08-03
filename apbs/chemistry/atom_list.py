@@ -1,9 +1,6 @@
 from math import inf
-import sys  # noqa
-import os  # noqa
-sys.path.insert(0, '..')  # noqa
 from . import Atom
-from geometry import Coordinate
+from apbs.geometry import Coordinate
 from typing import Tuple
 
 

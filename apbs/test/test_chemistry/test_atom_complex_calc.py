@@ -1,7 +1,4 @@
-import sys  # noqa
-import os  # noqa
-sys.path.insert(0, '..')  # noqa
-from chemistry import AtomComplexCalc
+from apbs.chemistry import AtomComplexCalc
 import pytest
 
 

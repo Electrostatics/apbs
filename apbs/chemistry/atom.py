@@ -1,11 +1,6 @@
-from typing import List
+from typing import List, Union
 import numpy as np
-
-import sys  # noqa
-import os  # noqa
-sys.path.insert(0, '..')  # noqa
-sys.path.insert(0, os.path.join('..', '..'))  # noqa
-from geometry import Coordinate  # noqa
+from apbs.geometry import Coordinate
 
 
 class Atom:
@@ -42,7 +37,8 @@ class Atom:
         return 'Atom< name< %s >, %s  radius< %s >, charge< %s >>' \
             % (self.name, self.position, self.radius, self.charge)
 
-    def euclidian_dist2(self, other: 'Atom') -> float:
+    def euclidian_dist2(self, other: Union['Atom', Coordinate, np.ndarray]
+                        ) -> float:
         '''
         Euclidian distance without the square root
         '''

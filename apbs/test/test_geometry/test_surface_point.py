@@ -1,7 +1,4 @@
-from .test_coordinate import *
-import sys  # noqa
-sys.path.insert(0, '..')  # noqa
-from geometry import SurfacePoint  # noqa
+from apbs.geometry import SurfacePoint
 import pytest
 
 

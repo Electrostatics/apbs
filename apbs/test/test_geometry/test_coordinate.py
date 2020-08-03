@@ -1,8 +1,5 @@
-import sys  # noqa
-sys.path.insert(0, '..')  # noqa
-
 import numpy as np
-from geometry import Coordinate
+from apbs.geometry import Coordinate
 import pytest
 
 

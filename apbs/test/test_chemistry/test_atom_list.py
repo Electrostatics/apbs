@@ -1,8 +1,6 @@
-import os  # noqa
-import sys  # noqa
-sys.path.insert(0, '..')  # noqa
-from geometry import Coordinate  # noqa
-from chemistry import AtomList, CellList  # noqa
+from apbs.geometry import Coordinate
+from apbs.chemistry import AtomList, CellList
+import os
 import pytest
 import tempfile
 

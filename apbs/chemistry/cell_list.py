@@ -1,6 +1,6 @@
 from collections import namedtuple
-from geometry import Coordinate  # noqa
-from . import AtomList  # noqa
+from apbs.geometry import Coordinate
+from . import AtomList
 
 # Alias for coordinate in cases where 'stride' makes more sense as the type,
 # though all the methods may remain the same.

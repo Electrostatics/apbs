@@ -1,6 +1,4 @@
-import sys  # noqa
-sys.path.insert(0, '..')  # noqa
-from geometry import Sphere
+from apbs.geometry import Sphere
 import pytest
 
 

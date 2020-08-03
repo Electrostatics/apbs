@@ -1,8 +1,7 @@
 import math
 import sys  # noqa
-sys.path.insert(0, '..')  # noqa
 
-from geometry import (
+from apbs.geometry import (
     Coordinate,
     Surface,
     Constants,

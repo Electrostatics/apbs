@@ -1,4 +1,3 @@
-# noqa
 from .constants import Constants
 from .coordinate import Coordinate
 from .surface_point import SurfacePoint
