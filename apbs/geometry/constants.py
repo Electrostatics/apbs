@@ -1,4 +1,3 @@
-
 class Constants:
 
     # Tolerance for calculations
