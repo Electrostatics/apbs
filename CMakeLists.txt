@@ -845,7 +845,7 @@ set(PACKAGE_NAME                       "${PROJECT_NAME}")
 set(CPACK_PACKAGE_NAME                 "${PACKAGE_NAME}")
 set(CPACK_PACKAGE_DESCRIPTION          "APBS - Adaptive Poisson Boltzmann Solver")
 
-set(CPACK_RESOURCE_FILE_LICENSE        "${PROJECT_SOURCE_DIR}/../COPYING")
+set(CPACK_RESOURCE_FILE_LICENSE        "${PROJECT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_DESCRIPTION_FILE     "${PROJECT_SOURCE_DIR}/README.md")
 
 set(CPACK_SOURCE_IGNORE_FILES          "${PROJECT_BINARY_DIR};/.git/;.gitignore;/tools/matlab/")
