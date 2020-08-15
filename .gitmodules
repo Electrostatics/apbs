@@ -14,6 +14,3 @@
 [submodule "externals/pb_solvers"]
 	path = externals/pb_solvers
 	url = https://github.com/Electrostatics/pb_solvers
-[submodule "externals/mesh_routines"]
-	path = externals/mesh_routines
-	url = https://github.com/lwwilson1/mesh_routines.git
