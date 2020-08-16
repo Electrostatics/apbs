@@ -36,7 +36,9 @@ extensions = [
     'sphinx_rtd_theme', 'sphinx.ext.mathjax', 'sphinx_sitemap'
 ]
 
-mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+mathjax_path = 'https://cdnjs.cloudflare.com'
+mathjax_path += '/ajax/libs/mathjax/2.7.0/MathJax.js'
+mathjax_path += '?config=TeX-AMS-MML_HTMLorMML'
 site_url = "https://apbs.readthedocs.io"
 
 autosummary_generate = True

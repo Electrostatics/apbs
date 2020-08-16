@@ -56,7 +56,7 @@ class Atom:
         if isinstance(other, Coordinate):
             return np.sum((self.position._data - other._data) ** 2)
         elif isinstance(other, np.ndarray):
-            # TODO: Figure out how to apply 
+            # TODO: Figure out how to apply
             # https://numpy.org/doc/stable/reference/generated/numpy.dot.html
             return np.sum((self.position._data - other) ** 2)
         else:

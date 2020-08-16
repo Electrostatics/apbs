@@ -32,8 +32,72 @@
 
 """
 
-from apbslib import *
-import sys, time
+from apbslib import (
+    MGparm,
+    NOsh_ctor,
+    NOsh_elec2calc,
+    NOsh_elecname,
+    NOsh_getCalc,
+    NOsh_printWhat,
+    NOsh_setupElecCalc,
+    NPT_ENERGY,
+    NPT_FORCE,
+    PBEparm,
+    Valist_load,
+    Vcom_ctor,
+    Vcom_rank,
+    Vcom_size,
+    Vmem_ctor,
+    delete_atomforcelist,
+    delete_double_array,
+    delete_gridlist,
+    delete_int_array,
+    delete_pbelist,
+    delete_pmglist,
+    delete_pmgplist,
+    delete_valist,
+    double_array,
+    energyMG,
+    getEnergies,
+    getForces,
+    getPotentials,
+    get_AtomForce,
+    get_Vpmg,
+    initMG,
+    int_array,
+    killChargeMaps,
+    killDielMaps,
+    killEnergy,
+    killForce,
+    killKappaMaps,
+    killMG,
+    killMolecules,
+    killPotMaps,
+    loadChargeMaps,
+    loadDielMaps,
+    loadKappaMaps,
+    loadPotMaps,
+    make_Valist,
+    new_atomforcelist,
+    new_gridlist,
+    new_pbelist,
+    new_pmglist,
+    new_pmgplist,
+    new_valist,
+    parseInputFromString,
+    printEnergy,
+    printForce,
+    printMGPARM,
+    printPBEPARM,
+    setPartMG,
+    solveMG,
+    wrap_forceMG,
+    writedataMG,
+    writematMG,
+    xrange,
+)
+import sys
+import time
 import string
 import re
 from sys import stdout, stderr
@@ -100,9 +164,10 @@ quit
 PQR = "ATOM      1  I   ION     1       0.000   0.000  0.000  1.00  3.00"
 
 Python_kb = 1.3806581e-23
-Python_Na = 6.0221367e+23
+Python_Na = 6.0221367e23
 NOSH_MAXMOL = 20
 NOSH_MAXCALC = 20
+
 
 class APBSError(Exception):
     """ APBSError class
@@ -124,7 +189,8 @@ class APBSError(Exception):
         """
             Return the error message
         """
-        return `self.value`
+        return repr(self.value)
+
 
 def getUnitConversion():
     """
@@ -134,8 +200,9 @@ def getUnitConversion():
             factor: The conversion factor (float)
     """
     temp = 298.15
-    factor = Python_kb/1000.0 * temp * Python_Na
+    factor = Python_kb / 1000.0 * temp * Python_Na
     return factor
+
 
 def getHeader():
     """ Get header information about APBS
@@ -148,7 +215,7 @@ def getHeader():
             header: Information about APBS
     """
 
-    header = "\n\n\
+    header = '\n\n\
     ----------------------------------------------------------------------\n\
     Adaptive Poisson-Boltzmann Solver (APBS)\n\
     Version 1.6\n\
@@ -161,33 +228,37 @@ def getHeader():
     Additional contributing authors listed in the code documentation.\n\
     \n\
     Copyright (c) 2010-2020 Battelle Memorial Institute.\n\
-    Developed at the Pacific Northwest National Laboratory, operated by Battelle Memorial Institute,\n\
+    Developed at the Pacific Northwest National Laboratory, operated by \
+    Battelle Memorial Institute,\n\
     Pacific Northwest Division for the U.S. Department Energy.\n\
     Portions Copyright (c) 2002-2010, Washington University in St. Louis.\n\
     Portions Copyright (c) 2002-2020, Nathan A. Baker.\n\
-    Portions Copyright (c) 1999-2002,  The Regents of the University of California.\n\
+    Portions Copyright (c) 1999-2002,  The Regents of the University of \
+    California.\n\
     Portions Copyright (c) 1995,  Michael Holst\n\
     \n\
     All rights reserved.\n\
     \n\
     Redistribution and use in source and binary forms, with or without\n\
-    modification, are permitted provided that the following conditions are met:\n\
+    modification, are permitted provided that the following conditions are \
+    met:\n\
     \n\
-    * Redistributions of source code must retain the above copyright notice, this\n\
-      list of conditions and the following disclaimer.\n\
+    * Redistributions of source code must retain the above copyright notice, \
+      this list of conditions and the following disclaimer.\n\
     \n\
-    * Redistributions in binary form must reproduce the above copyright notice,\n\
-      this list of conditions and the following disclaimer in the documentation\n\
-      and/or other materials provided with the distribution.\n\
+    * Redistributions in binary form must reproduce the above copyright \
+      notice, this list of conditions and the following disclaimer in the \
+      documentation and/or other materials provided with the distribution.\n\
     \n\
-    * Neither the name of Washington University in St. Louis nor the names of its\n\
-      contributors may be used to endorse or promote products derived from this\n\
-      software without specific prior written permission.\n\
+    * Neither the name of Washington University in St. Louis nor the names of \
+      its contributors may be used to endorse or promote products derived \
+      from this software without specific prior written permission.\n\
     \n\
     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n\
-    \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n\
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n\
     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\n\
-    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR\n\
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT \
+    OWNER OR\n\
     CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,\n\
     EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,\n\
     PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR\n\
@@ -196,8 +267,9 @@ def getHeader():
     NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\n\
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\
     ----------------------------------------------------------------------\n\
-    \n\n"
+    \n\n'
     return header
+
 
 def getUsage():
     """ Get usage information about running APBS via Python
@@ -245,19 +317,19 @@ def printResults(energyList, potList, forceList):
 
     factor = getUnitConversion()
 
-    for i in range(len(potList)):
+    for i in xrange(len(potList)):
         list = potList[i]
-        print "\nPer-atom potentials from calculation %i" % i
+        print(f"\nPer-atom potentials from calculation {i}")
         for j in range(len(list)):
             atom = list[j]
-            print "\t%i\t%.4f kT/e" % (j, (float(atom)))
+            print("\t%i\t%.4f kT/e" % (j, (float(atom))))
 
     for i in range(len(energyList)):
         list = energyList[i]
-        print "\nPer-atom energies from calculation %i" % i
+        print(f"\nPer-atom energies from calculation {i}")
         for j in range(len(list)):
             atom = list[j]
-            print "\t%i\t%.4f kJ/mol" % (j, (float(atom) * factor * 0.5))
+            print("\t%i\t%.4f kJ/mol" % (j, (float(atom) * factor * 0.5)))
 
     # Print the per-atom forces
 
@@ -266,14 +338,26 @@ def printResults(energyList, potList, forceList):
         iblist = forceList[i]["ib"]
         dblist = forceList[i]["db"]
 
-        print "\nPer-atom forces from calculation %i" % i
+        print(f"\nPer-atom forces from calculation {i}")
         for j in range(len(qflist)):
-            qf = "%.3E %.3E %.3E" % (qflist[j][0]*factor, qflist[j][1]*factor, qflist[j][2]*factor)
-            ib = "%.3E %.3E %.3E" % (iblist[j][0]*factor, iblist[j][1]*factor, iblist[j][2]*factor)
-            db = "%.3E %.3E %.3E" % (dblist[j][0]*factor, dblist[j][1]*factor, dblist[j][2]*factor)
-            print "\t%i\t%s (qf)" % (j, qf)
-            print "\t%i\t%s (ib)" % (j, ib)
-            print "\t%i\t%s (db)" % (j, db)
+            qf = "%.3E %.3E %.3E" % (
+                qflist[j][0] * factor,
+                qflist[j][1] * factor,
+                qflist[j][2] * factor,
+            )
+            ib = "%.3E %.3E %.3E" % (
+                iblist[j][0] * factor,
+                iblist[j][1] * factor,
+                iblist[j][2] * factor,
+            )
+            db = "%.3E %.3E %.3E" % (
+                dblist[j][0] * factor,
+                dblist[j][1] * factor,
+                dblist[j][2] * factor,
+            )
+            print(f"\t{j}\t{qf} (qf)")
+            print(f"\t{j}\t{ib} (ib)")
+            print(f"\t{j}\t{db} (db)")
 
 
 def runAPBS(PQR, INPUT):
@@ -309,44 +393,46 @@ def runAPBS(PQR, INPUT):
 
     if not parseInputFromString(nosh, INPUT):
         stderr.write("main:  Error while parsing input file.\n")
-        raise APBSError, "Error occurred!"
+        raise APBSError("Error occurred!")
 
     # Load the molecules using Valist_load routine, thereby
     # loading atoms directly into the valist object, removing
     # the need for an actual PQR file from stdin
 
     alist = new_valist(NOSH_MAXMOL)
-    atoms = string.split(PQR,"\n")
+    atoms = string.split(PQR, "\n")
     for i in range(len(atoms)):
         atom = atoms[i]
-        if not (atom.startswith("ATOM") or atom.startswith("HETATM")): continue
-        if atom == "": continue
+        if not (atom.startswith("ATOM") or atom.startswith("HETATM")):
+            continue
+        if atom == "":
+            continue
 
         # Try matching to see if a chain ID is present
         haschain = 0
-        if re.compile("( [A-Z]{3} [A-Z]{1} *\d+)").findall(atom) != []:
+        if re.compile(r"( [A-Z]{3} [A-Z]{1} *\d+)").findall(atom) != []:
             haschain = 1
 
         params = string.split(atom)
-        x.append(float(params[5+haschain]))
-        y.append(float(params[6+haschain]))
-        z.append(float(params[7+haschain]))
-        chg.append(float(params[8+haschain]))
-        rad.append(float(params[9+haschain]))
+        x.append(float(params[5 + haschain]))
+        y.append(float(params[6 + haschain]))
+        z.append(float(params[7 + haschain]))
+        chg.append(float(params[8 + haschain]))
+        rad.append(float(params[9 + haschain]))
 
     # If there are more than one PQR file, make multiple Valist
     # objects.  Make sure to get the actual length of the
     # coordinate since atoms may contain non ATOM lines.
 
-    myAlist = make_Valist(alist,0)
-    Valist_load(myAlist, len(x), x,y,z,chg,rad)
+    myAlist = make_Valist(alist, 0)
+    Valist_load(myAlist, len(x), x, y, z, chg, rad)
 
     if not NOsh_setupElecCalc(nosh, alist):
         stderr.write("main: Error setting up calculation.\n")
-        raise APBSError, "Error setting up calculations!"
+        raise APBSError("Error setting up calculations!")
 
-
-    for i in range(nosh.ncalc): totEnergy.append(0.0)
+    for i in range(nosh.ncalc):
+        totEnergy.append(0.0)
 
     # Initialize the Python holders
     energyList = []
@@ -361,54 +447,74 @@ def runAPBS(PQR, INPUT):
     dielZMap = new_gridlist(NOSH_MAXMOL)
     if loadDielMaps(nosh, dielXMap, dielYMap, dielZMap) != 1:
         stderr.write("Error reading dielectric maps!\n")
-        raise APBSError, "Error reading dielectric maps!"
+        raise APBSError("Error reading dielectric maps!")
 
     kappaMap = new_gridlist(NOSH_MAXMOL)
     if loadKappaMaps(nosh, kappaMap) != 1:
         stderr.write("Error reading kappa maps!\n")
-        raise APBSError, "Error reading kappa maps!"
+        raise APBSError("Error reading kappa maps!")
 
     chargeMap = new_gridlist(NOSH_MAXMOL)
     if loadChargeMaps(nosh, chargeMap) != 1:
         stderr.write("Error reading charge maps!\n")
-        raise APBSError, "Error reading charge maps!"
+        raise APBSError("Error reading charge maps!")
 
     potMap = new_gridlist(NOSH_MAXMOL)
     if loadPotMaps(nosh, chargeMap) != 1:
         stderr.write("Error reading charge maps!\n")
-        raise APBSError, "Error reading charge maps!"
+        raise APBSError("Error reading charge maps!")
 
     # Do the calculations
 
-    stdout.write("Preparing to run %d PBE calculations. \n" % nosh.ncalc)
+    stdout.write(f"Preparing to run {nosh.ncalc} PBE calculations. \n")
 
-    for icalc in xrange(nosh.ncalc):
+    for icalc in range(nosh.ncalc):
         stdout.write("---------------------------------------------\n")
         calc = NOsh_getCalc(nosh, icalc)
         mgparm = calc.mgparm
         pbeparm = calc.pbeparm
         if calc.calctype != 0:
             stderr.write("main:  Only multigrid calculations supported!\n")
-            raise APBSError, "Only multigrid calculations supported!"
+            raise APBSError("Only multigrid calculations supported!")
 
+        k = 0
         for k in range(0, nosh.nelec):
-            if NOsh_elec2calc(nosh,k) >= icalc:
+            if NOsh_elec2calc(nosh, k) >= icalc:
                 break
 
         name = NOsh_elecname(nosh, k)
         if name == "":
-            stdout.write("CALCULATION #%d:  MULTIGRID\n" % (icalc+1))
+            stdout.write("CALCULATION #%d:  MULTIGRID\n" % (icalc + 1))
         else:
-            stdout.write("CALCULATION #%d (%s): MULTIGRID\n" % ((icalc+1),name))
+            stdout.write(
+                "CALCULATION #%d (%s): MULTIGRID\n" % ((icalc + 1), name)
+            )
         stdout.write("Setting up problem...\n")
 
         # Routine initMG
 
-        if initMG(icalc, nosh, mgparm, pbeparm, realCenter, pbe,
-              alist, dielXMap, dielYMap, dielZMap, kappaMap, chargeMap,
-              pmgp, pmg, potMap) != 1:
+        if (
+            initMG(
+                icalc,
+                nosh,
+                mgparm,
+                pbeparm,
+                realCenter,
+                pbe,
+                alist,
+                dielXMap,
+                dielYMap,
+                dielZMap,
+                kappaMap,
+                chargeMap,
+                pmgp,
+                pmg,
+                potMap,
+            )
+            != 1
+        ):
             stderr.write("Error setting up MG calculation!\n")
-            raise APBSError, "Error setting up MG calculation!"
+            raise APBSError("Error setting up MG calculation!")
 
         # Print problem parameters if desired (comment out if you want
         # to minimize output to stdout)
@@ -418,27 +524,31 @@ def runAPBS(PQR, INPUT):
 
         # Solve the problem : Routine solveMG
 
-        thispmg = get_Vpmg(pmg,icalc)
+        thispmg = get_Vpmg(pmg, icalc)
 
         if solveMG(nosh, thispmg, mgparm.type) != 1:
             stderr.write("Error solving PDE! \n")
-            raise APBSError, "Error Solving PDE!"
+            raise APBSError("Error Solving PDE!")
 
         # Set partition information : Routine setPartMG
 
         if setPartMG(nosh, mgparm, thispmg) != 1:
             stderr.write("Error setting partition info!\n")
-            raise APBSError, "Error setting partition info!"
+            raise APBSError("Error setting partition info!")
 
         # Get the energies - the energy for this calculation
         # (calculation number icalc) will be stored in the totEnergy array
-        ret, totEnergy[icalc] = energyMG(nosh, icalc, thispmg, 0, 0.0, 0.0, 0.0, 0.0)
+        ret, totEnergy[icalc] = energyMG(
+            nosh, icalc, thispmg, 0, 0.0, 0.0, 0.0, 0.0
+        )
 
         # Calculate forces - doforce will be > 0 if anything other than
         # "calcforce no" is specified
 
         aforce = get_AtomForce(atomforce, icalc)
-        doforce = wrap_forceMG(mem, nosh, pbeparm, mgparm, thispmg, aforce, alist, nforce, icalc)
+        doforce = wrap_forceMG(
+            mem, nosh, pbeparm, mgparm, thispmg, aforce, alist, nforce, icalc
+        )
 
         # Write out data from MG calculations : Routine writedataMG
         writedataMG(rank, nosh, pbeparm, thispmg)
@@ -487,7 +597,7 @@ def runAPBS(PQR, INPUT):
     killKappaMaps(nosh, kappaMap)
     killDielMaps(nosh, dielXMap, dielYMap, dielZMap)
     killMolecules(nosh, alist)
-    #delete_Nosh(nosh)
+    # delete_Nosh(nosh)
 
     # Clean up Python structures
 
@@ -505,16 +615,20 @@ def runAPBS(PQR, INPUT):
     delete_pbelist(pbe)
 
     # Clean up MALOC structures
-    #delete_Com(com)
-    #delete_Mem(mem)
+    # delete_Com(com)
+    # delete_Mem(mem)
     stdout.write("\n")
     stdout.write("Thanks for using APBS!\n\n")
 
     # Stop the main timer
     main_timer_stop = time.clock()
-    stdout.write("Total execution time:  %1.6e sec\n" % (main_timer_stop - main_timer_start))
+    stdout.write(
+        "Total execution time:  %1.6e sec\n"
+        % (main_timer_stop - main_timer_start)
+    )
 
     return energyList, potList, forceList
+
 
 if __name__ == "__main__":
 
@@ -523,7 +637,7 @@ if __name__ == "__main__":
     if len(sys.argv) != 1:
         stderr.write("main:  Called with %d arguments!\n" % len(sys.argv))
         stderr.write(getUsage())
-        raise APBSError, "Incorrect Usage!"
+        raise APBSError("Incorrect Usage!")
 
     energyList, potList, forceList = runAPBS(PQR, INPUT)
 
