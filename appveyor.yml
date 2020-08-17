@@ -26,11 +26,11 @@ install:
   # - choco install tools\windows\swig.4.0.0.nupkg --yes --limit-output
   - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install -r -y swig
   
-  - dir swig.exe /S /B
-  
   - type C:\ProgramData\chocolatey\logs\chocolatey.log
 
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;C:\\projects\\source\\build\\bin;%PATH%"
+  - where /r c:\windows swig.exe
+  
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;C:\\projects\\source\\build\\bin;C:\\ProgramData\\chocolatey\\bin;%PATH%"
 
   # Check that we have the expected version and architecture for Python
   - python --version
