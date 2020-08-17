@@ -32,7 +32,7 @@ install:
   # compiled extensions and are not provided as pre-built wheel packages,
   # pip will build them from source using the MSVC compiler matching the
   # target Python version and architecture
-  - pip.exe install -r c:\projects\source\pdb2pqr\requirements.txt
+  - pip.exe install -r c:\projects\source\requirements.txt
 
 build_script:
 - cmd: >-
@@ -41,7 +41,7 @@ build_script:
 
     git submodule update
 
-    cd c:\projects\source\apbs
+    cd c:\projects\source
 
     mkdir build
 
