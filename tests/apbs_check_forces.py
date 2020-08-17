@@ -6,7 +6,7 @@ Checks computed forces from an apbs run
 
 import sys
 import re
-from . apbs_logger import Logger
+from apbs_logger import Logger
 
 ERROR_TOLERANCE = 1e-6
 
@@ -224,10 +224,10 @@ def check_forces(input_file, polar_file, apolar_file, logger):
     true_apolar_force_dict = parse_forces(ApolarForce, input_lines)
 
     logger.both("Checking Polar Forces")
-    compare_force_dicts(test_polar_force_dict, true_polar_force_dict)
+    compare_force_dicts(test_polar_force_dict, true_polar_force_dict, logger)
 
     logger.both("Checking Apolar Forces")
-    compare_force_dicts(test_apolar_force_dict, true_apolar_force_dict)
+    compare_force_dicts(test_apolar_force_dict, true_apolar_force_dict, logger)
 
 
 def test():

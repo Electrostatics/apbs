@@ -6,7 +6,7 @@ Provides functions for verifying results from a test run
 
 import sys
 from math import log10, floor
-from . apbs_logger import Logger
+from apbs_logger import Logger
 
 ERROR_TOLERANCE = 1e-4
 

@@ -6,7 +6,7 @@ Check intermediate computed energies form an APBS run
 
 import sys
 import re
-from . apbs_logger import Logger
+from apbs_logger import Logger
 
 ERROR_TOLERANCE = 1e-6
 

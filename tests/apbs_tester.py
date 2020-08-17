@@ -13,13 +13,14 @@ import operator
 from optparse import OptionParser
 from configparser import ConfigParser, NoOptionError
 from functools import reduce
-from . apbs_check_forces import check_forces
-from . apbs_check_results import check_results
-from . apbs_check_intermediate_energies import check_energies
-from . apbs_logger import Logger
+from apbs_check_forces import check_forces
+from apbs_check_results import check_results
+from apbs_check_intermediate_energies import check_energies
+from apbs_logger import Logger
 
 # The inputgen utility needs to be accessible, so we add its path
-from ..tools.manip.inputgen import split_input
+sys.path.insert(0, "../tools/manip")
+from inputgen import split_input
 
 # Matches a floating point number such as -1.23456789E-20
 FLOAT_PATTERN = r"([+-]?\d+\.\d+E[+-]\d+)"
@@ -88,9 +89,7 @@ def process_serial(binary, input_file):
     output_results = check_energies(output_name)
 
     output_pattern = r"Global net (?:ELEC|APOL) energy \= " + FLOAT_PATTERN
-    output_results2 = [
-        float(r) for r in re.findall(output_pattern, output_text)
-    ]
+    output_results2 = [float(r) for r in re.findall(output_pattern, output_text)]
 
     output_results += output_results2
 
@@ -135,9 +134,7 @@ def process_parallel(binary, input_file, procs, logger):
     return results
 
 
-def run_test(
-    binary, test_files, test_name, test_directory, setup, logger, ocd
-):
+def run_test(binary, test_files, test_name, test_directory, setup, logger, ocd):
     """
     Runs a given test from the test cases file
     """
@@ -180,18 +177,12 @@ def run_test(
             computed_results = None
 
             # Determine if this is a parallel run
-            match = re.search(
-                r"\s*pdime((\s+\d+)+)", open(input_file, "r").read()
-            )
+            match = re.search(r"\s*pdime((\s+\d+)+)", open(input_file, "r").read())
 
             # If it is parallel, get the number of procs and do a parallel run
             if match:
-                procs = reduce(
-                    operator.mul, [int(p) for p in match.group(1).split()]
-                )
-                computed_results = process_parallel(
-                    binary, input_file, procs, logger
-                )
+                procs = reduce(operator.mul, [int(p) for p in match.group(1).split()])
+                computed_results = process_parallel(binary, input_file, procs, logger)
             # Otherwise, just do a serial run
             else:
                 computed_results = process_serial(binary, input_file)
@@ -210,22 +201,20 @@ def run_test(
                     continue
 
                 # Compare the expected to computed results
-                computed_result = ""
+                computed_result = 0
                 try:
                     computed_result = computed_results[i]
                 except IndexError as error:
                     logger.message(
-                        "Computed result for index, %i, does not exist: %s"
-                        % (i, error)
+                        "Computed result for index, %i, does not exist: %s" % (i, error)
                     )
                 expected_result = float(expected_results[i])
                 logger.message(
-                    "Testing computed result %.12E " % computed_result
-                    + "against expected result %12E\n" % expected_result
+                    "Testing computed result against "
+                    + "expected result (%.12E, %12E)\n"
+                    % (computed_result, expected_result)
                 )
-                check_results(
-                    computed_result, expected_result, input_file, logger, ocd
-                )
+                check_results(computed_result, expected_result, input_file, logger, ocd)
 
         # Record the end time after the test
         end_time = datetime.datetime.now()
@@ -288,11 +277,7 @@ def main():
     )
 
     parser.add_option(
-        "-o",
-        "--ocd",
-        action="store_true",
-        dest="ocd",
-        help="Run APBS in OCD mode",
+        "-o", "--ocd", action="store_true", dest="ocd", help="Run APBS in OCD mode",
     )
 
     parser.add_option(
@@ -325,9 +310,7 @@ def main():
     try:
         logfile_fd = open(options.log_file, "w")
     except IOError as err:
-        parser.error(
-            "Could't open log_file %s: %s" % (options.log_file, err.strerror)
-        )
+        parser.error("Could't open log_file %s: %s" % (options.log_file, err.strerror))
 
     # Set up the logger with the message and log file descriptor
     logger = Logger(message_fd, logfile_fd)
@@ -362,12 +345,7 @@ def main():
 
         # Verify that the test is described in the test cases file
         if test_name not in config.sections():
-            print(
-                "  "
-                + test_name
-                + " section not found in "
-                + options.test_config
-            )
+            print("  " + test_name + " section not found in " + options.test_config)
             return 1
 
         # Grab the test directory

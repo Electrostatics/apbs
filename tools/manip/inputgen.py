@@ -30,7 +30,7 @@
 
 import sys
 import pickle
-from . psize import Psize
+from psize import Psize
 
 
 class Elec:
