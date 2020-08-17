@@ -28,7 +28,7 @@ install:
   
   - type C:\ProgramData\chocolatey\logs\chocolatey.log
 
-  - where /r C:\ProgramData swig.exe
+  - where /r C:\ProgramData\chocolatey swig.exe
   
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;C:\\projects\\source\\build\\bin;C:\\ProgramData\\chocolatey\\lib\\swig\\tools\\install;C:\\ProgramData\\chocolatey\\bin;%PATH%"
 
