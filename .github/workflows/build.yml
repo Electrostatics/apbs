@@ -11,8 +11,8 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-latest]
-        os: [macOS-latest]
-        # os: [ubuntu-latest, macOS-latest]
+        # os: [macOS-latest]
+        os: [ubuntu-latest, macOS-latest]
         # os: [ubuntu-latest, macOS-latest, windows-latest]
         python-version: [3.8]
         # cflag-options:
