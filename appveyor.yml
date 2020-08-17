@@ -23,8 +23,8 @@ cache:
   
 install:
   # Install non-python dependencies using chocolatey package manager
-  # - choco install -r -y swig
-  - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install tools\windows\swig.4.0.0.nupkg --yes --limit-output
+  # - choco install tools\windows\swig.4.0.0.nupkg --yes --limit-output
+  - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install -r -y swig
 
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;C:\\projects\\source\\build\\bin;%PATH%"
 
