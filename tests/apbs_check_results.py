@@ -20,7 +20,8 @@ def round_sigfigs(x, sigfigs):
 
 def check_results(computed_result, expected_result, input_file, logger, ocd):
     """
-    Compares computed results to an expected results within some margin of error
+    Compares computed results to an expected results within some margin of
+    error
     """
 
     # OCD mode requires a match up to 12 significant figures
@@ -34,26 +35,38 @@ def check_results(computed_result, expected_result, input_file, logger, ocd):
         expected_result = round_sigfigs(expected_result, 6)
 
     # Compute the error in the calculation
-    error = abs((computed_result - expected_result)/expected_result*100.0)
+    error = abs((computed_result - expected_result) / expected_result * 100.0)
 
-    # An exact match after rounding to specifiec precision means the test passed
+    # An exact match after rounding to specifiec precision means the test
+    # passed
     if computed_result == expected_result:
         logger.message("*** PASSED ***\n")
         logger.log("PASSED %.12e\n" % computed_result)
 
     # Otherwise, test that the error is below error tolerance
-    elif error < ERROR_TOLERANCE*100:
+    elif error < ERROR_TOLERANCE * 100:
         logger.message("*** PASSED (with rounding error - see log) ***\n")
-        logger.log("PASSED within error (%.12e; expected %.12e; %g%% error)\n" % (computed_result, expected_result, error))
+        logger.log(
+            "PASSED within error (%.12e; expected %.12e; %g%% error)\n"
+            % (computed_result, expected_result, error)
+        )
 
     # If neither is true, the test failed
     else:
         logger.message("*** FAILED ***\n")
         logger.message("   APBS returned      %.12e\n" % computed_result)
-        logger.message("   Expected result is %.12e (%g%% error)\n" % (expected_result, error))
-        logger.log("FAILED (%.12e; expected %.12e; %g%% error)\n" % (computed_result, expected_result, error))
+        logger.message(
+            "   Expected result is %.12e (%g%% error)\n"
+            % (expected_result, error)
+        )
+        logger.log(
+            "FAILED (%.12e; expected %.12e; %g%% error)\n"
+            % (computed_result, expected_result, error)
+        )
 
 
-if __name__ == '__main__':
-    sys.stderr.write("The python source file %s is a module and not runnable" % sys.argv[0])
+if __name__ == "__main__":
+    sys.stderr.write(
+        "The python source file %s is a module and not runnable" % sys.argv[0]
+    )
     sys.exit(1)

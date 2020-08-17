@@ -756,7 +756,7 @@ option(BUILD_DOC "Build/Rebuild documentation using doxygen" OFF)
 
 if(BUILD_DOC)
     message(STATUS "Building documentation enabled")
-    add_subdirectory(doc)
+    add_subdirectory(docs)
 endif()
 
 
@@ -774,14 +774,14 @@ endif()
 ################################################################################
 # Set up additional directories to install                                     #
 ################################################################################
-install(DIRECTORY ${APBS_ROOT}/doc
+install(DIRECTORY ${APBS_ROOT}/docs
         DESTINATION ${SHARE_INSTALL_PATH}
         PATTERN "programmer" EXCLUDE
         PATTERN "CMakeLists.txt" EXCLUDE)
 
 if(BUILD_DOC)
-    install(DIRECTORY ${APBS_BUILD}/doc/programmer
-            DESTINATION ${SHARE_INSTALL_PATH}/doc
+    install(DIRECTORY ${APBS_BUILD}/docs/programmer
+            DESTINATION ${SHARE_INSTALL_PATH}/docs
             PATTERN "Doxyfile" EXCLUDE
             PATTERN "latex" EXCLUDE
             PATTERN "mainpage.h" EXCLUDE)

@@ -1,4 +1,10 @@
-from vgrid import *
+from . vgrid import (
+    startVio,
+    Vgrid_ctor,
+    Vgrid_readDX,
+    Vgrid_value,
+    Vgrid_gradient,
+)
 import sys
 from sys import stdout, stderr
 
@@ -11,21 +17,25 @@ header = "\n\n\
     Adaptive Poisson-Boltzmann Solver (APBS)\n\
     ----------------------------------------------------------------------\n\
     \n\n"
-    
-usage = "python[2] read.py file.dx\n";
+
+usage = "python[2] read.py file.dx\n"
 
 NMAX = 5
+
 
 def main():
 
     inpath = ""
     value = 0.0
     data = []
-    
+
     startVio()
 
     if len(sys.argv) != 2:
-        stderr.write("\n*** Syntax error: got %d arguments, expected 2.\n\n" % len(sys.argv))
+        stderr.write(
+            "\n*** Syntax error: got %d arguments, expected 2.\n\n"
+            % len(sys.argv)
+        )
         stderr.write("%s\n" % usage)
         sys.exit(2)
 
@@ -49,7 +59,9 @@ def main():
 
     stdout.write("main:     nx = %d, ny = %d, nz = %d\n" % (nx, ny, nz))
     stdout.write("main:     hx = %g, hy = %g, hz = %g\n" % (hx, hy, hzed))
-    stdout.write("main:     xmin = %g, ymin = %g, zmin = %g\n" % (xmin, ymin, zmin))
+    stdout.write(
+        "main:     xmin = %g, ymin = %g, zmin = %g\n" % (xmin, ymin, zmin)
+    )
 
     # Read off some values
 
@@ -57,27 +69,38 @@ def main():
 
     for i in range(nx):
         inval = 0.0
-        pt = [xmin + i*hx, ymin + 0.5*(ny-1)*hy, zmin + 0.5*(nz-1)*hzed]
+        pt = [
+            xmin + i * hx,
+            ymin + 0.5 * (ny - 1) * hy,
+            zmin + 0.5 * (nz - 1) * hzed,
+        ]
         ret, value = Vgrid_value(grid, pt, inval)
         if ret:
-            stdout.write("main: u(%g, %g, %g) = %g\n" % (pt[0], pt[1], pt[2], value))
+            stdout.write(
+                "main: u(%g, %g, %g) = %g\n" % (pt[0], pt[1], pt[2], value)
+            )
 
     # Integrate
 
     stdout.write("main:  Integrating...\n")
     sum = 0
+    pt = 0
     for i in range(nx):
         for j in range(ny):
             for k in range(nz):
                 inval = 0.0
-                pt = [xmin + i*hx, ymin + j*hy, zmin + k*hzed]
+                pt = [xmin + i * hx, ymin + j * hy, zmin + k * hzed]
                 ret, value = Vgrid_value(grid, pt, inval)
                 if ret:
                     sum = sum + value
-    
-    stdout.write("main:  Integral over grid = %1.12E\n" % (sum*hx*hy*hzed))
 
-    grad = [0.0,0.0,0.0]
+    stdout.write(
+        "main:  Integral over grid = %1.12E\n" % (sum * hx * hy * hzed)
+    )
+
+    grad = [0.0, 0.0, 0.0]
     Vgrid_gradient(grid, pt, grad)
 
-if __name__ == "__main__": main()
+
+if __name__ == "__main__":
+    main()

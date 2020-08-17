@@ -11,53 +11,125 @@
     Todd Dolinsky (todd@ccb.wustl.edu)
     Nathan Baker (nathan.baker@pnl.gov)
 
-	APBS -- Adaptive Poisson-Boltzmann Solver
+    APBS -- Adaptive Poisson-Boltzmann Solver
 
-	  Nathan A. Baker (nathan.baker@pnl.gov)
-	  Pacific Northwest National Laboratory
+      Nathan A. Baker (nathan.baker@pnl.gov)
+      Pacific Northwest National Laboratory
 
-	  Additional contributing authors listed in the code documentation.
+      Additional contributing authors listed in the code documentation.
 
-	Copyright (c) 2010-2020 Battelle Memorial Institute.
-    Developed at the Pacific Northwest National Laboratory, operated by Battelle Memorial Institute,
+    Copyright (c) 2010-2020 Battelle Memorial Institute.
+    Developed at the Pacific Northwest National Laboratory, operated by
+    Battelle Memorial Institute,
     Pacific Northwest Division for the U.S. Department Energy.
     Portions Copyright (c) 2002-2010, Washington University in St. Louis.
     Portions Copyright (c) 2002-2020, Nathan A. Baker.
-    Portions Copyright (c) 1999-2002, The Regents of the University of California.
+    Portions Copyright (c) 1999-2002, The Regents of the University of
+    California.
     Portions Copyright (c) 1995, Michael Holst
 
-	All rights reserved.
+    All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
 
-	* Redistributions of source code must retain the above copyright notice, this
-	list of conditions and the following disclaimer.
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the following disclaimer.
 
-	* Redistributions in binary form must reproduce the above copyright notice,
-	this list of conditions and the following disclaimer in the documentation
-	and/or other materials provided with the distribution.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
 
-	* Neither the name of Washington University in St. Louis nor the names of its
-	contributors may be used to endorse or promote products derived from this
-	software without specific prior written permission.
+    * Neither the name of Washington University in St. Louis nor the names of
+    its contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-	"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-	LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-	A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-	CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-	PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-	PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-	LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-	NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+    OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from apbslib import *
-import sys, time
-import string
+from apbslib import (
+    MGparm,
+    NOsh_ctor,
+    NOsh_elec2calc,
+    NOsh_elecname,
+    NOsh_getCalc,
+    NOsh_parseInputFile,
+    NOsh_printWhat,
+    NOsh_setupElecCalc,
+    NPT_APOLENERGY,
+    NPT_APOLFORCE,
+    NPT_ELECENERGY,
+    NPT_ELECFORCE,
+    NPT_ENERGY,
+    NPT_FORCE,
+    PBEparm,
+    Vcom_ctor,
+    Vcom_rank,
+    Vcom_size,
+    Vmem_ctor,
+    atomForce,
+    delete_Com,
+    delete_Mem,
+    delete_Nosh,
+    delete_atomforcelist,
+    delete_double_array,
+    delete_gridlist,
+    delete_int_array,
+    delete_pbelist,
+    delete_pmglist,
+    delete_pmgplist,
+    delete_valist,
+    double_array,
+    energyMG,
+    get_AtomForce,
+    get_Vpmg,
+    initMG,
+    int_array,
+    killChargeMaps,
+    killDielMaps,
+    killEnergy,
+    killForce,
+    killKappaMaps,
+    killMG,
+    killMolecules,
+    loadChargeMaps,
+    loadDielMaps,
+    loadKappaMaps,
+    loadMolecules,
+    new_atomforcelist,
+    new_gridlist,
+    new_pbelist,
+    new_pmglist,
+    new_pmgplist,
+    new_valist,
+    printApolEnergy,
+    printApolForce,
+    printElecEnergy,
+    printElecForce,
+    printEnergy,
+    printForce,
+    printMGPARM,
+    printPBEPARM,
+    setPartMG,
+    solveMG,
+    startVio,
+    wrap_forceMG,
+    writedataMG,
+    writematMG,
+    xrange,
+)
+import sys
+import time
 from sys import stdout, stderr
 
 __author__ = "Todd Dolinsky, Nathan Baker, Yong Huang"
@@ -65,9 +137,10 @@ __date__ = "September 2009"
 __version__ = "1.3"
 
 Python_kb = 1.3806581e-23
-Python_Na = 6.0221367e+23
+Python_Na = 6.0221367e23
 NOSH_MAXMOL = 20
 NOSH_MAXCALC = 20
+
 
 class APBSError(Exception):
     """ APBSError class
@@ -89,7 +162,8 @@ class APBSError(Exception):
         """
             Return the error message
         """
-        return `self.value`
+        return repr(self.value)
+
 
 def getHeader():
     """ Get header information about APBS
@@ -97,7 +171,7 @@ def getHeader():
             header: Information about APBS
     """
 
-    header = "\n\n\
+    header = '\n\n\
     ----------------------------------------------------------------------\n\
     Adaptive Poisson-Boltzmann Solver (APBS)\n\
     Version 1.6\n\
@@ -111,32 +185,40 @@ def getHeader():
     \n\
     Copyright (c) 2010-2020 Battelle Memorial Institute. \n\
     Developed at the Pacific Northwest National Laboratory, \n\
-    operated by Battelle Memorial Institute, Pacific Northwest Division for the U.S. Department Energy.\n\
+    operated by Battelle Memorial Institute, Pacific Northwest Division for \
+    the U.S. Department Energy.\n\
     Portions Copyright (c) 2002-2010, Washington University in St. Louis.\n\
     Portions Copyright (c) 2002-2020, Nathan A. Baker.\n\
-    Portions Copyright (c) 1999-2002, The Regents of the University of California.\n\
+    Portions Copyright (c) 1999-2002, The Regents of the University of \
+    California.\n\
     Portions Copyright (c) 1995, Michael Holst\n\
     \n\
     All rights reserved.\n\
     \n\
     Redistribution and use in source and binary forms, with or without\n\
-    modification, are permitted provided that the following conditions are met:\n\
+    modification, are permitted provided that the following conditions are \
+    met:\n\
     \n\
-    * Redistributions of source code must retain the above copyright notice, this\n\
-      list of conditions and the following disclaimer.\n\
+    * Redistributions of source code must retain the above copyright notice, \
+      this\n list of conditions and the following disclaimer.\n\
     \n\
-    * Redistributions in binary form must reproduce the above copyright notice,\n\
-      this list of conditions and the following disclaimer in the documentation\n\
+    * Redistributions in binary form must reproduce the above copyright \
+      notice,\n\
+      this list of conditions and the following disclaimer in the \
+      documentation\n\
       and/or other materials provided with the distribution.\n\
     \n\
-    * Neither the name of Washington University in St. Louis nor the names of its\n\
-      contributors may be used to endorse or promote products derived from this\n\
+    * Neither the name of Washington University in St. Louis nor the names of \
+      its\n\
+      contributors may be used to endorse or promote products derived from \
+      this\n\
       software without specific prior written permission.\n\
     \n\
     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n\
-    \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n\
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n\
     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\n\
-    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR\n\
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT \
+    OWNER OR\n\
     CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,\n\
     EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,\n\
     PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR\n\
@@ -145,9 +227,10 @@ def getHeader():
     NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\n\
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\
     ----------------------------------------------------------------------\n\
-    \n\n"
+    \n\n'
 
     return header
+
 
 def getUsage():
     """ Get usage information about running APBS via Python
@@ -164,6 +247,7 @@ def getUsage():
     ----------------------------------------------------------------------\n\n"
 
     return usage
+
 
 def main():
     """ Main driver for testing.  Runs APBS on given input file """
@@ -194,7 +278,7 @@ def main():
     if len(sys.argv) != 2:
         stderr.write("main:  Called with %d arguments!\n" % len(sys.argv))
         stderr.write(getUsage())
-        raise APBSError, "Incorrect Usage!"
+        raise APBSError("Incorrect Usage!")
 
     # Parse the input file
     nosh = NOsh_ctor(rank, size)
@@ -202,20 +286,20 @@ def main():
     stdout.write("Parsing input file %s...\n" % input_file)
     if NOsh_parseInputFile(nosh, input_file) != 1:
         stderr.write("main:  Error while parsing input file.\n")
-        raise APBSError, "Error while parsing input file!"
+        raise APBSError("Error while parsing input file!")
 
     # Load the molecules using loadMolecules routine
     # loadMolecule passing NULL as second arg instead of Vparam
     alist = new_valist(NOSH_MAXMOL)
-    if loadMolecules(nosh,None,alist) != 1:
+    if loadMolecules(nosh, None, alist) != 1:
         stderr.write("main:  Error while loading molecules. \n")
-        raise APBSError, "Error while loading molecules!"
+        raise APBSError("Error while loading molecules!")
 
     # Setup the calculations
 
     if NOsh_setupElecCalc(nosh, alist) != 1:
         stderr.write("main: Error while setting up calculations. \n")
-        raise APBSError, "Error while setting up calculations!"
+        raise APBSError("Error while setting up calculations!")
 
     # Load the necessary maps
 
@@ -224,23 +308,24 @@ def main():
     dielZMap = new_gridlist(NOSH_MAXMOL)
     if loadDielMaps(nosh, dielXMap, dielYMap, dielZMap) != 1:
         stderr.write("Error reading dielectric maps!\n")
-        raise APBSError, "Error reading dielectric maps!"
+        raise APBSError("Error reading dielectric maps!")
 
     kappaMap = new_gridlist(NOSH_MAXMOL)
     if loadKappaMaps(nosh, kappaMap) != 1:
         stderr.write("Error reading kappa maps!\n")
-        raise APBSError, "Error reading kappa maps!"
+        raise APBSError("Error reading kappa maps!")
 
     chargeMap = new_gridlist(NOSH_MAXMOL)
     if loadChargeMaps(nosh, chargeMap) != 1:
         stderr.write("Error reading charge maps!\n")
-        raise APBSError, "Error reading charge maps!"
+        raise APBSError("Error reading charge maps!")
 
     # Do the calculations
 
     stdout.write("Preparing to run %d PBE calculations. \n" % nosh.ncalc)
 
-    for icalc in xrange(nosh.ncalc): totEnergy.append(0.0)
+    for icalc in xrange(nosh.ncalc):
+        totEnergy.append(0.0)
 
     for icalc in xrange(nosh.ncalc):
         stdout.write("---------------------------------------------\n")
@@ -249,26 +334,45 @@ def main():
         pbeparm = calc.pbeparm
         if calc.calctype != 0:
             stderr.write("main:  Only multigrid calculations supported!\n")
-            raise APBSError, "Only multigrid calculations supported!"
+            raise APBSError("Only multigrid calculations supported!")
 
+        k = 0
         for k in range(0, nosh.nelec):
-            if NOsh_elec2calc(nosh,k) >= icalc:
+            if NOsh_elec2calc(nosh, k) >= icalc:
                 break
 
         name = NOsh_elecname(nosh, k)
         if name == "":
-            stdout.write("CALCULATION #%d:  MULTIGRID\n" % (icalc+1))
+            stdout.write("CALCULATION #%d:  MULTIGRID\n" % (icalc + 1))
         else:
-            stdout.write("CALCULATION #%d (%s): MULTIGRID\n" % ((icalc+1),name))
+            stdout.write(
+                "CALCULATION #%d (%s): MULTIGRID\n" % ((icalc + 1), name)
+            )
         stdout.write("Setting up problem...\n")
 
         # Routine initMG
 
-        if initMG(icalc, nosh, mgparm, pbeparm, realCenter, pbe,
-              alist, dielXMap, dielYMap, dielZMap, kappaMap, chargeMap,
-              pmgp, pmg) != 1:
+        if (
+            initMG(
+                icalc,
+                nosh,
+                mgparm,
+                pbeparm,
+                realCenter,
+                pbe,
+                alist,
+                dielXMap,
+                dielYMap,
+                dielZMap,
+                kappaMap,
+                chargeMap,
+                pmgp,
+                pmg,
+            )
+            != 1
+        ):
             stderr.write("Error setting up MG calculation!\n")
-            raise APBSError, "Error setting up MG calculation!"
+            raise APBSError("Error setting up MG calculation!")
 
         # Print problem parameters if desired (comment out if you want
         # to minimize output to stdout)
@@ -278,28 +382,31 @@ def main():
 
         # Solve the problem : Routine solveMG
 
-        thispmg = get_Vpmg(pmg,icalc)
+        thispmg = get_Vpmg(pmg, icalc)
 
         if solveMG(nosh, thispmg, mgparm.type) != 1:
             stderr.write("Error solving PDE! \n")
-            raise APBSError, "Error Solving PDE!"
+            raise APBSError("Error Solving PDE!")
 
         # Set partition information : Routine setPartMG
 
         if setPartMG(nosh, mgparm, thispmg) != 1:
             stderr.write("Error setting partition info!\n")
-            raise APBSError, "Error setting partition info!"
+            raise APBSError("Error setting partition info!")
 
         # Get the energies - the energy for this calculation
         # (calculation number icalc) will be stored in the totEnergy array
 
-        ret, totEnergy[icalc] = energyMG(nosh, icalc, thispmg, 0, \
-                                         totEnergy[icalc], 0.0, 0.0, 0.0)
+        ret, totEnergy[icalc] = energyMG(
+            nosh, icalc, thispmg, 0, totEnergy[icalc], 0.0, 0.0, 0.0
+        )
 
         # Calculate forces
 
         aforce = get_AtomForce(atomforce, icalc)
-        wrap_forceMG(mem, nosh, pbeparm, mgparm, thispmg, aforce, alist, nforce, icalc)
+        wrap_forceMG(
+            mem, nosh, pbeparm, mgparm, thispmg, aforce, alist, nforce, icalc
+        )
 
         # Write out data from MG calculations : Routine writedataMG
         writedataMG(rank, nosh, pbeparm, thispmg)
@@ -358,7 +465,6 @@ def main():
     delete_pmgplist(pmgp)
     delete_pbelist(pbe)
 
-
     # Clean up MALOC structures
     delete_Com(com)
     delete_Mem(mem)
@@ -367,7 +473,11 @@ def main():
 
     # Stop the main timer
     main_timer_stop = time.clock()
-    stdout.write("Total execution time:  %1.6e sec\n" % (main_timer_stop - main_timer_start))
+    stdout.write(
+        "Total execution time:  %1.6e sec\n"
+        % (main_timer_stop - main_timer_start)
+    )
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

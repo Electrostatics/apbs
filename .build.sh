@@ -19,19 +19,22 @@ cmake                                           \
       -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR       \
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE          \
       -DENABLE_GEOFLOW=ON                       \
-      -DENABLE_BEM=ON                           \
+      -DENABLE_BEM=OFF                          \
       -DENABLE_FETK=ON                          \
       -DENABLE_OPENMP=ON                        \
       -DENABLE_PBAM=ON                          \
       -DENABLE_PBSAM=ON                         \
       -DENABLE_PYTHON=ON                        \
       -DENABLE_TESTS=ON                         \
+      -DENABLE_TINKER=OFF                       \
       -DBUILD_SHARED_LIBS=ON                    \
       -DBUILD_DOC=OFF                           \
       ..                                        || exit 1
+#      -DCMAKE_C_FLAGS="-Wl,-z,muldefs"
+#      -DCMAKE_C_FLAGS="-fPIC"                   \
 VERBOSE=1 make -j 1                             || exit 1
-#VERBOSE=1 make -j 1 install                     || exit 1
-#      -DCMAKE_C_FLAGS="-fPIC"             \
+VERBOSE=1 make -j 1 install                     || exit 1
+export PATH="$INSTALL_DIR/bin:$PATH"
 ctest -C Release --output-on-failure #           || exit 1
 
 cpack -C Release -G ZIP                         || exit 

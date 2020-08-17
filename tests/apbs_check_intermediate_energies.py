@@ -10,12 +10,13 @@ from apbs_logger import Logger
 
 ERROR_TOLERANCE = 1e-6
 
+
 class ElecEnergy:
     """
     extracts and compares computed intermediate energies
     """
 
-    pattern = r'\s(?P<label>[a-zA-Z]+ [a-zA-Z]+ = )[\-]?(?P<x>[0-9]+(\.[0-9]+)?(E[\+,\-][0-9]+)?)'
+    pattern = r"\s(?P<label>[a-zA-Z]+ [a-zA-Z]+ = )[\-]?(?P<x>[0-9]+(\.[0-9]+)?(E[\+,\-][0-9]+)?)"  # noqa E501
 
     def __init__(self, label, x):
         """
@@ -29,18 +30,17 @@ class ElecEnergy:
         extract energy results from a file at a given line
         """
         m = re.search(self.pattern, line)
-        self.label = m.group('label')
-        self.x = float(m.group('x'))
+        self.label = m.group("label")
+        self.x = float(m.group("x"))
 
     def __repr__(self):
         return "ElecEnergy{ label:%s, x:%g" % (self.label, self.x)
 
     def diff(self, other):
         """
-    	compares the value of two energy calculations
-    	"""
-
-        return abs(getattr(self, d) - getattr(other, d))
+        compares the value of two energy calculations
+        """
+        return abs(getattr(self, self.x) - getattr(other, other.x))
 
     def short(self):
         """
@@ -80,30 +80,38 @@ def check_energies(input_file):
 
     f = None
     try:
-        f = open(input_file, 'r')
+        f = open(input_file, "r")
     except IOError:
-        print("Couldn't read from energy file %s" % input_file, file=sys.stderr)
+        print(
+            "Couldn't read from energy file %s" % input_file, file=sys.stderr
+        )
 
     input_lines = f.readlines()
 
-    energy_list = extract_energy(ElecEnergy, input_lines, 'Total electrostatic energy')
-    energy_list += extract_energy(ElecEnergy, input_lines, 'Mobile charge energy')
-    energy_list += extract_energy(ElecEnergy, input_lines, 'Fixed charge energy')
-    energy_list += extract_energy(ElecEnergy, input_lines, 'Dielectric energy')
+    energy_list = extract_energy(
+        ElecEnergy, input_lines, "Total electrostatic energy"
+    )
+    energy_list += extract_energy(
+        ElecEnergy, input_lines, "Mobile charge energy"
+    )
+    energy_list += extract_energy(
+        ElecEnergy, input_lines, "Fixed charge energy"
+    )
+    energy_list += extract_energy(ElecEnergy, input_lines, "Dielectric energy")
 
     return energy_list
+
 
 def test():
     """
     Run the test
     """
-    l = open('energy.log', 'w')
-    logger = Logger(sys.stderr, l)
-    energy_list = check_energies('actio_stdout.txt')
+    lval = open("energy.log", "w")
+    logger = Logger(sys.stderr, lval)
+    energy_list = check_energies("actio_stdout.txt")
     print(energy_list)
 
 
-if __name__ == '__main__':
-    #print >> sys.stderr, "The python source files %s is a module and not runnable" % sys.argv[0]
-    print("The python source files %s is a module and not runnable" % sys.argv[0])
+if __name__ == "__main__":
+    print(f"The python source file {sys.argv[0]} is a module and not runnable")
     sys.exit(1)

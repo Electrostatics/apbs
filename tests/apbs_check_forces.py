@@ -10,13 +10,14 @@ from apbs_logger import Logger
 
 ERROR_TOLERANCE = 1e-6
 
+
 class PolarForce:
     """
     Exctracts and compares computations of polar forces
     """
 
     # A crazy regex pattern used to match label/value sets
-    pattern = r'\s+(?P<label>[a-zA-Z]+)\s+(?P<x>[+-]?\d\.\d+E[+-]\d+)\s+(?P<y>[+-]?\d\.\d+E[+-]\d+)\s+(?P<z>[+-]?\d\.\d+E[+-]\d+)'
+    pattern = r"\s+(?P<label>[a-zA-Z]+)\s+(?P<x>[+-]?\d\.\d+E[+-]\d+)\s+(?P<y>[+-]?\d\.\d+E[+-]\d+)\s+(?P<z>[+-]?\d\.\d+E[+-]\d+)"
 
     def __init__(self, label, x, y, z):
         """
@@ -32,10 +33,10 @@ class PolarForce:
         Extracts ploar force results from a file at a given line
         """
         m = re.search(self.pattern, line)
-        self.label = m.group('label')
-        self.x = float(m.group('x'))
-        self.y = float(m.group('y'))
-        self.z = float(m.group('z'))
+        self.label = m.group("label")
+        self.x = float(m.group("x"))
+        self.y = float(m.group("y"))
+        self.z = float(m.group("z"))
 
     def diff(self, other):
         """
@@ -43,7 +44,7 @@ class PolarForce:
         """
 
         diff_dict = {}
-        for d in ('x', 'y', 'z'):
+        for d in ("x", "y", "z"):
             diff_dict[d] = abs(getattr(self, d) - getattr(other, d))
         return diff_dict
 
@@ -51,7 +52,12 @@ class PolarForce:
         """
         Get the PolarForce
         """
-        return "PolarForce{ label:%s, x:%g, y:%g, z:%g}\n" % (self.label, self.x, self.y, self.z)
+        return "PolarForce{ label:%s, x:%g, y:%g, z:%g}\n" % (
+            self.label,
+            self.x,
+            self.y,
+            self.z,
+        )
 
     def short(self):
         """
@@ -66,7 +72,7 @@ class ApolarForce(PolarForce):
     """
 
     # A crazy regex pattern used to match label/value sets
-    pattern = r'\s+(?P<label>[a-zA-Z]+)\s+(?P<atom>\w+)\s+(?P<x>[+-]?\d\.\d+E[+-]\d+)\s+(?P<y>[+-]?\d\.\d+E[+-]\d+)\s+(?P<z>[+-]?\d\.\d+E[+-]\d+)'
+    pattern = r"\s+(?P<label>[a-zA-Z]+)\s+(?P<atom>\w+)\s+(?P<x>[+-]?\d\.\d+E[+-]\d+)\s+(?P<y>[+-]?\d\.\d+E[+-]\d+)\s+(?P<z>[+-]?\d\.\d+E[+-]\d+)"
 
     def __init__(self, label, atom, x, y, z):
         """
@@ -80,17 +86,23 @@ class ApolarForce(PolarForce):
         Extracts aploar force results from a file at a given line
         """
         m = re.search(self.pattern, line)
-        self.label = m.group('label')
-        self.atom = m.group('atom')
-        self.x = float(m.group('x'))
-        self.y = float(m.group('y'))
-        self.z = float(m.group('z'))
+        self.label = m.group("label")
+        self.atom = m.group("atom")
+        self.x = float(m.group("x"))
+        self.y = float(m.group("y"))
+        self.z = float(m.group("z"))
 
     def __rpr__(self):
-        return "ApolarForce{ label:%s, atom:%s, x:%g, y:%g, z:%g}\n" % (self.label, self.atom, self.x, self.y, self.z)
+        return "ApolarForce{ label:%s, atom:%s, x:%g, y:%g, z:%g}\n" % (
+            self.label,
+            self.atom,
+            self.x,
+            self.y,
+            self.z,
+        )
 
     def short(self):
-        return '%s for %s' % (self.label, self.atom)
+        return "%s for %s" % (self.label, self.atom)
 
 
 def extract_forces(force_class, lines, start_pattern):
@@ -114,7 +126,7 @@ def extract_forces(force_class, lines, start_pattern):
             if not re.search(force_class.pattern, line_text):
                 end_line = line_number
                 break
-    return parse_forces(force_class, lines[start_line : end_line])
+    return parse_forces(force_class, lines[start_line:end_line])
 
 
 def parse_forces(force_class, lines):
@@ -128,7 +140,7 @@ def parse_forces(force_class, lines):
     return force_dict
 
 
-def compare_force_dicts(test_force_dict, true_force_dict):
+def compare_force_dicts(test_force_dict, true_force_dict, logger):
     """
     Compares force dictionaries
     """
@@ -143,16 +155,38 @@ def compare_force_dicts(test_force_dict, true_force_dict):
             true_value = getattr(true_force, diff_key)
 
             if diff_value == 0.0:
-                logger.message('*** Comparison %s in %s PASSED ***' % (test_force.short(), diff_key))
-                logger.log('Comparison %s in %s PASSED (%g)' % (test_force.short(), diff_key, test_value))
+                logger.message(
+                    "*** Comparison %s in %s PASSED ***"
+                    % (test_force.short(), diff_key)
+                )
+                logger.log(
+                    "Comparison %s in %s PASSED (%g)"
+                    % (test_force.short(), diff_key, test_value)
+                )
             elif diff_value < ERROR_TOLERANCE:
-                logger.message('*** Comparison %s in %s PASSED (with rounding error - see log)***' % (test_force.short(), diff_key))
-                logger.log('Comparison %s in %s PASSED within error (%g; expected %g)' %(test_force.short(), diff_key, test_value, true_value))
+                logger.message(
+                    "*** Comparison %s in %s PASSED "
+                    % (test_force.short(), diff_key)
+                    + "(with rounding error - see log)***"
+                )
+                logger.log(
+                    "Comparison %s in %s PASSED within error (%g; expected %g)"
+                    % (test_force.short(), diff_key, test_value, true_value)
+                )
             else:
-                logger.message('*** Comparison %s in %s FAILED ***' % (test_force.short(), diff_key))
-                logger.message('   APBS returned %g' % test_value)
-                logger.message('   Expected result is %g (difference of: %g)' % (true_value, diff_value))
-                logger.log('Comparison %s in %s FAILED (%g; expected %g)' %(test_force.short(), diff_key, test_value, true_value))
+                logger.message(
+                    "*** Comparison %s in %s FAILED ***"
+                    % (test_force.short(), diff_key)
+                )
+                logger.message("   APBS returned %g" % test_value)
+                logger.message(
+                    "   Expected result is %g (difference of: %g)"
+                    % (true_value, diff_value)
+                )
+                logger.log(
+                    "Comparison %s in %s FAILED (%g; expected %g)"
+                    % (test_force.short(), diff_key, test_value, true_value)
+                )
 
 
 def check_forces(input_file, polar_file, apolar_file, logger):
@@ -163,44 +197,50 @@ def check_forces(input_file, polar_file, apolar_file, logger):
 
     f = None
     try:
-        f = open(input_file, 'r')
+        f = open(input_file, "r")
     except IOError:
-        print >> sys.stderr, "Couldn't read from forces file %s" % input_file
+        sys.stderr.write(f"Couldn't read from forces file {input_file}")
     input_lines = f.readlines()
 
-    test_polar_force_dict = extract_forces(PolarForce, input_lines, 'print force')
-    test_apolar_force_dict = extract_forces(ApolarForce, input_lines, 'print APOL force')
+    test_polar_force_dict = extract_forces(
+        PolarForce, input_lines, "print force"
+    )
+    test_apolar_force_dict = extract_forces(
+        ApolarForce, input_lines, "print APOL force"
+    )
 
     try:
-        f = open(polar_file, 'r')
+        f = open(polar_file, "r")
     except IOError:
-        print >> sys.stderr, "Couldn't read from forces file %s" % input_file
+        sys.stderr.write(f"Couldn't read from forces file {input_file}")
     input_lines = f.readlines()
     true_polar_force_dict = parse_forces(PolarForce, input_lines)
 
     try:
-        f = open(apolar_file, 'r')
+        f = open(apolar_file, "r")
     except IOError:
-        print >> sys.stderr, "Couldn't read from forces file %s" % input_file
+        sys.stderr.write(f"Couldn't read from forces file {input_file}")
     input_lines = f.readlines()
     true_apolar_force_dict = parse_forces(ApolarForce, input_lines)
 
     logger.both("Checking Polar Forces")
-    compare_force_dicts(test_polar_force_dict, true_polar_force_dict)
+    compare_force_dicts(test_polar_force_dict, true_polar_force_dict, logger)
 
     logger.both("Checking Apolar Forces")
-    compare_force_dicts(test_apolar_force_dict, true_apolar_force_dict)
+    compare_force_dicts(test_apolar_force_dict, true_apolar_force_dict, logger)
 
 
 def test():
     """
     test
     """
-    l = open('forces.log', 'w')
-    logger = Logger(sys.stderr, l)
-    check_forces('apbs-forces.out', 'polarforces', 'apolarforces', logger)
+    lval = open("forces.log", "w")
+    logger = Logger(sys.stderr, lval)
+    check_forces("apbs-forces.out", "polarforces", "apolarforces", logger)
 
 
-if __name__ == '__main__':
-    sys.stderr.write("The python source file %s is a module and not runnable" % sys.argv[0])
+if __name__ == "__main__":
+    sys.stderr.write(
+        "The python source file %s is a module and not runnable" % sys.argv[0]
+    )
     sys.exit(1)
