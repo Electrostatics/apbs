@@ -17,11 +17,16 @@ environment:
 matrix:
   fast_finish: false
 
+cache:
+  - C:\ProgramData\chocolatey\bin -> appveyor.yml # swig.exe
+  - C:\ProgramData\chocolatey\lib -> appveyor.yml # supporting swig Lib files.
+  
 install:
   # Install non-python dependencies using chocolatey package manager
-  - choco install -r -y swig
+  # - choco install -r -y swig
+  - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install tools\windows\swig.4.0.0.nupkg --yes --limit-output
 
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;C:\\projects\\source\\apbs\\build\\bin;%PATH%"
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;C:\\projects\\source\\build\\bin;%PATH%"
 
   # Check that we have the expected version and architecture for Python
   - python --version
