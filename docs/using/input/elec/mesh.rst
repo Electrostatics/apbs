@@ -12,18 +12,16 @@ The syntax is:
 
 where ``flag`` is an integer indicating the meshing software to be used:
 
-.. _MSMS: http://mgl.scripps.edu/people/sanner/html/msms_home.html
 .. _NanoShaper: https://www.electrostaticszone.eu/downloads
 
 0
-  MSMS_
+  NanoShaper_
 1
   SES implementation in NanoShaper_
 2
   Skin surface implementation in NanoShaper_
 
-The default avlue is MSMS_.
-Note that the executables for MSMS_ and NanoShaper_ must be included in your path to use them.
+Note that the executable NanoShaper_ must be included in your path to use them.
 
 .. todo::
 

@@ -146,3 +146,9 @@ cython_debug/
 
 # Data files for reference
 examples
+
+# FETK io files
+*.mc
+
+# Output files
+*.out
