@@ -15,7 +15,7 @@ where ``flag`` is an integer indicating the meshing software to be used:
 .. _NanoShaper: https://www.electrostaticszone.eu/downloads
 
 0
-  NanoShaper_
+  Formerly used for msms, no longer supported.
 1
   SES implementation in NanoShaper_
 2
