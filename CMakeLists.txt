@@ -231,10 +231,9 @@ endif()
 
 
 ################################################################################
-# Optionally copy MSMS/nanoshaper exectutables
+# Optionally copy NanoShaper exectutable
 # the actual grab is later for PBSAM enable
 ################################################################################
-option(GET_MSMS "Put MSMS executable in the build directory" OFF)
 option(GET_NanoShaper "Put NanoShaper executable in the build directory" OFF)
 
 ################################################################################
@@ -248,7 +247,6 @@ if(ENABLE_BEM)
     set(TABI bem)
     set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
 
-    set(GET_MSMS ON) #CACHE BOOL "Grabbing msms path"
     set(GET_NanoShaper ON) #CACHE BOOL "Grabbing NanoShaper path"
 
     if(WIN32)
@@ -490,8 +488,6 @@ option(ENABLE_PBSAM "pbsam method" OFF)
 if(ENABLE_PBSAM)
     message(STATUS "Building PBSAM")
     add_definitions(-DPBSAM_APBS)
-    set(GET_MSMS ON) #CACHE BOOL "Grabbing msms path")
-    message(STATUS "copying msms ${GET_MSMS}")
 
     list(APPEND CMAKE_MODULE_PATH ${EXTERNALS_PATH}/pb_s_am/cmake/modules)
     include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
@@ -535,33 +531,9 @@ endif()
 
 
 ################################################################################
-# Getting msms and /or nanoshaper binaries
+# Getting nanoshaper binary
 ################################################################################
-set(MESH_ROOT_URL_PATH "https://github.com/lwwilson1/mesh_routines/releases/download/v1.5")
-
-if(GET_MSMS)
-    set(MSMS_FULL_URL_PATH)
-    set(MSMS_RAW_BINARY_NAME "msms")
-    message(STATUS "Copying MSMS exectuable")
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
-        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms.MacOSX.2.6.1")
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
-        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms.x86_64Linux2.2.6.1.staticgcc")
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
-        set(MSMS_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/msms.exe")
-        set(MSMS_RAW_BINARY_NAME "msms.exe")
-    endif()
-
-    if (NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}")
-        file(DOWNLOAD ${MSMS_FULL_URL_PATH} "${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}")
-        message(STATUS "MSMS Download: ${MSMS_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}")
-    endif()
-
-    install(PROGRAMS "${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME}"
-            DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    message(STATUS "MSMS install: ${EXECUTABLE_OUTPUT_PATH}/${MSMS_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
-endif()
-
+set(MESH_ROOT_URL_PATH "https://github.com/lwwilson1/mesh_routines/releases/download/v1.6")
 
 if(GET_NanoShaper)
     set(NANOSHAPER_FULL_URL_PATH)

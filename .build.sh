@@ -19,7 +19,7 @@ cmake                                           \
       -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR       \
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE          \
       -DENABLE_GEOFLOW=ON                       \
-      -DENABLE_BEM=OFF                          \
+      -DENABLE_BEM=ON                           \
       -DENABLE_FETK=ON                          \
       -DENABLE_OPENMP=ON                        \
       -DENABLE_PBAM=ON                          \

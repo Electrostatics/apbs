@@ -107,12 +107,11 @@ typedef struct sPBSAMparm {
     PBSAMparm_CalcType type;  /**< What type of PBSAM calculation? */
     int parsed;  /**< Has this structure been filled? (0 = no, 1 = yes) */
 
-    /* The only parms in addition to PBAM would be MSMS
+    /* The only parms in addition to PBAM would be
        IMAT and Selfpol */
     int settolsp;
     double tolsp;
 
-    int setmsms;
     double probe_radius;
     double density;
 
@@ -224,15 +223,6 @@ VPRIVATE Vrc_Codes PBSAMparm_parseImat(PBSAMparm *thee, Vio *sock);
  * @param sock The stream from which parameter is taken
  */
 VPRIVATE Vrc_Codes PBSAMparm_parseExp(PBSAMparm *thee, Vio *sock);
-
-/**
- * @brief Find msms flag for if MSMS is to be run
- * @ingroup PBSAMparm
- * @author
- * @param thee PBSAMparm object to be copied into
- * @param sock The stream from which parameter is taken
- */
-VPRIVATE Vrc_Codes PBSAMparm_parseMSMS(PBSAMparm *thee, Vio *sock);
 
 #endif
 

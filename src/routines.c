@@ -5503,61 +5503,6 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
       strncpy(pbsamIn.expfil_[i], samparm->expfil[i], CHR_MAXLEN);
   }
 
-  // Running MSMS if the MSMS flag is used
-  if (samparm->setmsms == 1) {
-    for (i=0; i<pbamIn.nmol_; i++) {
-    // find a clever way to use prefix of molecule name for msms outputs
-    for (j=0; j < VMAX_ARGLEN; j++)
-       if (nosh->molpath[i][j] == '\0') break;
-
-    // assume terminated by '.pqr' -> 4 char, want to term w/ '.xyzr'
-	//char xyzr[j+2], surf[j+2], outname[j-4];
-	char xyzr[VMAX_ARGLEN], surf[VMAX_ARGLEN], outname[VMAX_ARGLEN];
-    for( k=0; k < j - 4; k++)
-    {
-        xyzr[k] = nosh->molpath[i][k];
-        outname[k] = nosh->molpath[i][k];
-        surf[k] = nosh->molpath[i][k];
-    }
-    outname[k] = '\0';
-    xyzr[k]   = '.';  surf[k]   = '.';
-    xyzr[k+1] = 'x';  surf[k+1] = 'v';
-    xyzr[k+2] = 'y';  surf[k+2] = 'e';
-    xyzr[k+3] = 'z';  surf[k+3] = 'r';
-    xyzr[k+4] = 'r';  surf[k+4] = 't';
-    xyzr[k+5] = '\0'; surf[k+5] = '\0';;
-
-    // write an XYZR file from xyzr data
-    FILE *fp;
-    fp=fopen(xyzr, "w");
-    Vatom *atom;
-    for(k=0; k< Valist_getNumberAtoms(molecules[i]); k++)
-    {
-       atom = Valist_getAtom(molecules[i],k);
-       fprintf(fp, "%.4f  %.4f  %.4f  %.4f\n", Vatom_getPosition(atom)[0],
-                                               Vatom_getPosition(atom)[1],
-                                               Vatom_getPosition(atom)[2],
-                                               Vatom_getRadius(atom));
-    }
-    fclose(fp);
-
-    #ifdef _WIN32
-       sprintf(fname_tp, "msms.exe -if %s -prob %f -dens %f -of %s",
-               xyzr, samparm->probe_radius,samparm->density, outname);
-    #else
-       sprintf(fname_tp, "msms -if %s -prob %f -dens %f -of %s",
-               xyzr, samparm->probe_radius,samparm->density, outname);
-    #endif
-
-      printf("%s\n", fname_tp);
-
-      printf("Running MSMS...\n");
-      ierr = system(fname_tp);
-
-      strncpy(pbsamIn.surffil_[i], surf, CHR_MAXLEN);
-    }
-  }
-
 
   // debug
   printPBSAMStruct( pbamIn, pbsamIn );

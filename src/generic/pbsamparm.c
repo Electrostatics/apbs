@@ -81,7 +81,6 @@ VPUBLIC Vrc_Codes PBSAMparm_ctor2(PBSAMparm *thee, PBSAMparm_CalcType type) {
     if (thee == VNULL) return VRC_FAILURE;
 
     thee->tolsp = 2.5;
-    thee->setmsms = 0;
     thee->probe_radius = 1.5;
     thee->density = 3.0;
 
@@ -141,7 +140,6 @@ VPUBLIC void PBSAMparm_copy(PBSAMparm *thee, PBSAMparm *parm) {
     thee->settolsp = parm->settolsp;
     thee->tolsp = parm->tolsp;
 
-    thee->setmsms = parm->setmsms;
     thee->probe_radius = parm->probe_radius;
     thee->density = parm->density;
     thee->setsurf = parm->setsurf;
@@ -178,27 +176,6 @@ VPRIVATE Vrc_Codes PBSAMparm_parseSurf(PBSAMparm *thee, Vio *sock){
 }
 
 
-//Parsing imat prefix file
-VPRIVATE Vrc_Codes PBSAMparm_parseMSMS(PBSAMparm *thee, Vio *sock){
-	int td;
-	char tok[VMAX_BUFSIZE];
-	const char *name = "mesh";
-
-	if(Vio_scanf(sock, "%s", tok) == 0){
-		Vnm_print(2, "parsePBSAM:  ran out of tokens on %s!\n", name);
-		return VRC_WARNING;
-	}
-
-	if(strcmp(tok, "msms") == 0){
-	  thee->setmsms = 1;
-	}
-	else{
-	  Vnm_print(2, "parsePBSAM: %s is not currently supported in PBSAM! Change to msms\n", tok);
-	  return VRC_WARNING;
-	}
-
-    return VRC_SUCCESS;
-}
 //Parsing imat prefix file
 VPRIVATE Vrc_Codes PBSAMparm_parseImat(PBSAMparm *thee, Vio *sock){
     const char* name = "imat";
@@ -266,8 +243,10 @@ VPUBLIC Vrc_Codes PBSAMparm_parseToken(PBSAMparm *thee, char tok[VMAX_BUFSIZE],
     // Molecule terms
     if (Vstring_strcasecmp(tok, "usemesh") == 0) {
         return PBSAMparm_parseSurf(thee, sock);
+/* Removing MSMS parsing
     }else if (Vstring_strcasecmp(tok, "mesh") == 0) {
         return PBSAMparm_parseMSMS(thee, sock);
+ */
     }else if (Vstring_strcasecmp(tok, "imat") == 0) {
         return PBSAMparm_parseImat(thee, sock);
     }else if (Vstring_strcasecmp(tok, "exp") == 0) {

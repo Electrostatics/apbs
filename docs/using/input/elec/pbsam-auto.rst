@@ -30,7 +30,6 @@ Keywords for this calculation type include:
    exp
    grid2d
    imat
-   msms
    ntraj
    pbc
    pdie
@@ -94,21 +93,6 @@ Vertex/surface file
 -------------------
 
 As part of the coarse-graining process a definition of the molecular surface is necessary.
-For this we have historically used the program `MSMS <http://mgltools.scripps.edu/packages/MSMS>`_  or on the `online MSMS web server` <http://mgl.scripps.edu/people/sanner/html/msms_server.html>`_.
-Within APBS, the user can implement the :doc:`msms` flag and the program will be run through APBS, but the executable must be included in your path.
-
-If using the command-line MSMS tool, after downloading it for the correct platform, it can be run as follows:
-
-.. code-block:: bash
-   
-   ./msms.system -if {filename}.xyzr -of {outfile}
-
-
-It requires an :file:`{filename}.xyzr` file as input, which is the xyz coordinates of each atom of the system followed by the VdW radius.
-This information can all be found in the PQR file.
-MSMS will produce :file:`{outfile}.face` and :file:`{outfile}.vert` file.  
-The vertex file is used to coarse-grain the molecule.
-Once this has been generated, it can be used again as input using the :doc:`surf` command.
 
 -----------------------
 Coarse-grained PQR file

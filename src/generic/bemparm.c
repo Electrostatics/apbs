@@ -158,8 +158,8 @@ VPUBLIC Vrc_Codes BEMparm_check(BEMparm *thee) {
         rc = VRC_FAILURE;
     }
 
-    if (thee->mesh > 2 || thee->mesh < 0) {
-        Vnm_print(2, "BEMparm_check: mesh must be 0 (msms) or 1 and 2 (NanoShaper)");
+    if (thee->mesh > 2 || thee->mesh < 1) {
+        Vnm_print(2, "BEMparm_check: mesh must be 1 or 2 (NanoShaper)");
         rc = VRC_FAILURE;
     }
 
@@ -281,19 +281,19 @@ VPRIVATE Vrc_Codes BEMparm_parseMESH(BEMparm *thee, Vio *sock) {
     char tok[VMAX_BUFSIZE];
 
     VJMPERR1(Vio_scanf(sock, "%s", tok) == 1);
-    if(strcmp(tok, "msms") == 0){
-      thee->mesh = 0;
-    }
-    else if(strcmp(tok, "ses") == 0){
+    thee->mesh = 0;
+    if(strcmp(tok, "ses") == 0){
       thee->mesh = 1;
     }
     else if(strcmp(tok, "skin") == 0){
       thee->mesh = 2;
     }
     else{
-      Vnm_print(2, "parseBEM: mesh option %s is not recognized! It must be one of msms, \
-                    ses, or skin.\n", tok);
-      return VRC_WARNING;
+      if (thee->mesh > 2 || thee->mesh < 1) {
+        Vnm_print(2, "parseBEM: mesh option %s is not recognized! It must be one of \
+                      ses or skin.\n", tok);
+        return VRC_WARNING;
+      }
     }
 
     thee->setmesh = 1;
