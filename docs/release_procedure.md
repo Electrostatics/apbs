@@ -57,7 +57,7 @@ APBS Release Procedure
 		cmake                                     \
 		      -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
 		      -DENABLE_GEOFLOW=ON                 \
-		      -DENABLE_BEM=ON -DGET_MSMS=ON       \
+		      -DENABLE_BEM=ON                     \
 		      -DENABLE_FETK=ON                    \
 		      -DENABLE_PBSAM=OFF                  \
 		      -DENABLE_PBAM=OFF                   \
@@ -68,29 +68,6 @@ APBS Release Procedure
 		      ..                                        || exit 1
 		#  Build and install the software
 		VERBOSE=1 make -j 1 install                     || exit 1
-		#  Test the software
-		cd ../tests                                     || exit 1
-		TESTNAMES="actin-dimer-auto     \
-		           actin-dimer-parallel \
-		           alkanes              \
-		           born                 \
-		           FKBP                 \
-		           geoflow              \
-		           hca-bind             \
-		           ion-pmf              \
-		           ion-protein          \
-		           ionize               \
-		           pka-lig              \
-		           point-pmf            \
-		           solv                 \
-		           protein-rna"
-		for testname in `echo $TESTNAMES`
-		do
-		  pushd .
-		  echo bash run_travis_test.sh $INSTALL_DIR/bin $testname
-		       bash run_travis_test.sh $INSTALL_DIR/bin $testname
-		  popd
-		done
 ```
      
  * Upload Binary Packages

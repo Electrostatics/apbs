@@ -107,7 +107,7 @@ typedef struct sPBSAMparm {
     PBSAMparm_CalcType type;  /**< What type of PBSAM calculation? */
     int parsed;  /**< Has this structure been filled? (0 = no, 1 = yes) */
 
-    /* The only parms in addition to PBAM would be MSMS
+    /* The only parms in addition to PBAM would be
        IMAT and Selfpol */
     int settolsp;
     double tolsp;

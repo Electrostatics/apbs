@@ -243,8 +243,10 @@ VPUBLIC Vrc_Codes PBSAMparm_parseToken(PBSAMparm *thee, char tok[VMAX_BUFSIZE],
     // Molecule terms
     if (Vstring_strcasecmp(tok, "usemesh") == 0) {
         return PBSAMparm_parseSurf(thee, sock);
+/* Removing MSMS parsing
     }else if (Vstring_strcasecmp(tok, "mesh") == 0) {
         return PBSAMparm_parseMSMS(thee, sock);
+ */
     }else if (Vstring_strcasecmp(tok, "imat") == 0) {
         return PBSAMparm_parseImat(thee, sock);
     }else if (Vstring_strcasecmp(tok, "exp") == 0) {

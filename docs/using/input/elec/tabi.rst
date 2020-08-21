@@ -76,7 +76,7 @@ The TABI-PB code produces an output file called :file:`surface_potential.dat` co
 
 * number of nodes, number of triangles
 * node index, vertices, normal vector, surface potential (kJ mol\ :sup:`-1` e\ :sub:`c`\ :sup:`-1`), surface potential normal derivatives (kJ mol\ :sup:`-1` e\ :sub:`c`\ :sup:`-1` A\ :sup:`-1`)
-* connectivity data for MSMS surface triangulation
+* connectivity data for surface triangulation
 
 The format is given below:
 

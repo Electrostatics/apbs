@@ -231,10 +231,9 @@ endif()
 
 
 ################################################################################
-# Optionally copy MSMS/nanoshaper exectutables
+# Optionally copy NanoShaper exectutable
 # the actual grab is later for PBSAM enable
 ################################################################################
-option(GET_MSMS "Put MSMS executable in the build directory" OFF)
 option(GET_NanoShaper "Put NanoShaper executable in the build directory" OFF)
 
 ################################################################################

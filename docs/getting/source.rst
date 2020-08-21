@@ -60,23 +60,19 @@ Using TABI-PB
 If you want to use the Treecode-Accelerated Boundary Integral method (TABI-PB) developed by Robert Krasny and Weihua Geng, set the CMake variable :makevar:`ENABLE_BEM` to ``ON``.
 
 TABI-PB requires the use of a molecular surface mesh generation software to create a surface representation of the molecule.
-By default, TABI-PB uses MSMS to generate a solvent excluded surface (SES), but it also supports the use of NanoShaper to generate an SES or Skin surface.
+By default, TABI-PB uses NanoShaper to generate an SES or Skin surface.
 See `TABI-PB documentation <https://github.com/Treecodes/TABI-PB>`_ for details on choosing NanoShaper.
 When TABI-PB runs, it will attempt to generate a surface mesh by looking in your path for the mesh generation executable.
 A user can obtain the appropriate executable using the steps described below. The user then must place these executables in their path.
 
-"""""""""""""""""""""""""""""""""""""""
-Getting MSMS and NanoShaper executables
-"""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""
+Getting NanoShaper executable
+"""""""""""""""""""""""""""""
 
 Surface meshing software executables are currently pre-built for OS X, Linux, and Windows and can be installed via CMake.
 The executables will be placed in the :file:`bin` directory of your build.
 
-MSMS is a molecular surface mesh generation software package developed by Michel Sanner.
-If you want an executable of MSMS built for your system, set the CMake variable :makevar:`GET_MSMS` to ``ON``. 
-
 NanoShaper is a molecular surface mesh generation software package developed by W. Rocchia and S. Decherchi.
-If you want an executable of MSMS built for your system, set the CMake variable :makevar:`GET_NanoShaper` to ``ON``.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Using finite element support
