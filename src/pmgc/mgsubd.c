@@ -54,6 +54,10 @@
 
 #include "mgsubd.h"
 
+double bf;
+double oh;
+double cputime;
+
 VPUBLIC void Vbuildops(
         int *nx, int *ny, int *nz,
         int *nlev, int *ipkey, int *iinfo,
