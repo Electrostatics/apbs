@@ -54,6 +54,18 @@
 
 #include "mypdec.h"
 
+double v1;
+double v2;
+double v3;
+double conc1;
+double conc2;
+double conc3;
+double vol;
+double relSize;
+int nion;
+double charge[MAXIONS];
+double sconc[MAXIONS];
+
 VPUBLIC void Vmypdefinitlpbe(int *tnion, double *tcharge, double *tsconc) {
 
     int i;

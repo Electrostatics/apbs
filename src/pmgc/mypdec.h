@@ -67,10 +67,10 @@
 #define SINH_MAX  85.0
 
 /// @todo  Remove dependencies on global variables
-double v1, v2, v3, conc1, conc2, conc3, vol, relSize;
-int nion;
-double charge[MAXIONS];
-double sconc[MAXIONS];
+extern double v1, v2, v3, conc1, conc2, conc3, vol, relSize;
+extern int nion;
+extern double charge[MAXIONS];
+extern double sconc[MAXIONS];
 
 #define Na 6.022045000e-04
 
