@@ -25,7 +25,7 @@ class ElecEnergy:
         self.label = label
         self.x = x
 
-    def __init__(self, line):
+    def __init__(self, line):  # noqa F811
         """
         extract energy results from a file at a given line
         """
@@ -82,9 +82,7 @@ def check_energies(input_file):
     try:
         f = open(input_file, "r")
     except IOError:
-        print(
-            f"Couldn't read from energy file {input_file}", file=sys.stderr
-        )
+        print(f"Couldn't read from energy file {input_file}", file=sys.stderr)
 
     input_lines = f.readlines()
 
@@ -107,7 +105,7 @@ def test():
     Run the test
     """
     lval = open("energy.log", "w")
-    logger = Logger(sys.stderr, lval)
+    logger = Logger(sys.stderr, lval)  # noqa F841
     energy_list = check_energies("actio_stdout.txt")
     print(energy_list)
 

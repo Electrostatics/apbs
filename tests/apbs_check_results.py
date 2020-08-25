@@ -6,7 +6,7 @@ Provides functions for verifying results from a test run
 
 import sys
 from math import log10, floor
-from apbs_logger import Logger
+from apbs_logger import Logger  # noqa F401
 
 ERROR_TOLERANCE = 1e-4
 
@@ -52,7 +52,8 @@ def check_results(computed_result, expected_result, input_file, logger, ocd):
     elif error < ERROR_TOLERANCE * 100:
         logger.message("*** PASSED (with rounding error - see log) ***\n")
         logger.log(
-            f"PASSED within error ({computed_result:.12e}; expected {expected_result:.12e}; {error}% error)\n"
+            f"PASSED within error ({computed_result:.12e}; "
+            + f"expected {expected_result:.12e}; {error}% error)\n"
         )
 
     # If neither is true, the test failed
@@ -63,7 +64,8 @@ def check_results(computed_result, expected_result, input_file, logger, ocd):
             f"   Expected result is {expected_result:.12e} ({error}% error)\n"
         )
         logger.log(
-            f"FAILED ({computed_result:.12e}; expected {expected_result:.12e}; {error}% error)\n"
+            f"FAILED ({computed_result:.12e}; "
+            + f"expected {expected_result:.12e}; {error}% error)\n"
         )
 
 
