@@ -102,7 +102,7 @@ class ApolarForce(PolarForce):
         )
 
     def short(self):
-        return "%s for %s" % (self.label, self.atom)
+        return f"{self.label} for self.atom"
 
 
 def extract_forces(force_class, lines, start_pattern):
@@ -156,36 +156,29 @@ def compare_force_dicts(test_force_dict, true_force_dict, logger):
 
             if diff_value == 0.0:
                 logger.message(
-                    "*** Comparison %s in %s PASSED ***"
-                    % (test_force.short(), diff_key)
+                    f"*** Comparison {test_force.short()} in {diff_key} PASSED ***"
                 )
                 logger.log(
-                    "Comparison %s in %s PASSED (%g)"
-                    % (test_force.short(), diff_key, test_value)
+                    f"Comparison {test_force.short()} in {diff_key} PASSED ({test_value})"
                 )
             elif diff_value < ERROR_TOLERANCE:
                 logger.message(
-                    "*** Comparison %s in %s PASSED "
-                    % (test_force.short(), diff_key)
+                    f"*** Comparison {test_force.short()} in {diff_key} PASSED "
                     + "(with rounding error - see log)***"
                 )
                 logger.log(
-                    "Comparison %s in %s PASSED within error (%g; expected %g)"
-                    % (test_force.short(), diff_key, test_value, true_value)
+                    f"Comparison {test_force.short()} in {diff_key} PASSED within error ({test_value}; expected {true_value})"
                 )
             else:
                 logger.message(
-                    "*** Comparison %s in %s FAILED ***"
-                    % (test_force.short(), diff_key)
+                    f"*** Comparison {test_force.short()} in {diff_key} FAILED ***"
                 )
-                logger.message("   APBS returned %g" % test_value)
+                logger.message(f"   APBS returned {test_value}")
                 logger.message(
-                    "   Expected result is %g (difference of: %g)"
-                    % (true_value, diff_value)
+                    f"   Expected result is {true_value} (difference of: {diff_value})"
                 )
                 logger.log(
-                    "Comparison %s in %s FAILED (%g; expected %g)"
-                    % (test_force.short(), diff_key, test_value, true_value)
+                    f"Comparison {test_force.short()} in {diff_key} FAILED ({test_value}; expected {true_value})"
                 )
 
 
@@ -193,7 +186,7 @@ def check_forces(input_file, polar_file, apolar_file, logger):
     """
     Check the forces
     """
-    logger.both("Checking forces for input file %s" % input_file)
+    logger.both(f"Checking forces for input file {input_file}")
 
     f = None
     try:
@@ -241,6 +234,6 @@ def test():
 
 if __name__ == "__main__":
     sys.stderr.write(
-        "The python source file %s is a module and not runnable" % sys.argv[0]
+        f"The python source file {sys.argv[0]} is a module and not runnable"
     )
     sys.exit(1)

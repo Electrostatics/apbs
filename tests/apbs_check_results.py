@@ -15,7 +15,12 @@ def round_sigfigs(x, sigfigs):
     """
     Rounds a number to a specified number of significant figures
     """
-    return round(x, sigfigs - int(floor(log10(abs(x)))) - 1)
+    value = 0.0
+    try:
+        value = round(x, sigfigs - int(floor(log10(abs(x)))) - 1)
+    except ValueError as msg:
+        sys.stderr.write(f"The value ({x}) caused an error: {msg}")
+    return value
 
 
 def check_results(computed_result, expected_result, input_file, logger, ocd):
@@ -41,32 +46,29 @@ def check_results(computed_result, expected_result, input_file, logger, ocd):
     # passed
     if computed_result == expected_result:
         logger.message("*** PASSED ***\n")
-        logger.log("PASSED %.12e\n" % computed_result)
+        logger.log(f"PASSED {computed_result:.12e}\n")
 
     # Otherwise, test that the error is below error tolerance
     elif error < ERROR_TOLERANCE * 100:
         logger.message("*** PASSED (with rounding error - see log) ***\n")
         logger.log(
-            "PASSED within error (%.12e; expected %.12e; %g%% error)\n"
-            % (computed_result, expected_result, error)
+            f"PASSED within error ({computed_result:.12e}; expected {expected_result:.12e}; {error}% error)\n"
         )
 
     # If neither is true, the test failed
     else:
         logger.message("*** FAILED ***\n")
-        logger.message("   APBS returned      %.12e\n" % computed_result)
+        logger.message(f"   APBS returned      {computed_result:.12e}\n")
         logger.message(
-            "   Expected result is %.12e (%g%% error)\n"
-            % (expected_result, error)
+            f"   Expected result is {expected_result:.12e} ({error}% error)\n"
         )
         logger.log(
-            "FAILED (%.12e; expected %.12e; %g%% error)\n"
-            % (computed_result, expected_result, error)
+            f"FAILED ({computed_result:.12e}; expected {expected_result:.12e}; {error}% error)\n"
         )
 
 
 if __name__ == "__main__":
     sys.stderr.write(
-        "The python source file %s is a module and not runnable" % sys.argv[0]
+        f"The python source file {sys.argv[0]} is a module and not runnable"
     )
     sys.exit(1)

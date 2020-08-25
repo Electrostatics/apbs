@@ -45,7 +45,7 @@ def test_binary(binary_name):
 
     # Next, looks for the apbs binary in the apbs bin directory
     try:
-        binary = os.path.abspath("../build/bin/%s" % binary_name)
+        binary = os.path.abspath(f"../build/bin/{binary_name}")
         command = [binary, "--version"]
         with subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
@@ -65,7 +65,7 @@ def process_serial(binary, input_file):
     base_name = input_file.split(".")[0]
 
     # The output file should have the same basename
-    output_name = "%s.out" % base_name
+    output_name = f"{base_name}.out"
 
     # Ensure that there are sufficient permissions to write to the output file
     output_file = open(output_name, "w")
@@ -115,13 +115,13 @@ def process_parallel(binary, input_file, procs, logger):
     for proc in range(procs):
 
         # Process each paralle input file and capture the results from each
-        proc_input_file = "%s-PE%d.in" % (base_name, proc)
+        proc_input_file = f"{base_name}-PE{proc}.in"
         proc_results = process_serial(binary, proc_input_file)
 
         # Log the results from each parallel run
-        logger.message("Processor %d results:\n" % proc)
+        logger.message(f"Processor {proc} results:\n")
         for proc_result in proc_results:
-            logger.message("  %.12E\n" % proc_result)
+            logger.message(f"  {proc_result:.12e}\n")
         logger.message("\n")
 
         # Aggregate the results from each processor
@@ -140,9 +140,9 @@ def run_test(binary, test_files, test_name, test_directory, setup, logger, ocd):
     """
 
     logger.log("-" * 80 + "\n")
-    logger.log("Test Timestamp: %s\n" % str(datetime.datetime.now()))
-    logger.log("Test Name:      %s\n" % test_name)
-    logger.log("Test Directory: %s\n" % test_directory)
+    logger.log(f"Test Timestamp: {datetime.datetime.now()}\n")
+    logger.log(f"Test Name:      {test_name}\n")
+    logger.log(f"Test Directory: {test_directory}\n")
 
     # The net time is initially zero
     net_time = datetime.timedelta(0)
@@ -157,19 +157,19 @@ def run_test(binary, test_files, test_name, test_directory, setup, logger, ocd):
     for (base_name, expected_results) in test_files:
 
         # Get the name of the input file from the base name
-        input_file = "%s.in" % base_name
+        input_file = f"{base_name}.in"
 
         # If the expected results is 'forces', do a forces test on the input
         if expected_results == "forces":
             logger.message("-" * 80 + "\n")
-            logger.message("Testing forces from %s\n\n" % input_file)
-            logger.log("Testing forces from %s\n" % input_file)
+            logger.message(f"Testing forces from {input_file}\n\n")
+            logger.log(f"Testing forces from {input_file}\n")
             start_time = datetime.datetime.now()
             check_forces(input_file, "polarforces", "apolarforces", logger)
         else:
             logger.message("-" * 80 + "\n")
-            logger.message("Testing input file %s\n\n" % input_file)
-            logger.log("Testing %s\n" % input_file)
+            logger.message(f"Testing input file {input_file}\n\n")
+            logger.log(f"Testing {input_file}\n")
 
             # Record the start time before the test runs
             start_time = datetime.datetime.now()
@@ -188,13 +188,13 @@ def run_test(binary, test_files, test_name, test_directory, setup, logger, ocd):
                 computed_results = process_serial(binary, input_file)
 
             # Split the expected results into a list of text values
-            print("EXPECTED COMPUTED: %i" % (len(computed_results)))
-            print("EXPECTED EXPECTED: %i" % (len(expected_results)))
-            print("COMPUTED: %s" % computed_results)
-            print("EXPECTED: %s" % expected_results)
+            print(f"EXPECTED COMPUTED: {len(computed_results)}")
+            print(f"EXPECTED EXPECTED: {len(expected_results)}")
+            print(f"COMPUTED: {computed_results}")
+            print(f"EXPECTED: {expected_results}")
             expected_results = expected_results.split()
             for result in computed_results:
-                print("COMPUTED RESULT %s" % result)
+                print(f"COMPUTED RESULT {result}")
             for i in range(len(expected_results)):
                 # If the expected result is a star, it means ignore that result
                 if expected_results[i] == "*":
@@ -206,13 +206,12 @@ def run_test(binary, test_files, test_name, test_directory, setup, logger, ocd):
                     computed_result = computed_results[i]
                 except IndexError as error:
                     logger.message(
-                        "Computed result for index, %i, does not exist: %s" % (i, error)
+                        f"Computed result for index, {i}, does not exist: {error}"
                     )
                 expected_result = float(expected_results[i])
                 logger.message(
                     "Testing computed result against "
-                    + "expected result (%.12E, %12E)\n"
-                    % (computed_result, expected_result)
+                    + f"expected result ({computed_result:.12e}, {expected_result:.12e})\n"
                 )
                 check_results(computed_result, expected_result, input_file, logger, ocd)
 
@@ -223,16 +222,16 @@ def run_test(binary, test_files, test_name, test_directory, setup, logger, ocd):
         stopwatch = elapsed_time.seconds + elapsed_time.microseconds / 1e6
 
         # Log the elapsed time for this test
-        logger.message("Elapsed time: %f seconds\n" % stopwatch)
+        logger.message(f"Elapsed time: {stopwatch} seconds\n")
         logger.message("-" * 80 + "\n")
 
     stopwatch = net_time.seconds + net_time.microseconds / 1e6
 
     # Log the elapsed time for all tests that were run
-    logger.message("Total elapsed time: %f seconds\n" % stopwatch)
+    logger.message(f"Total elapsed time: {stopwatch} seconds\n")
     logger.message("Test results have been logged\n")
     logger.message("-" * 80 + "\n")
-    logger.log("Time:           %d seconds\n" % stopwatch)
+    logger.log(f"Time:           {stopwatch} seconds\n")
 
     os.chdir("../../tests")
 
@@ -310,7 +309,7 @@ def main():
     try:
         logfile_fd = open(options.log_file, "w")
     except IOError as err:
-        parser.error("Could't open log_file %s: %s" % (options.log_file, err.strerror))
+        parser.error(f"Could't open log_file {options.log_file}: {err.strerror}")
 
     # Set up the logger with the message and log file descriptor
     logger = Logger(message_fd, logfile_fd)

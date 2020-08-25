@@ -34,7 +34,7 @@ class ElecEnergy:
         self.x = float(m.group("x"))
 
     def __repr__(self):
-        return "ElecEnergy{ label:%s, x:%g" % (self.label, self.x)
+        return f"ElecEnergy label:{self.label}, x:{self.x}"
 
     def diff(self, other):
         """
@@ -76,14 +76,14 @@ def check_energies(input_file):
     """
     check energies
     """
-    print("Checking for intermidiate energies in input file %s" % input_file)
+    print(f"Checking for intermidiate energies in input file {input_file}")
 
     f = None
     try:
         f = open(input_file, "r")
     except IOError:
         print(
-            "Couldn't read from energy file %s" % input_file, file=sys.stderr
+            f"Couldn't read from energy file {input_file}", file=sys.stderr
         )
 
     input_lines = f.readlines()
