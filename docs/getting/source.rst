@@ -6,7 +6,14 @@ How to build APBS from source
 =============================
 
 These instructions assume that you have downloaded the source code from `GitHub releases`_.
-Although it is possible to clone the code directly from our `GitHub repository`_, we do not recommend this approach as the head of the master branch is typically under development and unstable.
+
+.. caution:: We do not recommend cloning directly from the head of the master branch because it is typically under development and could be unstable. Unless you really know what you are doing, we advise you to skip the next step.
+
+-------------------------------
+Get source directly from Github
+-------------------------------
+
+Here are the commands to get the source directly from our `GitHub repository`_, 
 
 .. code:: bash
 
@@ -40,7 +47,7 @@ We are using Git submodules to manage various pieces of code.  To build the mast
 Set up CMake
 ------------
 
-The basic command for configuring the APBS build is
+From the top of the source directory, the basic commands for configuring the APBS build for CMake are
 
 .. code:: bash
 
@@ -49,9 +56,6 @@ The basic command for configuring the APBS build is
    # NOTE: This will be you $APBS_BUILD_DIR
    export APBS_BUILD_DIR=`echo $(PWD)`
    cmake ..
-
-from the top of the source directory. 
-This compiles a basic version of APBS.
 
 To see all the options you can run:
 
