@@ -10,13 +10,14 @@ Although it is possible to clone the code directly from our `GitHub repository`_
 
 .. code:: bash
 
-   git clone `GitHub repository`_
+   git clone https://github.com/Electrostatics/apbs
+   cd apbs
 
 -----------------
 Shortcut to build
 -----------------
 
-There is a script that is used to build APBS in the Github Actions. You may want to use the :file:`.build.sh`. file as a template for building APBS.
+There is a script that is used to build APBS in the Github Actions. You may want to use the file, :file:`.build.sh`, as a template for building APBS.
 
 .. caution:: When using make, there can be race conditions with CMake, autoconf, downloading dependencies, and make. It is best to run 
 
@@ -45,6 +46,8 @@ The basic command for configuring the APBS build is
 
    mkdir build
    cd build
+   # NOTE: This will be you $APBS_BUILD_DIR
+   export APBS_BUILD_DIR=`echo $(PWD)`
    cmake ..
 
 from the top of the source directory. 
@@ -54,6 +57,7 @@ To see all the options you can run:
 
 .. code:: bash
 
+   cd $APBS_BUILD_DIR
    ccmake ..
 
 Additional features can be built using the flags described below.
@@ -66,6 +70,7 @@ If you want to use the geometric flow implementation, when invoking CMake, set :
 
 .. code:: bash
 
+   cd $APBS_BUILD_DIR
    cmake -DENABLE_GEOFLOW=ON ..
 
 ^^^^^^^^^^^
@@ -80,6 +85,7 @@ If you want to use the Poisson-Boltzmann Analytical Method developed by the Tere
 
 .. code:: bash
 
+   cd $APBS_BUILD_DIR
    cmake -DENABLE_PBAM=ON ..
 
 ^^^^^^^^^^^^^
@@ -96,6 +102,7 @@ A user can obtain the appropriate executable using the steps described below. Th
 
 .. code:: bash
 
+   cd $APBS_BUILD_DIR
    cmake -DENABLE_BEM=ON ..
 
 """""""""""""""""""""""""""""
@@ -109,6 +116,7 @@ NanoShaper is a molecular surface mesh generation software package developed by 
 
 .. code:: bash
 
+   cd $APBS_BUILD_DIR
    cmake -DGET_NanoShaper=ON ..
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -128,6 +136,7 @@ In base, this can be accomplished with the command:
 .. code:: bash
 
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<build-dir>/fetk/lib:<install-dir>/fetk/lib
+   cd $APBS_BUILD_DIR
    cmake -DENABLE_FETK=ON ..
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -141,14 +150,73 @@ If you are on Linux you will also need to set the CMake variable :makevar:`BUILD
 
 .. code:: bash
 
+   cd $APBS_BUILD_DIR
    cmake -DENABLE_PYTHON=ON ..
 
------------------
-Building the code
------------------
+---------------------------
+Building the code - minimal
+---------------------------
 
 Assuming the Cmake command completed successfully, APBS can be built with
 
 .. code:: bash
 
+   cd $APBS_BUILD_DIR
+   # Run cmake with the options you prefer:
    VERBOSE=1 make -j 1
+
+----------------------------
+Building the code - advanced
+----------------------------
+
+.. code:: bash
+
+   export INSTALL_DIR=$SOME_DIR/apbs
+   export PATH=$INSTALL_DIR/bin:$PATH
+   # NOTE: In case you need to debug the source code:
+   # export RELEASE_TYPE=Debug
+   export RELEASE_TYPE=Release
+   cd $APBS_BUILD_DIR
+   # NOTE: In case you need to debug cmake, use verbose debug/trace mode:
+   # cmake -S .. -B $BUILD_DIR --trace-source=../CMakeLists.txt --trace-expand \
+   cmake                                        \
+      -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR       \
+      -DCMAKE_BUILD_TYPE=$RELEASE_TYPE          \
+      -DENABLE_GEOFLOW=ON                       \
+      -DENABLE_BEM=ON                           \
+      -DENABLE_FETK=ON                          \
+      -DENABLE_OPENMP=ON                        \
+      -DENABLE_PBAM=ON                          \
+      -DENABLE_PBSAM=ON                         \
+      -DENABLE_PYTHON=ON                        \
+      -DENABLE_TESTS=ON                         \
+      -DENABLE_TINKER=OFF                       \
+      -DBUILD_SHARED_LIBS=ON                    \
+      ..
+   VERBOSE=1 make -j 1
+
+------------
+Testing APBS
+------------
+
+.. code:: bash
+
+   cd $APBS_BUILD_DIR
+   # NOTE: Assuming you have already built APBS
+   # NOTE: So that the apbs and optional NanoShaper binaries are in the path:
+   export PATH="$APBS_BUILD_DIR/bin:$PATH"
+   ctest -C Release --output-on-failure
+
+---------------
+Installing APBS
+---------------
+
+.. code:: bash
+
+   export INSTALL_DIR="Some directory - default is /usr/local"
+   cd $APBS_BUILD_DIR
+   cmake                                  \
+      -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+      # NOTE: Add cmake options that you used during the Build APBS section
+   ..
+   VERBOSE=1 make -j 1 install
