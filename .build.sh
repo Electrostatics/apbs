@@ -8,6 +8,7 @@
 #export CMAKE_CXX_LINK_EXECUTABLE=clang
 export BUILD_DIR=build
 export INSTALL_DIR=$HOME/apbs
+export PATH=$INSTALL_DIR:$PATH
 export RELEASE_TYPE=Release
 rm -rf $INSTALL_DIR                             || exit 1
 mkdir -p $INSTALL_DIR                           || exit 1
@@ -30,8 +31,9 @@ cmake                                           \
       -DBUILD_SHARED_LIBS=ON                    \
       -DBUILD_DOC=OFF                           \
       ..                                        || exit 1
-#      -DCMAKE_C_FLAGS="-Wl,-z,muldefs"
 #      -DCMAKE_C_FLAGS="-fPIC"                   \
+#      -DCMAKE_C_FLAGS="--coverage"              \
+#      -DCMAKE_CXX_FLAGS="--coverage"            \
 VERBOSE=1 make -j 1                             || exit 1
 VERBOSE=1 make -j 1 install                     || exit 1
 export PATH="$INSTALL_DIR/bin:$PATH"

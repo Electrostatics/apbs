@@ -254,9 +254,6 @@ VEXTERNC int Vmaxlev(
         );
 
 
-/// @todo  Get rid of these globals in refactor
-extern double bf, oh, cputme;
-
 /** @brief   This routine prints out some info and such from inside multigrid.
  *  @author  Tucker Beck [C Translation], Michael Holst [Original]
  *  @note    Replaces prtstp from mgsubd.f

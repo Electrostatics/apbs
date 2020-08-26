@@ -1,0 +1,66 @@
+---
+name: Build
+on:
+  pull_request:
+  push:
+    branches: [master]
+jobs:
+  build:
+    name: Compile Code
+    runs-on: ${{ matrix.os }}
+    if: "!contains(github.event.head_commit.message, 'noci')"
+    strategy:
+      matrix:
+        # os: [ubuntu-latest]
+        # os: [macOS-latest]
+        os: [ubuntu-latest, macOS-latest]
+        # os: [ubuntu-latest, macOS-latest, windows-latest]
+        python-version: [3.8]
+        # cflag-options:
+          # - ' -DENABLE_GEOFLOW=ON  -DENABLE_BEM=ON  -DENABLE_FETK=ON  -DENABLE_PBSAM=ON  -DENABLE_PBAM=ON  -DENABLE_PYTHON=ON  -DBUILD_SHARED_LIBS=ON  -DBUILD_DOC=OFF'
+          # - ' -DENABLE_GEOFLOW=ON  -DENABLE_BEM=ON  -DENABLE_FETK=ON  -DENABLE_PBSAM=ON  -DENABLE_PBAM=ON  -DENABLE_PYTHON=ON  -DBUILD_SHARED_LIBS=OFF -DBUILD_DOC=OFF'
+          # - ' -DENABLE_GEOFLOW=ON  -DENABLE_BEM=ON  -DENABLE_FETK=ON  -DENABLE_PBSAM=OFF -DENABLE_PBAM=OFF -DENABLE_PYTHON=ON  -DBUILD_SHARED_LIBS=ON  -DCMAKE_C_FLAGS="-fPIC" -DBUILD_DOC=OFF'
+          # - ' -DENABLE_GEOFLOW=ON  -DENABLE_BEM=OFF -DENABLE_FETK=ON  -DENABLE_PBSAM=OFF -DENABLE_PBAM=OFF -DENABLE_PYTHON=ON  -DBUILD_SHARED_LIBS=ON  -DCMAKE_C_FLAGS="-fPIC" -DBUILD_DOC=OFF'
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Prereqs
+        uses: mstksg/get-package@v1
+        with:
+          brew: gcc@9 bison flex swig readline
+          apt-get: bison flex swig libreadline-dev
+      - name: Build and Install
+        run: |
+          echo "==================================== WHERE AM I ==================================== "
+          pwd
+          echo "==================================== VERSIONS: ==================================== "
+          echo "==================================== PYTHON VERSION"
+          python -c "import sys; print(sys.version)"
+          echo "==================================== CMAKE VERSION"
+          cmake --version
+          echo "==================================== Gcc VERSION"
+          gcc --version
+          echo "==================================== G++ VERSION"
+          g++ --version
+          echo "==================================== SWIG VERSION"
+          swig -version
+          echo "==================================== Install Python requirements ==================================== "
+          pip3 install -U pip
+          pip3 install -U pytest
+          pip3 install -U virtualenv
+          pip3 install -U numpy
+          pip3 install -r requirements.txt
+          #  Just build APBS for now
+          echo "==================================== PWD FOR TOP DIR ==================================== "
+          pwd
+          echo "==================================== Get External SubModules ==================================== "
+          git submodule init
+          git submodule update
+          echo "==================================== BUILD =============================================== "
+          ./.build.sh
+        env:
+          # https://codecov.io/gh/Electrostatics/apbs-pdb2pqr
+          CODECOV_TOKEN: "e3a1e24c-5598-4f47-9353-7fa0ac57f98e"

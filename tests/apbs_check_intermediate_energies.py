@@ -25,7 +25,7 @@ class ElecEnergy:
         self.label = label
         self.x = x
 
-    def __init__(self, line):
+    def __init__(self, line):  # noqa F811
         """
         extract energy results from a file at a given line
         """
@@ -34,7 +34,7 @@ class ElecEnergy:
         self.x = float(m.group("x"))
 
     def __repr__(self):
-        return "ElecEnergy{ label:%s, x:%g" % (self.label, self.x)
+        return f"ElecEnergy label:{self.label}, x:{self.x}"
 
     def diff(self, other):
         """
@@ -76,15 +76,13 @@ def check_energies(input_file):
     """
     check energies
     """
-    print("Checking for intermidiate energies in input file %s" % input_file)
+    print(f"Checking for intermidiate energies in input file {input_file}")
 
     f = None
     try:
         f = open(input_file, "r")
     except IOError:
-        print(
-            "Couldn't read from energy file %s" % input_file, file=sys.stderr
-        )
+        print(f"Couldn't read from energy file {input_file}", file=sys.stderr)
 
     input_lines = f.readlines()
 
@@ -107,7 +105,7 @@ def test():
     Run the test
     """
     lval = open("energy.log", "w")
-    logger = Logger(sys.stderr, lval)
+    logger = Logger(sys.stderr, lval)  # noqa F841
     energy_list = check_energies("actio_stdout.txt")
     print(energy_list)
 

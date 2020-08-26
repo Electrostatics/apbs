@@ -27,6 +27,6 @@ class Logger:
 
 if __name__ == "__main__":
     sys.stderr.write(
-        "The python source file %s is a module and not runnable" % sys.argv[0]
+        f"The python source file {sys.argv[0]} is a module and not runnable"
     )
     sys.exit(1)

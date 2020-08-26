@@ -56,7 +56,7 @@
 
 double bf;
 double oh;
-double cputime;
+double cputme;
 
 VPUBLIC void Vbuildops(
         int *nx, int *ny, int *nz,
