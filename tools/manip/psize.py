@@ -171,7 +171,7 @@ class Psize:
             else:
                 i = nsmall.index(max(nsmall))
                 nsmall[i] = 32 * ((nsmall[i] - 1) / 32 - 1) + 1
-                if nsmall <= 0:
+                if nsmall[i] <= 0:
                     sys.stdout.write(
                         "You picked a memory ceiling that is too small\n"
                     )
