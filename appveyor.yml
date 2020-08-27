@@ -66,9 +66,9 @@ build_script:
 
     cmake --build . --config "Release"
 
-    ps: gci -Path c:\projects\source\build -r -fi apbs.exe
-  
     ctest -C Release --verbose --output-on-failure
+
+    gci -Path c:\projects\source\build -r -fi apbs.exe
 
     cpack -C Release
 
