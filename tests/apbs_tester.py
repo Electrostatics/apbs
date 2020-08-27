@@ -7,9 +7,10 @@ Provides utility for testing apbs against examples and known results
 import sys
 import os
 import re
+import pathlib
 import datetime
-import subprocess
 import operator
+import subprocess
 from optparse import OptionParser
 from configparser import ConfigParser, NoOptionError
 from functools import reduce
@@ -26,6 +27,12 @@ from inputgen import split_input  # noqa E402
 FLOAT_PATTERN = r"([+-]?\d+\.\d+E[+-]\d+)"
 
 
+def find_binary(binary_name):
+    start_dir = pathlib.Path('../build')
+
+    for idx in start_dir.rglob(binary_name):
+        return(idx)
+
 def test_binary(binary_name):
     """
     Ensures that the apbs binary is available
@@ -33,7 +40,7 @@ def test_binary(binary_name):
 
     # Attempts to find apbs in the system path first
     try:
-        binary = binary_name
+        binary = find_binary(binary_name)
         command = [binary, "--version"]
         with subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
@@ -328,7 +335,7 @@ def main():
         logfile_fd = open(options.log_file, "w")
     except IOError as err:
         parser.error(
-            f"Could't open log_file {options.log_file}: {err.strerror}"
+            f"Couldn't open log_file {options.log_file}: {err.strerror}"
         )
 
     # Set up the logger with the message and log file descriptor
@@ -343,7 +350,7 @@ def main():
     binary = test_binary(options.executable)
     if binary == "":
         parser.error(
-            "Coulnd't detect an apbs binary in the path or local bin directory"
+            "Couldn't detect an apbs binary in the path or local bin directory"
         )
 
     # Get the names of all the test sections to run.
