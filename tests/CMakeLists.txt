@@ -15,7 +15,8 @@ endif()
 
 set(APBS_BINARY "apbs")
 if(CMAKE_HOST_WIN32)
-  set(APBS_BINARY "${CMAKE_BUILD_TYPE}/apbs.exe")
+  find_path(APBS_EXE_DIR "apbs.exe" HINTS ${CMAKE_SOURCE_DIR})
+  set(APBS_BINARY "${APBS_EXE_DIR}/apbs.exe")
 endif()
 
 set(TESTS_CFG_FILE ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg)
