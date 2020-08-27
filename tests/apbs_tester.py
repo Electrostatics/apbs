@@ -27,20 +27,23 @@ from inputgen import split_input  # noqa E402
 FLOAT_PATTERN = r"([+-]?\d+\.\d+E[+-]\d+)"
 
 
-def find_binary(binary_name):
-    start_dir = pathlib.Path('../build')
+def find_binary(binary_name, logger):
+    start_dir = pathlib.Path.cwd() / pathlib.Path('../build')
 
     for idx in start_dir.rglob(binary_name):
+        logger.message(
+            f"find_binary: {idx}"
+        )
         return(idx)
 
-def test_binary(binary_name):
+def test_binary(binary_name, logger):
     """
     Ensures that the apbs binary is available
     """
 
     # Attempts to find apbs in the system path first
     try:
-        binary = find_binary(binary_name)
+        binary = find_binary(binary_name, logger)
         command = [binary, "--version"]
         with subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
@@ -347,7 +350,7 @@ def main():
     config.read(options.test_config)
 
     # Make sure that the apbs binary can be found
-    binary = test_binary(options.executable)
+    binary = test_binary(options.executable, logger)
     if binary == "":
         parser.error(
             "Couldn't detect an apbs binary in the path or local bin directory"
