@@ -65,10 +65,13 @@ build_script:
     cat c:\projects\source/build\CMakeFiles\CMakeError.log
 
     cmake --build . --config "Release"
+  
+    where /r C:\projects\source\build apbs.exe
+
+    find C:\projects\source/build -name apbs.exe
 
     ctest -C Release --verbose --output-on-failure
 
     cpack -C Release
 
     unzip -l APBS*.zip
-
