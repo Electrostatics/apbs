@@ -66,8 +66,6 @@ build_script:
 
     cmake --build . --config "Release"
   
-    find C:\projects\source/build -name apbs.exe
-
     ctest -C Release --verbose --output-on-failure
 
     cpack -C Release
