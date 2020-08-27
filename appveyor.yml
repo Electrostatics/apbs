@@ -62,9 +62,11 @@ build_script:
 
     cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_BEM=ON -DENABLE_GEOFLOW=ON -DENABLE_INLINE=ON -DENABLE_PBAM=OFF -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
 
-    cat c:\projects\source/build\CMakeFiles\CMakeError.log
+    cat c:\projects\source\build\CMakeFiles\CMakeError.log
 
     cmake --build . --config "Release"
+
+    ps: gci -Path c:\projects\source\build -r -fi apbs.exe
   
     ctest -C Release --verbose --output-on-failure
 
