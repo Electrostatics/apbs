@@ -28,7 +28,7 @@ FLOAT_PATTERN = r"([+-]?\d+\.\d+E[+-]\d+)"
 
 
 def find_binary(binary_name, logger):
-    start_dir = pathlib.Path(__file__).parent.absolute() / "build"
+    start_dir = pathlib.Path(__file__).parent.parent.absolute() / "build"
 
     # This is an attempt to find the apbs binary on a Windows system
     # built with Visual Studio that creates binaries based on the
@@ -38,9 +38,10 @@ def find_binary(binary_name, logger):
     logger.message(f"START_DIR:{start_dir}\n")
     for idx in start_dir.iterdir():
         if idx.is_dir():
-            test_file = pathlib.Path(idx.absolute) / binary_name
+            logger.message(f"TEST_DIR:{idx}\n")
+            test_file = pathlib.Path(idx).absolute() / binary_name
             logger.message(f"TEST_FILE: {test_file}\n")
-            if pathlib.Path(test_file).exists():
+            if pathlib.Path(test_file).is_file():
                 return test_file
     raise FileNotFoundError(f"Can't find file, {binary_name}")
 
@@ -73,10 +74,11 @@ def test_binary(binary_name, logger):
         except OSError as ose:
             logger.message(f"\nException: {ose}\n")
 
-        raise FileNotFoundError(
-            f"Couldn't detect an apbs binary {binary_name}"
-            + "in the path or local bin directory"
-        )
+        if binary is None:
+            raise FileNotFoundError(
+                f"Couldn't detect an apbs binary {binary_name}"
+                + "in the path or local bin directory"
+            )
 
     try:
         command = [binary, "--version"]
@@ -375,11 +377,6 @@ def main():
 
     # Make sure that the apbs binary can be found
     binary = test_binary(options.executable, logger)
-    if binary == "":
-        parser.error(
-            f"Couldn't detect an apbs binary {options.executable} "
-            + "in the path or local bin directory"
-        )
 
     # Get the names of all the test sections to run.
     test_sections = []
