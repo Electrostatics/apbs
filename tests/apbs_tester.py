@@ -28,14 +28,20 @@ FLOAT_PATTERN = r"([+-]?\d+\.\d+E[+-]\d+)"
 
 
 def find_binary(binary_name, logger):
-    start_dir = pathlib.Path(__file__).parent.absolute()
+    start_dir = pathlib.Path(__file__).parent.absolute() / "build"
 
-    logger.message(f"start_dir:{start_dir}\n")
-    for idx in start_dir.rglob(str(f"*{binary_name}")):
-        logger.message(
-            f"find_binary: {idx}"
-        )
-        return(str(idx))
+    # This is an attempt to find the apbs binary on a Windows system
+    # built with Visual Studio that creates binaries based on the
+    # current configuration.
+    # On Linux/Mac systems the apbs binary will bin ../build/bin/apbs
+    # On Windows the apbs.exe binary could be in ../build/bin/*/apbs.exe
+    logger.message(f"START_DIR:{start_dir}\n")
+    for idx in start_dir.iterdir():
+        if idx.is_dir():
+            test_file = pathlib.Path(idx.absolute) / binary_name
+            logger.message(f"TEST_FILE: {test_file}\n")
+            if pathlib.Path(test_file).exists():
+                return test_file
     raise FileNotFoundError(f"Can't find file, {binary_name}")
 
 
@@ -48,6 +54,8 @@ def test_binary(binary_name, logger):
     # Attempts to find apbs in the system path first
     binary = ""
 
+    # Try a number of ways to find the apbs binary
+
     # Attempt number 1
     if pathlib.Path(binary_name).exists():
         binary = binary_name
@@ -56,30 +64,21 @@ def test_binary(binary_name, logger):
             # Attempt number 2
             binary = find_binary(binary_name, logger)
         except OSError as ose:
-            logger.message(f"{ose}\n")
+            logger.message(f"\nException: {ose}\n")
             pass
 
         try:
             # Attempt number 3
             binary = os.path.abspath(f"../build/bin/{binary_name}")
         except OSError as ose:
-            logger.message(f"{ose}\n")
-            pass
+            logger.message(f"\nException: {ose}\n")
+
+        raise FileNotFoundError(
+            f"Couldn't detect an apbs binary {binary_name}"
+            + "in the path or local bin directory"
+        )
 
     try:
-        command = [binary, "--version"]
-        with subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-        ) as proc:
-            line = str(proc.stdout.read())
-        return binary
-    except OSError as ose:
-        logger.message(f"\nException:{ose}\n")
-        pass
-
-    # Next, looks for the apbs binary in the apbs bin directory
-    try:
-        binary = os.path.abspath(f"../build/bin/{binary_name}")
         command = [binary, "--version"]
         with subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT

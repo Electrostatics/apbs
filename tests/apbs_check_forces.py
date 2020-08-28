@@ -22,9 +22,9 @@ class PolarForce:
         r"(?P<label>[a-zA-Z]+)\s+",
         r"(?P<x>[+-]?\d\.\d+E[+-]\d+)\s+",
         r"(?P<y>[+-]?\d\.\d+E[+-]\d+)\s+",
-        r"(?P<z>[+-]?\d\.\d+E[+-]\d+)"
+        r"(?P<z>[+-]?\d\.\d+E[+-]\d+)",
     ]
-    pattern = ''.join(patterns)
+    pattern = "".join(patterns)
 
     def __init__(self, label, x, y, z):
         """
@@ -40,14 +40,14 @@ class PolarForce:
         Extracts ploar force results from a file at a given line
         """
         try:
-          m = re.search(self.pattern, line)
-          self.label = m.group("label")
-          self.x = float(m.group("x"))
-          self.y = float(m.group("y"))
-          self.z = float(m.group("z"))
+            m = re.search(self.pattern, line)
+            self.label = m.group("label")
+            self.x = float(m.group("x"))
+            self.y = float(m.group("y"))
+            self.z = float(m.group("z"))
         except Exception as msg:
-          sys.stderr.write(f"\nLINE:{line}\nException:{msg}\n")
-          raise msg
+            sys.stderr.write(f"\nLINE:{line}\nException:{msg}\n")
+            raise msg
 
     def diff(self, other):
         """
@@ -89,9 +89,9 @@ class ApolarForce(PolarForce):
         r"(?P<atom>\w+)\s+",
         r"(?P<x>[+-]?\d\.\d+E[+-]\d+)\s+",
         r"(?P<y>[+-]?\d\.\d+E[+-]\d+)\s+",
-        r"(?P<z>[+-]?\d\.\d+E[+-]\d+)"
+        r"(?P<z>[+-]?\d\.\d+E[+-]\d+)",
     ]
-    pattern = ''.join(patterns)
+    pattern = "".join(patterns)
 
     def __init__(self, label, atom, x, y, z):
         """
@@ -105,15 +105,15 @@ class ApolarForce(PolarForce):
         Extracts aploar force results from a file at a given line
         """
         try:
-          m = re.search(self.pattern, line)
-          self.label = m.group("label")
-          self.atom = m.group("atom")
-          self.x = float(m.group("x"))
-          self.y = float(m.group("y"))
-          self.z = float(m.group("z"))
+            m = re.search(self.pattern, line)
+            self.label = m.group("label")
+            self.atom = m.group("atom")
+            self.x = float(m.group("x"))
+            self.y = float(m.group("y"))
+            self.z = float(m.group("z"))
         except Exception as msg:
-          sys.stderr.write(f"\nLINE:{line}\nException:{msg}\n")
-          raise msg
+            sys.stderr.write(f"\nLINE:{line}\nException:{msg}\n")
+            raise msg
 
     def __rpr__(self):
         return "ApolarForce{ label:%s, atom:%s, x:%g, y:%g, z:%g}\n" % (
