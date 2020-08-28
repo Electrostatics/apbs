@@ -80,6 +80,12 @@ def test_binary(binary_name, logger):
                 + "in the path or local bin directory"
             )
 
+        if not os.access(binary, os.X_OK):
+            raise PermissionError(
+                f"The apbs binary {binary_name}"
+                + "is not executable!"
+            )
+
     try:
         command = [binary, "--version"]
         with subprocess.Popen(
