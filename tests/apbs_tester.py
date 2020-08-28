@@ -28,21 +28,19 @@ FLOAT_PATTERN = r"([+-]?\d+\.\d+E[+-]\d+)"
 
 
 def find_binary(binary_name, logger):
-    start_dir = pathlib.Path(__file__).parent.parent.absolute() / "build"
-
     # This is an attempt to find the apbs binary on a Windows system
     # built with Visual Studio that creates binaries based on the
     # current configuration.
     # On Linux/Mac systems the apbs binary will bin ../build/bin/apbs
     # On Windows the apbs.exe binary could be in ../build/bin/*/apbs.exe
+    start_dir = pathlib.Path(__file__).parent.parent.absolute() / "build"
     logger.message(f"START_DIR:{start_dir}\n")
-    for idx in start_dir.iterdir():
-        if idx.is_dir():
-            logger.message(f"TEST_DIR:{idx}\n")
-            test_file = pathlib.Path(idx).absolute() / binary_name
-            logger.message(f"TEST_FILE: {test_file}\n")
-            if pathlib.Path(test_file).is_file():
-                return test_file
+    paths = pathlib.Path(start_dir).rglob(f"**/{binary_name}")
+    for idx in paths:
+        if idx.is_file():
+            if os.access(str(idx), os.X_OK):
+                return str(idx)
+
     raise FileNotFoundError(f"Can't find file, {binary_name}")
 
 
@@ -56,35 +54,24 @@ def test_binary(binary_name, logger):
     binary = ""
 
     # Try a number of ways to find the apbs binary
-
-    # Attempt number 1
     if pathlib.Path(binary_name).exists():
+        # Attempt number 1 - The full path was passed in
         binary = binary_name
     else:
-        try:
-            # Attempt number 2
-            binary = find_binary(binary_name, logger)
-        except OSError as ose:
-            logger.message(f"\nException: {ose}\n")
-            pass
+        # Attempt number 2 - Just the binary name was passed in
+        binary = find_binary(binary_name, logger)
 
-        try:
-            # Attempt number 3
-            binary = os.path.abspath(f"../build/bin/{binary_name}")
-        except OSError as ose:
-            logger.message(f"\nException: {ose}\n")
+    if binary is None:
+        raise FileNotFoundError(
+            f"Couldn't detect an apbs binary {binary_name}"
+            + "in the path or local bin directory"
+        )
 
-        if binary is None:
-            raise FileNotFoundError(
-                f"Couldn't detect an apbs binary {binary_name}"
-                + "in the path or local bin directory"
-            )
-
-        if not os.access(binary, os.X_OK):
-            raise PermissionError(
-                f"The apbs binary {binary_name}"
-                + "is not executable!"
-            )
+    if not os.access(binary, os.X_OK):
+        raise PermissionError(
+            f"The apbs binary, {binary}, "
+            + "is not executable!"
+        )
 
     try:
         command = [binary, "--version"]
