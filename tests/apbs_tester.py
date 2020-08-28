@@ -28,29 +28,53 @@ FLOAT_PATTERN = r"([+-]?\d+\.\d+E[+-]\d+)"
 
 
 def find_binary(binary_name, logger):
-    start_dir = pathlib.Path.cwd() / pathlib.Path('../build')
+    start_dir = pathlib.Path(__file__).parent.absolute()
 
-    for idx in start_dir.rglob(binary_name):
+    logger.message(f"start_dir:{start_dir}\n")
+    for idx in start_dir.rglob(str(f"*{binary_name}")):
         logger.message(
             f"find_binary: {idx}"
         )
-        return(idx)
+        return(str(idx))
+    raise FileNotFoundError(f"Can't find file, {binary_name}")
+
 
 def test_binary(binary_name, logger):
     """
     Ensures that the apbs binary is available
     """
 
+    logger.message(f"BINARY_NAME:{binary_name}\n")
     # Attempts to find apbs in the system path first
+    binary = ""
+
+    # Attempt number 1
+    if pathlib.Path(binary_name).exists():
+        binary = binary_name
+    else:
+        try:
+            # Attempt number 2
+            binary = find_binary(binary_name, logger)
+        except OSError as ose:
+            logger.message(f"{ose}\n")
+            pass
+
+        try:
+            # Attempt number 3
+            binary = os.path.abspath(f"../build/bin/{binary_name}")
+        except OSError as ose:
+            logger.message(f"{ose}\n")
+            pass
+
     try:
-        binary = find_binary(binary_name, logger)
         command = [binary, "--version"]
         with subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         ) as proc:
             line = str(proc.stdout.read())
         return binary
-    except OSError:
+    except OSError as ose:
+        logger.message(f"\nException:{ose}\n")
         pass
 
     # Next, looks for the apbs binary in the apbs bin directory
@@ -62,7 +86,8 @@ def test_binary(binary_name, logger):
         ) as proc:
             line = str(proc.stdout.read())  # noqa F841
         return binary
-    except OSError:
+    except OSError as ose:
+        logger.message(f"\nException:{ose}\n")
         return ""
 
 
@@ -353,7 +378,8 @@ def main():
     binary = test_binary(options.executable, logger)
     if binary == "":
         parser.error(
-            "Couldn't detect an apbs binary in the path or local bin directory"
+            f"Couldn't detect an apbs binary {options.executable} "
+            + "in the path or local bin directory"
         )
 
     # Get the names of all the test sections to run.
