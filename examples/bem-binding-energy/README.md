@@ -16,9 +16,6 @@ More details are available on the APBS website contributions section.
 
 Input File| APBS Version| Result (kJ/mol)| Expected (kJ/mol)
 ---|---|---|---
-[1d30.in](1d30.in)| **3.0**| **-21961.965**| **-21961.946**
-| | 1.5| -21961.983|
-[1d30_monomer1.in](1d30_monomer1.in)| **3.0**| **-26075.345**| **-26075.316**
-| | 1.5| -26075.357|
-[1d30_monomer2.in](1d30_monomer2.in)| **3.0**| **-762.105**| **-762.103**
-| | 1.5| -762.103|
+[1d30.in](1d30.in)| **3.0**| **-22113.098**| **-22113.098**
+[1d30_monomer1.in](1d30_monomer1.in)| **3.0**| **-26225.275**| **-26225.275**
+[1d30_monomer2.in](1d30_monomer2.in)| **3.0**| **-779.948**| **-779.948**
