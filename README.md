@@ -2,7 +2,7 @@ APBS - Adaptive Poisson-Boltzmann Solver
 ========================================
 
 [![Documentation Status](https://readthedocs.org/projects/apbs/badge/?version=latest)](https://apbs.readthedocs.io/en/latest/?badge=latest)
-![Build Status](https://travis-ci.org/Electrostatics/apbs-pdb2pqr.svg?branch=master)
+![Appveyor Build Status](https://ci.appveyor.com/project/intendo/apbs?branch=master&svg=true)
 
 This repository contains the APBS software.
 
