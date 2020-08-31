@@ -68,6 +68,6 @@ build_script:
 
     ctest -C Release --verbose --output-on-failure
 
-    cpack -C Release
+    cpack -C Release -G ZIP
 
     unzip -l APBS*.zip
