@@ -47,6 +47,8 @@ install:
   # target Python version and architecture
   - pip.exe install -r c:\projects\source\requirements.txt
 
+  # ctest -C Release --verbose --output-on-failure
+
 build_script:
 - cmd: >-
 
@@ -66,7 +68,6 @@ build_script:
 
     cmake --build . --config "Release"
 
-    #ctest -C Release --verbose --output-on-failure
 
     cpack -C Release -G ZIP
 
