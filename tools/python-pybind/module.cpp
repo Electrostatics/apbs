@@ -6,10 +6,11 @@
  * @file tools/python-pybind/module.cpp
  * @author Asher Mancinelli <asher.mancinelli@pnnl.gov>
  *
- * @brief Glue code that binds each function/class to python
+ * @brief Creates python module and passes to each binding function.
  *
  * @note Keep all binding functions in their own header/impl pair. No raw
- * functions should live in this file; this is for *binding only*.
+ * functions or binding should live in this file; this is for creating the
+ * module and passing to binding functions only.
  */
 
 namespace py = pybind11;
@@ -18,7 +19,5 @@ PYBIND11_MODULE(apbs, m) {
   m.doc() = R"pbdoc(
     )pbdoc";
 
-  /// @see bind_nosh.hpp
-  m.def("parseInputFromString", &parseInputFromString);
-  m.def("getPotentials", &getPotentials<double>);
+  bind_nosh(m);
 }

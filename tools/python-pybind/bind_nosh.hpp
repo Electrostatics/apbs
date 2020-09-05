@@ -4,6 +4,12 @@
 #include <string>
 #include <vector>
 
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wunused-function"
+#endif
 extern "C"
 {
 #include "apbscfg.h" 
@@ -19,12 +25,11 @@ extern "C"
  * @brief Contains bindings for nosh-related functions.
  *
  * @note keep all implementations in the impl unless templated.
+ * @note contains bindings for nosh and all classes encapsulated by this struct
+ * within the source.
+ *
+ * @see src/generic/nosh.h:195
  */
-
-/**
- * @todo request help documenting
- */
-int parseInputFromString(NOsh *nosh, std::string str);
 
 /**
  * @todo request help documenting
@@ -65,3 +70,8 @@ std::vector<T> getPotentials(NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg, Valist *al
     Vgrid_dtor(&grid);    
     return values;
 }
+
+/**
+ * @brief Perform binding to module
+ */
+void bind_nosh(py::module& m);
