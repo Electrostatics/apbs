@@ -3,7 +3,10 @@ find_package(pybind11 REQUIRED)
 add_library(apbs_pybind
   MODULE
   module.cpp
-  bind_nosh.cpp)
+  bind_nosh.cpp
+  bind_vatom.cpp
+  bind_valist.cpp
+  )
 
 set_target_properties(apbs_pybind
   PROPERTIES

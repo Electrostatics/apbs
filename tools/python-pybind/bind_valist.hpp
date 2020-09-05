@@ -3,6 +3,10 @@
 #include <pybind11/pybind11.h>
 namespace py = pybind11;
 
+
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wunused-function"
+#endif
 extern "C"
 {
 #include "generic/valist.h"
@@ -21,6 +25,6 @@ extern "C"
  */
 
 /**
- * @brief Perform binding of _Vatom_ to module
+ * @brief Perform binding to module
  */
-void bind_vatom(py::module& m);
+void bind_valist(py::module& m);

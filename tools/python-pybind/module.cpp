@@ -1,6 +1,12 @@
 #include <pybind11/pybind11.h>
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wunused-function"
+#endif
 #include "bind_nosh.hpp"
+#include "bind_vatom.hpp"
+#include "bind_valist.hpp"
+#include "bind_constants.hpp"
 
 /**
  * @file tools/python-pybind/module.cpp
@@ -17,7 +23,11 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(apbs, m) {
   m.doc() = R"pbdoc(
+    
     )pbdoc";
 
   bind_nosh(m);
+  bind_vatom(m);
+  bind_valist(m);
+  bind_constants(m);
 }
