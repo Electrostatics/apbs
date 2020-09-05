@@ -10,7 +10,7 @@ int parseInputFromString(NOsh *nosh, std::string str)
   VASSERT( bufsize <= VMAX_BUFSIZE );
   sock = Vio_ctor("BUFF","ASC",VNULL,"0","r");
 
-  Vio_bufTake(sock, str.c_str(), str.size());
+  Vio_bufTake(sock, const_cast<char*>(str.c_str()), str.size());
 
   ret = NOsh_parseInput(nosh, sock); 
   sock->VIObuffer = VNULL;
@@ -52,7 +52,7 @@ void bind_nosh(py::module& m)
           VASSERT( bufsize <= VMAX_BUFSIZE );
           sock = Vio_ctor("BUFF","ASC",VNULL,"0","r");
 
-          Vio_bufTake(sock, str.c_str(), str.size());
+          Vio_bufTake(sock, const_cast<char*>(str.c_str()), str.size());
 
           ret = NOsh_parseInput(self, sock); 
           sock->VIObuffer = VNULL;

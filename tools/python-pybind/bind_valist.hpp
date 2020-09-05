@@ -1,8 +1,10 @@
 #pragma once
 
-#include <pybind11/pybind11.h>
-namespace py = pybind11;
+#include <vector>
 
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+namespace py = pybind11;
 
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wunused-function"
@@ -23,6 +25,17 @@ extern "C"
  *
  * @see src/generic/valist.h:195
  */
+
+/**
+ * @todo request documentation for this
+ */
+void Valist_load(Valist *self,
+                 int size,
+                 std::vector<double> x,
+                 std::vector<double> y,
+                 std::vector<double> z,
+                 std::vector<double> chg,
+                 std::vector<double> rad);
 
 /**
  * @brief Perform binding to module
