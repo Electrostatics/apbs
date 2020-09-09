@@ -180,6 +180,14 @@ Building the code - advanced
    # NOTE: In case you need to debug the source code:
    # export RELEASE_TYPE=Debug
    export RELEASE_TYPE=Release
+   # NOTE: If cmake or make fail, save yourself and make sure your remove
+   #       everything including the build directory. This code base uses
+   #       many older autoconf based projects that do not know how to save
+   #       state or recover from partial builds. If cmake or make fail, you
+   #       should figure out how to fix it and then remove everything and
+   #       try again.
+   rmdir $APBS_BUILD_DIR
+   mkdir -p $APBS_BUILD_DIR
    cd $APBS_BUILD_DIR
    # NOTE: In case you need to debug cmake, use verbose debug/trace mode:
    # cmake -S .. -B $BUILD_DIR --trace-source=../CMakeLists.txt --trace-expand \
