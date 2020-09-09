@@ -1,3 +1,5 @@
+python-dev-tools>=2020.9.4
+pybind11>=2.5
 sphinx>=3.1
 sphinx_rtd_theme
 sphinx_sitemap
