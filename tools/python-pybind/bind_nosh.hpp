@@ -2,6 +2,8 @@
 
 #include <string>
 #include <vector>
+#include <optional>
+#include <stdexcept>
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -39,7 +41,7 @@ std::vector<T> getPotentials(NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg, Valist *al
 {
     Vgrid *grid;
     Vatom *atom; 
-    int i, rc, nx, ny, nz;
+    int i, nx, ny, nz;
     double hx, hy, hzed, xcent, ycent, zcent, xmin, ymin, zmin;
     double value;
     double *position;
