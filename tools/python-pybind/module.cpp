@@ -22,12 +22,20 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(apbs, m) {
-  m.doc() = R"pbdoc(
-    
+  m.doc() = R"pbdoc(APBS Python Bindings
+
+    .. note:: When the C code would return an int to represent an error code, these
+      bindings will return a `None` value. For example,
+
+    .. code:: python
+
+      from apbs import NOsh
+      nosh = NOsh()
+
     )pbdoc";
 
+  bind_valist(m);
   bind_nosh(m);
   bind_vatom(m);
-  bind_valist(m);
   bind_constants(m);
 }
