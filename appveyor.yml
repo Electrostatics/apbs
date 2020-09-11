@@ -70,6 +70,8 @@ build_script:
 
     cmake --build . --config "Release"
 
+    cmake --build . --target install
+
     cd ..
 
     cd c:\projects\source
