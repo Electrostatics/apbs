@@ -60,9 +60,9 @@ build_script:
 
     cd externals/pybind11
 
-    mkdir -p build
+    mkdir build
     
-    mkdir -p install
+    mkdir install
 
     cd build
     
