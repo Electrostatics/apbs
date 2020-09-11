@@ -58,23 +58,23 @@ build_script:
 
     git submodule update
 
-    pushd $(pwd)/externals/pybind11
+    cd externals/pybind11
 
-    [ -d build ] || mkdir -p build
+    mkdir -p build
     
-    [ -d install ] || mkdir -p install
+    mkdir -p install
 
-    pushd build
+    cd build
     
     cmake .. -DCMAKE_INSTALL_PREFIX=$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" ../install)
 
     make -j 1 install
 
-    popd
+    cd ..
 
     export pybind11_DIR=$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" ./install)
 
-    popd
+    cd c:\projects\source
 
     mkdir build
 
