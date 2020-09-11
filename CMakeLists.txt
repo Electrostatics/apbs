@@ -273,7 +273,7 @@ if(ENABLE_BEM)
     include_directories(${EXTERNALS_PATH}/${TABI}/src)
 
     if(BUILD_SHARED_LIBS)
-        install(FILES ${binary_dir}/libTABIPBlib${CMAKE_SHARED_LIBRARY_SUFFIX}
+        install(FILES ${binary_dir}/TABIPBlib${CMAKE_SHARED_LIBRARY_SUFFIX}
                 DESTINATION ${LIBRARY_INSTALL_PATH})
     endif()
 endif() # ENABLE_BEM
