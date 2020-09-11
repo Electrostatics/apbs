@@ -11,6 +11,7 @@ namespace py = pybind11;
 #endif
 extern "C"
 {
+#include "apbscfg.h" 
 #include "generic/valist.h"
 }
 
