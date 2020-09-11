@@ -32,7 +32,7 @@ install:
   
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;C:\\Program Files (x86)\\CMake\\bin;%PATH%;C:\\projects\\source\\build\\bin;C:\\ProgramData\\chocolatey\\lib\\swig\\tools\\install;C:\\ProgramData\\chocolatey\\bin;%PATH%"
 
-  - "SET pybind11_DIR=C:\\projects\\source\\externals\\pybind11\tools"
+  - "SET pybind11_DIR=C:\\projects\\source\\externals\\pybind11\\tools\\build"
   
 #  - swig -swiglib
   - "SET SWIG_DIR=C:\\ProgramData\\chocolatey\\lib\\swig\\tools\\install"
@@ -52,11 +52,29 @@ install:
 build_script:
 - cmd: >-
 
+    cd c:\projects\source
+
     git submodule init
 
     git submodule update
 
-    cd c:\projects\source
+    pushd $(pwd)/externals/pybind11
+
+    [ -d build ] || mkdir -p build
+    
+    [ -d install ] || mkdir -p install
+
+    pushd build
+    
+    cmake .. -DCMAKE_INSTALL_PREFIX=$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" ../install)
+
+    make -j 1 install
+
+    popd
+
+    export pybind11_DIR=$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" ./install)
+
+    popd
 
     mkdir build
 
