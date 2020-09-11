@@ -68,9 +68,7 @@ build_script:
     
     cmake .. -DCMAKE_INSTALL_PREFIX=%pybind11_DIR%
 
-    cmake --build . --config "Release"
-
-    cmake --build . --target install
+    cmake --build . --config "Release" --target install
 
     cd ..
 
@@ -84,7 +82,7 @@ build_script:
 
     cat c:\projects\source\build\CMakeFiles\CMakeError.log
 
-    cmake --build . --config "Release"
+    cmake --build . --config "Release" --parallel 1
 
     ctest -C Release --verbose --output-on-failure
 
