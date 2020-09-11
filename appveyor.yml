@@ -68,7 +68,7 @@ build_script:
     
     cmake .. -DCMAKE_INSTALL_PREFIX=%pybind11_DIR%
 
-    make -j 1 install
+    cmake --build . --config "Release"
 
     cd ..
 
