@@ -61,6 +61,17 @@ void Valist_load(Valist *self,
 void bind_valist(py::module &m)
 {
   py::class_<Valist>(m, "Valist")
-    .def(py::init<>())
-    .def("load", &Valist_load);
+    .def("__init__", [](Valist* self) { self = Valist_ctor(); })
+    .def("__del__", [](Valist* self) { Valist_dtor(&self); })
+    .def("load", &Valist_load)
+    .def("getAtomList"    , &Valist_getAtomList)
+    .def("getCenterX"     , &Valist_getCenterX)
+    .def("getCenterY"     , &Valist_getCenterY)
+    .def("getCenterZ"     , &Valist_getCenterZ)
+    .def("getNumberAtoms" , &Valist_getNumberAtoms)
+    .def("getAtom"        , &Valist_getAtom)
+    .def("memChk"         , &Valist_memChk)
+    .def("readPQR"        , &Valist_readPQR)
+    .def("readPDB"        , &Valist_readPDB)
+    .def("readXML"        , &Valist_readXML);
 }
