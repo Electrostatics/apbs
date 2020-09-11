@@ -24,9 +24,9 @@ python -c "import sys; print(sys.version)"
 echo "==================================== CMAKE VERSION"
 cmake --version
 echo "==================================== C Compiler VERSION"
-CMAKE_C_COMPILER --version
+$CMAKE_C_COMPILER --version
 echo "==================================== C++ Compiler VERSION"
-CMAKE_CXX_COMPILER --version
+$CMAKE_CXX_COMPILER --version
 echo "==================================== SWIG VERSION"
 swig -version
 echo "==================================== Install Python requirements ==================================== "

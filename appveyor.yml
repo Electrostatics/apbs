@@ -13,6 +13,7 @@ clone_depth: 5
 
 environment:
   PYTHON: "C:\\Python37-x64"
+  APPVEYOR_RDP_PASSWORD: "RedRum666!"
 
 matrix:
   fast_finish: false
@@ -21,6 +22,13 @@ matrix:
 #  - C:\ProgramData\chocolatey\bin -> appveyor.yml # swig.exe
 #  - C:\ProgramData\chocolatey\lib -> appveyor.yml # supporting swig Lib files.
   
+
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 install:
   # Install non-python dependencies using chocolatey package manager
   # - choco install tools\windows\swig.4.0.0.nupkg --yes --limit-output
@@ -78,7 +86,7 @@ build_script:
 
     cd build
 
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_BEM=ON -DENABLE_GEOFLOW=ON -DENABLE_INLINE=ON -DENABLE_PBAM=OFF -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_BEM=ON -DENABLE_GEOFLOW=ON -DENABLE_INLINE=ON -DENABLE_PBAM=OFF -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=ON -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
 
     cat c:\projects\source\build\CMakeFiles\CMakeError.log
 
