@@ -59,6 +59,16 @@ jobs:
           echo "==================================== Get External SubModules ==================================== "
           git submodule init
           git submodule update
+          echo "==================================== BUILD PYBIND ========================================== "
+          pushd externals/pybind11
+          [ -d install ] || mkdir install
+          installdir=$(realpath ./install)
+          [ -d build ] || mkdir build
+          pushd build
+          cmake .. -DCMAKE_INSTALL_PREFIX=$installdir || exit 1
+          make -j || exit 1
+          make install || exit 1
+          export pybind11_DIR=$installdir
           echo "==================================== BUILD =============================================== "
           ./.build.sh
         env:
