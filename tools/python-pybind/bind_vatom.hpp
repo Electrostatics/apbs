@@ -1,11 +1,18 @@
 #pragma once
 
+#include <string>
+#include <vector>
+#include <array>
+
 #include <pybind11/pybind11.h>
 namespace py = pybind11;
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wunused-function"
+#endif
 extern "C"
 {
-#include "generic/valist.h"
+#include "generic/vatom.h"
 }
 
 /**
