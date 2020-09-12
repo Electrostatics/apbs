@@ -17,8 +17,6 @@ extern "C"
 #include "apbscfg.h" 
 #include "routines.h"
 #include "generic/nosh.h"
-#include "generic/valist.h"
-#include "generic/vatom.h"
 }
 
 /**

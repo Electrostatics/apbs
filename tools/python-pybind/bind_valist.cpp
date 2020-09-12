@@ -58,9 +58,40 @@ void Valist_load(Valist *self,
   self->center[2] = 0.5 * (self->maxcrd[2] + self->mincrd[2]);
 }
 
+/**
+ * @brief Class to bind sValist to C++ STL types for better interfacing
+ * with python.
+ */
+struct Valist_glue : public Valist
+{
+  std::array<double, 3> center;   /**< Molecule center (xmin - xmax)/2, etc.*/
+  std::array<double, 3> mincrd;   /**< Minimum coordinates */
+  std::array<double, 3> maxcrd;   /**< Maximum coordinates */
+  std::vector<Vatom> vatoms;       /**< Atom list */
+};
+
 void bind_valist(py::module &m)
 {
-  py::class_<Valist>(m, "Valist")
+  py::class_<Valist_glue>(m, "Valist")
     .def(py::init<>())
-    .def("load", &Valist_load);
+    .def("__del__", [](Valist* self) { Valist_dtor(&self); })
+    .def("load", &Valist_load)
+    .def("getAtomList"    , &Valist_getAtomList)
+    .def("getCenterX"     , &Valist_getCenterX)
+    .def("getCenterY"     , &Valist_getCenterY)
+    .def("getCenterZ"     , &Valist_getCenterZ)
+    .def("getNumberAtoms" , &Valist_getNumberAtoms)
+    .def("getAtom"        , &Valist_getAtom)
+    .def("memChk"         , &Valist_memChk)
+    .def("readPQR"        , &Valist_readPQR)
+    .def("readPDB"        , &Valist_readPDB)
+    .def("readXML"        , &Valist_readXML)
+    .def_readwrite("number"     , &Valist::number)
+    .def_readwrite("center"     , &Valist_glue::center)
+    .def_readwrite("mincrd"     , &Valist_glue::mincrd)
+    .def_readwrite("maxcrd"     , &Valist_glue::maxcrd)
+    .def_readwrite("maxrad"     , &Valist::maxrad)
+    .def_readwrite("charge"     , &Valist::charge)
+    .def_readwrite("vatoms"     , &Valist_glue::vatoms)
+    .def_readwrite("vmem"       , &Valist::vmem);
 }
