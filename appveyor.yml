@@ -23,11 +23,11 @@ matrix:
 #  - C:\ProgramData\chocolatey\lib -> appveyor.yml # supporting swig Lib files.
   
 
-init:
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+# init:
+#   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+# on_finish:
+#   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 install:
   # Install non-python dependencies using chocolatey package manager
@@ -86,7 +86,7 @@ build_script:
 
     cd build
 
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_BEM=OFF -DENABLE_GEOFLOW=OFF -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_BEM=OFF -DENABLE_GEOFLOW=OFF -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=ON -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
 
     cat c:\projects\source\build\CMakeFiles\CMakeError.log
 
