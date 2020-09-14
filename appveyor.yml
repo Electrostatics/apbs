@@ -60,6 +60,8 @@ install:
 build_script:
 - cmd: >-
 
+    set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
     cd c:\projects\source
 
     git submodule init
@@ -76,7 +78,7 @@ build_script:
     
     cmake .. -DCMAKE_INSTALL_PREFIX=%pybind11_DIR%
 
-    cmake --build . --config "Release" --target install
+    cmake --build . --config "Release" --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
 
     cd ..
 
@@ -90,7 +92,7 @@ build_script:
 
     cat c:\projects\source\build\CMakeFiles\CMakeError.log
 
-    cmake --build . -C Release --parallel 1 --target install
+    cmake --build . -C Release --parallel 1 --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
 
     ctest -C Release --verbose --output-on-failure
 
