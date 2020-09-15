@@ -119,3 +119,7 @@ build_script:
     cpack -C Release -G ZIP
 
     unzip -l APBS*.zip
+
+on_failure: 
+- if exist c:\projects\source\build\CMakeFiles\CMakeOutput.log type c:\projects\source\build\CMakeFiles\CMakeOutput.log
+- if exist c:\projects\source\build\CMakeFiles\CMakeError.log type c:\projects\source\build\CMakeFiles\CMakeError.log
