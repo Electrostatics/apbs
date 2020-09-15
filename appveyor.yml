@@ -70,13 +70,19 @@ build_script:
 
     cd externals/pybind11
 
+    echo PYBIND11_BUILD
+
     mkdir build
     
     mkdir install
 
     cd build
     
+    echo PYBIND11_CONFIGURE
+
     cmake .. -DCMAKE_INSTALL_PREFIX=%pybind11_DIR%
+
+    echo PYBIND11_MAKE_INSTALL
 
     cmake --build . --config "Release" --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
 
@@ -88,14 +94,28 @@ build_script:
 
     cd build
 
+    echo APBS_CONFIG
+
     cmake -C Release -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_BEM=OFF -DENABLE_GEOFLOW=OFF -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=ON -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
 
-    cat c:\projects\source\build\CMakeFiles\CMakeError.log
+    echo APBS_CMAKE_OUTPUT
+
+    if exist c:\projects\source\build\CMakeFiles\CMakeOutput.log type c:\projects\source\build\CMakeFiles\CMakeOutput.log
+
+    echo APBS_CMAKE_ERROR
+
+    if exist c:\projects\source\build\CMakeFiles\CMakeError.log type c:\projects\source\build\CMakeFiles\CMakeError.log
+
+    echo APBS_MAKE_INSTALL
 
     cmake --build . -C Release --parallel 1 --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
 
+    echo APBS_TEST
+
     ctest -C Release --verbose --output-on-failure
 
+    echo APBS_PACKAGE
+    
     cpack -C Release -G ZIP
 
     unzip -l APBS*.zip
