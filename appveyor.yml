@@ -40,6 +40,8 @@ install:
   
   - SET PATH="%PYTHON%;%PYTHON%\Scripts;C:\Program Files (x86)\CMake\bin;C:\projects\source\build\bin;C:\ProgramData\chocolatey\lib\swig\tools\install;C:\ProgramData\chocolatey\bin;%PATH%"
 
+  - echo %PATH%
+
   - SET pybind11_DIR=C:\projects\source\externals\pybind11\install
   
 #  - swig -swiglib
