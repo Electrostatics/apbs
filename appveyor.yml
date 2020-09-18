@@ -12,7 +12,7 @@ clone_folder: c:\projects\source
 clone_depth: 5
 
 environment:
-  PYTHON: "C:\\Python37-x64"
+  PYTHON: C:\Python37-x64
   APPVEYOR_RDP_PASSWORD: "RedRum666!"
 
 matrix:
@@ -23,11 +23,11 @@ matrix:
 #  - C:\ProgramData\chocolatey\lib -> appveyor.yml # supporting swig Lib files.
   
 
-init:
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+# init:
+#   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+# on_finish:
+#   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 install:
   # Install non-python dependencies using chocolatey package manager
@@ -38,13 +38,13 @@ install:
 
   - where /r C:\ProgramData\chocolatey swig.swg
   
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;C:\\Program Files (x86)\\CMake\\bin;%PATH%;C:\\projects\\source\\build\\bin;C:\\ProgramData\\chocolatey\\lib\\swig\\tools\\install;C:\\ProgramData\\chocolatey\\bin;%PATH%"
+  - SET PATH="%PYTHON%;%PYTHON%\Scripts;C:\Program Files (x86)\CMake\bin;C:\projects\source\build\bin;C:\ProgramData\chocolatey\lib\swig\tools\install;C:\ProgramData\chocolatey\bin;%PATH%"
 
-  - "SET pybind11_DIR=C:\\projects\\source\\externals\\pybind11\\install"
+  - SET pybind11_DIR=C:\projects\source\externals\pybind11\install
   
 #  - swig -swiglib
-  - "SET SWIG_DIR=C:\\ProgramData\\chocolatey\\lib\\swig\\tools\\install"
-  - "SET SWIG_EXECUTABLE=C:\\ProgramData\\chocolatey\\lib\\swig\\tools\\install\\swig.exe"
+  - SET SWIG_DIR=C:\ProgramData\chocolatey\lib\swig\tools\install
+  - SET SWIG_EXECUTABLE=C:\ProgramData\chocolatey\lib\swig\tools\install\swig.exe
   
   # Check that we have the expected version and architecture for Python
   - python --version
@@ -86,6 +86,8 @@ build_script:
 
     cmake --build . --config "Release" --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
 
+    set pybind11_DIR=C:\projects\source\externals\pybind11\install\share\cmake\pybind11
+
     cd ..
 
     cd c:\projects\source
@@ -96,7 +98,7 @@ build_script:
 
     echo APBS_CONFIG
 
-    cmake -C Release --trace-expand -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_BEM=OFF -DENABLE_GEOFLOW=OFF -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=ON -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
+    cmake -C Release --trace-expand -DPYBIND11_DIR=%pybind11_DIR% -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_BEM=OFF -DENABLE_GEOFLOW=OFF -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=ON -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
 
     echo APBS_CMAKE_OUTPUT
 
