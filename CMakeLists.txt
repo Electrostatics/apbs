@@ -125,8 +125,7 @@ set(SYS_LIBPATHS /usr/lib64)
 
 
 ################################################################################
-# Debian/Ubuntu hack for                                                       #
-# https://github.com/Electrostatics/apbs-pdb2pqr/issues/364                    #
+# Debian/Ubuntu hack                                                           #
 ################################################################################
 if(EXISTS "/etc/debian_version" AND
   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -833,7 +832,7 @@ set(CPACK_PACKAGE_VERSION_PATCH        "${CMAKE_MICRO_VERSION}")
 #  NOTE: The following is tempting but does not work!
 # set(FULL_PACKAGE_NAME                  "${PACKAGE_NAME}-${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION}")
 set(CPACK_PACKAGE_VENDOR               "PNNL")
-set(CPACK_PACKAGE_CONTACT              "APBS - https://github.com/Electrostatics/apbs-pdb2pqr")
+set(CPACK_PACKAGE_CONTACT              "APBS - https://github.com/Electrostatics/apbs")
 set(CPACK_PACKAGE_FILE_NAME            "${PACKAGE_NAME}-${APBS_VERSION}.${CMAKE_HOST_SYSTEM_NAME}")
 set(CPACK_STRIP_FILES                   True)
 
