@@ -38,9 +38,11 @@ install:
 
   - where /r C:\ProgramData\chocolatey swig.swg
   
-  - SET PATH="%PYTHON%;%PYTHON%\Scripts;C:\Program Files (x86)\CMake\bin;C:\projects\source\build\bin;C:\ProgramData\chocolatey\lib\swig\tools\install;C:\ProgramData\chocolatey\bin;%PATH%"
+  - SET PATH=%PYTHON%;%PYTHON%\Scripts;C:\Program Files (x86)\CMake\bin;C:\projects\source\build\bin;C:\ProgramData\chocolatey\lib\swig\tools\install;C:\ProgramData\chocolatey\bin;%PATH%
 
   - echo %PATH%
+
+  - where /r C:\Python37-x64 python.exe
 
   - SET pybind11_DIR=C:\projects\source\externals\pybind11\install
   
