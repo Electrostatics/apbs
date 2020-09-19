@@ -46,7 +46,6 @@ install:
 
   - SET pybind11_DIR=C:\projects\source\externals\pybind11\install
   
-#  - swig -swiglib
   - SET SWIG_DIR=C:\ProgramData\chocolatey\lib\swig\tools\install
   - SET SWIG_EXECUTABLE=C:\ProgramData\chocolatey\lib\swig\tools\install\swig.exe
   
@@ -61,7 +60,7 @@ install:
   # target Python version and architecture
   - pip.exe install -r c:\projects\source\requirements.txt
 
-  #cmake --build . -C Release --parallel 1 --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
+  #cmake --build . -config Release --parallel 1 --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
 
 build_script:
 - cmd: >-
@@ -76,7 +75,9 @@ build_script:
 
     cd externals/pybind11
 
+    echo "*****************************************************************************"
     echo PYBIND11_BUILD
+    echo "*****************************************************************************"
 
     mkdir build
     
@@ -84,13 +85,17 @@ build_script:
 
     cd build
     
+    echo "*****************************************************************************"
     echo PYBIND11_CONFIGURE
+    echo "*****************************************************************************"
 
     cmake .. -DCMAKE_INSTALL_PREFIX=%pybind11_DIR%
 
+    echo "*****************************************************************************"
     echo PYBIND11_MAKE_INSTALL
+    echo "*****************************************************************************"
 
-    cmake --build . -C Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
+    cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
 
     set pybind11_DIR=C:\projects\source\externals\pybind11\install\share\cmake\pybind11
 
@@ -102,34 +107,46 @@ build_script:
 
     cd build
 
+    echo "*****************************************************************************"
     echo APBS_CONFIG
+    echo "*****************************************************************************"
 
-    cmake -C Release --trace-expand -DPYBIND11_DIR=%pybind11_DIR% -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_BEM=OFF -DENABLE_GEOFLOW=OFF -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=ON -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
+    cmake --config Release -DPYBIND11_DIR=%pybind11_DIR% -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_BEM=OFF -DENABLE_GEOFLOW=OFF -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=ON -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
 
+    echo "*****************************************************************************"
     echo APBS_CMAKE_OUTPUT
+    echo "*****************************************************************************"
 
     if exist c:\projects\source\build\CMakeFiles\CMakeOutput.log type c:\projects\source\build\CMakeFiles\CMakeOutput.log
 
+    echo "*****************************************************************************"
     echo APBS_CMAKE_ERROR
+    echo "*****************************************************************************"
 
     if exist c:\projects\source\build\CMakeFiles\CMakeError.log type c:\projects\source\build\CMakeFiles\CMakeError.log
 
+    echo "*****************************************************************************"
     echo APBS_MAKE_INSTALL
+    echo "*****************************************************************************"
 
-    cmake --build . -C Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
+    cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
 
+    echo "*****************************************************************************"
     echo APBS_TEST
+    echo "*****************************************************************************"
 
-    ctest -C Release --verbose --output-on-failure
+    ctest --config Release --verbose --output-on-failure
 
     # echo APBS_PACKAGE
     
-    # cpack -C Release -G ZIP
+    # cpack --config Release -G ZIP
 
     # unzip -l APBS*.zip
 
+    echo "*****************************************************************************"
     echo APBS_DONE
+    echo "*****************************************************************************"
 
 on_failure: 
-- if exist c:\projects\source\build\CMakeFiles\CMakeOutput.log type c:\projects\source\build\CMakeFiles\CMakeOutput.log
-- if exist c:\projects\source\build\CMakeFiles\CMakeError.log type c:\projects\source\build\CMakeFiles\CMakeError.log
+  - if exist c:\projects\source\build\CMakeFiles\CMakeOutput.log type c:\projects\source\build\CMakeFiles\CMakeOutput.log
+  - if exist c:\projects\source\build\CMakeFiles\CMakeError.log type c:\projects\source\build\CMakeFiles\CMakeError.log
