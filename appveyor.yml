@@ -61,6 +61,8 @@ install:
   # target Python version and architecture
   - pip.exe install -r c:\projects\source\requirements.txt
 
+  #cmake --build . -C Release --parallel 1 --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
+
 build_script:
 - cmd: >-
 
@@ -88,7 +90,7 @@ build_script:
 
     echo PYBIND11_MAKE_INSTALL
 
-    cmake --build . --config "Release" --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
+    cmake --build . -C Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
 
     set pybind11_DIR=C:\projects\source\externals\pybind11\install\share\cmake\pybind11
 
@@ -114,17 +116,19 @@ build_script:
 
     echo APBS_MAKE_INSTALL
 
-    cmake --build . -C Release --parallel 1 --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
+    cmake --build . -C Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
 
     echo APBS_TEST
 
     ctest -C Release --verbose --output-on-failure
 
-    echo APBS_PACKAGE
+    # echo APBS_PACKAGE
     
-    cpack -C Release -G ZIP
+    # cpack -C Release -G ZIP
 
-    unzip -l APBS*.zip
+    # unzip -l APBS*.zip
+
+    echo APBS_DONE
 
 on_failure: 
 - if exist c:\projects\source\build\CMakeFiles\CMakeOutput.log type c:\projects\source\build\CMakeFiles\CMakeOutput.log
