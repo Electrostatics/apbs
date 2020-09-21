@@ -23,6 +23,9 @@ matrix:
 #  - C:\ProgramData\chocolatey\lib -> appveyor.yml # supporting swig Lib files.
   
 
+# For interactive debugging using Remote Desktop, you need the init, on_finish, and APPVEYOR_RDP_PASSWORD
+#   - https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
+
 # init:
 #   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
@@ -31,39 +34,31 @@ matrix:
 
 install:
   # Install non-python dependencies using chocolatey package manager
-  # - choco install tools\windows\swig.4.0.0.nupkg --yes --limit-output
-  # - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install --ignorechecksum -f -r -y swig --version=4.0.0
-  
+  - choco install tools\windows\swig.4.0.0.nupkg --yes --limit-output
+  - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install --ignorechecksum -f -r -y swig --version=4.0.0
   #  - type C:\ProgramData\chocolatey\logs\chocolatey.log
-
-  # - where /r C:\ProgramData\chocolatey swig.swg
+  - where /r C:\ProgramData\chocolatey swig.swg
+  - SET SWIG_DIR=C:\ProgramData\chocolatey\lib\swig\tools\install
+  - SET SWIG_EXECUTABLE=C:\ProgramData\chocolatey\lib\swig\tools\install\swig.exe
   
-  # - SET PATH=%PYTHON%;%PYTHON%\Scripts;C:\Program Files (x86)\CMake\bin;C:\projects\source\build\bin;C:\ProgramData\chocolatey\lib\swig\tools\install;C:\ProgramData\chocolatey\bin;%PATH%
-
+  # Add SWIG, Python, and CMake to PATH
+  - SET PATH=%PYTHON%;%PYTHON%\Scripts;C:\Program Files (x86)\CMake\bin;C:\projects\source\build\bin;C:\ProgramData\chocolatey\lib\swig\tools\install;C:\ProgramData\chocolatey\bin;%PATH%
   - echo %PATH%
-
-  # - where /r C:\Python37-x64 python.exe
-
-  # - SET pybind11_DIR=C:\projects\source\externals\pybind11\install
-  
-  # - SET SWIG_DIR=C:\ProgramData\chocolatey\lib\swig\tools\install
-  # - SET SWIG_EXECUTABLE=C:\ProgramData\chocolatey\lib\swig\tools\install\swig.exe
   
   # Check that we have the expected version and architecture for Python
-  # - python --version
-
-  # - python -m pip install --upgrade pip
+  - where /r C:\Python37-x64 python.exe
+  - python --version
+  - python -m pip install --upgrade pip
 
   # Install the build dependencies of the project. If some dependencies contain
   # compiled extensions and are not provided as pre-built wheel packages,
   # pip will build them from source using the MSVC compiler matching the
   # target Python version and architecture
+  - pip.exe install -r c:\projects\source\requirements.txt
 
-  # - pip.exe install -r c:\projects\source\requirements.txt
-
-  #cmake --build . -config Release --parallel 1 --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
 
 build_script:
+  #  Setup Visual Studio Environment for compiling, linking, and logging
   - set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\vsdevcmd\core\vsdevcmd_start.bat"
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
@@ -80,15 +75,16 @@ build_script:
   #  ECHO "VS VARS FILE = %vsdevcmd%"
   #  call %vsdevcmd%
 
+  #  Get the external projects configured
   - cd c:\projects\source
   - git submodule init
   - git submodule update
-  - cd externals/pybind11
 
   - echo "*****************************************************************************"
   - echo PYBIND11_BUILD
   - echo "*****************************************************************************"
-
+  - set pybind11_DIR=C:\projects\source\externals\pybind11\install
+  - cd externals/pybind11
   - mkdir build
   - mkdir install
   - cd build
@@ -101,6 +97,7 @@ build_script:
   - echo "*****************************************************************************"
   - echo PYBIND11_MAKE_INSTALL
   - echo "*****************************************************************************"
+  # cmake --build . --config Release --parallel 1 --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
   - cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
 
   - set pybind11_DIR=C:\projects\source\externals\pybind11\install\share\cmake\pybind11
@@ -134,15 +131,15 @@ build_script:
   - echo "*****************************************************************************"
   - ctest --config Release --verbose --output-on-failure
 
-  # echo APBS_PACKAGE
-    
-  # cpack --config Release -G ZIP
+  - echo "*****************************************************************************"
+  - echo APBS_PACKAGE
+  - echo "*****************************************************************************"
+  - cpack --config Release -G ZIP
+  - unzip -l APBS*.zip
 
-  # unzip -l APBS*.zip
-
-  #  echo "*****************************************************************************"
-  #  echo APBS_DONE
-  #  echo "*****************************************************************************"
+  - echo "*****************************************************************************"
+  - echo APBS_DONE
+  - echo "*****************************************************************************"
 
 on_failure: 
   - if exist c:\projects\source\build\CMakeFiles\CMakeOutput.log type c:\projects\source\build\CMakeFiles\CMakeOutput.log
