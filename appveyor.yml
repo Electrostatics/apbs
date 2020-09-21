@@ -67,6 +67,12 @@ build_script:
 
     set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
+    FOR /F "tokens=* USEBACKQ" %F IN (`where /r "C:\Program Files (x86)\Microsoft Visual Studio" vsdevcmd_start.bat`) DO (SET vsdevcmd="%F")
+
+    ECHO "VS DEV CMD BAT FILE = %vsdevcmd%"
+
+    %vsdevcmd%
+
     cd c:\projects\source
 
     git submodule init
