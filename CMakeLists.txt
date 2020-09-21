@@ -229,6 +229,8 @@ endif()
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
     list(APPEND APBS_LIBS m stdc++)
+else()
+    list(APPEND wsock32 ws2_32)
 endif()
 
 
