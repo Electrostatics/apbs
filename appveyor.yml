@@ -66,113 +66,73 @@ install:
 build_script:
   - set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\vsdevcmd\core\vsdevcmd_start.bat"
-  - set
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 
+  # set
   #  REM set VSDIR="C:\Program Files (x86)\Microsoft Visual Studio"
-
   #  set VSDIR="C:\"
-
   #  FOR /F "tokens=* USEBACKQ" %F IN (`where /r %VSDIR% vsdevcmd_start.bat`) DO (SET vsdevcmd="%F")
-
   #  REM Should be something like C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\vsdevcmd\core\vsdevcmd_start.bat"
-
   #  ECHO "VS DEV CMD BAT FILE = %vsdevcmd%"
-
   #  call %vsdevcmd%
-
   #  FOR /F "tokens=* USEBACKQ" %F IN (`where /r %VSDIR% vsvars64.bat`) DO (SET vsdevcmd="%F")
-
   #  REM Should be something like "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-
   #  ECHO "VS VARS FILE = %vsdevcmd%"
-
   #  call %vsdevcmd%
 
-  #  cd c:\projects\source
+  - cd c:\projects\source
+  - git submodule init
+  - git submodule update
+  - cd externals/pybind11
 
-  #  git submodule init
+  - echo "*****************************************************************************"
+  - echo PYBIND11_BUILD
+  - echo "*****************************************************************************"
 
-  #  git submodule update
+  - mkdir build
+  - mkdir install
+  - cd build
 
-  #  cd externals/pybind11
+  - echo "*****************************************************************************"
+  - echo PYBIND11_CONFIGURE
+  - echo "*****************************************************************************"
+  - cmake .. -DCMAKE_INSTALL_PREFIX=%pybind11_DIR%
 
-  #  echo "*****************************************************************************"
+  - echo "*****************************************************************************"
+  - echo PYBIND11_MAKE_INSTALL
+  - echo "*****************************************************************************"
+  - cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
 
-  #  echo PYBIND11_BUILD
+  - set pybind11_DIR=C:\projects\source\externals\pybind11\install\share\cmake\pybind11
+  - cd ..
+  - cd c:\projects\source
+  - mkdir build
+  - cd build
 
-  #  echo "*****************************************************************************"
+  - echo "*****************************************************************************"
+  - echo APBS_CONFIG
+  - echo "*****************************************************************************"
+  - cmake --config Release -DPYBIND11_DIR=%pybind11_DIR% -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_FETK=OFF -DENABLE_BEM=OFF -DENABLE_GEOFLOW=OFF -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=ON -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
 
-  #  mkdir build
-  #  
-  #  mkdir install
+  - echo "*****************************************************************************"
+  - echo APBS_CMAKE_OUTPUT
+  - echo "*****************************************************************************"
+  - if exist c:\projects\source\build\CMakeFiles\CMakeOutput.log type c:\projects\source\build\CMakeFiles\CMakeOutput.log
 
-  #  cd build
-  #  
-  #  echo "*****************************************************************************"
+  - echo "*****************************************************************************"
+  - echo APBS_CMAKE_ERROR
+  - echo "*****************************************************************************"
+  - if exist c:\projects\source\build\CMakeFiles\CMakeError.log type c:\projects\source\build\CMakeFiles\CMakeError.log
 
-  #  echo PYBIND11_CONFIGURE
+  - echo "*****************************************************************************"
+  - echo APBS_MAKE_INSTALL
+  - echo "*****************************************************************************"
+  - cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
 
-  #  echo "*****************************************************************************"
-
-  #  cmake .. -DCMAKE_INSTALL_PREFIX=%pybind11_DIR%
-
-  #  echo "*****************************************************************************"
-
-  #  echo PYBIND11_MAKE_INSTALL
-
-  #  echo "*****************************************************************************"
-
-  #  cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
-
-  #  set pybind11_DIR=C:\projects\source\externals\pybind11\install\share\cmake\pybind11
-
-  #  cd ..
-
-  #  cd c:\projects\source
-
-  #  mkdir build
-
-  #  cd build
-
-  #  echo "*****************************************************************************"
-
-  #  echo APBS_CONFIG
-
-  #  echo "*****************************************************************************"
-
-  #  cmake --config Release -DPYBIND11_DIR=%pybind11_DIR% -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_FETK=OFF -DENABLE_BEM=OFF -DENABLE_GEOFLOW=OFF -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=ON -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
-
-  #  echo "*****************************************************************************"
-
-  #  echo APBS_CMAKE_OUTPUT
-
-  #  echo "*****************************************************************************"
-
-  #  if exist c:\projects\source\build\CMakeFiles\CMakeOutput.log type c:\projects\source\build\CMakeFiles\CMakeOutput.log
-
-  #  echo "*****************************************************************************"
-
-  #  echo APBS_CMAKE_ERROR
-
-  #  echo "*****************************************************************************"
-
-  #  if exist c:\projects\source\build\CMakeFiles\CMakeError.log type c:\projects\source\build\CMakeFiles\CMakeError.log
-
-  #  echo "*****************************************************************************"
-
-  #  echo APBS_MAKE_INSTALL
-
-  #  echo "*****************************************************************************"
-
-  #  cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
-
-  #  echo "*****************************************************************************"
-
-  #  echo APBS_TEST
-
-  #  echo "*****************************************************************************"
-
-  #  ctest --config Release --verbose --output-on-failure
+  - echo "*****************************************************************************"
+  - echo APBS_TEST
+  - echo "*****************************************************************************"
+  - ctest --config Release --verbose --output-on-failure
 
   # echo APBS_PACKAGE
     
