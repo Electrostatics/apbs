@@ -64,33 +64,35 @@ install:
   #cmake --build . -config Release --parallel 1 --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
 
 build_script:
-  -  set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-  
+  - set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\vsdevcmd\core\vsdevcmd_start.bat"
+  - set
+
   #  REM set VSDIR="C:\Program Files (x86)\Microsoft Visual Studio"
 
-  -  set VSDIR="C:\"
+  #  set VSDIR="C:\"
 
-  -  FOR /F "tokens=* USEBACKQ" %F IN (`where /r %VSDIR% vsdevcmd_start.bat`) DO (SET vsdevcmd="%F")
+  #  FOR /F "tokens=* USEBACKQ" %F IN (`where /r %VSDIR% vsdevcmd_start.bat`) DO (SET vsdevcmd="%F")
 
   #  REM Should be something like C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\vsdevcmd\core\vsdevcmd_start.bat"
 
-  -  ECHO "VS DEV CMD BAT FILE = %vsdevcmd%"
+  #  ECHO "VS DEV CMD BAT FILE = %vsdevcmd%"
 
-  -  call %vsdevcmd%
+  #  call %vsdevcmd%
 
-  -  FOR /F "tokens=* USEBACKQ" %F IN (`where /r %VSDIR% vsvars64.bat`) DO (SET vsdevcmd="%F")
+  #  FOR /F "tokens=* USEBACKQ" %F IN (`where /r %VSDIR% vsvars64.bat`) DO (SET vsdevcmd="%F")
 
   #  REM Should be something like "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 
-  -  ECHO "VS VARS FILE = %vsdevcmd%"
+  #  ECHO "VS VARS FILE = %vsdevcmd%"
 
-  -  call %vsdevcmd%
+  #  call %vsdevcmd%
 
-  -  cd c:\projects\source
+  #  cd c:\projects\source
 
-  -  git submodule init
+  #  git submodule init
 
-  -  git submodule update
+  #  git submodule update
 
   #  cd externals/pybind11
 
