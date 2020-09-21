@@ -229,8 +229,6 @@ endif()
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
     list(APPEND APBS_LIBS m stdc++)
-else()
-    list(APPEND wsock32 ws2_32)
 endif()
 
 
@@ -304,6 +302,13 @@ if(ENABLE_MPI)
     endif()
 endif()
 
+
+################################################################################
+# Handle the finite element solver dependencies                                #
+################################################################################
+option(ENABLE_FETK "Enable the finite element solver" OFF)
+
+
 ################################################################################
 # Deal with MALOC                                                              #
 # Note that we depend exclusively on the MALOC that is in our external FETK    #
@@ -319,16 +324,10 @@ if(NOT ENABLE_FETK)
                         ${EXTERNALS_PATH}/fetk/maloc/src/psh)
     list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
     list(APPEND APBS_LIBS maloc)
-endif()
-
-
-################################################################################
-# Handle the finite element solver dependencies                                #
-################################################################################
-option(ENABLE_FETK "Enable the finite element solver" OFF)
-
-if(ENABLE_FETK)
-
+    if (WIN32)
+      list(APPEND MALOC_LIBS wsock32 WS2_32)
+    endif()
+else()
     if(WIN32)
         message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
     else()
@@ -715,7 +714,7 @@ if(CYGWIN)
 endif()
 
 if(NOT CYGWIN AND NOT MINGW AND WIN32)
-    list(APPEND APBS_LIBS wsock32)
+    list(APPEND APBS_LIBS wsock32 WS2_32)
     ADD_DEFINITIONS("/D _CRT_SECURE_NO_WARNINGS")
 endif()
 
