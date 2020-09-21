@@ -67,19 +67,19 @@ build_script:
 
     set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   
-    # set VSDIR="C:\Program Files (x86)\Microsoft Visual Studio"
+    REM set VSDIR="C:\Program Files (x86)\Microsoft Visual Studio"
     set VSDIR="C:\"
 
     FOR /F "tokens=* USEBACKQ" %F IN (`where /r %VSDIR% vsdevcmd_start.bat`) DO (SET vsdevcmd="%F")
 
-    # Should be something like C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\vsdevcmd\core\vsdevcmd_start.bat"
+    REM Should be something like C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\vsdevcmd\core\vsdevcmd_start.bat"
     ECHO "VS DEV CMD BAT FILE = %vsdevcmd%"
 
     call %vsdevcmd%
 
     FOR /F "tokens=* USEBACKQ" %F IN (`where /r %VSDIR% vsvars64.bat`) DO (SET vsdevcmd="%F")
 
-    # Should be something like "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+    REM Should be something like "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
     ECHO "VS VARS FILE = %vsdevcmd%"
 
     call %vsdevcmd%
