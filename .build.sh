@@ -68,10 +68,10 @@ cmake                                                     \
       -DENABLE_OPENMP=ON                                  \
       -DENABLE_PBAM=ON                                    \
       -DENABLE_PBSAM=ON                                   \
-      -DENABLE_PYTHON=OFF                                 \
+      -DENABLE_PYTHON=ON                                  \
       -DENABLE_TESTS=ON                                   \
       -DENABLE_TINKER=OFF                                 \
-      -DBUILD_SHARED_LIBS=OFF                             \
+      -DBUILD_SHARED_LIBS=ON                              \
       -DBUILD_DOC=OFF                                     \
       -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} ${COVERAGE}"      \
       -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${COVERAGE}"  \
