@@ -128,7 +128,7 @@ build_script:
   - echo "*****************************************************************************"
   - echo APBS_TEST
   - echo "*****************************************************************************"
-  - ctest --config Release --verbose --output-on-failure
+  - ctest -C Release --verbose --output-on-failure
 
   - echo "*****************************************************************************"
   - echo APBS_PACKAGE
