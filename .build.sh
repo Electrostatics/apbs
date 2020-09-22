@@ -52,7 +52,11 @@ pushd $(pwd)/externals/pybind11
 [ -d build ] || mkdir -p build
 [ -d install ] || mkdir -p install
 pushd build
-cmake .. -DDOWNLOAD_CATCH=ON -DCMAKE_INSTALL_PREFIX=$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" ../install)
+cmake                              \
+      -DDOWNLOAD_CATCH=ON          \
+      -DPYBIND11_TEST=OFF          \
+      -DCMAKE_INSTALL_PREFIX=$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" ../install) \
+      ..
 make -j install
 popd
 export pybind11_DIR=$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" ./install)
