@@ -394,8 +394,7 @@ else()
                                   vf2c
                                   tetgen
                                   triangle
-                                  readline
-                                  termcap)
+                                  readline)
 
         if(BUILD_SHARED_LIBS)
             install(DIRECTORY ${install_dir}/lib/
