@@ -229,7 +229,7 @@ VPUBLIC void VbuildG_1(int *nxf, int *nyf, int *nzf,
         for(jj=2; jj<=*ny-1; jj++) {
             j = 2 * jj - 1;
 
-            for(ii=2; ii<=*nx-1; i++) {
+            for(ii=2; ii<=*nx-1; ii++) {
                i = 2 * ii - 1;
 
                // Index computations
