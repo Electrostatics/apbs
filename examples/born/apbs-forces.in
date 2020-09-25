@@ -1,9 +1,5 @@
 #############################################################################
-### BORN ION SOLVATION ENERGY
-### $Id: apbs-mol-auto.in 1119 2007-07-23 13:52:03Z sobolevnrm $
-###
-### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for 
-### input file sytax.
+# BORN ION SOLVATION ENERGY
 #############################################################################
 
 # READ IN MOLECULES

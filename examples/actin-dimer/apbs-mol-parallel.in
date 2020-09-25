@@ -1,9 +1,5 @@
 #########################################################################/smo
-### ACTIN DIMER BINDING ENERGY
-### $Id$
-###
-### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for
-### syntax help.
+# ACTIN DIMER BINDING ENERGY
 ##########################################################################
 
 read

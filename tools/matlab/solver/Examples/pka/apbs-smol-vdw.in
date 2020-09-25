@@ -1,9 +1,5 @@
 ##########################################################################
-### PROTEIN KINASE BINDING ENERGY -- VAN DER WAALS SURFACE
-### $Id: apbs-smol-vdw.in 1346 2009-02-10 21:11:14Z sdg0919 $
-###
-### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for
-### syntax help.
+# PROTEIN KINASE BINDING ENERGY -- VAN DER WAALS SURFACE
 ##########################################################################
 
 read 
