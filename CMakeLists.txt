@@ -138,6 +138,50 @@ endif()
 ################################################################################
 file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}/temp)
 
+################################################################################
+# Pull dependencies from prebuilt tarball?                                     #
+################################################################################
+option(APBS_USE_PREBUILT_LIBS "Pull dependencies from prebuilt tarball" OFF)
+
+if(APBS_USE_PREBUILT_LIBS)
+  find_package(Wget REQUIRED)
+  find_package(UnixCommands REQUIRED)
+  if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    set(PREBUILT_NAME "apbs-dependencies-v3.0.0-x86_64-linux")
+  elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Mac OS X")
+    set(PREBUILT_NAME "apbs-dependencies-v3.0.0-x86_64-darwin")
+  else()
+    message(FATAL_ERROR "No prebuilt libraries currently available for windows.")
+  endif()
+  message(STATUS "Downloading tarball ${PREBUILT_NAME}.tar.gz")
+  execute_process(
+    COMMAND bash -c "
+    if [[ ! -f ${PREBUILT_NAME}.tar.gz ]]; then
+      ${WGET_EXECUTABLE} https://github.com/ashermancinelli/apbs-deps/releases/download/v3.0.0/${PREBUILT_NAME}.tar.gz
+    else
+      echo '-- Found prebuilt binary tarball already downloaded.'
+    fi
+    "
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/externals)
+  message(STATUS "Decompressing ${PROJECT_SOURCE_DIR}/externals/${PREBUILT_NAME}.tar.gz")
+  execute_process(
+    COMMAND bash -c "
+    if [[ ! -d ${PREBUILT_NAME} ]]; then
+      tar xvzf ${PREBUILT_NAME}.tar.gz
+    else
+      echo '-- Found prebuilt binaries already extracted.'
+    fi
+    "
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/externals)
+  message(STATUS "Configuring cmake to use libraries and headers from ${PROJECT_SOURCE_DIR}/externals/${PREBUILT_NAME}/")
+  include_directories(${PROJECT_SOURCE_DIR}/externals/${PREBUILT_NAME}/include)
+  link_directories(${PROJECT_SOURCE_DIR}/externals/${PREBUILT_NAME}/lib)
+  link_directories(${PROJECT_SOURCE_DIR}/externals/${PREBUILT_NAME}/lib64)
+  execute_process(
+    COMMAND "cp ${PROJECT_SOURCE_DIR}/externals/${PREBUILT_NAME}/bin/* ${PROJECT_BINARY_DIR}")
+endif()
+
+# message(FATAL_ERROR "--")
 
 ################################################################################
 # Set the lookup paths for external library dependencies                       #
@@ -328,82 +372,88 @@ if(NOT ENABLE_FETK)
       list(APPEND MALOC_LIBS wsock32 WS2_32)
     endif()
 else()
-    if(WIN32)
-        message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
-    else()
-        message(STATUS "Building FETK components.")
-        set(CONFIG_OPTS --prefix=<INSTALL_DIR>)
+    # lib/include/bin dirs for fetk will alredy be set up
+    # we just have to add the libraries
+    list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
+    list(APPEND APBS_LIBS
+                              maloc
+                              amd
+                              punc
+                              mc
+                              gamer
+                              superlu
+                              umfpack
+                              blas
+                              vf2c
+                              tetgen
+                              triangle
+                              readline)
 
-        set(MPI_ENV "")
-        if(HAVE_MPI_H)
-            list(APPEND CONFIG_OPTS --enable-mpi)
+    if(BUILD_SHARED_LIBS)
+        install(DIRECTORY ${install_dir}/lib/
+                DESTINATION ${LIBRARY_INSTALL_PATH})
+    endif()
 
-            # MALOC just cares about libmpi
-            foreach(LIB_PATH ${MPI_C_LIBRARIES})
-                get_filename_component(LIB ${LIB_PATH} NAME_WE)
-                if(LIB STREQUAL "libmpi")
-                    get_filename_component(MPI_LIB_DIR ${LIB_PATH} DIRECTORY)
-                endif()
-            endforeach()
+    SET(HAVE_MC_H 1)
+    SET(HAVE_PUNC_H 1)
+    SET(HAVE_BIOM_H 1)
 
-            set(MPI_ENV "FETK_MPI_INCLUDE=${MPI_C_INCLUDE_PATH}" "FETK_MPI_LIBRARY=${MPI_LIB_DIR}")
-        endif()
+    # Build FETK as subproject
+    if(NOT APBS_USE_PREBUILT_LIBS)
+        if(WIN32)
+            message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
+        else()
+            message(STATUS "Building FETK components.")
+            set(CONFIG_OPTS --prefix=<INSTALL_DIR>)
 
-        ExternalProject_Add(fetk-maloc
-            PREFIX fetk
-            SOURCE_DIR ${EXTERNALS_PATH}/fetk/maloc/src
-            CONFIGURE_COMMAND ${MPI_ENV} ${EXTERNALS_PATH}/fetk/maloc/configure ${CONFIG_OPTS}
-            BUILD_COMMAND ${MAKE})
+            set(MPI_ENV "")
+            if(HAVE_MPI_H)
+                list(APPEND CONFIG_OPTS --enable-mpi)
 
-        ExternalProject_Add(fetk-punc
-            PREFIX fetk
-            DEPENDS fetk-maloc
-            SOURCE_DIR ${EXTERNALS_PATH}/fetk/punc/src
-            CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure ${CONFIG_OPTS}
-            BUILD_COMMAND ${MAKE})
+                # MALOC just cares about libmpi
+                foreach(LIB_PATH ${MPI_C_LIBRARIES})
+                    get_filename_component(LIB ${LIB_PATH} NAME_WE)
+                    if(LIB STREQUAL "libmpi")
+                        get_filename_component(MPI_LIB_DIR ${LIB_PATH} DIRECTORY)
+                    endif()
+                endforeach()
 
-        ExternalProject_Add(fetk-gamer
-            PREFIX fetk
-            DEPENDS fetk-maloc
-            SOURCE_DIR ${EXTERNALS_PATH}/fetk/gamer/src
-            CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure ${CONFIG_OPTS}
-            BUILD_COMMAND ${MAKE})
+                set(MPI_ENV "FETK_MPI_INCLUDE=${MPI_C_INCLUDE_PATH}" "FETK_MPI_LIBRARY=${MPI_LIB_DIR}")
+            endif()
 
-        ExternalProject_Add(fetk-mc
-            PREFIX fetk
-            DEPENDS fetk-maloc fetk-punc
-            SOURCE_DIR ${EXTERNALS_PATH}/fetk/mc/src
-            CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure ${CONFIG_OPTS}
-            BUILD_COMMAND ${MAKE})
+            ExternalProject_Add(fetk-maloc
+                PREFIX fetk
+                SOURCE_DIR ${EXTERNALS_PATH}/fetk/maloc/src
+                CONFIGURE_COMMAND ${MPI_ENV} ${EXTERNALS_PATH}/fetk/maloc/configure ${CONFIG_OPTS}
+                BUILD_COMMAND ${MAKE})
 
-        set(FETK_ENABLED 1)
+            ExternalProject_Add(fetk-punc
+                PREFIX fetk
+                DEPENDS fetk-maloc
+                SOURCE_DIR ${EXTERNALS_PATH}/fetk/punc/src
+                CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure ${CONFIG_OPTS}
+                BUILD_COMMAND ${MAKE})
 
-        ExternalProject_Get_Property(fetk-maloc install_dir)
-        include_directories(${install_dir}/include)
+            ExternalProject_Add(fetk-gamer
+                PREFIX fetk
+                DEPENDS fetk-maloc
+                SOURCE_DIR ${EXTERNALS_PATH}/fetk/gamer/src
+                CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure ${CONFIG_OPTS}
+                BUILD_COMMAND ${MAKE})
 
-        list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
-        list(APPEND APBS_LIBS
-                                  maloc
-                                  amd
-                                  punc
-                                  mc
-                                  gamer
-                                  superlu
-                                  umfpack
-                                  blas
-                                  vf2c
-                                  tetgen
-                                  triangle
-                                  readline)
+            ExternalProject_Add(fetk-mc
+                PREFIX fetk
+                DEPENDS fetk-maloc fetk-punc
+                SOURCE_DIR ${EXTERNALS_PATH}/fetk/mc/src
+                CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure ${CONFIG_OPTS}
+                BUILD_COMMAND ${MAKE})
 
-        if(BUILD_SHARED_LIBS)
-            install(DIRECTORY ${install_dir}/lib/
-                    DESTINATION ${LIBRARY_INSTALL_PATH})
-        endif()
+            set(FETK_ENABLED 1)
 
-        SET(HAVE_MC_H 1)
-        SET(HAVE_PUNC_H 1)
-        SET(HAVE_BIOM_H 1)
+            ExternalProject_Get_Property(fetk-maloc install_dir)
+            include_directories(${install_dir}/include)
+
+          endif()
     endif()
 endif()
 
