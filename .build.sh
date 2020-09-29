@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#export CC=gcc
-#export CXX=g++
+export CC=gcc
+export CXX=g++
 #export CMAKE_C_COMPILER=$CC
 #export CMAKE_CXX_COMPILER=$CXX
 #export CMAKE_C_LINK_EXECUTABLE=$CC
@@ -64,23 +64,23 @@ popd
 cd $BUILD_DIR                                             || exit 1
 #cmake -S .. -B $BUILD_DIR --trace-source=../CMakeLists.txt --trace-expand \
 cmake                                                     \
-      -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR                 \
+      -DBUILD_DOC=OFF                                     \
+      -DBUILD_SHARED_LIBS=OFF                             \
+      -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} ${COVERAGE}"      \
+      -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${COVERAGE}"  \
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE                    \
-      -DENABLE_GEOFLOW=ON                                 \
+      -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR                 \
       -DENABLE_BEM=ON                                     \
+      -DENABLE_GEOFLOW=ON                                 \
       -DENABLE_FETK=ON                                    \
       -DENABLE_OPENMP=ON                                  \
       -DENABLE_PBAM=ON                                    \
       -DENABLE_PBSAM=ON                                   \
-      -DENABLE_PYTHON=ON                                  \
+      -DENABLE_PYTHON=OFF                                  \
       -DENABLE_TESTS=ON                                   \
       -DENABLE_TINKER=OFF                                 \
-      -DBUILD_SHARED_LIBS=ON                              \
-      -DBUILD_DOC=OFF                                     \
-      -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} ${COVERAGE}"      \
-      -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${COVERAGE}"  \
       ..                                                  || exit 1
-#      -DCMAKE_C_FLAGS="-fPIC"                             \
+
 VERBOSE=1 make -j 1                                       || exit 1
 VERBOSE=1 make -j 1 install                               #|| exit 1
 export PATH="$INSTALL_DIR/bin:$PATH"
