@@ -1,4 +1,5 @@
 from apbs.geometry import Sphere
+from apbs.geometry import Surface
 import pytest
 
 

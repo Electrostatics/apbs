@@ -22,4 +22,11 @@ class MultiGrid:
     def set_part(
         self, lower_corner: Coordinate, upper_corner: Coordinate
     ) -> None:
+        """
+        :param lower_corner: The X,Y,Z coordinates in angstroms
+        :type lower_corner: Coordinate
+        :param upper_corner: The X,Y,Z coordinates in angstroms
+        :type upper_corner: Coordinate
+        """
+        # TODO: This needs to be implemented
         pass
