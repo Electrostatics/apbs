@@ -5,6 +5,7 @@ from apbs.chemistry import Atom, AtomList
 
 class PQRReader:
     def __init__(self):
+        # TODO: Limit the field_name grammar to ATOM or HETOM literals
         identifier = Word(alphas, alphanums + "_")
         integer_val = Word(nums + "-")
         float_val = Word(nums + "-" + ".")
@@ -25,7 +26,11 @@ class PQRReader:
         self.atom = atomValue + ZeroOrMore(atomValue)
 
     def loads(self, pqr_string) -> AtomList:
-        # find instances of atoms ignoring other syntax
+        """
+        Find instances of atoms ignoring other syntax
+
+        :param pqr_string: One or more ATOM/HETOM
+        """
         atoms = []
         idx = 1
         for item, start, stop in self.atom.scanString(pqr_string):
@@ -49,7 +54,13 @@ class PQRReader:
             idx += 1
         return AtomList(atoms)
 
-    def load(self, filename) -> AtomList:
+    def load(self, filename: str) -> AtomList:
+        """
+        Read Atoms from a file in PQR format
+
+        :param filename: The path/filename to the PQR file
+        :type filename: string
+        """
         with open(filename, "r") as file:
             data = file.read().replace("\n", "")
         return self.loads(data)

@@ -1,4 +1,4 @@
-import math
+import numpy as np
 import sys  # noqa
 
 from apbs.geometry import (
@@ -32,8 +32,8 @@ class AtomComplexCalc:
         self.alist = alist
         self.surface_density = surface_density
         max_radius = alist.max_radius + clist.max_radius
-        max_area = 4.0 * (max_radius ** 2) * math.pi
-        nsphere = math.ceil(max_area * surface_density)
+        max_area = 4.0 * (max_radius ** 2) * np.pi
+        nsphere = np.ceil(max_area * surface_density)
 
         # TODO: calculate reference shpere (see VaccSurf_refSphere)
 
@@ -122,6 +122,6 @@ class AtomComplexCalc:
                 surf.coords.append((rad * ref.coords[i] + apos))
                 surf.coords[-1].is_on_surf = True
 
-        surf.area = 4.0 * math.pi * rad * rad * float(surf.npoints) / float(ref.npoints)
+        surf.area = 4.0 * np.pi * rad * rad * float(surf.npoints) / float(ref.npoints)
 
         return surf

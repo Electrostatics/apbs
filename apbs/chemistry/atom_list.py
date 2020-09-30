@@ -15,6 +15,10 @@ class AtomList:
     """
 
     def __init__(self, atoms: List = None):
+        """
+        :param atoms: A list of Atoms
+        :type atoms: List
+        """
         self._atoms: Tuple[Atom] = atoms if atoms is not None else []
         self.charge: float = None
         self.maxrad: float = None
