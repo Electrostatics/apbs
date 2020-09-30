@@ -19,9 +19,7 @@ class AtomComplexCalc:
     Port of Vacc
     """
 
-    def __init__(
-        self, alist: AtomList, clist: CellList, surface_density: float
-    ):
+    def __init__(self, alist: AtomList, clist: CellList, surface_density: float):
         """
         .. note:: This is not just a port of the ctor for Vacc, but also
         replaces Vacc_storeParms. Vacc_storeParms seems to be simply an
@@ -112,9 +110,7 @@ class AtomComplexCalc:
             pos.z = rad(ref.zs[i]) + apos.z
 
             # need to implement
-            if self.accessable_outside_inflated_venderwalls_rad(
-                pos, prad, atomID
-            ):
+            if self.accessable_outside_inflated_venderwalls_rad(pos, prad, atomID):
                 npoints += 1
                 ref.is_on_surf[i] = True
             else:
@@ -126,13 +122,6 @@ class AtomComplexCalc:
                 surf.coords.append((rad * ref.coords[i] + apos))
                 surf.coords[-1].is_on_surf = True
 
-        surf.area = (
-            4.0
-            * math.pi
-            * rad
-            * rad
-            * float(surf.npoints)
-            / float(ref.npoints)
-        )
+        surf.area = 4.0 * math.pi * rad * rad * float(surf.npoints) / float(ref.npoints)
 
         return surf

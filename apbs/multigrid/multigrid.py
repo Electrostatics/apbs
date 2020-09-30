@@ -19,7 +19,5 @@ VEXTERNC void Vpmg_setPart(
 
 
 class MultiGrid:
-    def set_part(
-        self, lower_corner: Coordinate, upper_corner: Coordinate
-    ) -> None:
+    def set_part(self, lower_corner: Coordinate, upper_corner: Coordinate) -> None:
         pass

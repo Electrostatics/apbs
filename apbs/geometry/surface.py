@@ -12,9 +12,7 @@ class Surface:
     def __init__(self, probe_radius: float, npoints: int):
         self.probe_radius = probe_radius
         self.npoints = npoints
-        self.coords: List[SurfacePoint] = [
-            SurfacePoint() for _ in range(npoints)
-        ]
+        self.coords: List[SurfacePoint] = [SurfacePoint() for _ in range(npoints)]
         self._dp: Dict[str, float] = dict()
 
     def __getitem__(self, idx: int) -> SurfacePoint:

@@ -4,8 +4,7 @@ import math
 
 
 class CurvatureFlag:
-    """Enum class to replace curvature flags in original source
-    """
+    """Enum class to replace curvature flags in original source"""
 
     ReducedMaximalCurvature = 0
     MeanCurvature = 1
@@ -78,21 +77,9 @@ class Grid:
             int(math.floor(tmp.z)),
         )
 
-        hi.x = (
-            self.dims.x - 1
-            if abs(pt.x - self.maxs.x) < Constants.epsilon
-            else hi.x
-        )
-        hi.y = (
-            self.dims.y - 1
-            if abs(pt.y - self.maxs.y) < Constants.epsilon
-            else hi.y
-        )
-        hi.z = (
-            self.dims.z - 1
-            if abs(pt.z - self.maxs.z) < Constants.epsilon
-            else hi.z
-        )
+        hi.x = self.dims.x - 1 if abs(pt.x - self.maxs.x) < Constants.epsilon else hi.x
+        hi.y = self.dims.y - 1 if abs(pt.y - self.maxs.y) < Constants.epsilon else hi.y
+        hi.z = self.dims.z - 1 if abs(pt.z - self.maxs.z) < Constants.epsilon else hi.z
 
         lo.x = 0 if abs(pt.x - self.mins.x) < Constants.eps else lo.x
         lo.y = 0 if abs(pt.y - self.mins.y) < Constants.eps else lo.y
@@ -102,36 +89,21 @@ class Grid:
             dx, dy, dz = tmp.x - lo.x, tmp.y - lo.y, tmp.z - lo.z
             ret_value = list()
             ret_value.append(float(dx * dy * dz * self.data[hi.x, hi.y, hi.z]))
+            ret_value.append(float(dx * (1.0 - dy) * dz * self.data[hi.x, lo.y, hi.z]))
+            ret_value.append(float(dx * dy * (1.0 - dz) * self.data[hi.x, hi.y, lo.z]))
             ret_value.append(
-                float(dx * (1.0 - dy) * dz * self.data[hi.x, lo.y, hi.z])
+                float(dx * (1.0 - dy) * (1.0 - dz) * self.data[hi.x, lo.y, lo.z])
+            )
+            ret_value.append(float((1.0 - dx) * dy * dz * self.data[lo.x, hi.y, hi.z]))
+            ret_value.append(
+                float((1.0 - dx) * (1.0 - dy) * dz * self.data[lo.x, lo.y, hi.z])
             )
             ret_value.append(
-                float(dx * dy * (1.0 - dz) * self.data[hi.x, hi.y, lo.z])
-            )
-            ret_value.append(
-                float(
-                    dx * (1.0 - dy) * (1.0 - dz) * self.data[hi.x, lo.y, lo.z]
-                )
-            )
-            ret_value.append(
-                float((1.0 - dx) * dy * dz * self.data[lo.x, hi.y, hi.z])
-            )
-            ret_value.append(
-                float(
-                    (1.0 - dx) * (1.0 - dy) * dz * self.data[lo.x, lo.y, hi.z]
-                )
+                float((1.0 - dx) * dy * (1.0 - dz) * self.data[lo.x, hi.y, lo.z])
             )
             ret_value.append(
                 float(
-                    (1.0 - dx) * dy * (1.0 - dz) * self.data[lo.x, hi.y, lo.z]
-                )
-            )
-            ret_value.append(
-                float(
-                    (1.0 - dx)
-                    * (1.0 - dy)
-                    * (1.0 - dz)
-                    * self.data[lo.x, lo.y, lo.z]
+                    (1.0 - dx) * (1.0 - dy) * (1.0 - dz) * self.data[lo.x, lo.y, lo.z]
                 )
             )
 
@@ -169,24 +141,21 @@ class Grid:
         ...
 
     def integrate(self) -> float:
-        """Get the integral of the data
-        """
+        """Get the integral of the data"""
         ...
 
     def norml1(self) -> float:
         r"""Get the \f$L_1\f$ norm of the data.  This returns the integral:
-            \f[ \| u \|_{L_1} = \int_\Omega | u(x) | dx  \f]
+        \f[ \| u \|_{L_1} = \int_\Omega | u(x) | dx  \f]
         """
         ...
 
     def norml2(self) -> float:
-        r"""Computes the \f$L_2\f$ norm of the data.
-        """
+        r"""Computes the \f$L_2\f$ norm of the data."""
         ...
 
     def norml_inf(self) -> float:
-        r"""Computes the \f$L_\infty\f$ norm of the data.
-        """
+        r"""Computes the \f$L_\infty\f$ norm of the data."""
         ...
 
     def seminormH1(self) -> float:
@@ -224,6 +193,4 @@ class Grid:
                 len(fields) == 3
             ), "Found an unknown option or found line with values != 3"
 
-            self.data.append(
-                [float(fields[0]), float(fields[1]), float(fields[2])]
-            )
+            self.data.append([float(fields[0]), float(fields[1]), float(fields[2])])
