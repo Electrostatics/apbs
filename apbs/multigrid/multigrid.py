@@ -19,7 +19,9 @@ VEXTERNC void Vpmg_setPart(
 
 
 class MultiGrid:
-    def set_part(self, lower_corner: Coordinate, upper_corner: Coordinate) -> None:
+    def set_part(
+        self, lower_corner: Coordinate, upper_corner: Coordinate
+    ) -> None:
         """
         :param lower_corner: The X,Y,Z coordinates in angstroms
         :type lower_corner: Coordinate

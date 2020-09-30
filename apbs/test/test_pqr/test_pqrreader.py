@@ -1,10 +1,5 @@
-import numpy as np
 import pathlib
-import pytest
 from apbs.chemistry.atom_list import AtomList
-from apbs.pqr.reader import PQRReader
-from apbs.chemistry import Atom
-from apbs.geometry import Coordinate
 from apbs.pqr import PQRReader
 
 
@@ -18,9 +13,9 @@ ATOM     39 O3PB ADP     1     -16.362  -6.763  26.980 -0.900 1.700
 ATOM     39 O3PB ADP     1  D   -16.362  -6.763  26.980 -0.900 1.700
 """
         atomlist: AtomList = sut.loads(sample)
-        for var in range(1):
-            assert abs(atomlist.atoms[var].x - -24.642) < 0.001
-            assert int(atomlist.atoms[var].x) == -24
+        for idx in range(1):
+            assert abs(atomlist.atoms[idx].x - -24.642) < 0.001
+            assert int(atomlist.atoms[idx].x) == -24
 
     def test_load(self):
         sut = PQRReader()

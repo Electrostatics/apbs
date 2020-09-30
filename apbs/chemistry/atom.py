@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Union
 import numpy as np
 from apbs.geometry import Coordinate
 
@@ -19,37 +19,38 @@ class Atom:
     def __init__(self, *args, **kwargs):
         """
         Arguments:
-          :param id: A unique identifier for this Atom
-          :type id: int
-          :param field_name: Specifies the type of PQR entry and should either
-                             be ATOM or HETATM in order to be parsed by APBS.
-          :type field_name: string
-          :param atom_number: The atom index.
-          :type atom_number: int
-          :param atom_name: The atom name.
-          :type atom_name: string
-          :param residue_name: The residue name.
-          :type residue_name: string
-          :param chain_id: An optional value which provides the chain ID of
-                           the atom. NOTE: that chain ID support is a new
-                           feature of APBS 0.5.0 and later versions.
-          :type chain_id: string
-          :param residue_number: The residue index.
-          :type residue_number: int
-          :param ins_code: An optional value which provides the PDB insertion code.
-          :type ins_code: string
-          :param x: The X atomic coordinate in angstroms
-          :type x: float
-          :param y: The Y atomic coordinate in angstroms
-          :type y: float
-          :param z: The Z atomic coordinate in angstroms
-          :type z: float
-          :param charge: The atomic charge (in electrons).
-          :type charge: float
-          :param radius: The atomic radius (in angstroms).
-          :type radius: float
 
-          :Example:
+        :param id: A unique identifier for this Atom
+        :type id: int
+        :param field_name: Specifies the type of PQR entry and should either
+                           be ATOM or HETATM in order to be parsed by APBS.
+        :type field_name: string
+        :param atom_number: The atom index.
+        :type atom_number: int
+        :param atom_name: The atom name.
+        :type atom_name: string
+        :param residue_name: The residue name.
+        :type residue_name: string
+        :param chain_id: An optional value which provides the chain ID of
+                         the atom. NOTE: that chain ID support is a new
+                         feature of APBS 0.5.0 and later versions.
+        :type chain_id: string
+        :param residue_number: The residue index.
+        :type residue_number: int
+        :param ins_code: An optional value which provides the PDB insertion code.
+        :type ins_code: string
+        :param x: The X atomic coordinate in angstroms
+        :type x: float
+        :param y: The Y atomic coordinate in angstroms
+        :type y: float
+        :param z: The Z atomic coordinate in angstroms
+        :type z: float
+        :param charge: The atomic charge (in electrons).
+        :type charge: float
+        :param radius: The atomic radius (in angstroms).
+        :type radius: float
+
+        :Example:
 
           atom = Atom(
                     field_name=ATOM,
@@ -89,22 +90,14 @@ class Atom:
         #     raise ValueError("The Atom id must be set to non-zero value")
 
     def __str__(self):
-        return "Atom< name< %s >, %s, radius< %s >, charge< %s >>" % (
-            self.name,
-            self.position,
-            self.radius,
-            self.charge,
-        )
+        return f"Atom< name< {self.name} >, {self.position}, radius< {self.radius} >, charge< {self.charge} > >"
 
     def __repr__(self):
-        return "Atom< name< %s >, %s  radius< %s >, charge< %s >>" % (
-            self.name,
-            self.position,
-            self.radius,
-            self.charge,
-        )
+        return f"Atom< name< {self.name} >, {self.position}, radius< {self.radius} >, charge< {self.charge} > >"
 
-    def euclidian_dist2(self, other: Union["Atom", Coordinate, np.ndarray]) -> float:
+    def euclidian_dist2(
+        self, other: Union["Atom", Coordinate, np.ndarray]
+    ) -> float:
         """
         Euclidian distance without the square root
 
@@ -112,6 +105,8 @@ class Atom:
                       the euclidian distance from this Atom (without taking
                       the square root)
         :type other: Atom, Coordinate, or np.ndarray
+        :return: The euclidian distance between two X,Y,Z coordinates
+        :rtype: float
         """
         if isinstance(other, Atom):
             return np.sum((self.position._data - other.position._data) ** 2)

@@ -1,15 +1,17 @@
-from pyparsing import *
-from typing import List
+from pyparsing import Group, Word, ZeroOrMore, alphas, alphanums, nums
 from apbs.chemistry import Atom, AtomList
 
 
 class PQRReader:
+    """A grammar/parser for PQR formatted data and files."""
+
     def __init__(self):
+        """Define the grammar for an ATOM in PQR format."""
         # TODO: Limit the field_name grammar to ATOM or HETOM literals
         identifier = Word(alphas, alphanums + "_")
         integer_val = Word(nums + "-")
         float_val = Word(nums + "-" + ".")
-        atomValue = Group(
+        atom_value = Group(
             identifier("field_name")
             + integer_val("atom_number")
             + identifier("atom_name")
@@ -23,17 +25,19 @@ class PQRReader:
             + float_val("charge")
             + float_val("radius")
         )
-        self.atom = atomValue + ZeroOrMore(atomValue)
+        self.atom = atom_value + ZeroOrMore(atom_value)
 
-    def loads(self, pqr_string) -> AtomList:
+    def loads(self, pqr_string: str) -> AtomList:
         """
-        Find instances of atoms ignoring other syntax
+        Find instances of atoms ignoring other syntax.
 
-        :param pqr_string: One or more ATOM/HETOM
+        :param str pqr_string: One or more ATOM/HETOM
+        :return: the list of Atoms in the pqr_string
+        :rtype: AtomList
         """
         atoms = []
         idx = 1
-        for item, start, stop in self.atom.scanString(pqr_string):
+        for item, _start, _stop in self.atom.scanString(pqr_string):
             for match in item:
                 atom = Atom(
                     field_name=match.field_name,
@@ -58,11 +62,12 @@ class PQRReader:
         """
         Read Atoms from a file in PQR format
 
-        :param filename: The path/filename to the PQR file
-        :type filename: string
+        :param str filename: The path/filename to the PQR file
+        :return: the list of Atoms in the pqr file
+        :rtype: AtomList
         """
-        with open(filename, "r") as file:
-            data = file.read().replace("\n", "")
+        with open(filename, "r") as fp:
+            data = fp.read().replace("\n", "")
         return self.loads(data)
 
 

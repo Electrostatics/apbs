@@ -1,6 +1,6 @@
 from typing import List, Optional
 from apbs.geometry import Coordinate, Constants
-import math
+import numpy as np
 
 
 class CurvatureFlag:
@@ -69,17 +69,29 @@ class Grid:
         )
 
         hi = Coordinate(
-            int(math.ceil(tmp.x)), int(math.ceil(tmp.y)), int(math.ceil(tmp.z))
+            int(np.ceil(tmp.x)), int(np.ceil(tmp.y)), int(np.ceil(tmp.z))
         )
         lo = Coordinate(
-            int(math.floor(tmp.x)),
-            int(math.floor(tmp.y)),
-            int(math.floor(tmp.z)),
+            int(np.floor(tmp.x)),
+            int(np.floor(tmp.y)),
+            int(np.floor(tmp.z)),
         )
 
-        hi.x = self.dims.x - 1 if abs(pt.x - self.maxs.x) < Constants.epsilon else hi.x
-        hi.y = self.dims.y - 1 if abs(pt.y - self.maxs.y) < Constants.epsilon else hi.y
-        hi.z = self.dims.z - 1 if abs(pt.z - self.maxs.z) < Constants.epsilon else hi.z
+        hi.x = (
+            self.dims.x - 1
+            if abs(pt.x - self.maxs.x) < Constants.epsilon
+            else hi.x
+        )
+        hi.y = (
+            self.dims.y - 1
+            if abs(pt.y - self.maxs.y) < Constants.epsilon
+            else hi.y
+        )
+        hi.z = (
+            self.dims.z - 1
+            if abs(pt.z - self.maxs.z) < Constants.epsilon
+            else hi.z
+        )
 
         lo.x = 0 if abs(pt.x - self.mins.x) < Constants.eps else lo.x
         lo.y = 0 if abs(pt.y - self.mins.y) < Constants.eps else lo.y
@@ -89,27 +101,42 @@ class Grid:
             dx, dy, dz = tmp.x - lo.x, tmp.y - lo.y, tmp.z - lo.z
             ret_value = list()
             ret_value.append(float(dx * dy * dz * self.data[hi.x, hi.y, hi.z]))
-            ret_value.append(float(dx * (1.0 - dy) * dz * self.data[hi.x, lo.y, hi.z]))
-            ret_value.append(float(dx * dy * (1.0 - dz) * self.data[hi.x, hi.y, lo.z]))
             ret_value.append(
-                float(dx * (1.0 - dy) * (1.0 - dz) * self.data[hi.x, lo.y, lo.z])
-            )
-            ret_value.append(float((1.0 - dx) * dy * dz * self.data[lo.x, hi.y, hi.z]))
-            ret_value.append(
-                float((1.0 - dx) * (1.0 - dy) * dz * self.data[lo.x, lo.y, hi.z])
+                float(dx * (1.0 - dy) * dz * self.data[hi.x, lo.y, hi.z])
             )
             ret_value.append(
-                float((1.0 - dx) * dy * (1.0 - dz) * self.data[lo.x, hi.y, lo.z])
+                float(dx * dy * (1.0 - dz) * self.data[hi.x, hi.y, lo.z])
             )
             ret_value.append(
                 float(
-                    (1.0 - dx) * (1.0 - dy) * (1.0 - dz) * self.data[lo.x, lo.y, lo.z]
+                    dx * (1.0 - dy) * (1.0 - dz) * self.data[hi.x, lo.y, lo.z]
+                )
+            )
+            ret_value.append(
+                float((1.0 - dx) * dy * dz * self.data[lo.x, hi.y, hi.z])
+            )
+            ret_value.append(
+                float(
+                    (1.0 - dx) * (1.0 - dy) * dz * self.data[lo.x, lo.y, hi.z]
+                )
+            )
+            ret_value.append(
+                float(
+                    (1.0 - dx) * dy * (1.0 - dz) * self.data[lo.x, hi.y, lo.z]
+                )
+            )
+            ret_value.append(
+                float(
+                    (1.0 - dx)
+                    * (1.0 - dy)
+                    * (1.0 - dz)
+                    * self.data[lo.x, lo.y, lo.z]
                 )
             )
 
             ret_value = sum(ret_value)
 
-            if ret_value == math.nan:
+            if ret_value == np.nan:
                 # TODO: Add a more descriptive error
                 raise RuntimeError(
                     "Value routine failed to converge with the following "
@@ -193,4 +220,6 @@ class Grid:
                 len(fields) == 3
             ), "Found an unknown option or found line with values != 3"
 
-            self.data.append([float(fields[0]), float(fields[1]), float(fields[2])])
+            self.data.append(
+                [float(fields[0]), float(fields[1]), float(fields[2])]
+            )
