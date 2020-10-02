@@ -56,7 +56,7 @@ class Atom:
                 )
         """
 
-        if (len(args) > 0):
+        if len(args) > 0:
             self.position = Coordinate(args[0], args[1], args[2])
 
         self.field_name: str = kwargs.get("field_name", None)
@@ -68,13 +68,15 @@ class Atom:
         self.ins_code: str = kwargs.get("ins_code", None)
         if "x" in kwargs and "y" in kwargs and "z" in kwargs:
             self.position = Coordinate(
-                float(kwargs.get("x")), float(kwargs.get("y")), float(kwargs.get("z"))
+                float(kwargs.get("x")),
+                float(kwargs.get("y")),
+                float(kwargs.get("z")),
             )
         self.charge: float = float(kwargs.get("charge", 0.0))
         self.radius: float = float(kwargs.get("radius", 0.0))
         self.epsilon: float = float(kwargs.get("epsilon", 0.0))
         self.id: int = int(kwargs.get("id", 0))
-        if ("id" not in kwargs):
+        if "id" not in kwargs:
             raise ValueError("The Atom id must be set to non-zero value")
 
     def __str__(self):

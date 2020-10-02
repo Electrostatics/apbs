@@ -6,16 +6,20 @@ import pytest
 
 class TestAtom:
     def test_ctor(self):
-        sut = Atom(x=0, y=0, z=0)
+        sut = Atom(id=1, x=0, y=0, z=0)
         assert (sut.position._data == np.array((0, 0, 0))).all()
 
+    def test_atom_exception(self):
+        """test that exception is raised for invalid atoms"""
+        with pytest.raises(ValueError):
+            assert Atom(0, 0, 0)
+
     def test_property_get(self):
-        sut = Atom(x=1, y=2, z=3)
+        sut = Atom(id=1, x=1, y=2, z=3)
         assert sut.x == 1
         assert sut.y == 2
         assert sut.z == 3
 
-    @pytest.mark.skip(reason="Needs conversion to Atom with xyz values")
     @pytest.mark.parametrize(
         "params1,params2",
         [
@@ -26,11 +30,10 @@ class TestAtom:
     )
     def test_euclidian_distance_atom(self, params1, params2):
         expect = np.sum((np.array(params1) - np.array(params2)) ** 2)
-        a = Atom(*params1)
-        b = Atom(*params2)
+        a = Atom(id=1, *params1)
+        b = Atom(id=2, *params2)
         assert a.euclidian_dist2(b) == expect
 
-    @pytest.mark.skip(reason="Needs conversion to Atom with xyz values")
     @pytest.mark.parametrize(
         "params1,params2",
         [
@@ -41,10 +44,9 @@ class TestAtom:
     )
     def test_euclidian_distance_array(self, params1, params2):
         expect = np.sum((np.array(params1) - np.array(params2)) ** 2)
-        a = Atom(*params1)
+        a = Atom(id=1, *params1)
         assert a.euclidian_dist2(np.array(params2)) == expect
 
-    @pytest.mark.skip(reason="Needs conversion to Atom with xyz values")
     @pytest.mark.parametrize(
         "params1,params2",
         [
@@ -55,6 +57,6 @@ class TestAtom:
     )
     def test_euclidian_distance_array2(self, params1, params2):
         expect = np.sum((np.array(params1) - np.array(params2)) ** 2)
-        a = Atom(*params1)
+        a = Atom(id=1, *params1)
         b = Coordinate(*params2)
         assert a.euclidian_dist2(b) == expect
