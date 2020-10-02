@@ -1,4 +1,4 @@
-from pyparsing import Group, Word, ZeroOrMore, alphas, alphanums, nums
+from pyparsing import Group, Literal, Word, ZeroOrMore, alphas, alphanums, nums
 from apbs.chemistry import Atom, AtomList
 
 
@@ -6,13 +6,13 @@ class PQRReader:
     """A grammar/parser for PQR formatted data and files."""
 
     def __init__(self):
-        """Define the grammar for an ATOM in PQR format."""
-        # TODO: Limit the field_name grammar to ATOM or HETOM literals
+        """Define the grammar for an ATOM/HETOM in PQR format."""
         identifier = Word(alphas, alphanums + "_")
         integer_val = Word(nums + "-")
         float_val = Word(nums + "-" + ".")
+        keyword_val = Literal("ATOM") | Literal("HETOM")
         atom_value = Group(
-            identifier("field_name")
+            keyword_val("field_name")
             + integer_val("atom_number")
             + identifier("atom_name")
             + identifier("residue_name")
@@ -36,23 +36,23 @@ class PQRReader:
         :rtype: AtomList
         """
         atoms = []
-        idx = 1
+        idx: int = 1
         for item, _start, _stop in self.atom.scanString(pqr_string):
             for match in item:
                 atom = Atom(
                     field_name=match.field_name,
-                    atom_number=match.atom_number,
+                    atom_number=int(match.atom_number),
                     atom_name=match.atom_name,
                     residue_name=match.residue_name,
                     chain_id=match.chain_id,
-                    residue_number=match.residue_number,
+                    residue_number=int(match.residue_number),
                     ins_code=match.ins_code,
-                    x=match.x,
-                    y=match.y,
-                    z=match.z,
-                    charge=match.charge,
-                    radius=match.radius,
-                    id=idx,
+                    x=float(match.x),
+                    y=float(match.y),
+                    z=float(match.z),
+                    charge=float(match.charge),
+                    radius=float(match.radius),
+                    id=int(idx),
                 )
                 atoms.append(atom)
             idx += 1
@@ -77,9 +77,12 @@ if __name__ == "__main__":
 ATOM   5226  HD1 TYR   337     -24.642  -2.718  30.187  0.115 1.358
 ATOM      7  CD   LYS D   1      44.946 37.289  9.712    -0.0608  1.9080
 ATOM     39 O3PB ADP     1     -16.362  -6.763  26.980 -0.900 1.700
-ATOM     39 O3PB ADP     1  DORK   -16.362  -6.763  26.980 -0.900 1.700
+REMARK This is just a comment hiding in the data
+HETOM     39 O3PB ADP     1     -16.362  -6.763  26.980 -0.900 1.700
+ATOM     39 O3PB ADP     1  D   -16.362  -6.763  26.980 -0.900 1.700
 """
 
     reader = PQRReader()
     atoms = []
     atoms = reader.loads(sample)
+    print(atoms)
