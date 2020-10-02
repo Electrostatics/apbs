@@ -1,5 +1,2 @@
 python-dev-tools
 pybind11
-sphinx
-sphinx_rtd_theme
-sphinx_sitemap
