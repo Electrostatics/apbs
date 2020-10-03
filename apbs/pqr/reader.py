@@ -6,7 +6,7 @@ class PQRReader:
     """A grammar/parser for PQR formatted data and files."""
 
     def __init__(self):
-        """Define the grammar for an ATOM/HETOM in PQR format."""
+        """Define the grammar for an ATOM/HETATM in PQR format."""
         identifier = Word(alphas, alphanums + "_")
         integer_val = Word(nums + "-")
         float_val = Word(nums + "-" + ".")
