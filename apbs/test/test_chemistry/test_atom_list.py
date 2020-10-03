@@ -12,15 +12,15 @@ def get_atom_list(tmp_path) -> AtomList:
 
     with open(fqpn, "w") as f:
         f.write(
-            "HETOM    1  C    ALK    1       "
+            "HETATM    1  C    ALK    1       "
             "1.000   4.000   7.000 0.000 1.000\n"
         )
         f.write(
-            "HETOM    1  C    ALK    1       "
+            "HETATM    1  C    ALK    1       "
             "2.000   5.000   8.000 0.000 2.000\n"
         )
         f.write(
-            "HETOM    1  C    ALK    1       "
+            "HETATM    1  C    ALK    1       "
             "3.000   6.000   9.000 0.000 3.000\n"
         )
 
