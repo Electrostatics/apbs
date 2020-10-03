@@ -10,7 +10,7 @@ class PQRReader:
         identifier = Word(alphas, alphanums + "_")
         integer_val = Word(nums + "-")
         float_val = Word(nums + "-" + ".")
-        keyword_val = Literal("ATOM") | Literal("HETOM")
+        keyword_val = Literal("ATOM") | Literal("HETATM")
         atom_value = Group(
             keyword_val("field_name")
             + integer_val("atom_number")
@@ -31,7 +31,7 @@ class PQRReader:
         """
         Find instances of atoms ignoring other syntax.
 
-        :param str pqr_string: One or more ATOM/HETOM
+        :param str pqr_string: One or more ATOM/HETATM
         :return: the list of Atoms in the pqr_string
         :rtype: AtomList
         """
@@ -74,11 +74,12 @@ class PQRReader:
 if __name__ == "__main__":
     # execute only if run as a script
     sample = r"""
+REMARK This is just test data and values may have been modified for testing
 ATOM   5226  HD1 TYR   337     -24.642  -2.718  30.187  0.115 1.358
 ATOM      7  CD   LYS D   1      44.946 37.289  9.712    -0.0608  1.9080
 ATOM     39 O3PB ADP     1     -16.362  -6.763  26.980 -0.900 1.700
 REMARK This is just a comment hiding in the data
-HETOM     39 O3PB ADP     1     -16.362  -6.763  26.980 -0.900 1.700
+HETATM     39 O3PB ADP     1     -16.362  -6.763  26.980 -0.900 1.700
 ATOM     39 O3PB ADP     1  D   -16.362  -6.763  26.980 -0.900 1.700
 """
 
