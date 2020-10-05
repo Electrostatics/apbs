@@ -1,14 +1,16 @@
 from apbs.geometry import Coordinate
-from apbs.chemistry import AtomList, CellList
-import pytest
+from apbs.chemistry import Atom, AtomList
+from apbs.pqr import PQRReader
+from pytest import approx, fixture
 
 
-@pytest.fixture()
-def pdb_file(tmp_path):
+@fixture
+def get_atom_list(tmp_path) -> AtomList:
+    """Return the AtomList from the file generated."""
 
-    fp = tmp_path / "atom.pdb"
+    fqpn = tmp_path / "atom.pdb"
 
-    with open(fp, "w") as f:
+    with open(fqpn, "w") as f:
         f.write(
             "HETATM    1  C    ALK    1       "
             "1.000   4.000   7.000 0.000 1.000\n"
@@ -21,56 +23,51 @@ def pdb_file(tmp_path):
             "HETATM    1  C    ALK    1       "
             "3.000   6.000   9.000 0.000 3.000\n"
         )
-    return fp
+
+    reader = PQRReader()
+    return reader.load(fqpn)
 
 
-class TestAtomList:
-    @pytest.mark.skip(reason="Needs conversion to get AtomList from PQRReader")
-    def test_read_pdb(self, pdb_file: str):
+def test_atom_list(get_atom_list: AtomList):
 
-        sut = AtomList(pdb_file)
-        assert len(sut._atoms) == 3
+    sut = get_atom_list
+    assert sut.count == 3
 
-        a = sut._atoms[0]
-        assert a.name == "C"
-        assert a.res_name == "ALK"
-        assert a.position.x == 1.0
-        assert a.position.y == 4.0
-        assert a.position.z == 7.0
-        assert a.charge == 0.0
-        assert a.radius == 1.0
+    a: Atom = sut._atoms[0]
+    assert a.atom_name == "C"
+    assert a.residue_name == "ALK"
+    assert a.x == 1.0
+    assert a.y == 4.0
+    assert a.z == 7.0
+    assert 0.0 == approx(a.charge)
+    assert 1.0 == approx(a.radius)
 
-    @pytest.mark.skip(reason="Needs conversion to get AtomList from PQRReader")
-    def test_min(self, pdb_file: str):
 
-        sut = AtomList(pdb_file)
+def test_min(get_atom_list: AtomList):
 
-        lo: Coordinate = sut.mincrd()
-        assert lo.x == 1.0
-        assert lo.y == 4.0
-        assert lo.z == 7.0
+    sut = get_atom_list
 
-    @pytest.mark.skip(reason="Needs conversion to get AtomList from PQRReader")
-    def test_max(self, pdb_file: str):
+    lo: Coordinate = sut.min_coord()
+    assert lo.x == approx(1.0)
+    assert lo.y == approx(4.0)
+    assert lo.z == approx(7.0)
 
-        sut = AtomList(pdb_file)
 
-        hi: Coordinate = sut.maxcrd()
-        assert hi.x == 3.0
-        assert hi.y == 6.0
-        assert hi.z == 9.0
+def test_max(get_atom_list: AtomList):
 
-    @pytest.mark.skip(reason="Needs conversion to get AtomList from PQRReader")
-    def test_center(self, pdb_file: str):
+    sut = get_atom_list
 
-        sut = AtomList(pdb_file)
+    hi: Coordinate = sut.max_coord()
+    assert hi.x == 3.0
+    assert hi.y == 6.0
+    assert hi.z == 9.0
 
-        mi: Coordinate = sut.center()
-        assert mi.x == 2.0
-        assert mi.y == 5.0
-        assert mi.z == 8.0
 
-    @pytest.mark.skip(reason="Needs conversion to get AtomList from PQRReader")
-    def test_max_radius(self, pdb_file: str):
-        sut = CellList(pdb_file)
-        assert sut.max_radius == 3.0
+def test_center(get_atom_list: AtomList):
+
+    sut = get_atom_list
+
+    mi: Coordinate = sut.center()
+    assert mi.x == 2.0
+    assert mi.y == 5.0
+    assert mi.z == 8.0
