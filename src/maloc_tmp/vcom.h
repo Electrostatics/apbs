@@ -38,11 +38,11 @@
 #ifndef _VCOM_H_
 #define _VCOM_H_
 
-#include <maloc_tmp/_maloc_base.h>
-#include <maloc_tmp/vnm.h>
-#include <maloc_tmp/vmem.h>
-#include <maloc_tmp/vio.h>
-#include <maloc_tmp/vset.h>
+#include "maloc_tmp/maloc_base.h"
+#include "maloc_tmp/vnm.h"
+#include "maloc_tmp/vmem.h"
+#include "maloc_tmp/vio.h"
+#include "maloc_tmp/vset.h"
 
 /** @brief A base value for MPI tags */
 #define VCOM_MPI_TAG 111

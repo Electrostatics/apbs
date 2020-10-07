@@ -39,7 +39,7 @@
 #ifndef _VIO_H_
 #define _VIO_H_
 
-#include "_maloc_base.h"
+#include "maloc_base.h"
 #include "maloccf.h"
 #include "vnm.h"
 

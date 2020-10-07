@@ -38,9 +38,9 @@
 #ifndef _VSET_H_
 #define _VSET_H_
 
-#include <maloc_tmp/_maloc_base.h>
-#include <maloc_tmp/vnm.h>
-#include <maloc_tmp/vmem.h>
+#include "maloc_base.h"
+#include "vnm.h"
+#include "vmem.h"
 
 /*
  * ***************************************************************************
