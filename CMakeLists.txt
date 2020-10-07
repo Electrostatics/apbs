@@ -316,13 +316,13 @@ option(ENABLE_FETK "Enable the finite element solver" OFF)
 # to add CMake support to MALOC, and that FETK has no such support, in general.#
 ################################################################################
 # We'll use autotools to build MALOC if FETK is enabled.
-add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
-include_directories(${EXTERNALS_PATH}/fetk/maloc/src/base
-                    ${EXTERNALS_PATH}/fetk/maloc/src/vsys
-                    ${EXTERNALS_PATH}/fetk/maloc/src/vsh
-                    ${EXTERNALS_PATH}/fetk/maloc/src/psh)
-list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
-list(APPEND APBS_LIBS maloc)
+# add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
+# include_directories(${EXTERNALS_PATH}/fetk/maloc/src/base
+#                     ${EXTERNALS_PATH}/fetk/maloc/src/vsys
+#                     ${EXTERNALS_PATH}/fetk/maloc/src/vsh
+#                     ${EXTERNALS_PATH}/fetk/maloc/src/psh)
+# list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
+# list(APPEND APBS_LIBS maloc)
 if (WIN32)
   list(APPEND MALOC_LIBS wsock32 WS2_32)
 endif()
