@@ -63,6 +63,7 @@
 #define _VALIST_H_
 
 #include "apbscfg.h"
+#include <maloc_tmp/vmem.h>
 
 #include "generic/vhal.h"
 #include "generic/vatom.h"

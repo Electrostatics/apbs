@@ -83,7 +83,7 @@
 /*
  * Depends heavily on Vio
  */
-#include "maloc/maloc.h"
+#include <maloc_tmp/vio.h>
 
 #include "generic/vhal.h"
 

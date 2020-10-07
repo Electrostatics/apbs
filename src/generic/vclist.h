@@ -64,10 +64,6 @@
 
 #include "apbscfg.h"
 
-#if defined(HAVE_MC_H)
-#include "mc/mc.h"
-#endif
-
 #include "generic/vhal.h"
 #include "generic/valist.h"
 #include "generic/vatom.h"

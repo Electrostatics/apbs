@@ -62,14 +62,7 @@
 #define _APBSROUTINES_H_
 
 #include "apbs.h"
-
-#ifdef HAVE_MC_H
-#    include "mc/mc.h"
-#    include "fem/vfetk.h"
-#endif
-#ifdef HAVE_MCX_H
-#    include "mcx/mcx.h"
-#endif
+#include <maloc_tmp/vcom.h>
 
 #ifdef ENABLE_BEM
   #include "TABIPBstruct.h"

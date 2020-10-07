@@ -78,8 +78,6 @@
 
 #include "apbscfg.h"
 
-#include "mc/mc.h"
-
 /**
  *  @ingroup Vpee
  *  @author  Nathan Baker

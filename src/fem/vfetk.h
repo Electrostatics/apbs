@@ -64,8 +64,6 @@
 
 #include "apbscfg.h"
 
-#include "mc/mc.h"
-
 #include "generic/vhal.h"
 #include "generic/vatom.h"
 // #include "generic/valist.h"

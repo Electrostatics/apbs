@@ -42,6 +42,7 @@ macro(add_sublibrary LIBRARY)
     message(STATUS "Added ${LIBRARY_NAME}")
 endmacro()
 
+add_subdirectory(maloc_tmp)
 add_subdirectory(generic)
 add_subdirectory(pmgc)
 add_subdirectory(mg)
@@ -52,6 +53,7 @@ endif(ENABLE_FETK)
 
 add_items(SOURCES routines.c)
 add_sublibrary(routines)
+target_link_libraries(apbs_routines maloc_tmp)
 
 message(STATUS "External Headers: ${EXTERNAL_HEADERS}")
 

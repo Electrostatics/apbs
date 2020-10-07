@@ -63,10 +63,7 @@
 #define _VACC_H_
 
 #include "apbscfg.h"
-
-#if defined(HAVE_MC_H)
-#include "mc/mc.h"
-#endif
+#include <maloc_tmp/vset.h>
 
 #include "generic/vhal.h"
 #include "generic/valist.h"

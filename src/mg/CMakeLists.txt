@@ -17,3 +17,4 @@ add_items(
 )
 
 add_sublibrary(mg apbs_generic apbs_pmgc)
+target_link_libraries(apbs_mg maloc_tmp)
