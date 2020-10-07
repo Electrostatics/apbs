@@ -76,8 +76,6 @@
  */
 #define EXPMIN -85.00
 
-#include "maloc/maloc.h"
-
 /** @brief   Provide a capped exp() function
  *
  *           If the argument x of Vcap_exp() exceeds EXPMAX or EXPMIN, then we

@@ -78,7 +78,6 @@
 
 #include "apbscfg.h"
 
-#include "maloc/maloc.h"
 #include "mc/mc.h"
 
 /**

@@ -65,8 +65,6 @@
 #define _BEMPARM_H_
 
 /* Generic header files */
-#include "maloc/maloc.h"
-
 #include "generic/vhal.h"
 #include "generic/vstring.h"
 

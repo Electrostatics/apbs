@@ -80,6 +80,9 @@
 
 #include "apbscfg.h"
 
+/*
+ * Depends heavily on Vio
+ */
 #include "maloc/maloc.h"
 
 #include "generic/vhal.h"

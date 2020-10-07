@@ -315,98 +315,17 @@ option(ENABLE_FETK "Enable the finite element solver" OFF)
 # repository.  Also note, that in order for this to work on Windows, we've had #
 # to add CMake support to MALOC, and that FETK has no such support, in general.#
 ################################################################################
-if(NOT ENABLE_FETK)
-    # We'll use autotools to build MALOC if FETK is enabled.
-    add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
-    include_directories(${EXTERNALS_PATH}/fetk/maloc/src/base
-                        ${EXTERNALS_PATH}/fetk/maloc/src/vsys
-                        ${EXTERNALS_PATH}/fetk/maloc/src/vsh
-                        ${EXTERNALS_PATH}/fetk/maloc/src/psh)
-    list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
-    list(APPEND APBS_LIBS maloc)
-    if (WIN32)
-      list(APPEND MALOC_LIBS wsock32 WS2_32)
-    endif()
-else()
-    if(WIN32)
-        message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
-    else()
-        message(STATUS "Building FETK components.")
-        set(CONFIG_OPTS --prefix=<INSTALL_DIR>)
-
-        set(MPI_ENV "")
-        if(HAVE_MPI_H)
-            list(APPEND CONFIG_OPTS --enable-mpi)
-
-            # MALOC just cares about libmpi
-            foreach(LIB_PATH ${MPI_C_LIBRARIES})
-                get_filename_component(LIB ${LIB_PATH} NAME_WE)
-                if(LIB STREQUAL "libmpi")
-                    get_filename_component(MPI_LIB_DIR ${LIB_PATH} DIRECTORY)
-                endif()
-            endforeach()
-
-            set(MPI_ENV "FETK_MPI_INCLUDE=${MPI_C_INCLUDE_PATH}" "FETK_MPI_LIBRARY=${MPI_LIB_DIR}")
-        endif()
-
-        ExternalProject_Add(fetk-maloc
-            PREFIX fetk
-            SOURCE_DIR ${EXTERNALS_PATH}/fetk/maloc/src
-            CONFIGURE_COMMAND ${MPI_ENV} ${EXTERNALS_PATH}/fetk/maloc/configure ${CONFIG_OPTS}
-            BUILD_COMMAND ${MAKE})
-
-        ExternalProject_Add(fetk-punc
-            PREFIX fetk
-            DEPENDS fetk-maloc
-            SOURCE_DIR ${EXTERNALS_PATH}/fetk/punc/src
-            CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure ${CONFIG_OPTS}
-            BUILD_COMMAND ${MAKE})
-
-        ExternalProject_Add(fetk-gamer
-            PREFIX fetk
-            DEPENDS fetk-maloc
-            SOURCE_DIR ${EXTERNALS_PATH}/fetk/gamer/src
-            CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure ${CONFIG_OPTS}
-            BUILD_COMMAND ${MAKE})
-
-        ExternalProject_Add(fetk-mc
-            PREFIX fetk
-            DEPENDS fetk-maloc fetk-punc
-            SOURCE_DIR ${EXTERNALS_PATH}/fetk/mc/src
-            CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure ${CONFIG_OPTS}
-            BUILD_COMMAND ${MAKE})
-
-        set(FETK_ENABLED 1)
-
-        ExternalProject_Get_Property(fetk-maloc install_dir)
-        include_directories(${install_dir}/include)
-
-        list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
-        list(APPEND APBS_LIBS
-                                  maloc
-                                  amd
-                                  punc
-                                  mc
-                                  gamer
-                                  superlu
-                                  umfpack
-                                  blas
-                                  vf2c
-                                  tetgen
-                                  triangle
-                                  readline)
-
-        if(BUILD_SHARED_LIBS)
-            install(DIRECTORY ${install_dir}/lib/
-                    DESTINATION ${LIBRARY_INSTALL_PATH})
-        endif()
-
-        SET(HAVE_MC_H 1)
-        SET(HAVE_PUNC_H 1)
-        SET(HAVE_BIOM_H 1)
-    endif()
+# We'll use autotools to build MALOC if FETK is enabled.
+add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
+include_directories(${EXTERNALS_PATH}/fetk/maloc/src/base
+                    ${EXTERNALS_PATH}/fetk/maloc/src/vsys
+                    ${EXTERNALS_PATH}/fetk/maloc/src/vsh
+                    ${EXTERNALS_PATH}/fetk/maloc/src/psh)
+list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
+list(APPEND APBS_LIBS maloc)
+if (WIN32)
+  list(APPEND MALOC_LIBS wsock32 WS2_32)
 endif()
-
 
 ################################################################################
 # Optionally build geoflow (git submodule)

@@ -64,7 +64,6 @@
 
 #include "apbscfg.h"
 
-#include "maloc/maloc.h"
 #if defined(HAVE_MC_H)
 #include "mc/mc.h"
 #endif

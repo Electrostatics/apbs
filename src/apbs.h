@@ -63,9 +63,6 @@
 
 #include "apbscfg.h"
 
-/* MALOC headers */
-#include "maloc/maloc.h"
-
 /* Generic headers */
 #include "generic/nosh.h"
 #include "generic/mgparm.h"

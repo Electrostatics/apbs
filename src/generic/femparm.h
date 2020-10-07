@@ -66,8 +66,6 @@
 /* Generic header files */
 #include "apbscfg.h"
 
-#include "maloc/maloc.h"
-
 #include "generic/vhal.h"
 #include "generic/vstring.h"
 

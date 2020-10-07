@@ -54,8 +54,6 @@
 
 #include "apbscfg.h"
 
-#include "maloc/maloc.h"
-
 #include "generic/vhal.h"
 #include "pmgc/mypdec.h"
 

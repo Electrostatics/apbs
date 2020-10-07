@@ -49,8 +49,6 @@
 #ifndef _BUILDGD_H_
 #define _BUILDGD_H_
 
-#include "maloc/maloc.h"
-
 #include "apbscfg.h"
 
 #include "generic/vhal.h"
