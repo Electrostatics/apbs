@@ -1,3 +1,15 @@
+from . import (
+        bindings,
+        chemistry,
+        geometry,
+        grid,
+        multigrid,
+        pqr,
+        test,
+        bin,
+        lib,
+        )
+
 version_str = "0.0.1"
 
 header = """

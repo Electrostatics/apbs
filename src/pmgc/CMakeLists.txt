@@ -43,3 +43,11 @@ add_items(
 )
 
 add_sublibrary(pmgc)
+
+add_custom_command(
+  TARGET apbs_pmgc
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy 
+    $<TARGET_FILE:apbs_pmgc> 
+    ${PROJECT_SOURCE_DIR}/apbs/lib/$<TARGET_FILE_NAME:apbs_pmgc>
+  )

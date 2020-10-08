@@ -4,7 +4,17 @@ add_subdirectory(mesh)
 add_subdirectory(manip)
 
 if(ENABLE_PYTHON)
-    add_subdirectory(python)
-    add_subdirectory(python-pybind)
+  list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+  include(FindAPBSPythonLibraries)
+  include(APBSWrapPythonLibraries)
+
+  add_subdirectory(python)
+  add_subdirectory(python_pybind)
+
+  apbs_wrap_python_libs(
+    TARGETS
+    _apbslib
+    apbs_pybind
+    )
 endif(ENABLE_PYTHON)
 

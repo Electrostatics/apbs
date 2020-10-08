@@ -54,3 +54,27 @@ target_link_libraries(tensor2dx ${LIBS})
 
 add_executable(uhbd_asc2bin uhbd_asc2bin.c)
 target_link_libraries(uhbd_asc2bin ${LIBS})
+
+foreach(BINARY analysis
+    benchmark
+    del2dx
+    dx2mol
+    dx2uhbd
+    dxmath
+    mergedx
+    mergedx2
+    mgmesh
+    multivalue
+    similarity
+    smooth
+    tensor2dx
+    uhbd_asc2bin
+    value)
+  add_custom_command(
+    TARGET ${BINARY}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy 
+      $<TARGET_FILE:${BINARY}>
+      ${PROJECT_SOURCE_DIR}/apbs/bin/$<TARGET_FILE_NAME:${BINARY}>
+    )
+endforeach()

@@ -15,3 +15,6 @@
 	path = externals/pybind11
 	url = https://github.com/pybind/pybind11
 	ignore = all
+[submodule "pybind11"]
+	path = pybind11
+	url = https://github.com/pybind/pybind11.git

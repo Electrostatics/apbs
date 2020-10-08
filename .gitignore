@@ -152,6 +152,27 @@ examples
 
 # Output files
 *.out
+apbs/bin/analysis
+apbs/bin/apbs
+apbs/bin/benchmark
+apbs/bin/born
+apbs/bin/coulomb
+apbs/bin/del2dx
+apbs/bin/dx2mol
+apbs/bin/dx2uhbd
+apbs/bin/dxmath
+apbs/bin/mergedx
+apbs/bin/mergedx2
+apbs/bin/mgmesh
+apbs/bin/multivalue
+apbs/bin/similarity
+apbs/bin/smooth
+apbs/bin/tensor2dx
+apbs/bin/uhbd_asc2bin
+apbs/bin/value
+apbs/bindings/_apbslib
+apbs/bindings/apbs_pybind
+apbs/bindings/apbslib.py
 
 # Personal notes
 NOTES.txt
