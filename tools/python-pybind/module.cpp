@@ -21,7 +21,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(apbs, m) {
+PYBIND11_MODULE(apbs_pybind, m) {
   m.doc() = R"pbdoc(APBS Python Bindings
 
     .. note:: When the C code would return an int to represent an error code, these

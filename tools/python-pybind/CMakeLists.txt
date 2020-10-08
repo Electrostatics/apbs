@@ -12,7 +12,7 @@ set_target_properties(apbs_pybind
   PROPERTIES
   PREFIX "${PYTHON_MODULE_PREFIX}"
   SUFFIX "${PYTHON_MODULE_EXTENSION}"
-  OUTPUT_NAME "apbs"
+  OUTPUT_NAME "apbs_pybind"
   )
 
 message(STATUS "LIBS ${APBS_LIBS}")
@@ -26,3 +26,10 @@ target_link_libraries(
   )
 
 install(TARGETS apbs_pybind LIBRARY DESTINATION lib)
+if(PYTHON_SITE_PACKAGES_DIR)
+  install(TARGETS apbs_pybind LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES_DIR})
+else()
+  message(STATUS "Python site-packages dir not specified.")
+  message(STATUS "apbs_pybind module will likely not be on your \
+    PYTHONPATH unless you add ${CMAKE_INSTALL_PREFIX}/lib manually.")
+endif()
