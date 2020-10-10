@@ -41,5 +41,3 @@ if(EXISTS ${TESTS_CFG_FILE})
 else()
     message(FATAL  "******* MISSING Test Config (${TESTS_CFG_FILE})")
 endif()
-
-add_subdirectory(src)
