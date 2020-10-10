@@ -65,6 +65,7 @@
 #define _PBAMPARM_H_
 
 /* Generic header files */
+#include <maloc_tmp/vio.h>
 #include "generic/vhal.h"
 #include "generic/vstring.h"
 

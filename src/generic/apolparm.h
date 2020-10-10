@@ -65,6 +65,7 @@
 
 /* Generic header files */
 #include "apbscfg.h"
+#include <maloc_tmp/vio.h>
 #include <maloc_tmp/vmem.h>
 
 #include "generic/vhal.h"

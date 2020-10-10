@@ -64,6 +64,7 @@
 
 #include "apbscfg.h"
 #include <maloc_tmp/vmem.h>
+#include <maloc_tmp/vio.h>
 
 #include "generic/vhal.h"
 #include "generic/vstring.h"

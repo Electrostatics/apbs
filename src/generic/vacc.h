@@ -63,7 +63,8 @@
 #define _VACC_H_
 
 #include "apbscfg.h"
-#include <maloc_tmp/vset.h>
+#include <maloc_tmp/vio.h>
+// #include <maloc_tmp/vset.h>
 
 #include "generic/vhal.h"
 #include "generic/valist.h"
@@ -113,7 +114,7 @@ struct sVacc {
   VaccSurf **surf;  /**< Array of surface points for each atom; is not
                     * initialized until needed (test against VNULL to
                     * determine initialization state) */
-  Vset acc;  /**< An integer array (to be treated as bitfields) of Vset type
+  /** Vset acc;  /**< An integer array (to be treated as bitfields) of Vset type
               * with length equal to the number of vertices in the mesh */
   double surf_density;  /**< Minimum solvent accessible surface point density
                          * (in pts/A^2) */

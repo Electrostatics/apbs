@@ -64,6 +64,7 @@
 #ifndef _BEMPARM_H_
 #define _BEMPARM_H_
 
+#include <maloc_tmp/vio.h>
 /* Generic header files */
 #include "generic/vhal.h"
 #include "generic/vstring.h"

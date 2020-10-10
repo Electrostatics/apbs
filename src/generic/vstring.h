@@ -80,11 +80,6 @@
 
 #include "apbscfg.h"
 
-/*
- * Depends heavily on Vio
- */
-#include <maloc_tmp/vio.h>
-
 #include "generic/vhal.h"
 
 /** @brief   Case-insensitive string comparison (BSD standard)

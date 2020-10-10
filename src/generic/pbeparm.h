@@ -63,6 +63,7 @@
 #define _PBEPARM_H_
 
 #include "apbscfg.h"
+#include <maloc_tmp/vio.h>
 
 #include "generic/vhal.h"
 #include "generic/vstring.h"

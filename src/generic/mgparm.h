@@ -64,6 +64,7 @@
 #ifndef _MGPARM_H_
 #define _MGPARM_H_
 
+#include <maloc_tmp/vio.h>
 /* Generic header files */
 #include "generic/vhal.h"
 #include "generic/vstring.h"

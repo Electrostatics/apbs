@@ -63,6 +63,7 @@
 #define _VPARAM_H_
 
 #include "apbscfg.h"
+#include <maloc_tmp/vio.h>
 #include <maloc_tmp/vmem.h>
 
 #include "generic/vhal.h"
