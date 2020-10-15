@@ -1,3 +1,2 @@
 python-dev-tools
-https://github.com/pybind/pybind11/archive/master.zip
 GitPython==3.1.9

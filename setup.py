@@ -9,11 +9,8 @@ from tools.install_scripts.cmake_setuptools import *
 proj_root = os.path.dirname(os.path.realpath(__file__))
 
 print('-- Ensuring required pip modules are installed')
-import pip
-pip.main(
-        ['install'] + 
-        open('requirements.txt', 'r').readlines() + 
-        ['--upgrade'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--trusted-host', 'pypi.org', '--trusted-host', 'files.pythonhosted.org', '--upgrade', 'pip', 'setuptools'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
 
 from distutils import sysconfig as sc
 python_site_pkgs = sc.get_python_lib(prefix='', plat_specific=True)
@@ -37,11 +34,8 @@ if not os.path.exists('setup.cfg'):
 extra_cmake_args = dict(
         ENABLE_PYTHON='ON',
         CMAKE_BUILD_TYPE='Release',
-        PYTHON_SITE_PACKAGES_DIR=python_site_pkgs)
-
-import pybind11
-extra_cmake_args['pybind11_DIR'] = os.path.join(
-        os.path.dirname(pybind11.get_cmake_dir()), 'pybind11')
+        PYTHON_SITE_PACKAGES_DIR=python_site_pkgs,
+        pybind11_DIR=str(os.path.join(proj_root, 'externals', 'pybind11')))
 
 setup(
     name='APBS',
