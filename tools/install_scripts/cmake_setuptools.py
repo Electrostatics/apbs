@@ -130,9 +130,10 @@ class CMakeBuild(build_ext):
         print(f'CMake arguments: {cmake_args}',
                 f'Build directory: {self.build_temp}',
                 f'Source directory: {ext.sourcedir}')
-        subprocess.check_call(
+        os.environ['VERBOSE'] = '1'
+        subprocess.run(
                 ['cmake', ext.sourcedir] + cmake_args,
                 cwd=self.build_temp, env=env)
-        subprocess.check_call(
+        subprocess.run(
                 ['cmake', '--build', '.'] + build_args,
                 cwd=self.build_temp)

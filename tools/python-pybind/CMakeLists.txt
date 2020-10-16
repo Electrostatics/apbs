@@ -1,14 +1,23 @@
 
-ExternalProject_add(pybind11
-  PREFIX pybind11
-  SOURCE_DIR "${PROJECT_SOURCE_DIR}/externals/pybind11"
-  CMAKE_CACHE_ARGS
-    -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_BINARY_DIR}/pybind11
-  )
+find_package(pybind11)
 
-# find_package(pybind11 REQUIRED)
-add_library(pybind11 INTERFACE)
-target_include_directories(pybind11 INTERFACE ${PROJECT_BINARY_DIR}/pybind11}
+add_library(pybind11_dep INTERFACE)
+if(NOT TARGET pybind11::module)
+  ExternalProject_add(pybind11
+    PREFIX pybind11
+    GIT_REPOSITORY "https://github.com/pybind/pybind11.git"
+    GIT_TAG "v2.5.0"
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+    )
+  target_include_directories(pybind11_dep INTERFACE
+    ${CMAKE_CURRENT_BINARY_DIR}/pybind11/src/pybind11/include)
+else()
+  target_link_libraries(pybind11_dep INTERFACE pybind11::module)
+endif()
+
+target_include_directories(pybind11_dep INTERFACE ${Python_INCLUDE_DIRS})
 
 add_library(apbs_pybind
   MODULE
@@ -30,7 +39,7 @@ message(STATUS "INTERNAL_LIBS ${APBS_INTERNAL_LIBS}")
 target_link_libraries(
   apbs_pybind
   PRIVATE
-  pybind11::module
+  pybind11_dep
   ${APBS_LIBS}
   ${APBS_INTERNAL_LIBS}
   )

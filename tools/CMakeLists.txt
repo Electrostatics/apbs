@@ -4,7 +4,15 @@ add_subdirectory(mesh)
 add_subdirectory(manip)
 
 if(ENABLE_PYTHON)
-    add_subdirectory(python)
-    add_subdirectory(python-pybind)
+  set(CMAKE_FIND_FRAMEWORK NEVER)
+  find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+
+  INCLUDE_DIRECTORIES(${Python3_INCLUDE_DIRS})
+  message(STATUS "***** Python3 include path is: ${Python3_INCLUDE_DIRS}")
+  message(STATUS "***** Python3 library path is: ${Python3_LIBRARIES}")
+  message(STATUS "***** Python3 library dir  is: ${Python3_LIBRARY_DIRS}")
+
+  add_subdirectory(python)
+  add_subdirectory(python-pybind)
 endif(ENABLE_PYTHON)
 
