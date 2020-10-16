@@ -1,5 +1,15 @@
 
-find_package(pybind11 REQUIRED)
+ExternalProject_add(pybind11
+  PREFIX pybind11
+  SOURCE_DIR "${PROJECT_SOURCE_DIR}/externals/pybind11"
+  CMAKE_CACHE_ARGS
+    -DCMAKE_INSTALL_PREFIX:PATH=${PROJECT_BINARY_DIR}/pybind11
+  )
+
+# find_package(pybind11 REQUIRED)
+add_library(pybind11 INTERFACE)
+target_include_directories(pybind11 INTERFACE ${PROJECT_BINARY_DIR}/pybind11}
+
 add_library(apbs_pybind
   MODULE
   module.cpp
