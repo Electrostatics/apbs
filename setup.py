@@ -31,7 +31,7 @@ if not os.path.exists('setup.cfg'):
     with open('MANIFEST.in', 'w') as f:
         for line in output.stdout.decode('utf-8').split('\n'):
             if os.path.isfile('./' + line):
-                f.write('include ' + line + '\n')
+                f.write('include "' + line + '"\n')
         f.write('recursive-include externals *\n')
 
 extra_cmake_args = dict(
@@ -53,6 +53,9 @@ setup(
     ext_modules=[CMakeExtension(
         proj_root,
         **extra_cmake_args)],
-    cmdclass=dict(build_ext=CMakeBuild),
+    cmdclass=dict(
+        build_ext=CMakeBuild,
+        install=CMakeInstall,
+        develop=CMakeInstall),
     zip_safe=False,
     )

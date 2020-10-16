@@ -2,9 +2,12 @@ import os
 import sys
 import platform
 import subprocess
+import glob
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
+from setuptools.command.install import install
+from setuptools.command.develop import develop
 from distutils.version import LooseVersion
 
 '''
@@ -21,6 +24,59 @@ class CMakeExtension(Extension):
         Extension.__init__(self, name, sources=[])
         self.sourcedir = os.path.abspath('')
         self.extra_cmake_args = extra_cmake_args or dict()
+
+
+def replace_run(cls):
+    '''Replace run command with custom cmake hook'''
+
+    def find_builddir(self):
+        top_level_builddir = os.path.join(os.getcwd(), 'build')
+        if not os.path.exists(top_level_builddir):
+            raise OSError('Top-level build directory not found.')
+
+        possible_builddirs = glob.glob(
+                os.path.join(top_level_builddir, 'temp.*'))
+
+        if len(possible_builddirs) == 0:
+            raise OSError('Temp build directory not found.')
+        elif len(possible_builddirs) > 1:
+            raise RuntimeError('Found multiple temp build directories.'
+                    'Please rebuild after removing old build directories.')
+
+        return possible_builddirs[0]
+
+    cls.find_builddir = find_builddir
+
+    old_run = cls.run
+
+    def run(self):
+
+        builddir = self.find_builddir()
+
+        try:
+            out = subprocess.check_output(['cmake', '--version'])
+        except OSError:
+            raise RuntimeError('CMake must be installed to build this module.')
+
+        subprocess.check_call(
+                ['cmake', '--install', '.'],
+                cwd=builddir)
+
+        old_run(self)
+
+    cls.run = run
+
+    return cls
+
+
+@replace_run
+class CMakeInstall(install):
+    pass
+
+
+@replace_run
+class CMakeDevelop(develop):
+    pass
 
 
 class CMakeBuild(build_ext):
@@ -79,7 +135,4 @@ class CMakeBuild(build_ext):
                 cwd=self.build_temp, env=env)
         subprocess.check_call(
                 ['cmake', '--build', '.'] + build_args,
-                cwd=self.build_temp)
-        subprocess.check_call(
-                ['cmake', '--install', '.'],
                 cwd=self.build_temp)
