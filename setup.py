@@ -6,6 +6,7 @@ import subprocess
 
 from tools.setup_helpers.cmake_setuptools import *
 from tools.setup_helpers.extra_setuptools_commands import *
+from setuptools import setup, find_packages
 
 proj_name = 'APBS'
 
@@ -49,19 +50,14 @@ setup(
         'sdist': SDistChecked,
         },
     zip_safe=False,
-    packages=[
-        'apbs',
-        'apbs.apbs',
-        ],
+    packages=find_packages(include=['apbs', 'apbs.*']),
     package_dir={
-        'apbs': '.',
-        'apbs.apbs': str(os.path.join('.', 'apbs')),
+        'apbs': str(os.path.join('.', 'apbs')),
         },
     package_data={
         proj_name: [
-            'bin/apbs'
-            'lib/*'
-            'tools/python/apbslib.py'
+            'build/bin/*'
+            'build/lib/*'
             ]
         },
     classifiers=[
