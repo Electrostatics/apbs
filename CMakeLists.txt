@@ -642,20 +642,6 @@ if(ENABLE_VERBOSE_DEBUG)
     message(STATUS "Verbose debugging mode enabled")
 endif()
 
-
-################################################################################
-# Configure Python                                                             #
-# Buidling the Python goodness happens in the tool/python directory.           #
-################################################################################
-option(ENABLE_PYTHON "Enable python support" OFF)
-
-#If(ENABLE_PYTHON AND UNIX AND NOT APPLE AND NOT BUILD_SHARED_LIBS)
-#    message(FATAL_ERROR "In order to build the APBS Python shared library, BUILD_SHARED_LIBS must be enabled.")
-#elseif(ENABLE_PYTHON AND APPLE AND BUILD_SHARED_LIBS)
-#             message(FATAL_ERROR "ENABLE_PYTHON option in OSX systems requires the variable BUILD_SHARED_LIBS to be set to off.")
-#endif()
-
-
 ################################################################################
 # Handle conditional building with OpenMP                                      #
 ################################################################################
@@ -725,6 +711,13 @@ link_directories(${APBS_LIB_DIRS})
 include_directories(${APBS_ROOT}/src ${APBS_BUILD}/src ${APBS_ROOT}/include)
 add_subdirectory(src)
 
+################################################################################
+# Configure Python                                                             #
+# Buidling the Python goodness happens in the tool/python directory.           #
+################################################################################
+
+option(ENABLE_PYTHON "Enable python support" OFF)
+set(PYTHON_SITE_PACKAGES_DIR "" CACHE STRING "Path to python site packages")
 
 ################################################################################
 # Build APBS documentation                                                     #
@@ -746,7 +739,6 @@ if(BUILD_TOOLS)
     message(STATUS "Supplemental tools enabled")
     add_subdirectory(tools)
 endif()
-
 
 ################################################################################
 # Set up additional directories to install                                     #

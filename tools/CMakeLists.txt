@@ -13,6 +13,6 @@ if(ENABLE_PYTHON)
   message(STATUS "***** Python3 library dir  is: ${Python3_LIBRARY_DIRS}")
 
   add_subdirectory(python)
-  add_subdirectory(python-pybind)
+  add_subdirectory(python_pybind)
 endif(ENABLE_PYTHON)
 

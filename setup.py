@@ -4,52 +4,68 @@ import sys
 import platform
 import subprocess
 
-from tools.install_scripts.cmake_setuptools import *
+from tools.setup_helpers.cmake_setuptools import *
+from tools.setup_helpers.extra_setuptools_commands import *
 
-proj_root = os.path.dirname(os.path.realpath(__file__))
+proj_name = 'APBS'
 
-print('-- Ensuring required pip modules are installed')
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--trusted-host', 'pypi.org', '--trusted-host', 'files.pythonhosted.org', '--upgrade', 'pip', 'setuptools'])
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
+if not os.path.exists(os.path.join('.', __file__)):
+    print('-- Must run setup.py in project root directory!')
+    sys.exit()
+
+if os.path.exists('MANIFEST'):
+    os.remove('MANIFEST')
+
+proj_root = os.path.dirname(os.path.abspath(__file__))
+old_path = os.getcwd()
+os.chdir(proj_root)
+sys.path.insert(0, proj_root)
 
 from distutils import sysconfig as sc
 python_site_pkgs = sc.get_python_lib(prefix='', plat_specific=True)
 print(f'-- Found python site-packages directory {python_site_pkgs}')
 
-if not os.path.exists('setup.cfg'):
-    print('-- Ensuring submodules are up-to-date')
-    from git import Repo
-    repo = Repo(proj_root)
-    for submodule in repo.submodules:
-        submodule.update(init=True)
-
-    print('-- Generating MANIFEST.in')
-    output = subprocess.run(['git', 'ls-files'], check=True, capture_output=True)
-    with open('MANIFEST.in', 'w') as f:
-        for line in output.stdout.decode('utf-8').split('\n'):
-            if os.path.isfile('./' + line):
-                f.write('include "' + line + '"\n')
-        f.write('recursive-include externals *\n')
-
 extra_cmake_args = dict(
-        ENABLE_PYTHON='ON',
-        CMAKE_BUILD_TYPE='Release',
-        PYTHON_SITE_PACKAGES_DIR=python_site_pkgs,
-        pybind11_DIR=str(os.path.join(proj_root, 'externals', 'pybind11')))
+    ENABLE_PYTHON='ON',
+    CMAKE_BUILD_TYPE='Release',
+    PYTHON_SITE_PACKAGES_DIR=python_site_pkgs,
+    )
 
 setup(
-    name='APBS',
+    name=proj_name,
     version='3.0.0',
     author='',
     author_email='',
     description='Adaptive Poisson-Boltzmann Solver',
     long_description=open('LICENSE.md', 'r').read(),
     ext_modules=[CMakeExtension(
-        proj_root,
+        f'{proj_root}.apbs.bindings.pybind',
         **extra_cmake_args)],
-    cmdclass=dict(
-        build_ext=CMakeBuild,
-        install=CMakeInstall,
-        develop=CMakeInstall),
+    cmdclass={
+        'build_ext': CMakeBuild,
+        'install': CMakeInstall,
+        'develop': CMakeInstall,
+        'clean': CleanBuild,
+        'sdist': SDistChecked,
+        },
     zip_safe=False,
+    packages=[
+        'apbs',
+        'apbs.apbs',
+        ],
+    package_dir={
+        'apbs': '.',
+        'apbs.apbs': str(os.path.join('.', 'apbs')),
+        },
+    package_data={
+        proj_name: [
+            'bin/apbs'
+            'lib/*'
+            'tools/python/apbslib.py'
+            ]
+        },
+    classifiers=[
+        'Programming Language :: C++',
+        'Programming Language :: Python :: 3',
+        ] + ['Programming Language :: Python :: 3.{}' for i in range(5, 8)],
     )

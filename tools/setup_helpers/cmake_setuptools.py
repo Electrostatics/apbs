@@ -3,70 +3,41 @@ import sys
 import platform
 import subprocess
 import glob
-
-from setuptools import setup, Extension
+from typing import Optional
+from shutil import rmtree
+from setuptools import setup, Extension, Command
 from setuptools.command.build_ext import build_ext
 from setuptools.command.install import install
 from setuptools.command.develop import develop
+import setuptools
 from distutils.version import LooseVersion
 
-'''
+from .env import *
+from .utils import *
 
-Taken from pybind11 examples of integrating cmake and python compilation
 
-github.com/pybind/cmake_example/blob/master/setup.py
+class CleanBuild(Command):
+    '''Clean build directory'''
 
-'''
+    user_options = []
+
+    def initialize_options(self):
+        ...
+
+    def finalize_options(self):
+        ...
+
+    def run(self):
+        build_dir = get_build_dir()
+        rmtree(build_dir)
 
 
 class CMakeExtension(Extension):
+    '''Base for CMake setuptools extension'''
     def __init__(self, name, **extra_cmake_args):
         Extension.__init__(self, name, sources=[])
         self.sourcedir = os.path.abspath('')
         self.extra_cmake_args = extra_cmake_args or dict()
-
-
-def replace_run(cls):
-    '''Replace run command with custom cmake hook'''
-
-    def find_builddir(self):
-        top_level_builddir = os.path.join(os.getcwd(), 'build')
-        if not os.path.exists(top_level_builddir):
-            raise OSError('Top-level build directory not found.')
-
-        possible_builddirs = glob.glob(
-                os.path.join(top_level_builddir, 'temp.*'))
-
-        if len(possible_builddirs) == 0:
-            raise OSError('Temp build directory not found.')
-        elif len(possible_builddirs) > 1:
-            raise RuntimeError('Found multiple temp build directories.'
-                    'Please rebuild after removing old build directories.')
-
-        return possible_builddirs[0]
-
-    cls.find_builddir = find_builddir
-
-    old_run = cls.run
-
-    def run(self):
-
-        builddir = self.find_builddir()
-
-        try:
-            out = subprocess.check_output(['cmake', '--version'])
-        except OSError:
-            raise RuntimeError('CMake must be installed to build this module.')
-
-        subprocess.check_call(
-                ['cmake', '--install', '.'],
-                cwd=builddir)
-
-        old_run(self)
-
-    cls.run = run
-
-    return cls
 
 
 @replace_run
@@ -87,11 +58,18 @@ class CMakeBuild(build_ext):
             raise RuntimeError("CMake must be installed to build the following extensions: " +
                                ", ".join(e.name for e in self.extensions))
 
+        pip_install()
+        init_submodules()
+        generate_manifest()
+
         for ext in self.extensions:
             self.build_extension(ext)
 
     def build_extension(self, ext):
+        build_dir = get_build_dir()
+
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+
         # required for auto-detection of auxiliary "native" libs
         if not extdir.endswith(os.path.sep):
             extdir += os.path.sep
@@ -106,7 +84,7 @@ class CMakeBuild(build_ext):
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
 
-        if platform.system() == "Windows":
+        if IS_WINDOWS:
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(cfg.upper(), extdir)]
             if sys.maxsize > 2**32:
                 cmake_args += ['-A', 'x64']
@@ -115,25 +93,25 @@ class CMakeBuild(build_ext):
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
             build_args += ['--', '-j2']
 
-        if not os.access(sys.prefix, os.W_OK):
-            raise PermissionError('setup.py does not have write access to install prefix')
-
         cmake_args += ['-DCMAKE_INSTALL_PREFIX=' + 
                 os.path.abspath(sys.prefix) ]
 
-        env = os.environ.copy()
-        env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
+        os.environ['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(os.environ.get('CXXFLAGS', ''),
                                                               self.distribution.get_version())
-        if not os.path.exists(self.build_temp):
-            os.makedirs(self.build_temp)
 
-        print(f'CMake arguments: {cmake_args}',
-                f'Build directory: {self.build_temp}',
-                f'Source directory: {ext.sourcedir}')
-        os.environ['VERBOSE'] = '1'
+        print(f'-- CMake arguments: {cmake_args}')
+        print(f'-- Build directory: {build_dir}')
+        print(f'-- Source directory: {ext.sourcedir}')
+
+        # We currently aren't checking the output of these since they sometimes
+        # give false negatives that halt the build process.
+        # TODO: investigate false negatives
+        print('-- Configuring')
         subprocess.run(
                 ['cmake', ext.sourcedir] + cmake_args,
-                cwd=self.build_temp, env=env)
+                cwd=build_dir)
+
+        print('-- Building')
         subprocess.run(
                 ['cmake', '--build', '.'] + build_args,
-                cwd=self.build_temp)
+                cwd=build_dir)

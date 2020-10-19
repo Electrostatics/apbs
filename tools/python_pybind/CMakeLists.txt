@@ -3,16 +3,9 @@ find_package(pybind11)
 
 add_library(pybind11_dep INTERFACE)
 if(NOT TARGET pybind11::module)
-  ExternalProject_add(pybind11
-    PREFIX pybind11
-    GIT_REPOSITORY "https://github.com/pybind/pybind11.git"
-    GIT_TAG "v2.5.0"
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ""
-    )
   target_include_directories(pybind11_dep INTERFACE
-    ${CMAKE_CURRENT_BINARY_DIR}/pybind11/src/pybind11/include)
+    ${PROJECT_SOURCE_DIR}/externals/pybind11/include)
+  include(${PROJECT_SOURCE_DIR}/externals/pybind11/tools/FindPythonLibsNew.cmake)
 else()
   target_link_libraries(pybind11_dep INTERFACE pybind11::module)
 endif()
@@ -27,6 +20,7 @@ add_library(apbs_pybind
   bind_valist.cpp
   )
 
+message(STATUS "Site pkgs ${PROJECT_BINARY_DIR}/${PYTHON_SITE_PACKAGES_DIR}")
 set_target_properties(apbs_pybind
   PROPERTIES
   PREFIX "${PYTHON_MODULE_PREFIX}"
@@ -44,9 +38,9 @@ target_link_libraries(
   ${APBS_INTERNAL_LIBS}
   )
 
-install(TARGETS apbs_pybind LIBRARY DESTINATION lib)
+install(TARGETS apbs_pybind DESTINATION lib)
 if(PYTHON_SITE_PACKAGES_DIR)
-  install(TARGETS apbs_pybind LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES_DIR})
+  install(TARGETS apbs_pybind DESTINATION ${PYTHON_SITE_PACKAGES_DIR})
 else()
   message(STATUS "Python site-packages dir not specified.")
   message(STATUS "apbs_pybind module will likely not be on your \
