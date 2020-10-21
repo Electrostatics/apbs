@@ -10,6 +10,7 @@ else()
   target_link_libraries(pybind11_dep INTERFACE pybind11::module)
 endif()
 
+target_link_libraries(pybind11_dep INTERFACE ${Python3_LIBRARIES})
 target_include_directories(pybind11_dep INTERFACE ${Python_INCLUDE_DIRS})
 
 add_library(apbs_pybind

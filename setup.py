@@ -4,11 +4,13 @@ import sys
 import platform
 import subprocess
 import glob
+import pprint
 
 from tools.setup_helpers.cmake_setuptools import *
 from tools.setup_helpers.extra_setuptools_commands import *
 from setuptools import setup, find_packages
 
+pp = pprint.PrettyPrinter(indent=2)
 proj_name = 'apbs'
 
 if not os.path.exists(os.path.join('.', __file__)):
@@ -72,8 +74,8 @@ for k, v in raw_package_data.items():
         if not f.endswith('.py') and not '__pycache__' in f:
             package_data[k].append(os.path.basename(f))
 
-print(package_data)
-#exit()
+print('Package data:')
+pp.pprint(package_data)
 
 setup(
     name=proj_name,

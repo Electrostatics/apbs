@@ -5,3 +5,4 @@ mmcif-pdbx==1.1.2
 numpy==1.19.1
 pytest
 pyparser
+wheel
