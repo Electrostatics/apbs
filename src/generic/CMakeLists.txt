@@ -46,3 +46,9 @@ add_items(
 )
 
 add_sublibrary(generic)
+
+add_custom_command(
+  TARGET apbs_generic
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:apbs_generic> "${PROJECT_SOURCE_DIR}/apbs/lib/$<TARGET_FILE_NAME:apbs_generic>"
+  )

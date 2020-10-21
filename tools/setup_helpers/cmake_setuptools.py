@@ -16,22 +16,6 @@ from .env import *
 from .utils import *
 
 
-class CleanBuild(Command):
-    '''Clean build directory'''
-
-    user_options = []
-
-    def initialize_options(self):
-        ...
-
-    def finalize_options(self):
-        ...
-
-    def run(self):
-        build_dir = get_build_dir()
-        rmtree(build_dir)
-
-
 class CMakeExtension(Extension):
     '''Base for CMake setuptools extension'''
     def __init__(self, name, **extra_cmake_args):
@@ -60,7 +44,7 @@ class CMakeBuild(build_ext):
 
         pip_install()
         init_submodules()
-        generate_manifest()
+        #generate_manifest()
 
         for ext in self.extensions:
             self.build_extension(ext)
@@ -91,7 +75,8 @@ class CMakeBuild(build_ext):
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            build_args += ['--', '-j2']
+            n_jobs = int(os.environ.get('BUILD_JOBS', 2))
+            build_args += ['--', f'-j{n_jobs}']
 
         cmake_args += ['-DCMAKE_INSTALL_PREFIX=' + 
                 os.path.abspath(sys.prefix) ]

@@ -52,6 +52,11 @@ endif(ENABLE_FETK)
 
 add_items(SOURCES routines.c)
 add_sublibrary(routines)
+add_custom_command(
+  TARGET apbs_routines
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:apbs_routines> "${PROJECT_SOURCE_DIR}/apbs/lib/$<TARGET_FILE_NAME:apbs_routines>"
+  )
 
 message(STATUS "External Headers: ${EXTERNAL_HEADERS}")
 
@@ -66,6 +71,11 @@ message(STATUS " ")
 #target_include_directories(apbs PRIVATE apbs.h routines.h)
 target_link_libraries(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
 #add_dependencies(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
+add_custom_command(
+  TARGET apbs
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:apbs> "${PROJECT_SOURCE_DIR}/apbs/bin/$<TARGET_FILE_NAME:apbs>"
+  )
 
 configure_file(
     ${APBS_ROOT}/src/.config/apbscfg.h.in

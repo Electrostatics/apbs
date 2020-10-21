@@ -1,4 +1,5 @@
 
+from setuptools import dist
 from distutils.command.sdist import sdist
 from .utils import *
 
@@ -9,3 +10,6 @@ class SDistChecked(sdist):
         sdist.run(self)
 
 
+class BinaryDistribution(dist.Distribution):
+    def has_ext_modules(foo):
+        return True

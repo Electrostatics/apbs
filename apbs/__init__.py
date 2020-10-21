@@ -5,7 +5,9 @@ from . import (
         grid,
         multigrid,
         pqr,
-        test
+        test,
+        bin,
+        lib
         )
 
 version_str = "0.0.1"
