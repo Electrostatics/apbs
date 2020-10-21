@@ -7,7 +7,7 @@ from . import (
         pqr,
         test,
         bin,
-        lib
+        lib,
         )
 
 version_str = "0.0.1"

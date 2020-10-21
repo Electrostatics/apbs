@@ -11,3 +11,24 @@ For more information about APBS, please see
 
 * Home page:  http://www.poissonboltzmann.org/
 * Documentation: http://apbs.readthedocs.io
+
+### Development [Experimental]
+
+To install python package, use the following:
+
+```shell
+$ python setup.py build
+$ python setup.py install
+```
+
+```python
+>>> import apbs
+>>> # To access swig bindings to the C code:
+>>> from apbs.bindings.swig import *
+>>> # To access pybind bindings to the C code:
+>>> from apbs.bindings.swig import *
+>>> # To get path to binaries:
+>>> apbs.bin.get_path()
+>>> # To get path to libraries:
+>>> apbs.lib.get_path()
+```
