@@ -10,8 +10,8 @@ else()
   target_link_libraries(pybind11_dep INTERFACE pybind11::module)
 endif()
 
-target_include_directories(pybind11_dep INTERFACE ${Python3_INCLUDE_DIRS})
-target_link_libraries(pybind11_dep INTERFACE ${Python3_LIBRARIES})
+target_include_directories(pybind11_dep INTERFACE ${Python3_INCLUDE_DIRS} $ENV{Python3_INCLUDE_DIRS})
+# target_link_libraries(pybind11_dep INTERFACE ${Python3_LIBRARIES})
 
 add_library(apbs_pybind
   MODULE
@@ -32,6 +32,14 @@ set_target_properties(apbs_pybind
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
   )
 
+if(APPLE)
+  set_target_properties(apbs_pybind
+    PROPERTIES
+    COMPILE_FLAGS "-undefined dynamic_lookup"
+    )
+endif()
+
+
 message(STATUS "LIBS ${APBS_LIBS}")
 message(STATUS "INTERNAL_LIBS ${APBS_INTERNAL_LIBS}")
 target_link_libraries(
@@ -50,11 +58,11 @@ add_custom_command(
     ${PROJECT_SOURCE_DIR}/apbs/bindings/$<TARGET_FILE_NAME:apbs_pybind>
   )
 
-install(TARGETS apbs_pybind DESTINATION lib)
-if(PYTHON_SITE_PACKAGES_DIR)
-  install(TARGETS apbs_pybind DESTINATION ${Python3_SITELIB})
-else()
-  message(STATUS "Python site-packages dir not specified.")
-  message(STATUS "apbs_pybind module will likely not be on your \
-    PYTHONPATH unless you add ${CMAKE_INSTALL_PREFIX}/lib manually.")
-endif()
+# install(TARGETS apbs_pybind DESTINATION lib)
+# if(PYTHON_SITE_PACKAGES_DIR)
+  # install(TARGETS apbs_pybind DESTINATION ${Python3_SITELIB})
+# else()
+  # message(STATUS "Python site-packages dir not specified.")
+  # message(STATUS "apbs_pybind module will likely not be on your \
+    # PYTHONPATH unless you add ${CMAKE_INSTALL_PREFIX}/lib manually.")
+# endif()

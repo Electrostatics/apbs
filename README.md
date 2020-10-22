@@ -14,6 +14,12 @@ For more information about APBS, please see
 
 ### Development [Experimental]
 
+Development dependencies:
+
+- SWIG >4.0
+- GCC capable of C++17 (recommended >=7.5.0)
+- pip >=19
+
 To install python package, use the following:
 
 ```shell

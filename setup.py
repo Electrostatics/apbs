@@ -53,7 +53,7 @@ print(f'-- Found python site-packages directory {python_site_pkgs}')
 extra_cmake_args = dict(
     ENABLE_PYTHON='ON',
     CMAKE_BUILD_TYPE='Release',
-    PYTHON_SITE_PACKAGES_DIR=python_site_pkgs,
+    Python_ROOT_DIR=os.environ.get('Python_ROOT_DIR', ''),
     )
 
 # Skip installation step if building a whl
@@ -102,5 +102,5 @@ setup(
     classifiers=[
         'Programming Language :: C++',
         'Programming Language :: Python :: 3',
-        ] + [f'Programming Language :: Python :: 3.{i}' for i in range(5, 9)],
+        ] + [f'Programming Language :: Python :: 3.{i}' for i in range(6, 9)],
     )
