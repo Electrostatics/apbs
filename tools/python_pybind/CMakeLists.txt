@@ -42,6 +42,14 @@ target_link_libraries(
   ${APBS_INTERNAL_LIBS}
   )
 
+add_custom_command(
+  TARGET apbs_pybind
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+    $<TARGET_FILE:apbs_pybind>
+    ${PROJECT_SOURCE_DIR}/apbs/bindings/$<TARGET_FILE_NAME:apbs_pybind>
+  )
+
 install(TARGETS apbs_pybind DESTINATION lib)
 if(PYTHON_SITE_PACKAGES_DIR)
   install(TARGETS apbs_pybind DESTINATION ${PYTHON_SITE_PACKAGES_DIR})

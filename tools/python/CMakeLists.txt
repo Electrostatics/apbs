@@ -35,7 +35,15 @@ set_target_properties(_apbslib
 add_custom_command(
   TARGET _apbslib
   POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/apbslib.py "${CMAKE_BINARY_DIR}/lib/apbslib.py"
+  COMMAND ${CMAKE_COMMAND} -E copy 
+    ${CMAKE_CURRENT_BINARY_DIR}/apbslib.py 
+    "${CMAKE_BINARY_DIR}/lib/apbslib.py"
+  COMMAND ${CMAKE_COMMAND} -E copy 
+    ${CMAKE_CURRENT_BINARY_DIR}/apbslib.py
+    ${PROJECT_SOURCE_DIR}/apbs/bindings/apbslib.py
+  COMMAND ${CMAKE_COMMAND} -E copy 
+    $<TARGET_FILE:_apbslib>
+    ${PROJECT_SOURCE_DIR}/apbs/bindings/$<TARGET_FILE_NAME:_apbslib>
   )
 
 install(TARGETS _apbslib DESTINATION ${PYTHON_SITE_PACKAGES_DIR})
