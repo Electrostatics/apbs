@@ -81,7 +81,7 @@ setup(
     name=proj_name,
     version='3.0.0',
     author='',
-    author_email='',
+    author_email='asher.mancinelli@pnnl.gov',
     description='Adaptive Poisson-Boltzmann Solver',
     long_description=open('LICENSE.md', 'r').read(),
     ext_modules=[CMakeExtension(
@@ -102,5 +102,5 @@ setup(
     classifiers=[
         'Programming Language :: C++',
         'Programming Language :: Python :: 3',
-        ] + [f'Programming Language :: Python :: 3.{i}' for i in range(5, 8)],
+        ] + [f'Programming Language :: Python :: 3.{i}' for i in range(5, 9)],
     )
