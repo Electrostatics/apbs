@@ -27,6 +27,9 @@ set_target_properties(apbs_pybind
   PREFIX "${PYTHON_MODULE_PREFIX}"
   SUFFIX "${PYTHON_MODULE_EXTENSION}"
   OUTPUT_NAME "apbs_pybind"
+  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
   )
 
 message(STATUS "LIBS ${APBS_LIBS}")
@@ -37,6 +40,14 @@ target_link_libraries(
   pybind11_dep
   ${APBS_LIBS}
   ${APBS_INTERNAL_LIBS}
+  )
+
+add_custom_command(
+  TARGET apbs_pybind
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+    $<TARGET_FILE:apbs_pybind>
+    ${PROJECT_SOURCE_DIR}/apbs/bindings/$<TARGET_FILE_NAME:apbs_pybind>
   )
 
 install(TARGETS apbs_pybind DESTINATION lib)

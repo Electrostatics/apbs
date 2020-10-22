@@ -15,3 +15,13 @@ target_link_libraries(coulomb ${LIBS})
 
 add_executable(born born.c)
 target_link_libraries(born ${LIBS})
+
+foreach(BINARY born coulomb)
+  add_custom_command(
+    TARGET ${BINARY}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy 
+      $<TARGET_FILE:${BINARY}>
+      ${PROJECT_SOURCE_DIR}/apbs/bin/$<TARGET_FILE_NAME:${BINARY}>
+    )
+endforeach()

@@ -32,11 +32,7 @@ def replace_run(cls):
 
     def run(self):
 
-        build_dir = os.environ.get('BUILD_DIR')
-        if not build_dir:
-            print('-- BUILD_DIR not set in environment. This is likely a'
-                'configuration error. Please contact the maintainers.')
-            sys.exit(1)
+        build_dir = get_build_dir()
 
         try:
             out = subprocess.check_output(['cmake', '--version'])
@@ -46,9 +42,10 @@ def replace_run(cls):
         if not os.access(sys.prefix, os.W_OK):
             raise PermissionError('setup.py does not have write access to install prefix')
 
-        subprocess.check_call(
-                ['cmake', '--install', '.'],
-                cwd=build_dir)
+        if check_env_flag('DO_INSTALL'):
+            subprocess.check_call(
+                    ['cmake', '--install', '.'],
+                    cwd=build_dir)
 
         old_run(self)
 
