@@ -38,6 +38,8 @@ if(APPLE)
     PROPERTIES
     COMPILE_FLAGS "-undefined dynamic_lookup"
     )
+elseif(WIN32 OR WIN64)
+  target_link_libraries(_apbslib ${Python3_LIBRARIES})
 endif()
 
 add_custom_command(

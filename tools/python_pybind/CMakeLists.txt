@@ -11,7 +11,9 @@ else()
 endif()
 
 target_include_directories(pybind11_dep INTERFACE ${Python3_INCLUDE_DIRS} $ENV{Python3_INCLUDE_DIRS})
-# target_link_libraries(pybind11_dep INTERFACE ${Python3_LIBRARIES})
+if(WIN32 OR WIN64)
+  target_link_libraries(pybind11_dep INTERFACE ${Python3_LIBRARIES})
+endif()
 
 add_library(apbs_pybind
   MODULE
