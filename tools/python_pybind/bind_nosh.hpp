@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <optional>
 #include <stdexcept>
 
 #include <pybind11/pybind11.h>

@@ -10,7 +10,8 @@ else()
   target_link_libraries(pybind11_dep INTERFACE pybind11::module)
 endif()
 
-target_include_directories(pybind11_dep INTERFACE ${Python_INCLUDE_DIRS})
+target_include_directories(pybind11_dep INTERFACE ${Python3_INCLUDE_DIRS})
+target_link_libraries(pybind11_dep INTERFACE ${Python3_LIBRARIES})
 
 add_library(apbs_pybind
   MODULE
@@ -20,7 +21,7 @@ add_library(apbs_pybind
   bind_valist.cpp
   )
 
-message(STATUS "Site pkgs ${PROJECT_BINARY_DIR}/${PYTHON_SITE_PACKAGES_DIR}")
+message(STATUS "Site pkgs ${PROJECT_BINARY_DIR}/${Python3_SITELIB}")
 set_target_properties(apbs_pybind
   PROPERTIES
   PREFIX "${PYTHON_MODULE_PREFIX}"
@@ -40,7 +41,7 @@ target_link_libraries(
 
 install(TARGETS apbs_pybind DESTINATION lib)
 if(PYTHON_SITE_PACKAGES_DIR)
-  install(TARGETS apbs_pybind DESTINATION ${PYTHON_SITE_PACKAGES_DIR})
+  install(TARGETS apbs_pybind DESTINATION ${Python3_SITELIB})
 else()
   message(STATUS "Python site-packages dir not specified.")
   message(STATUS "apbs_pybind module will likely not be on your \

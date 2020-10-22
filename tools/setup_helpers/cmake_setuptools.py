@@ -84,6 +84,7 @@ class CMakeBuild(build_ext):
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
 
+        build_jobs = int(os.environ.get('BUILD_JOBS', '2'))
         if IS_WINDOWS:
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(cfg.upper(), extdir)]
             if sys.maxsize > 2**32:
@@ -91,7 +92,7 @@ class CMakeBuild(build_ext):
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            build_args += ['--', '-j2']
+            build_args += ['--', f'-j{build_jobs}']
 
         cmake_args += ['-DCMAKE_INSTALL_PREFIX=' + 
                 os.path.abspath(sys.prefix) ]
