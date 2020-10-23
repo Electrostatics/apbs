@@ -45,16 +45,21 @@ class CleanBuild(Command):
                 if not f.endswith('.py'):
                     os.remove(os.path.join(proj_root, 'apbs', subdir, f))
 
-
-from distutils import sysconfig as sc
-python_site_pkgs = sc.get_python_lib(prefix='', plat_specific=True)
-print(f'-- Found python site-packages directory {python_site_pkgs}')
-
 extra_cmake_args = dict(
-    ENABLE_PYTHON='ON',
     CMAKE_BUILD_TYPE='Release',
-    Python_ROOT_DIR=os.environ.get('Python_ROOT_DIR', ''),
+    ENABLE_BEM='ON',
+    ENABLE_GEOFLOW='ON',
+    ENABLE_FETK='ON',
+    ENABLE_OPENMP='ON',
+    ENABLE_PBAM='ON',
+    ENABLE_PBSAM='ON',
+    ENABLE_PYTHON='ON',
+    ENABLE_TESTS='ON',
+    ENABLE_TINKER='OFF',
     )
+
+if os.environ.get('Python_ROOT_DIR', None):
+    extra_cmake_args['Python_ROOT_DIR'] = os.environ['Python_ROOT_DIR']
 
 # Skip installation step if building a whl
 if 'bdist' in sys.argv or 'bdist_wheel' in sys.argv:
