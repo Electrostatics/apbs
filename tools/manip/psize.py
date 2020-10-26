@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """
 psize.py
 Get dimensions and other interesting information from a PQR file
@@ -157,10 +158,10 @@ class Psize:
         return self.n
 
     def setSmallest(self, n):
-        """ Compute parallel division in case memory requirement above
+        """Compute parallel division in case memory requirement above
         ceiling Find the smallest dimension and see if the number of
         grid points in that dimension will fit below the memory ceiling
-        Reduce nsmall until an nsmall^3 domain will fit into memory """
+        Reduce nsmall until an nsmall^3 domain will fit into memory"""
         nsmall = []
         for i in range(3):
             nsmall.append(n[i])
@@ -181,8 +182,8 @@ class Psize:
         return nsmall
 
     def setProcGrid(self, n, nsmall):
-        """ Calculate the number of processors required to span each
-        dimension """
+        """Calculate the number of processors required to span each
+        dimension"""
 
         zofac = 1 + 2 * self.constants["ofrac"]
         for i in range(3):
@@ -192,8 +193,8 @@ class Psize:
         return self.np
 
     def setFocus(self, flen, np, clen):
-        """ Calculate the number of levels of focusing required for
-        each processor subdomain """
+        """Calculate the number of levels of focusing required for
+        each processor subdomain"""
 
         nfoc = [0, 0, 0]
         for i in range(3):

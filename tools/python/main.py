@@ -143,32 +143,32 @@ NOSH_MAXCALC = 20
 
 
 class APBSError(Exception):
-    """ APBSError class
+    """APBSError class
 
-        The APBSError class inherits off the Exception module and returns
-        a string defining the nature of the error.
+    The APBSError class inherits off the Exception module and returns
+    a string defining the nature of the error.
     """
 
     def __init__(self, value):
         """
-            Initialize with error message
+        Initialize with error message
 
-            Parameters
-                value:  Error Message (string)
+        Parameters
+            value:  Error Message (string)
         """
         self.value = value
 
     def __str__(self):
         """
-            Return the error message
+        Return the error message
         """
         return repr(self.value)
 
 
 def getHeader():
-    """ Get header information about APBS
-        Returns (header)
-            header: Information about APBS
+    """Get header information about APBS
+    Returns (header)
+        header: Information about APBS
     """
 
     header = '\n\n\
@@ -233,9 +233,9 @@ def getHeader():
 
 
 def getUsage():
-    """ Get usage information about running APBS via Python
-        Returns (usage)
-            usage: Text about running APBS via Python
+    """Get usage information about running APBS via Python
+    Returns (usage)
+        usage: Text about running APBS via Python
     """
 
     usage = "\n\n\

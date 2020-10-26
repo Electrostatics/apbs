@@ -1,0 +1,24 @@
+[tool.black]
+line-length = 79
+target-version = ['py37']
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | pybind11
+    | externals
+  )/
+  | versioneer.py
+  | pdb2pqr/_version.py  # Exclude files from versioneer
+  | tools/python/vgrid/vgrid.py
+)
+'''

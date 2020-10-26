@@ -69,8 +69,7 @@ def test_binary(binary_name, logger):
 
     if not os.access(binary, os.X_OK):
         raise PermissionError(
-            f"The apbs binary, {binary}, "
-            + "is not executable!"
+            f"The apbs binary, {binary}, " + "is not executable!"
         )
 
     try:

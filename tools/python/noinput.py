@@ -170,34 +170,34 @@ NOSH_MAXCALC = 20
 
 
 class APBSError(Exception):
-    """ APBSError class
+    """APBSError class
 
-        The APBSError class inherits off the Exception module and returns
-        a string defining the nature of the error.
+    The APBSError class inherits off the Exception module and returns
+    a string defining the nature of the error.
     """
 
     def __init__(self, value):
         """
-            Initialize with error message
+        Initialize with error message
 
-            Parameters
-                value:  Error Message (string)
+        Parameters
+            value:  Error Message (string)
         """
         self.value = value
 
     def __str__(self):
         """
-            Return the error message
+        Return the error message
         """
         return repr(self.value)
 
 
 def getUnitConversion():
     """
-        Get the unit conversion from kT to kJ/mol
+    Get the unit conversion from kT to kJ/mol
 
-        Returns
-            factor: The conversion factor (float)
+    Returns
+        factor: The conversion factor (float)
     """
     temp = 298.15
     factor = Python_kb / 1000.0 * temp * Python_Na
@@ -205,9 +205,9 @@ def getUnitConversion():
 
 
 def getHeader():
-    """ Get header information about APBS
-        Returns (header)
-            header: Information about APBS
+    """Get header information about APBS
+    Returns (header)
+        header: Information about APBS
     """
 
     """ Get header information about APBS
@@ -272,9 +272,9 @@ def getHeader():
 
 
 def getUsage():
-    """ Get usage information about running APBS via Python
-        Returns (usage)
-            usage: Text about running APBS via Python
+    """Get usage information about running APBS via Python
+    Returns (usage)
+        usage: Text about running APBS via Python
     """
 
     usage = "\n\n\
@@ -290,27 +290,27 @@ def getUsage():
 
 def printResults(energyList, potList, forceList):
     """
-        Print the results stored in the energy, potential and force lists to
-        stdout. The arrays are accessed as follows:
+    Print the results stored in the energy, potential and force lists to
+    stdout. The arrays are accessed as follows:
 
-        energyList[calc #][atom #]: Per-atom energy for a specific calc #
+    energyList[calc #][atom #]: Per-atom energy for a specific calc #
 
-        potList[calc #][atom #]  :  Per-atom potential for a specific calc #
+    potList[calc #][atom #]  :  Per-atom potential for a specific calc #
 
-        forceList is a little more difficult, as it is a list of dictionaries
-        of lists:
+    forceList is a little more difficult, as it is a list of dictionaries
+    of lists:
 
-        forceList[calc #]['force type'][atom #][x=0/y=1/z=2 direction ]
+    forceList[calc #]['force type'][atom #][x=0/y=1/z=2 direction ]
 
-        So to access the qf x-component force from the first APBS elec
-        calculation for the 2nd (atom id 1) atom, you can access
+    So to access the qf x-component force from the first APBS elec
+    calculation for the 2nd (atom id 1) atom, you can access
 
-        forceList[0]['qf'][1][0]
+    forceList[0]['qf'][1][0]
 
-        If you plan on using these lists extensively it would be wise to
-        convert them into Python objects - this format is the cleanest for
-        getting information back out from C, but not for dealing between
-        Python functions.
+    If you plan on using these lists extensively it would be wise to
+    convert them into Python objects - this format is the cleanest for
+    getting information back out from C, but not for dealing between
+    Python functions.
     """
     # Print the per-atom energies
     #    Each list corresponds to a calculation, having len(atoms) entries

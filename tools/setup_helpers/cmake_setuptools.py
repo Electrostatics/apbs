@@ -1,16 +1,11 @@
 import os
 import sys
-import platform
 import subprocess
-import glob
-from typing import Optional
 from shutil import rmtree
-from setuptools import setup, Extension, Command
+from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from setuptools.command.install import install
 from setuptools.command.develop import develop
-import setuptools
-from distutils.version import LooseVersion
 
 from .env import *
 from .utils import *

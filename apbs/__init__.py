@@ -1,19 +1,18 @@
 from . import (
-        bindings,
-        chemistry,
-        geometry,
-        grid,
-        multigrid,
-        pqr,
-        test,
-        bin,
-        lib,
-        )
+    bindings,
+    chemistry,
+    geometry,
+    grid,
+    multigrid,
+    pqr,
+    test,
+    bin,
+    lib,
+)
 
 version_str = "0.0.1"
 
 header = """
-
 ----------------------------------------------------------------------
 
     APBS -- Adaptive Poisson-Boltzmann Solver

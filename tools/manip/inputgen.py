@@ -4,11 +4,6 @@
 
     Written by Todd Dolinsky based on original sed script by Nathan Baker
 
-    ----------------------------
-
-    Version:  $Id$
-
-    ----------------------------
 """
 
 # User - Definable Variables: Default values
@@ -35,14 +30,14 @@ from psize import Psize
 
 class Elec:
     """
-        An object for the ELEC section of an APBS input file
+    An object for the ELEC section of an APBS input file
     """
 
     def __init__(self, pqrpath, size, method, asyncflag, istrng=0, potdx=0):
         """
-            Initialize the variables that can be set in this object
-            Users can modify any of these variables (that's why
-            they're here!)
+        Initialize the variables that can be set in this object
+        Users can modify any of these variables (that's why
+        they're here!)
         """
 
         # If this is an async or parallel calc, we want to use
@@ -106,8 +101,8 @@ class Elec:
 
     def __str__(self):
         """
-            Return the elec statement as a string. Check the method
-            to see which keywords to use.
+        Return the elec statement as a string. Check the method
+        to see which keywords to use.
         """
         text = "elec %s\n" % self.label
         text += "    %s\n" % self.method
@@ -189,30 +184,30 @@ class Elec:
 
 class Input:
     """
-        The input class.  Each input object is one APBS input file.
+    The input class.  Each input object is one APBS input file.
     """
 
     def __init__(self, pqrpath, size, method, asyncflag, istrng=0, potdx=0):
         """
-            Initialize the input file class.  Each input file contains
-            a PQR name, a list of elec objects, and a list of strings
-            containing print statements.  For starters assume two
-            ELEC statements are needed, one for the inhomgenous and
-            the other for the homogenous dielectric calculations.
+        Initialize the input file class.  Each input file contains
+        a PQR name, a list of elec objects, and a list of strings
+        containing print statements.  For starters assume two
+        ELEC statements are needed, one for the inhomgenous and
+        the other for the homogenous dielectric calculations.
 
-            Users can edit the elec statements and the print statements.
+        Users can edit the elec statements and the print statements.
 
-            This assumes you have already run psize, either by
-                 size.runPsize(/path/to/pqr) or
+        This assumes you have already run psize, either by
+             size.runPsize(/path/to/pqr) or
 
-                 size.parse_string(string)
-                 size.set_all()
+             size.parse_string(string)
+             size.set_all()
 
-            Parameters
-                pqrpath:   The path to the PQR file (string)
-                size:      The Psize object (psize)
-                method:    The method (para, auto, manual, async) to use
-                asyncflag: 1 if async is desired, 0 otherwise
+        Parameters
+            pqrpath:   The path to the PQR file (string)
+            size:      The Psize object (psize)
+            method:    The method (para, auto, manual, async) to use
+            asyncflag: 1 if async is desired, 0 otherwise
         """
 
         self.pqrpath = pqrpath
@@ -239,7 +234,7 @@ class Input:
 
     def __str__(self):
         """
-            Return the text of the input file
+        Return the text of the input file
         """
         text = "read\n"
         text += "    mol pqr %s\n" % self.pqrname
@@ -253,7 +248,7 @@ class Input:
 
     def print_input_files(self):
         """
-            Make the input file(s) associated with this object
+        Make the input file(s) associated with this object
         """
         period = self.pqrpath.find(".")
         if self.asyncflag == 1:
@@ -290,7 +285,7 @@ class Input:
 
     def dump_pickle(self):
         """
-            Make a Python pickle associated with the APBS input parameters
+        Make a Python pickle associated with the APBS input parameters
         """
         period = self.pqrpath.find(".")
         if period > 0:
@@ -304,11 +299,11 @@ class Input:
 
 def split_input(filename):
     """
-        Split the parallel input file into multiple async file names
+    Split the parallel input file into multiple async file names
 
-        Parameters
-            filename:  The path to the original parallel input
-                       file (string)
+    Parameters
+        filename:  The path to the original parallel input
+                   file (string)
     """
     nproc = 0
     file = open(filename, "rU")
@@ -343,7 +338,7 @@ def split_input(filename):
 
 def usage():
     """
-        Display the usage information for this script
+    Display the usage information for this script
     """
     size = Psize()
     cfac = size.getConstant("cfac")

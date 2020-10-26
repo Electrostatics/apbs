@@ -2,7 +2,7 @@
 
 import sys
 import getopt
-from . vgrid import (
+from .vgrid import (
     startVio,
     Vgrid_ctor,
     Vgrid_readDX,
@@ -33,20 +33,20 @@ HEADER = "\n\n\
 
 def IJK(nx, ny, nz, i, j, k):
     """
-        Translate a three dimensional point to
-        a one dimensional list
+    Translate a three dimensional point to
+    a one dimensional list
 
-        Parameters
-            nx:    No. of total gridpoints in x direction (int)
-            ny:    No. of total gridpoints in y direction (int)
-            nz:    No. of total gridpoints in z direction (int)
-            i:     Specific gridpoint in x direction (int)
-            j:     Specific gridpoint in y direction (int)
-            k:     Specific gridpoint in z direction (int)
+    Parameters
+        nx:    No. of total gridpoints in x direction (int)
+        ny:    No. of total gridpoints in y direction (int)
+        nz:    No. of total gridpoints in z direction (int)
+        i:     Specific gridpoint in x direction (int)
+        j:     Specific gridpoint in y direction (int)
+        k:     Specific gridpoint in z direction (int)
 
-        Returns
-            value: The one dimensional value matching the
-                   three dimensional point
+    Returns
+        value: The one dimensional value matching the
+               three dimensional point
     """
     value = k * nx * ny + j * nx + i
     return value
@@ -54,15 +54,15 @@ def IJK(nx, ny, nz, i, j, k):
 
 def createGrid(inputpath, root):
     """
-        Create the merged grid by use of an APBS input file and
-        the multiple dx files.
+    Create the merged grid by use of an APBS input file and
+    the multiple dx files.
 
-        Parameters
-            inputpath: The path to the APBS input file (string)
-            root:      The root of the name of the multiple dx files,
-                       to be completed with <int>.dx (string)
-        Returns
-            mygrid:    The merged grid object (Vgrid)
+    Parameters
+        inputpath: The path to the APBS input file (string)
+        root:      The root of the name of the multiple dx files,
+                   to be completed with <int>.dx (string)
+    Returns
+        mygrid:    The merged grid object (Vgrid)
     """
 
     # Initialize some variables
@@ -158,21 +158,30 @@ def createGrid(inputpath, root):
 
         print("\tGrid dimensions: %i %i %i" % (grid.nx, grid.ny, grid.nz))
         print("\tGrid spacing: %.5f %.5f %.5f" % (grid.hx, grid.hy, grid.hzed))
-        print("\tGrid lower corner: %.2f %.2f %.2f" % (
-            grid.xmin,
-            grid.ymin,
-            grid.zmin,
-        ))
-        print("\tGrid upper corner: %.2f %.2f %.2f" % (
-            grid.xmax,
-            grid.ymax,
-            grid.zmax,
-        ))
-        print("\tGlobal Gridpoint Minima: %i %i %i\n" % (
-            mins[0],
-            mins[1],
-            mins[2],
-        ))
+        print(
+            "\tGrid lower corner: %.2f %.2f %.2f"
+            % (
+                grid.xmin,
+                grid.ymin,
+                grid.zmin,
+            )
+        )
+        print(
+            "\tGrid upper corner: %.2f %.2f %.2f"
+            % (
+                grid.xmax,
+                grid.ymax,
+                grid.zmax,
+            )
+        )
+        print(
+            "\tGlobal Gridpoint Minima: %i %i %i\n"
+            % (
+                mins[0],
+                mins[1],
+                mins[2],
+            )
+        )
 
         # If this is the first processor, initialize the merged grid
 
@@ -277,16 +286,16 @@ def createGrid(inputpath, root):
 
 def resampleGrid(grid, nx, ny, nz):
     """
-        Resample the grid to a smaller (less-defined) resolution
+    Resample the grid to a smaller (less-defined) resolution
 
-        Parameters
-            grid:   The merged grid (Vgrid)
-            nx:     The number of gridpoints in the x dir (int)
-            nx:     The number of gridpoints in the x dir (int)
-            nx:     The number of gridpoints in the x dir (int)
+    Parameters
+        grid:   The merged grid (Vgrid)
+        nx:     The number of gridpoints in the x dir (int)
+        nx:     The number of gridpoints in the x dir (int)
+        nx:     The number of gridpoints in the x dir (int)
 
-        Retrurns
-            newgrid: The resampleed merged grid (Vgrid)
+    Retrurns
+        newgrid: The resampleed merged grid (Vgrid)
     """
 
     print("Resampling the grid...")
@@ -345,11 +354,11 @@ def resampleGrid(grid, nx, ny, nz):
 
 def printGrid(mygrid, outpath):
     """
-        Print the merged grid using the Vgrid_writeDX command
+    Print the merged grid using the Vgrid_writeDX command
 
-        Parameters
-            mygrid:  The merged grid (Vgrid)
-            outpath: The output path for the new .dx file (string)
+    Parameters
+        mygrid:  The merged grid (Vgrid)
+        outpath: The output path for the new .dx file (string)
     """
     print(f"Writing output to {outpath}...")
     title = "Merged Grid from mergedx.py"
@@ -358,7 +367,7 @@ def printGrid(mygrid, outpath):
 
 def usage():
     """
-        Print usage information
+    Print usage information
     """
     val = f"{HEADER}"
     val += """
@@ -395,7 +404,7 @@ Usage: mergedx.py [options] <input-file> <dx-stem>
 
 def main():
     """
-        The main driver for the mergedx script
+    The main driver for the mergedx script
     """
     shortOptlist = "h"
     longOptlist = ["help", "out=", "nx=", "ny=", "nz="]
