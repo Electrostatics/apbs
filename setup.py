@@ -1,10 +1,8 @@
 import os
-import re
 import sys
-import platform
-import subprocess
 import glob
 import pprint
+from distutils import sysconfig as sc
 
 from tools.setup_helpers.cmake_setuptools import *
 from tools.setup_helpers.extra_setuptools_commands import *
@@ -46,7 +44,12 @@ class CleanBuild(Command):
                     os.remove(os.path.join(proj_root, "apbs", subdir, f))
 
 
+python_site_pkgs = sc.get_python_lib(prefix="", plat_specific=True)
+print(f"-- Found python site-packages directory {python_site_pkgs}")
+
 extra_cmake_args = dict(
+    BUILD_DOC="OFF",
+    BUILD_SHARED_LIBS="OFF",
     CMAKE_BUILD_TYPE="Release",
     ENABLE_BEM="ON",
     ENABLE_GEOFLOW="ON",
@@ -61,6 +64,7 @@ extra_cmake_args = dict(
 
 if os.environ.get("Python_ROOT_DIR", None):
     extra_cmake_args["Python_ROOT_DIR"] = os.environ["Python_ROOT_DIR"]
+    PYTHON_SITE_PACKAGES_DIR = python_site_pkgs
 
 # Skip installation step if building a whl
 if "bdist" in sys.argv or "bdist_wheel" in sys.argv:
@@ -73,11 +77,11 @@ raw_package_data = {
 }
 
 # Filter out python and pyc files from package data
-package_data = dict()
+package_data = {}
 for k, v in raw_package_data.items():
     package_data[k] = []
     for f in v:
-        if not f.endswith(".py") and not "__pycache__" in f:
+        if not f.endswith(".py") and "__pycache__" not in f:
             package_data[k].append(os.path.basename(f))
 
 print("Package data:")
@@ -85,7 +89,7 @@ pp.pprint(package_data)
 
 setup(
     name=proj_name,
-    version="3.0.0",
+    version="3.1.0",
     author="",
     author_email="asher.mancinelli@pnnl.gov",
     description="Adaptive Poisson-Boltzmann Solver",
@@ -100,6 +104,7 @@ setup(
         "develop": CMakeInstall,
         "clean": CleanBuild,
         "sdist": SDistChecked,
+        "test": CMakeTest,
     },
     zip_safe=False,
     packages=find_packages(include=["apbs", "apbs.*"]),
