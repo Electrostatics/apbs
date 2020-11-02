@@ -17,8 +17,8 @@ This directory contains five example .in files:
 These files can be used to demonstrate TABI-PB pKa calculations, documented at:
 http://www.poissonboltzmann.org/examples/Lysozyme_pKa_example/
 
-File Input| APBS Version| Result (kJ/mol)| Expected (kJ/mol)
----|---|---|---
-[ASH66.in](ASH66.in)| **3.0**| **-4.026**| **-4.026**
-[2LTZ-ASH66.in](2LTZ-ASH66.in)| **3.0**| **-369.020**| **-369.020**
-[2LTZ-noASH66.in](2LTZ-noASH66.in)| **3.0**| **-367.795**| **-367.795**
+Input File | Description | APBS Version| Result (kJ/mol)| Expected (kJ/mol)
+---|---|---|---|---
+[ASH66.in](ASH66.in)|| **3.0**| **-4.026**| **-4.026**
+[2LTZ-ASH66.in](2LTZ-ASH66.in)|| **3.0**| **-369.020**| **-369.020**
+[2LTZ-noASH66.in](2LTZ-noASH66.in)|| **3.0**| **-367.795**| **-367.795**
