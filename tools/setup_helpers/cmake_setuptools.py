@@ -65,7 +65,7 @@ class CMakeBuild(build_ext):
         for k, v in ext.extra_cmake_args.items():
             cmake_args.append('-D' + k + '=' + v)
 
-        cfg = 'Debug' if self.debug else 'Release'
+        cfg = 'Release'
         build_args = ['--config', cfg]
 
         build_jobs = int(os.environ.get('BUILD_JOBS', '2'))
@@ -73,6 +73,7 @@ class CMakeBuild(build_ext):
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(cfg.upper(), extdir)]
             if sys.maxsize > 2**32:
                 cmake_args += ['-A', 'x64']
+            cmake_args += ['-G', 'Visual Studio 16 2019']
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]

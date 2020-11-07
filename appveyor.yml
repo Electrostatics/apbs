@@ -3,6 +3,7 @@ version: 3.0.{build}
 branches:
   only:
     - master
+    - pip-dev
 
 image:
   - Visual Studio 2019
@@ -106,13 +107,11 @@ build_script:
   - set pybind11_DIR=C:\projects\source\externals\pybind11\install\share\cmake\pybind11
   - cd ..
   - cd c:\projects\source
-  - mkdir build
-  - cd build
 
   - echo "*****************************************************************************"
-  - echo APBS_CONFIG
+  - echo APBS_BUILD
   - echo "*****************************************************************************"
-  - cmake --config Release -DPYBIND11_DIR=%pybind11_DIR% -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_FETK=OFF -DENABLE_BEM=ON -DENABLE_GEOFLOW=ON -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=OFF -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
+  - python setup.py build -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_FETK=OFF -DENABLE_BEM=ON -DENABLE_GEOFLOW=ON -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=OFF -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON 
 
   - echo "*****************************************************************************"
   - echo APBS_CMAKE_OUTPUT
@@ -125,20 +124,9 @@ build_script:
   - if exist c:\projects\source\build\CMakeFiles\CMakeError.log type c:\projects\source\build\CMakeFiles\CMakeError.log
 
   - echo "*****************************************************************************"
-  - echo APBS_MAKE_INSTALL
+  - echo APBS_BDIST_WHEEL
   - echo "*****************************************************************************"
-  - cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
-
-  - echo "*****************************************************************************"
-  - echo APBS_TEST
-  - echo "*****************************************************************************"
-  - ctest -C Release --verbose --output-on-failure
-
-  - echo "*****************************************************************************"
-  - echo APBS_PACKAGE
-  - echo "*****************************************************************************"
-  - cpack -C Release -G ZIP
-  - unzip -l APBS*.zip
+  - python setup.py bdist_wheel
 
   - echo "*****************************************************************************"
   - echo APBS_DONE

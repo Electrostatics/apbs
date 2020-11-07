@@ -47,16 +47,35 @@ class CleanBuild(Command):
 
 extra_cmake_args = dict(
     CMAKE_BUILD_TYPE='Release',
-    ENABLE_BEM='OFF',
-    ENABLE_GEOFLOW='OFF',
-    ENABLE_FETK='OFF',
-    ENABLE_OPENMP='OFF',
-    ENABLE_PBAM='OFF',
-    ENABLE_PBSAM='OFF',
-    ENABLE_PYTHON='ON',
+    ENABLE_BEM='ON',
+    ENABLE_GEOFLOW='ON',
+    ENABLE_FETK='ON',
+    ENABLE_OPENMP='ON',
+    ENABLE_PBAM='ON',
+    ENABLE_PBSAM='ON',
+    ENABLE_PYTHON='OFF',
     ENABLE_TESTS='ON',
     ENABLE_TINKER='OFF',
+    BUILD_TESTING='OFF', 
+    BUILD_TOOLS='OFF', 
+    CHECK_EPSILON='OFF',
+    BUILD_SHARED_LIBS='OFF',
+    GET_NanoShaper='OFF', 
     )
+
+args = []
+for i, arg in enumerate(sys.argv):
+    if arg.startswith('-D') and '=' in arg:
+        k, v = arg.split('=')
+        k = k.replace('-D', '')
+        extra_cmake_args[k] = v
+    else:
+        args.append(arg)
+
+sys.argv = args
+
+if platform.system() == 'Windows':
+    extra_cmake_args['ENABLE_FETK'] = 'OFF'
 
 if os.environ.get('Python_ROOT_DIR', None):
     extra_cmake_args['Python_ROOT_DIR'] = os.environ['Python_ROOT_DIR']
@@ -97,6 +116,9 @@ for k, v in raw_package_data.items():
 
 print('Package data:')
 pp.pprint(package_data)
+
+print('Cmake args:')
+pp.pprint(extra_cmake_args)
 
 setup(
     name=proj_name,
