@@ -5563,3 +5563,142 @@ VPUBLIC int solvePBSAM( Valist* molecules[NOSH_MAXMOL],
 }
 
 #endif
+
+/**
+ * Dump compile-time options
+ */
+VPUBLIC void dump_options()
+{
+    puts("Apbs configuration:");
+
+    printf("PACKAGE_STRING:%s",PACKAGE_STRING);
+
+    printf("APBS_FAST:");
+#ifdef APBS_FAST
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("DEBUG:");
+#ifdef DEBUG
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("VERBOSE_DEBUG:");
+#ifdef VERBOSE_DEBUG
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("VAPBSQUIET:");
+#ifdef VAPBSQUIET
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("HAVE_TIME_FUNC:");
+#ifdef HAVE_TIME_FUNC
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("HAVE_RAND_FUNC:");
+#ifdef HAVE_RAND_FUNC
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("HAVE_SRAND_FUNC:");
+#ifdef HAVE_SRAND_FUNC
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("HAVE_LIBREADLINE:");
+#ifdef HAVE_LIBREADLINE
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("APBS_NOINLINE:");
+#ifdef APBS_NOINLINE
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("HAVE_EMBED:");
+#ifdef HAVE_EMBED
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("HAVE_ZLIB:");
+#ifdef HAVE_ZLIB
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("WITH_TINKER:");
+#ifdef WITH_TINKER
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("FETK_ENABLED:");
+#ifdef FETK_ENABLED
+    printf("1");
+#else
+    puts("0");
+#endif
+
+    printf("HAVE_PUNC_H:");
+#ifdef HAVE_PUNC_H
+    puts("1");
+#else
+    printf("0");
+#endif
+
+    printf("HAVE_MCX_H:");
+#ifdef HAVE_MCX_H
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("HAVE_MC_H:");
+#ifdef HAVE_MC_H
+    printf("1");
+#else
+    puts("0");
+#endif
+
+    printf("HAVE_BIOM_H:");
+#ifdef HAVE_BIOM_H
+    puts("1");
+#else
+    printf("0");
+#endif
+
+    printf("HAVE_MPI_H:");
+#ifdef HAVE_MPI_H
+    puts("1");
+#else
+    puts("0");
+#endif
+
+    printf("FLOAT_EPSILON:%f\n",FLOAT_EPSILON);
+    printf("DOUBLE_EPSILON:%f\n",DOUBLE_EPSILON);
+}
