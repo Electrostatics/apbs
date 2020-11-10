@@ -1,11 +1,10 @@
 from typing import List, Optional
 from apbs.geometry import Coordinate, Constants
-import math
+import numpy as np
 
 
 class CurvatureFlag:
-    """Enum class to replace curvature flags in original source
-    """
+    """Enum class to replace curvature flags in original source"""
 
     ReducedMaximalCurvature = 0
     MeanCurvature = 1
@@ -70,12 +69,12 @@ class Grid:
         )
 
         hi = Coordinate(
-            int(math.ceil(tmp.x)), int(math.ceil(tmp.y)), int(math.ceil(tmp.z))
+            int(np.ceil(tmp.x)), int(np.ceil(tmp.y)), int(np.ceil(tmp.z))
         )
         lo = Coordinate(
-            int(math.floor(tmp.x)),
-            int(math.floor(tmp.y)),
-            int(math.floor(tmp.z)),
+            int(np.floor(tmp.x)),
+            int(np.floor(tmp.y)),
+            int(np.floor(tmp.z)),
         )
 
         hi.x = (
@@ -137,7 +136,7 @@ class Grid:
 
             ret_value = sum(ret_value)
 
-            if ret_value == math.nan:
+            if ret_value == np.nan:
                 # TODO: Add a more descriptive error
                 raise RuntimeError(
                     "Value routine failed to converge with the following "
@@ -169,24 +168,21 @@ class Grid:
         ...
 
     def integrate(self) -> float:
-        """Get the integral of the data
-        """
+        """Get the integral of the data"""
         ...
 
     def norml1(self) -> float:
         r"""Get the \f$L_1\f$ norm of the data.  This returns the integral:
-            \f[ \| u \|_{L_1} = \int_\Omega | u(x) | dx  \f]
+        \f[ \| u \|_{L_1} = \int_\Omega | u(x) | dx  \f]
         """
         ...
 
     def norml2(self) -> float:
-        r"""Computes the \f$L_2\f$ norm of the data.
-        """
+        r"""Computes the \f$L_2\f$ norm of the data."""
         ...
 
     def norml_inf(self) -> float:
-        r"""Computes the \f$L_\infty\f$ norm of the data.
-        """
+        r"""Computes the \f$L_\infty\f$ norm of the data."""
         ...
 
     def seminormH1(self) -> float:

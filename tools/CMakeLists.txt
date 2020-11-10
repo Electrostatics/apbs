@@ -5,5 +5,6 @@ add_subdirectory(manip)
 
 if(ENABLE_PYTHON)
     add_subdirectory(python)
+    add_subdirectory(python-pybind)
 endif(ENABLE_PYTHON)
 

@@ -1,9 +1,5 @@
 ##########################################################################
-### 1D7I/DSS BINDING ENERGY
-### $Id$
-###
-### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for
-### syntax help.
+# 1D7I/DSS BINDING ENERGY
 ##########################################################################
 
 read 

@@ -57,10 +57,13 @@ OPTION(BUILD_SHARED_LIBS "Build shared libraries." OFF)
 ################################################################################
 message(STATUS "Setting project paths")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -fpermissive -fPIC")
+set(CMAKE_CXX_STANDARD 17)
 if(WIN32)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W4")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:100000000")
+else()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -fpermissive -fPIC")
 endif()
 if(APPLE AND BUILD_SHARED_LIBS)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -undefined dynamic_lookup")
@@ -122,8 +125,7 @@ set(SYS_LIBPATHS /usr/lib64)
 
 
 ################################################################################
-# Debian/Ubuntu hack for                                                       #
-# https://github.com/Electrostatics/apbs-pdb2pqr/issues/364                    #
+# Debian/Ubuntu hack                                                           #
 ################################################################################
 if(EXISTS "/etc/debian_version" AND
   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -301,6 +303,13 @@ if(ENABLE_MPI)
     endif()
 endif()
 
+
+################################################################################
+# Handle the finite element solver dependencies                                #
+################################################################################
+option(ENABLE_FETK "Enable the finite element solver" OFF)
+
+
 ################################################################################
 # Deal with MALOC                                                              #
 # Note that we depend exclusively on the MALOC that is in our external FETK    #
@@ -316,16 +325,10 @@ if(NOT ENABLE_FETK)
                         ${EXTERNALS_PATH}/fetk/maloc/src/psh)
     list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
     list(APPEND APBS_LIBS maloc)
-endif()
-
-
-################################################################################
-# Handle the finite element solver dependencies                                #
-################################################################################
-option(ENABLE_FETK "Enable the finite element solver" OFF)
-
-if(ENABLE_FETK)
-
+    if (WIN32)
+      list(APPEND MALOC_LIBS wsock32 WS2_32)
+    endif()
+else()
     if(WIN32)
         message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
     else()
@@ -392,8 +395,7 @@ if(ENABLE_FETK)
                                   vf2c
                                   tetgen
                                   triangle
-                                  readline
-                                  termcap)
+                                  readline)
 
         if(BUILD_SHARED_LIBS)
             install(DIRECTORY ${install_dir}/lib/
@@ -469,6 +471,9 @@ if(ENABLE_PBAM)
     ExternalProject_Get_Property(pbam binary_dir)
     add_definitions(-DENABLE_PBAM)
     list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
+    if (WIN32)
+        list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src/${CMAKE_BUILD_TYPE}")
+    endif()
     list(APPEND APBS_LIBS PBAMLib)
     include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
     include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
@@ -709,7 +714,7 @@ if(CYGWIN)
 endif()
 
 if(NOT CYGWIN AND NOT MINGW AND WIN32)
-    list(APPEND APBS_LIBS wsock32)
+    list(APPEND APBS_LIBS wsock32 WS2_32)
     ADD_DEFINITIONS("/D _CRT_SECURE_NO_WARNINGS")
 endif()
 
@@ -828,7 +833,7 @@ set(CPACK_PACKAGE_VERSION_PATCH        "${CMAKE_MICRO_VERSION}")
 #  NOTE: The following is tempting but does not work!
 # set(FULL_PACKAGE_NAME                  "${PACKAGE_NAME}-${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION}")
 set(CPACK_PACKAGE_VENDOR               "PNNL")
-set(CPACK_PACKAGE_CONTACT              "APBS - https://github.com/Electrostatics/apbs-pdb2pqr")
+set(CPACK_PACKAGE_CONTACT              "APBS - https://github.com/Electrostatics/apbs")
 set(CPACK_PACKAGE_FILE_NAME            "${PACKAGE_NAME}-${APBS_VERSION}.${CMAKE_HOST_SYSTEM_NAME}")
 set(CPACK_STRIP_FILES                   True)
 

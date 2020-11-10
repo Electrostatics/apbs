@@ -82,6 +82,14 @@ int main(
          char **argv  /**< Argument strings */
          )
 {
+    // Dump compile-time options
+    for (int i=0; i<argc; i++) {
+        if (strcmp(argv[i],"--config")==0) {
+            dump_options();
+            return 0;
+        }
+    }
+
     // PCE: Adding below variables temporarily
     clock_t ts, te;
     // End PCE
@@ -238,6 +246,7 @@ int main(
     for type are either \"xml\" or \"flat\".\n\
 --help                   Display this help information.\n\
 --version                Display the current APBS version.\n\
+--config                 Display configuration options APBS was built with.\n\
 ----------------------------------------------------------------------\n\n"};
 
     /* ************** CHECK PARALLEL STATUS *************** */

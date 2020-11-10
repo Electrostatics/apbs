@@ -152,3 +152,6 @@ examples
 
 # Output files
 *.out
+
+# Personal notes
+NOTES.txt
