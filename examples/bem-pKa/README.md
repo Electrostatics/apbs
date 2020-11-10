@@ -19,9 +19,6 @@ http://www.poissonboltzmann.org/examples/Lysozyme_pKa_example/
 
 File Input| APBS Version| Result (kJ/mol)| Expected (kJ/mol)
 ---|---|---|---
-[ASH66.in](ASH66.in)| **3.0**| **-4.165**| **-4.165**
-| 1.5| -4.165|
-[2LTZ-ASH66.in](2LTZ-ASH66.in)| **3.0**| **-360.665**| **-360.665**
-| 1.5| -360.665|
-[2LTZ-noASH66.in](2LTZ-noASH66.in)| **3.0**| **-359.870**| **-359.870**
-| 1.5| -359.870|
+[ASH66.in](ASH66.in)| **3.0**| **-4.026**| **-4.026**
+[2LTZ-ASH66.in](2LTZ-ASH66.in)| **3.0**| **-369.020**| **-369.020**
+[2LTZ-noASH66.in](2LTZ-noASH66.in)| **3.0**| **-367.795**| **-367.795**

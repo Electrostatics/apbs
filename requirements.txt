@@ -1,3 +1,2 @@
-sphinx>=3.1
-sphinx_rtd_theme
-sphinx_sitemap
+python-dev-tools
+pybind11

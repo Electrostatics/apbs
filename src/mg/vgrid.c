@@ -748,7 +748,7 @@ VPUBLIC int Vgrid_readDX(Vgrid *thee,
     VJMPERR1(!strcmp(tok, "items"));
     /* Get # */
     VJMPERR2(1 == Vio_scanf(sock, "%s", tok));
-    VJMPERR1(1 == sscanf(tok, "%lu", &itmp));
+    VJMPERR1(1 == sscanf(tok, "%zu", &itmp));
     u = (size_t)thee->nx * thee->ny * thee->nz;
     VJMPERR1(u == itmp);
     /* Get "data" */

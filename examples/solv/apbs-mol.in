@@ -1,9 +1,5 @@
 ##########################################################################
-### ELECTROSTATIC ENERGY FOR METHANOL -> METHOXIDE IONIZATION
-### $Id$
-###
-### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for
-### syntax help.
+# ELECTROSTATIC ENERGY FOR METHANOL -> METHOXIDE IONIZATION
 ##########################################################################
 
 read 
