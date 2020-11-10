@@ -264,10 +264,11 @@ if(ENABLE_BEM)
     endif()
 
     ExternalProject_Get_Property(${TABI} binary_dir)
-    list(APPEND APBS_LIB_DIRS "${binary_dir}")
+    list(APPEND APBS_LIB_DIRS "${binary_dir}/src")
     list(APPEND APBS_LIBS TABIPBlib)
     include_directories(${EXTERNALS_PATH}/${TABI})
     include_directories(${EXTERNALS_PATH}/${TABI}/src)
+    include_directories(${EXTERNALS_PATH}/${TABI}/src/tabipb_wrap)
 
     if(BUILD_SHARED_LIBS)
         install(FILES ${binary_dir}/libTABIPBlib${CMAKE_SHARED_LIBRARY_SUFFIX}

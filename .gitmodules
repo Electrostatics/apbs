@@ -10,7 +10,7 @@
 	url = https://github.com/Electrostatics/pb_solvers
 [submodule "externals/bem"]
 	path = externals/bem
-	url = https://github.com/Electrostatics/TABIPB.git
+	url = https://github.com/Treecodes/TABI-PB.git
 [submodule "externals/pb_solvers"]
 	path = externals/pb_solvers
 	url = https://github.com/Electrostatics/pb_solvers

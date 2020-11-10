@@ -4968,8 +4968,8 @@ VPUBLIC void killBEM(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC]
 }
 
 
-void apbs2tabipb_(TABIPBparm* tabiparm,
-                  TABIPBvars* tabivars);
+int runTABIPBWrapAPBS(TABIPBInput tabipbIn,
+                      Valist* APBSMolecule);
 
 VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
                      NOsh *nosh,
@@ -4977,84 +4977,43 @@ VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
                      BEMparm *bemparm,
                      BEMparm_CalcType type) {
 
-    int nx,
-        ny,
-        nz,
-        i;
-
     if (nosh != VNULL) {
         if (nosh->bogus) return 1;
     }
 
     Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
 
-    TABIPBparm *tabiparm = (TABIPBparm*)calloc(1,sizeof(TABIPBparm));
-
-    sprintf(tabiparm->fpath, "");
-    strncpy(tabiparm->fname, nosh->molpath[0],4);
-    tabiparm->fname[4] = '\0';
-    tabiparm->density = pbeparm->sdens;
-    tabiparm->probe_radius = pbeparm->srad;
-
-    tabiparm->epsp = pbeparm->pdie;
-    tabiparm->epsw = pbeparm->sdie;
-    tabiparm->bulk_strength = 0.0;
-    for (i=0; i<pbeparm->nion; i++)
-        tabiparm->bulk_strength += pbeparm->ionc[i]
-                                  *pbeparm->ionq[i]*pbeparm->ionq[i];
-    tabiparm->temp = pbeparm->temp;
-
-    tabiparm->order = bemparm->tree_order;
-    tabiparm->maxparnode = bemparm->tree_n0;
-    tabiparm->theta = bemparm->mac;
-
-    tabiparm->mesh_flag = bemparm->mesh;
-
-    tabiparm->number_of_lines = Valist_getNumberAtoms(molecules[0]);
-
-    tabiparm->output_datafile = bemparm->outdata;
-
-    TABIPBvars *tabivars = (TABIPBvars*)calloc(1,sizeof(TABIPBvars));
-    if ((tabivars->chrpos = (double *) malloc(3 * tabiparm->number_of_lines * sizeof(double))) == NULL) {
-            printf("Error in allocating t_chrpos!\n");
+    TABIPBInput tabipbIn;
+    
+    tabipbIn.mesh_flag_ = bemparm->mesh;
+    tabipbIn.mesh_density_ = pbeparm->sdens;
+    tabipbIn.mesh_probe_radius_ = pbeparm->srad;
+    
+    tabipbIn.phys_temp_ = pbeparm->temp;
+    tabipbIn.phys_eps_solute_ = pbeparm->pdie;
+    tabipbIn.phys_eps_solvent_ = pbeparm->sdie;
+    
+    tabipbIn.phys_bulk_strength_ = 0.;
+    
+    for (int i = 0; i < pbeparm->nion; ++i) {
+        tabipbIn.phys_bulk_strength_ += pbeparm->ionc[i]
+                                      * pbeparm->ionq[i]
+                                      * pbeparm->ionq[i];
     }
-    if ((tabivars->atmchr = (double *) malloc(tabiparm->number_of_lines * sizeof(double))) == NULL) {
-            printf("Error in allocating t_atmchr!\n");
-    }
-    if ((tabivars->atmrad = (double *) malloc(tabiparm->number_of_lines * sizeof(double))) == NULL) {
-            printf("Error in allocating t_atmrad!\n");
-    }
+    
+    tabipbIn.tree_degree_ = bemparm->tree_order;
+    tabipbIn.tree_max_per_leaf_ = bemparm->tree_n0;
+    tabipbIn.tree_theta_ = bemparm->mac;
+    
+    tabipbIn.output_data_ = bemparm->outdata;
 
-    Vatom *atom;
+    runTABIPBWrapAPBS(tabipbIn, molecules[0]);
 
-    for (i = 0; i < tabiparm->number_of_lines; i++){
-      atom = Valist_getAtom(molecules[0], i);
-      tabivars->chrpos[3*i] = Vatom_getPosition(atom)[0];
-      tabivars->chrpos[3*i + 1] = Vatom_getPosition(atom)[1];
-      tabivars->chrpos[3*i + 2] = Vatom_getPosition(atom)[2];
-      tabivars->atmchr[i] = Vatom_getCharge(atom);
-      tabivars->atmrad[i] = Vatom_getRadius(atom);
-    }
-
-//apbs2tabipb(TABIPBparm* tabiparm, Valist* molecules[NOSH_MAXMOL]);
-    apbs2tabipb_(tabiparm, tabivars);
-
-    free(tabiparm);
-    free(tabivars->chrpos);
-    free(tabivars->atmchr);
-    free(tabivars->atmrad);
-    free(tabivars->vert_ptl); // allocate in output_potential()
-    free(tabivars->xvct); // allocate in output_potential()
-    free_matrix(tabivars->vert); // allocate in output_potential()
-    free_matrix(tabivars->snrm); // allocate in output_potential()
-    free_matrix(tabivars->face); // allocate in output_potential()
 
     Vnm_tprint(1, "\n\nReturning to APBS caller...\n\n");
     Vnm_tprint(1, "Solvation energy and Coulombic energy in kJ/mol...\n\n");
-    Vnm_tprint(1, "  Global net ELEC energy = %1.12E\n", tabivars->soleng);
-    Vnm_tprint(1, "  Global net COULOMBIC energy = %1.12E\n\n", tabivars->couleng);
-
-    free(tabivars);
+    //Vnm_tprint(1, "  Global net ELEC energy = %1.12E\n", tabivars->soleng);
+    //Vnm_tprint(1, "  Global net COULOMBIC energy = %1.12E\n\n", tabivars->couleng);
 
     Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
 

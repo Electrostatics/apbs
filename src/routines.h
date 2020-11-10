@@ -72,7 +72,7 @@
 #endif
 
 #ifdef ENABLE_BEM
-  #include "TABIPBstruct.h"
+  #include "TABIPBWrap.h"
 #endif
 
 #ifdef ENABLE_GEOFLOW
