@@ -16,8 +16,8 @@ environment:
   APPVEYOR_RDP_PASSWORD: "RedRum666!"
 
 artifacts:
-  - path: "C:\\projects\\source\\build\\APBS-3.0.0.Windows.zip"
-    name: APBS_Windows.zip
+  - path: "**\APBS*.zip"
+    name: APBS.zip
     
 matrix:
   fast_finish: false
