@@ -4968,9 +4968,6 @@ VPUBLIC void killBEM(NOsh *nosh, Vpbe *pbe[NOSH_MAXCALC]
 }
 
 
-int runTABIPBWrapAPBS(TABIPBInput tabipbIn,
-                      Valist* APBSMolecule);
-
 VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
                      NOsh *nosh,
                      PBEparm *pbeparm,
@@ -4983,7 +4980,7 @@ VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
 
     Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
 
-    TABIPBInput tabipbIn;
+    struct TABIPBInput tabipbIn;
     
     tabipbIn.mesh_flag_ = bemparm->mesh;
     tabipbIn.mesh_density_ = pbeparm->sdens;
@@ -5007,13 +5004,12 @@ VPUBLIC int solveBEM(Valist* molecules[NOSH_MAXMOL],
     
     tabipbIn.output_data_ = bemparm->outdata;
 
-    runTABIPBWrapAPBS(tabipbIn, molecules[0]);
-
+    struct TABIPBOutput tabipbOut = runTABIPBWrapAPBS(tabipbIn, molecules[0]);
 
     Vnm_tprint(1, "\n\nReturning to APBS caller...\n\n");
     Vnm_tprint(1, "Solvation energy and Coulombic energy in kJ/mol...\n\n");
-    //Vnm_tprint(1, "  Global net ELEC energy = %1.12E\n", tabivars->soleng);
-    //Vnm_tprint(1, "  Global net COULOMBIC energy = %1.12E\n\n", tabivars->couleng);
+    Vnm_tprint(1, "  Global net ELEC energy = %1.12E\n", tabipbOut.solvation_energy_);
+    Vnm_tprint(1, "  Global net COULOMBIC energy = %1.12E\n\n", tabipbOut.coulombic_energy_);
 
     Vnm_tstop(APBS_TIMER_SOLVER, "Solver timer");
 

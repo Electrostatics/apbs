@@ -76,7 +76,7 @@ def check_energies(input_file):
     """
     check energies
     """
-    print(f"Checking for intermidiate energies in input file {input_file}")
+    print(f"Checking for intermediate energies in input file {input_file}")
 
     f = None
     try:

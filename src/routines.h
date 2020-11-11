@@ -73,6 +73,7 @@
 
 #ifdef ENABLE_BEM
   #include "TABIPBWrap.h"
+#include "../externals/bem/src/tabipb_wrap/TABIPBWrap.h"
 #endif
 
 #ifdef ENABLE_GEOFLOW
