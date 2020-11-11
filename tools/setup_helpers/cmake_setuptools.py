@@ -101,8 +101,8 @@ class CMakeBuild(build_ext):
                 capture_output=True)
 
         if self.verbose:
-            print('-- Configuration stdout:\n', proc.stdout)
-            print('-- Configuration stderr:\n', proc.stderr)
+            print('-- Configuration stdout:\n', proc.stdout.decode())
+            print('-- Configuration stderr:\n', proc.stderr.decode())
 
         print('-- Building')
         proc = subprocess.run(
@@ -111,6 +111,6 @@ class CMakeBuild(build_ext):
                 capture_output=True)
 
         if self.verbose:
-            print('-- Build stdout:\n', proc.stdout)
-            print('-- Build stderr:\n', proc.stderr)
+            print('-- Build stdout:\n', proc.stdout.decode())
+            print('-- Build stderr:\n', proc.stderr.decode())
 

@@ -8,12 +8,14 @@ if(ENABLE_PYTHON)
   include(FindAPBSPythonLibraries)
   include(APBSWrapPythonLibraries)
 
-  add_subdirectory(python)
+  # Temporarily remove swig bindings for appveyor build as of commit
+  # be2fe43. This should be uncommented before deployment.
+  # add_subdirectory(python)
   add_subdirectory(python_pybind)
 
   apbs_wrap_python_libs(
     TARGETS
-    _apbslib
+    # _apbslib
     apbs_pybind
     )
 endif(ENABLE_PYTHON)
