@@ -46,21 +46,21 @@ class CleanBuild(Command):
                     os.remove(os.path.join(proj_root, 'apbs', subdir, f))
 
 extra_cmake_args = dict(
-    CMAKE_BUILD_TYPE='Release',
-    ENABLE_BEM='ON',
-    ENABLE_GEOFLOW='ON',
-    ENABLE_FETK='ON',
-    ENABLE_OPENMP='ON',
-    ENABLE_PBAM='ON',
-    ENABLE_PBSAM='ON',
-    ENABLE_PYTHON='OFF',
-    ENABLE_TESTS='ON',
-    ENABLE_TINKER='OFF',
-    BUILD_TESTING='OFF', 
-    BUILD_TOOLS='OFF', 
-    CHECK_EPSILON='OFF',
-    BUILD_SHARED_LIBS='OFF',
-    GET_NanoShaper='OFF', 
+        CMAKE_BUILD_TYPE='Release',
+        CMAKE_VERBOSE_MAKEFILE='ON',
+        BUILD_TESTING='ON',
+        BUILD_TOOLS='ON',
+        CHECK_EPSILON='ON',
+        ENABLE_FETK='OFF',
+        ENABLE_BEM='ON',
+        ENABLE_GEOFLOW='ON',
+        ENABLE_INLINE='ON',
+        ENABLE_PBAM='ON',
+        ENABLE_PYTHON='OFF',
+        ENABLE_TESTS='ON',
+        BUILD_SHARED_LIBS='OFF',
+        ENABLE_VERBOSE_DEBUG='ON',
+        GET_NanoShaper='ON',
     )
 
 args = []

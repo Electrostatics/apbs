@@ -84,28 +84,6 @@ build_script:
   - git submodule init
   - git submodule update
 
-  - echo "*****************************************************************************"
-  - echo PYBIND11_BUILD
-  - echo "*****************************************************************************"
-  - set pybind11_DIR=C:\projects\source\externals\pybind11\install
-  - cd externals/pybind11
-  - mkdir build
-  - mkdir install
-  - cd build
-
-  - echo "*****************************************************************************"
-  - echo PYBIND11_CONFIGURE
-  - echo "*****************************************************************************"
-  - cmake .. -DCMAKE_INSTALL_PREFIX=%pybind11_DIR% -DDOWNLOAD_CATCH=ON
-
-  - echo "*****************************************************************************"
-  - echo PYBIND11_MAKE_INSTALL
-  - echo "*****************************************************************************"
-  # cmake --build . --config Release --parallel 1 --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
-  - cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
-
-  - set pybind11_DIR=C:\projects\source\externals\pybind11\install\share\cmake\pybind11
-  - cd ..
   - cd c:\projects\source
 
   - echo "*****************************************************************************"

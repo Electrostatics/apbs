@@ -51,6 +51,7 @@ class CMakeBuild(build_ext):
 
     def build_extension(self, ext):
         build_dir = get_build_dir()
+        self.verbose = True
 
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
 
@@ -94,11 +95,22 @@ class CMakeBuild(build_ext):
         # give false negatives that halt the build process.
         # TODO: investigate false negatives
         print('-- Configuring')
-        subprocess.run(
+        proc = subprocess.run(
                 ['cmake', ext.sourcedir] + cmake_args,
-                cwd=build_dir)
+                cwd=build_dir,
+                capture_output=True)
+
+        if self.verbose:
+            print('-- Configuration stdout:\n', proc.stdout)
+            print('-- Configuration stderr:\n', proc.stderr)
 
         print('-- Building')
-        subprocess.run(
+        proc = subprocess.run(
                 ['cmake', '--build', '.'] + build_args,
-                cwd=build_dir)
+                cwd=build_dir,
+                capture_output=True)
+
+        if self.verbose:
+            print('-- Build stdout:\n', proc.stdout)
+            print('-- Build stderr:\n', proc.stderr)
+
