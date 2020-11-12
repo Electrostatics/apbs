@@ -19,6 +19,9 @@ environment:
 artifacts:
   - path: '**\APBS*.zip'
     name: APBS.zip
+
+  - path: '**\apbs*.whl'
+    name: apbs.whl
     
 matrix:
   fast_finish: false
@@ -104,7 +107,7 @@ build_script:
   - echo "*****************************************************************************"
   - echo APBS_BDIST_WHEEL
   - echo "*****************************************************************************"
-  - python setup.py bdist_wheel
+  - python setup.py bdist_wheel -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_FETK=OFF -DENABLE_BEM=ON -DENABLE_GEOFLOW=ON -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON 
 
   - echo "*****************************************************************************"
   - echo APBS_DONE

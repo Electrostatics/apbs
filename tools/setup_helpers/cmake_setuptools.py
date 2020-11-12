@@ -51,7 +51,6 @@ class CMakeBuild(build_ext):
 
     def build_extension(self, ext):
         build_dir = get_build_dir()
-        self.verbose = True
 
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
 
@@ -98,19 +97,12 @@ class CMakeBuild(build_ext):
         proc = subprocess.run(
                 ['cmake', ext.sourcedir] + cmake_args,
                 cwd=build_dir,
-                capture_output=True)
-
-        if self.verbose:
-            print('-- Configuration stdout:\n', proc.stdout.decode())
-            print('-- Configuration stderr:\n', proc.stderr.decode())
+                stdout=sys.stdout,
+                stderr=subprocess.STDOUT)
 
         print('-- Building')
         proc = subprocess.run(
                 ['cmake', '--build', '.'] + build_args,
                 cwd=build_dir,
-                capture_output=True)
-
-        if self.verbose:
-            print('-- Build stdout:\n', proc.stdout.decode())
-            print('-- Build stderr:\n', proc.stderr.decode())
-
+                stdout=sys.stdout,
+                stderr=subprocess.STDOUT)
