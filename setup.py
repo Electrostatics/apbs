@@ -52,15 +52,15 @@ extra_cmake_args = dict(
         BUILD_TOOLS='ON',
         CHECK_EPSILON='ON',
         ENABLE_FETK='OFF',
-        ENABLE_BEM='ON',
-        ENABLE_GEOFLOW='ON',
+        ENABLE_BEM='OFF',
+        ENABLE_GEOFLOW='OFF',
         ENABLE_INLINE='ON',
-        ENABLE_PBAM='ON',
-        ENABLE_PYTHON='OFF',
+        ENABLE_PBAM='OFF',
+        ENABLE_PYTHON='ON',
         ENABLE_TESTS='ON',
         BUILD_SHARED_LIBS='OFF',
         ENABLE_VERBOSE_DEBUG='ON',
-        GET_NanoShaper='ON',
+        GET_NanoShaper='OFF',
     )
 
 args = []

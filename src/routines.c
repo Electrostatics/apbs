@@ -5571,7 +5571,7 @@ VPUBLIC void dump_options()
 {
     puts("Apbs configuration:");
 
-    printf("PACKAGE_STRING:%s",PACKAGE_STRING);
+    printf("PACKAGE_STRING:%s\n",PACKAGE_STRING);
 
     printf("APBS_FAST:");
 #ifdef APBS_FAST
@@ -5659,7 +5659,7 @@ VPUBLIC void dump_options()
 
     printf("FETK_ENABLED:");
 #ifdef FETK_ENABLED
-    printf("1");
+    puts("1");
 #else
     puts("0");
 #endif
@@ -5668,7 +5668,7 @@ VPUBLIC void dump_options()
 #ifdef HAVE_PUNC_H
     puts("1");
 #else
-    printf("0");
+    puts("0");
 #endif
 
     printf("HAVE_MCX_H:");
@@ -5680,7 +5680,7 @@ VPUBLIC void dump_options()
 
     printf("HAVE_MC_H:");
 #ifdef HAVE_MC_H
-    printf("1");
+    puts("1");
 #else
     puts("0");
 #endif
@@ -5689,7 +5689,7 @@ VPUBLIC void dump_options()
 #ifdef HAVE_BIOM_H
     puts("1");
 #else
-    printf("0");
+    puts("0");
 #endif
 
     printf("HAVE_MPI_H:");
