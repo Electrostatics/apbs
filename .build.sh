@@ -41,6 +41,7 @@ pwd
 echo "==================================== Get External SubModules ==================================== "
 git submodule init
 git submodule update
+git submodule sync
 echo "==================================== BUILD =============================================== "
 
 rm -rf $BUILD_DIR                                         || exit 1
