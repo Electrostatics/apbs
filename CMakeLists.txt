@@ -309,25 +309,23 @@ endif()
 option(ENABLE_FETK "Enable the finite element solver" OFF)
 
 
+#  HACK START - This used to be in tools/windows/configuration headers/maloccf.h
+file(COPY tools/maloccf.h DESTINATION ${APBS_BUILD}/src)
+#  if should be done something like the following:
+#configure_file(
+#     ${EXTERNALS_PATH}/fetk/maloc/src/config/maloccf.h.in
+#     DESTINATION ${APBS_BUILD}/src/maloccf.h
+#)
+#  HACK END   - This used to be in tools/windows/configuration headers/maloccf.h
+
+
 ################################################################################
 # Deal with MALOC                                                              #
 # Note that we depend exclusively on the MALOC that is in our external FETK    #
 # repository.  Also note, that in order for this to work on Windows, we've had #
 # to add CMake support to MALOC, and that FETK has no such support, in general.#
 ################################################################################
-if(NOT ENABLE_FETK)
-    # We'll use autotools to build MALOC if FETK is enabled.
-    add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
-    include_directories(${EXTERNALS_PATH}/fetk/maloc/src/base
-                        ${EXTERNALS_PATH}/fetk/maloc/src/vsys
-                        ${EXTERNALS_PATH}/fetk/maloc/src/vsh
-                        ${EXTERNALS_PATH}/fetk/maloc/src/psh)
-    list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
-    list(APPEND APBS_LIBS maloc)
-    if (WIN32)
-      list(APPEND MALOC_LIBS wsock32 WS2_32)
-    endif()
-else()
+if(ENABLE_FETK)
     if(WIN32)
         message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
     else()
@@ -404,6 +402,19 @@ else()
         SET(HAVE_MC_H 1)
         SET(HAVE_PUNC_H 1)
         SET(HAVE_BIOM_H 1)
+    endif()
+else()
+    # We'll use autotools to build MALOC if FETK is enabled.
+    add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
+    include_directories(${EXTERNALS_PATH}/fetk/maloc/src/base
+                        ${EXTERNALS_PATH}/fetk/maloc/src/vsys
+                        ${EXTERNALS_PATH}/fetk/maloc/src/vsh
+                        ${EXTERNALS_PATH}/fetk/maloc/src/psh
+                        ${EXTERNALS_PATH}/fetk/mc/src/aaa_inc)
+    list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
+    list(APPEND APBS_LIBS maloc)
+    if (WIN32)
+      list(APPEND MALOC_LIBS wsock32 WS2_32)
     endif()
 endif()
 

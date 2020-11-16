@@ -77,7 +77,7 @@ cmake                                                     \
       -DENABLE_OPENMP=ON                                  \
       -DENABLE_PBAM=ON                                    \
       -DENABLE_PBSAM=ON                                   \
-      -DENABLE_PYTHON=OFF                                  \
+      -DENABLE_PYTHON=OFF                                 \
       -DENABLE_TESTS=ON                                   \
       -DENABLE_TINKER=OFF                                 \
       ..                                                  || exit 1
