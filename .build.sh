@@ -67,7 +67,7 @@ cd $BUILD_DIR                                             || exit 1
 #cmake -S .. -B $BUILD_DIR --trace-source=../CMakeLists.txt --trace-expand \
 cmake                                                     \
       -DBUILD_DOC=OFF                                     \
-      -DBUILD_SHARED_LIBS=OFF                             \
+      -DBUILD_SHARED_LIBS=ON                              \
       -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} ${COVERAGE}"      \
       -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${COVERAGE}"  \
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE                    \
@@ -75,10 +75,10 @@ cmake                                                     \
       -DENABLE_BEM=ON                                     \
       -DENABLE_GEOFLOW=ON                                 \
       -DENABLE_FETK=ON                                    \
-      -DENABLE_OPENMP=OFF                                 \
+      -DENABLE_OPENMP=ON                                  \
       -DENABLE_PBAM=ON                                    \
       -DENABLE_PBSAM=ON                                   \
-      -DENABLE_PYTHON=ON                                  \
+      -DENABLE_PYTHON=OFF                                 \
       -DENABLE_TESTS=ON                                   \
       -DENABLE_TINKER=OFF                                 \
       ..                                                  || exit 1
