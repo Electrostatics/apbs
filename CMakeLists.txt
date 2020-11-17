@@ -58,6 +58,7 @@ OPTION(BUILD_SHARED_LIBS "Build shared libraries." OFF)
 message(STATUS "Setting project paths")
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD 90)
 if(WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W4")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:100000000")
