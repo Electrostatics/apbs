@@ -75,7 +75,7 @@ cmake                                                     \
       -DENABLE_BEM=ON                                     \
       -DENABLE_GEOFLOW=ON                                 \
       -DENABLE_FETK=ON                                    \
-      -DENABLE_OPENMP=ON                                  \
+      -DENABLE_OPENMP=OFF                                 \
       -DENABLE_PBAM=ON                                    \
       -DENABLE_PBSAM=ON                                   \
       -DENABLE_PYTHON=ON                                  \
