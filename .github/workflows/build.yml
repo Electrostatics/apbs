@@ -17,11 +17,6 @@ jobs:
         os: [ubuntu-latest, macOS-latest]
         # os: [ubuntu-latest, macOS-latest, windows-latest]
         python-version: [3.8]
-        # cflag-options:
-          # - ' -DENABLE_GEOFLOW=ON  -DENABLE_BEM=ON  -DENABLE_FETK=ON  -DENABLE_PBSAM=ON  -DENABLE_PBAM=ON  -DENABLE_PYTHON=ON  -DBUILD_SHARED_LIBS=ON  -DBUILD_DOC=OFF'
-          # - ' -DENABLE_GEOFLOW=ON  -DENABLE_BEM=ON  -DENABLE_FETK=ON  -DENABLE_PBSAM=ON  -DENABLE_PBAM=ON  -DENABLE_PYTHON=ON  -DBUILD_SHARED_LIBS=OFF -DBUILD_DOC=OFF'
-          # - ' -DENABLE_GEOFLOW=ON  -DENABLE_BEM=ON  -DENABLE_FETK=ON  -DENABLE_PBSAM=OFF -DENABLE_PBAM=OFF -DENABLE_PYTHON=ON  -DBUILD_SHARED_LIBS=ON  -DCMAKE_C_FLAGS="-fPIC" -DBUILD_DOC=OFF'
-          # - ' -DENABLE_GEOFLOW=ON  -DENABLE_BEM=OFF -DENABLE_FETK=ON  -DENABLE_PBSAM=OFF -DENABLE_PBAM=OFF -DENABLE_PYTHON=ON  -DBUILD_SHARED_LIBS=ON  -DCMAKE_C_FLAGS="-fPIC" -DBUILD_DOC=OFF'
     steps:
       - uses: actions/checkout@v1
       - name: Set up Python
@@ -31,8 +26,8 @@ jobs:
       - name: Prereqs
         uses: mstksg/get-package@v1
         with:
-          brew: gcc@9 bison flex swig readline
-          apt-get: bison flex swig libreadline-dev
+          brew: gcc@9 bison flex swig readline libomp
+          apt-get: build-essential bison flex swig libreadline-dev libomp-dev
       - name: Build and Install
         run: |
           ./.build.sh
