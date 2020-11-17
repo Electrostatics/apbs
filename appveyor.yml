@@ -38,7 +38,6 @@ matrix:
 install:
   # Install non-python dependencies using chocolatey package manager
   - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install --ignorechecksum -f -r -y swig --version=4.0.0
-  - choco install openblas -y
   - choco install lapack -y
   #  - type C:\ProgramData\chocolatey\logs\chocolatey.log
   - where /r C:\ProgramData\chocolatey swig.swg
