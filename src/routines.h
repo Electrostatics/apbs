@@ -868,3 +868,9 @@ VEXTERNC int solvePBSAM(
                                 PBSAMparm *samparm
 );
 #endif
+
+/**
+ * @brief Dump compile-time options to I/O
+ * @ingroup Frontend
+ */
+VEXTERNC void dump_options();

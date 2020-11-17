@@ -9,12 +9,16 @@ image:
 
 clone_folder: c:\projects\source
 
-clone_depth: 5
+clone_depth: 2
 
 environment:
   PYTHON: "C:\\Python37-x64"
   APPVEYOR_RDP_PASSWORD: "RedRum666!"
 
+artifacts:
+  - path: '**\APBS*.zip'
+    name: APBS.zip
+    
 matrix:
   fast_finish: false
 
