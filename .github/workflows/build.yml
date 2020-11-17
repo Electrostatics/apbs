@@ -23,11 +23,16 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Prereqs
+      - name: Mac Prereqs
+        if: matrix.os == 'macOS-latest'
         uses: mstksg/get-package@v1
         with:
-          brew: gcc@9 bison flex swig readline libomp
-          apt-get: build-essential bison flex swig libreadline-dev libomp-dev
+          brew: gcc@9 bison flex swig readline libomp lapack
+      - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          for apt_file in `grep -lr microsoft /etc/apt/sources.list.d/`; do sudo rm $apt_file; done
+          sudo apt-get -yq build-essential bison flex swig libreadline-dev libomp-dev
       - name: Build and Install
         run: |
           ./.build.sh
