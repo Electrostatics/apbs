@@ -61,6 +61,7 @@ cmake                              \
 make -j install
 popd
 export pybind11_DIR=$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" ./install)
+echo "pybind11_DIR=${pybind11_DIR}"
 popd
 cd $BUILD_DIR                                             || exit 1
 #cmake -S .. -B $BUILD_DIR --trace-source=../CMakeLists.txt --trace-expand \
@@ -77,7 +78,7 @@ cmake                                                     \
       -DENABLE_OPENMP=ON                                  \
       -DENABLE_PBAM=ON                                    \
       -DENABLE_PBSAM=ON                                   \
-      -DENABLE_PYTHON=OFF                                 \
+      -DENABLE_PYTHON=ON                                  \
       -DENABLE_TESTS=ON                                   \
       -DENABLE_TINKER=OFF                                 \
       ..                                                  || exit 1

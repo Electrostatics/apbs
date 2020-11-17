@@ -309,14 +309,15 @@ endif()
 option(ENABLE_FETK "Enable the finite element solver" OFF)
 
 
-#  HACK START - This used to be in tools/windows/configuration headers/maloccf.h
+#  HACK START - This used to be in tools/windows/configuration headers/*.h
+file(COPY tools/apbscfg.h DESTINATION ${APBS_BUILD}/src)
 file(COPY tools/maloccf.h DESTINATION ${APBS_BUILD}/src)
 #  if should be done something like the following:
 #configure_file(
 #     ${EXTERNALS_PATH}/fetk/maloc/src/config/maloccf.h.in
 #     DESTINATION ${APBS_BUILD}/src/maloccf.h
 #)
-#  HACK END   - This used to be in tools/windows/configuration headers/maloccf.h
+#  HACK END   - This used to be in tools/windows/configuration headers/*.h
 
 
 ################################################################################
@@ -681,7 +682,7 @@ if(ENABLE_OPENMP)
             add_definitions("${OpenMP_C_FLAGS}")
             list(APPEND APBS_LIBS ${OpenMP_C_FLAGS})
         else()
-            message(WARNING "OpenMP was not found.  OpenMP support disabled")
+            message(FATAL_ERROR "OpenMP was not found.  OpenMP support disabled")
         endif()
     else()
         message(WARNING "OpenMP may not be enabled in debugging mode")
