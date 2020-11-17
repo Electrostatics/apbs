@@ -67,7 +67,7 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -fpermissive -fPIC")
 endif()
 if(APPLE AND BUILD_SHARED_LIBS)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -undefined dynamic_lookup")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c90 -undefined dynamic_lookup")
 endif()
 
 set(APBS_ROOT ${PROJECT_SOURCE_DIR})
@@ -201,6 +201,7 @@ else()
   set(FLOAT_EPSILON "1.19209290e-7")
   set(DOUBLE_EPSILON "2.2204460492503131e-16")
 endif()
+
 
 
 ################################################################################
