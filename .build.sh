@@ -1,11 +1,11 @@
 #!/bin/bash
 
-export CC=gcc
-export CXX=g++
-#export CMAKE_C_COMPILER=$CC
-#export CMAKE_CXX_COMPILER=$CXX
-#export CMAKE_C_LINK_EXECUTABLE=$CC
-#export CMAKE_CXX_LINK_EXECUTABLE=$CXX
+export CC=gcc-9
+export CXX=g++-9
+export CMAKE_C_COMPILER=$CC
+export CMAKE_CXX_COMPILER=$CXX
+export CMAKE_C_LINK_EXECUTABLE=$CC
+export CMAKE_CXX_LINK_EXECUTABLE=$CXX
 
 export SRC_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export COVERAGE="-g -O0 -fprofile-arcs -ftest-coverage"
@@ -34,13 +34,14 @@ pip3 install -U pip
 pip3 install -U pytest
 pip3 install -U virtualenv
 pip3 install -U numpy
-pip3 install -r requirements.txt
+pip3 install --use-feature=2020-resolver -r requirements.txt
 #  Just build APBS for now
 echo "==================================== PWD FOR TOP DIR ==================================== "
 pwd
 echo "==================================== Get External SubModules ==================================== "
 git submodule init
 git submodule update
+git submodule sync
 echo "==================================== BUILD =============================================== "
 
 rm -rf $BUILD_DIR                                         || exit 1
@@ -60,12 +61,13 @@ cmake                              \
 make -j install
 popd
 export pybind11_DIR=$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" ./install)
+echo "pybind11_DIR=${pybind11_DIR}"
 popd
 cd $BUILD_DIR                                             || exit 1
 #cmake -S .. -B $BUILD_DIR --trace-source=../CMakeLists.txt --trace-expand \
 cmake                                                     \
       -DBUILD_DOC=OFF                                     \
-      -DBUILD_SHARED_LIBS=OFF                             \
+      -DBUILD_SHARED_LIBS=ON                              \
       -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} ${COVERAGE}"      \
       -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${COVERAGE}"  \
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE                    \
@@ -76,7 +78,7 @@ cmake                                                     \
       -DENABLE_OPENMP=ON                                  \
       -DENABLE_PBAM=ON                                    \
       -DENABLE_PBSAM=ON                                   \
-      -DENABLE_PYTHON=OFF                                  \
+      -DENABLE_PYTHON=OFF                                 \
       -DENABLE_TESTS=ON                                   \
       -DENABLE_TINKER=OFF                                 \
       ..                                                  || exit 1
