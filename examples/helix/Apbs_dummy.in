@@ -1,9 +1,5 @@
 #############################################################################
-### TM SOLVATION ENERGY
-### : apbs.in 998 2006-11-28 21:24:40Z sobolevnrm $
-###
-### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for 
-### input file sytax.
+# TM SOLVATION ENERGY
 #############################################################################
 # READ IN MOLECULES
 read

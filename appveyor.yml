@@ -9,11 +9,16 @@ image:
 
 clone_folder: c:\projects\source
 
-clone_depth: 5
+clone_depth: 2
 
 environment:
   PYTHON: "C:\\Python37-x64"
+  APPVEYOR_RDP_PASSWORD: "RedRum666!"
 
+artifacts:
+  - path: '**\APBS*.zip'
+    name: APBS.zip
+    
 matrix:
   fast_finish: false
 
@@ -21,24 +26,31 @@ matrix:
 #  - C:\ProgramData\chocolatey\bin -> appveyor.yml # swig.exe
 #  - C:\ProgramData\chocolatey\lib -> appveyor.yml # supporting swig Lib files.
   
+
+# For interactive debugging using Remote Desktop, you need the init, on_finish, and APPVEYOR_RDP_PASSWORD
+#   - https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
+
+# init:
+#   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+# on_finish:
+#   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 install:
   # Install non-python dependencies using chocolatey package manager
-  # - choco install tools\windows\swig.4.0.0.nupkg --yes --limit-output
   - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install --ignorechecksum -f -r -y swig --version=4.0.0
-  
-#  - type C:\ProgramData\chocolatey\logs\chocolatey.log
-
+  #  - type C:\ProgramData\chocolatey\logs\chocolatey.log
   - where /r C:\ProgramData\chocolatey swig.swg
+  - SET SWIG_DIR=C:\ProgramData\chocolatey\lib\swig\tools\install
+  - SET SWIG_EXECUTABLE=C:\ProgramData\chocolatey\lib\swig\tools\install\swig.exe
   
-  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;C:\\Program Files (x86)\\CMake\\bin;%PATH%;C:\\projects\\source\\build\\bin;C:\\ProgramData\\chocolatey\\lib\\swig\\tools\\install;C:\\ProgramData\\chocolatey\\bin;%PATH%"
-
-#  - swig -swiglib
-  - "SET SWIG_DIR=C:\\ProgramData\\chocolatey\\lib\\swig\\tools\\install"
-  - "SET SWIG_EXECUTABLE=C:\\ProgramData\\chocolatey\\lib\\swig\\tools\\install\\swig.exe"
+  # Add SWIG, Python, and CMake to PATH
+  - SET PATH=%PYTHON%;%PYTHON%\Scripts;C:\Program Files (x86)\CMake\bin;C:\projects\source\build\bin;C:\ProgramData\chocolatey\lib\swig\tools\install;C:\ProgramData\chocolatey\bin;%PATH%
+  - echo %PATH%
   
   # Check that we have the expected version and architecture for Python
+  - where /r C:\Python37-x64 python.exe
   - python --version
-
   - python -m pip install --upgrade pip
 
   # Install the build dependencies of the project. If some dependencies contain
@@ -47,27 +59,91 @@ install:
   # target Python version and architecture
   - pip.exe install -r c:\projects\source\requirements.txt
 
+
 build_script:
-- cmd: >-
+  #  Setup Visual Studio Environment for compiling, linking, and logging
+  - set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\vsdevcmd\core\vsdevcmd_start.bat"
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 
-    git submodule init
+  # set
+  #  REM set VSDIR="C:\Program Files (x86)\Microsoft Visual Studio"
+  #  set VSDIR="C:\"
+  #  FOR /F "tokens=* USEBACKQ" %F IN (`where /r %VSDIR% vsdevcmd_start.bat`) DO (SET vsdevcmd="%F")
+  #  REM Should be something like C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\vsdevcmd\core\vsdevcmd_start.bat"
+  #  ECHO "VS DEV CMD BAT FILE = %vsdevcmd%"
+  #  call %vsdevcmd%
+  #  FOR /F "tokens=* USEBACKQ" %F IN (`where /r %VSDIR% vsvars64.bat`) DO (SET vsdevcmd="%F")
+  #  REM Should be something like "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+  #  ECHO "VS VARS FILE = %vsdevcmd%"
+  #  call %vsdevcmd%
 
-    git submodule update
+  #  Get the external projects configured
+  - cd c:\projects\source
+  - git submodule init
+  - git submodule update
 
-    cd c:\projects\source
+  - echo "*****************************************************************************"
+  - echo PYBIND11_BUILD
+  - echo "*****************************************************************************"
+  - set pybind11_DIR=C:\projects\source\externals\pybind11\install
+  - cd externals/pybind11
+  - mkdir build
+  - mkdir install
+  - cd build
 
-    mkdir build
+  - echo "*****************************************************************************"
+  - echo PYBIND11_CONFIGURE
+  - echo "*****************************************************************************"
+  - cmake .. -DCMAKE_INSTALL_PREFIX=%pybind11_DIR% -DDOWNLOAD_CATCH=ON
 
-    cd build
+  - echo "*****************************************************************************"
+  - echo PYBIND11_MAKE_INSTALL
+  - echo "*****************************************************************************"
+  # cmake --build . --config Release --parallel 1 --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
+  - cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
 
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_BEM=ON -DENABLE_GEOFLOW=ON -DENABLE_INLINE=ON -DENABLE_PBAM=OFF -DENABLE_PYTHON=ON -DENABLE_TESTS=ON -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
+  - set pybind11_DIR=C:\projects\source\externals\pybind11\install\share\cmake\pybind11
+  - cd ..
+  - cd c:\projects\source
+  - mkdir build
+  - cd build
 
-    cat c:\projects\source\build\CMakeFiles\CMakeError.log
+  - echo "*****************************************************************************"
+  - echo APBS_CONFIG
+  - echo "*****************************************************************************"
+  - cmake --config Release -DPYBIND11_DIR=%pybind11_DIR% -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_FETK=OFF -DENABLE_BEM=ON -DENABLE_GEOFLOW=ON -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=OFF -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
 
-    cmake --build . --config "Release"
+  - echo "*****************************************************************************"
+  - echo APBS_CMAKE_OUTPUT
+  - echo "*****************************************************************************"
+  - if exist c:\projects\source\build\CMakeFiles\CMakeOutput.log type c:\projects\source\build\CMakeFiles\CMakeOutput.log
 
-    ctest -C Release --verbose --output-on-failure
+  - echo "*****************************************************************************"
+  - echo APBS_CMAKE_ERROR
+  - echo "*****************************************************************************"
+  - if exist c:\projects\source\build\CMakeFiles\CMakeError.log type c:\projects\source\build\CMakeFiles\CMakeError.log
 
-    cpack -C Release -G ZIP
+  - echo "*****************************************************************************"
+  - echo APBS_MAKE_INSTALL
+  - echo "*****************************************************************************"
+  - cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
 
-    unzip -l APBS*.zip
+  - echo "*****************************************************************************"
+  - echo APBS_TEST
+  - echo "*****************************************************************************"
+  - ctest -C Release --verbose --output-on-failure
+
+  - echo "*****************************************************************************"
+  - echo APBS_PACKAGE
+  - echo "*****************************************************************************"
+  - cpack -C Release -G ZIP
+  - unzip -l APBS*.zip
+
+  - echo "*****************************************************************************"
+  - echo APBS_DONE
+  - echo "*****************************************************************************"
+
+on_failure: 
+  - if exist c:\projects\source\build\CMakeFiles\CMakeOutput.log type c:\projects\source\build\CMakeFiles\CMakeOutput.log
+  - if exist c:\projects\source\build\CMakeFiles\CMakeError.log type c:\projects\source\build\CMakeFiles\CMakeError.log

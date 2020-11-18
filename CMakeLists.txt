@@ -57,10 +57,13 @@ OPTION(BUILD_SHARED_LIBS "Build shared libraries." OFF)
 ################################################################################
 message(STATUS "Setting project paths")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -fpermissive -fPIC")
+set(CMAKE_CXX_STANDARD 17)
 if(WIN32)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W4")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:100000000")
+else()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -fpermissive -fPIC")
 endif()
 if(APPLE AND BUILD_SHARED_LIBS)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -undefined dynamic_lookup")
@@ -122,8 +125,7 @@ set(SYS_LIBPATHS /usr/lib64)
 
 
 ################################################################################
-# Debian/Ubuntu hack for                                                       #
-# https://github.com/Electrostatics/apbs-pdb2pqr/issues/364                    #
+# Debian/Ubuntu hack                                                           #
 ################################################################################
 if(EXISTS "/etc/debian_version" AND
   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -231,13 +233,14 @@ endif()
 
 
 ################################################################################
-# Optionally copy NanoShaper exectutable
-# the actual grab is later for PBSAM enable
+# Optionally copy NanoShaper executable                                        #
+# the actual grab is later for BEM enable                                      #
 ################################################################################
 option(GET_NanoShaper "Put NanoShaper executable in the build directory" OFF)
 
+
 ################################################################################
-# Optionally build BEM: TABI-PB method                                          #
+# Optionally build BEM: TABI-PB method                                         #
 ################################################################################
 option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
 
@@ -253,27 +256,61 @@ if(ENABLE_BEM)
         ExternalProject_add(${TABI}
             SOURCE_DIR ${TABI_PATH}
             CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+                       -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
+                       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target TABIPBlib
             INSTALL_COMMAND "")
     else()
         ExternalProject_add(${TABI}
             SOURCE_DIR ${TABI_PATH}
             CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+                       -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
+                       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
             INSTALL_COMMAND "")
     endif()
 
     ExternalProject_Get_Property(${TABI} binary_dir)
-    list(APPEND APBS_LIB_DIRS "${binary_dir}")
+    list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
     list(APPEND APBS_LIBS TABIPBlib)
     include_directories(${EXTERNALS_PATH}/${TABI})
     include_directories(${EXTERNALS_PATH}/${TABI}/src)
+    include_directories(${EXTERNALS_PATH}/${TABI}/src/tabipb_wrap)
 
     if(BUILD_SHARED_LIBS)
-        install(FILES ${binary_dir}/libTABIPBlib${CMAKE_SHARED_LIBRARY_SUFFIX}
+        install(FILES ${binary_dir}/lib/libTABIPBlib${CMAKE_SHARED_LIBRARY_SUFFIX}
                 DESTINATION ${LIBRARY_INSTALL_PATH})
     endif()
 endif() # ENABLE_BEM
+
+
+################################################################################
+# Getting nanoshaper binary
+################################################################################
+set(MESH_ROOT_URL_PATH "https://github.com/lwwilson1/mesh_routines/releases/download/v1.6")
+
+if(GET_NanoShaper)
+    set(NANOSHAPER_FULL_URL_PATH)
+    set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper")
+    message(STATUS "Copying NanoShaper executable")
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_OSX")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_Linux64")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper32.exe")
+        set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper.exe")
+    endif()
+
+    if(NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+        file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME})
+        message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+    endif()
+
+    install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}
+            DESTINATION ${EXECUTABLE_INSTALL_PATH})
+    message(STATUS "NanoShaper install: ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
+endif()
 
 
 ################################################################################
@@ -300,6 +337,13 @@ if(ENABLE_MPI)
     endif()
 endif()
 
+
+################################################################################
+# Handle the finite element solver dependencies                                #
+################################################################################
+option(ENABLE_FETK "Enable the finite element solver" OFF)
+
+
 ################################################################################
 # Deal with MALOC                                                              #
 # Note that we depend exclusively on the MALOC that is in our external FETK    #
@@ -315,16 +359,10 @@ if(NOT ENABLE_FETK)
                         ${EXTERNALS_PATH}/fetk/maloc/src/psh)
     list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
     list(APPEND APBS_LIBS maloc)
-endif()
-
-
-################################################################################
-# Handle the finite element solver dependencies                                #
-################################################################################
-option(ENABLE_FETK "Enable the finite element solver" OFF)
-
-if(ENABLE_FETK)
-
+    if (WIN32)
+      list(APPEND MALOC_LIBS wsock32 WS2_32)
+    endif()
+else()
     if(WIN32)
         message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
     else()
@@ -391,8 +429,7 @@ if(ENABLE_FETK)
                                   vf2c
                                   tetgen
                                   triangle
-                                  readline
-                                  termcap)
+                                  readline)
 
         if(BUILD_SHARED_LIBS)
             install(DIRECTORY ${install_dir}/lib/
@@ -468,6 +505,9 @@ if(ENABLE_PBAM)
     ExternalProject_Get_Property(pbam binary_dir)
     add_definitions(-DENABLE_PBAM)
     list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
+    if (WIN32)
+        list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src/${CMAKE_BUILD_TYPE}")
+    endif()
     list(APPEND APBS_LIBS PBAMLib)
     include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
     include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
@@ -527,35 +567,6 @@ if(ENABLE_PBSAM)
         install(FILES ${binary_dir}/pbsam/src/libPBSAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
                 DESTINATION ${LIBRARY_INSTALL_PATH})
     endif()
-endif()
-
-
-################################################################################
-# Getting nanoshaper binary
-################################################################################
-set(MESH_ROOT_URL_PATH "https://github.com/lwwilson1/mesh_routines/releases/download/v1.6")
-
-if(GET_NanoShaper)
-    set(NANOSHAPER_FULL_URL_PATH)
-    set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper")
-    message(STATUS "Copying NanoShaper exectuable")
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
-        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_OSX")
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
-        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_Linux64")
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
-        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper32.exe")
-        set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper.exe")
-    endif()
-
-    if (NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
-        file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME})
-        message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
-    endif()
-
-    install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}
-            DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    message(STATUS "NanoShaper install: ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
 endif()
 
 
@@ -708,7 +719,7 @@ if(CYGWIN)
 endif()
 
 if(NOT CYGWIN AND NOT MINGW AND WIN32)
-    list(APPEND APBS_LIBS wsock32)
+    list(APPEND APBS_LIBS wsock32 WS2_32)
     ADD_DEFINITIONS("/D _CRT_SECURE_NO_WARNINGS")
 endif()
 
@@ -827,7 +838,7 @@ set(CPACK_PACKAGE_VERSION_PATCH        "${CMAKE_MICRO_VERSION}")
 #  NOTE: The following is tempting but does not work!
 # set(FULL_PACKAGE_NAME                  "${PACKAGE_NAME}-${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION}")
 set(CPACK_PACKAGE_VENDOR               "PNNL")
-set(CPACK_PACKAGE_CONTACT              "APBS - https://github.com/Electrostatics/apbs-pdb2pqr")
+set(CPACK_PACKAGE_CONTACT              "APBS - https://github.com/Electrostatics/apbs")
 set(CPACK_PACKAGE_FILE_NAME            "${PACKAGE_NAME}-${APBS_VERSION}.${CMAKE_HOST_SYSTEM_NAME}")
 set(CPACK_STRIP_FILES                   True)
 

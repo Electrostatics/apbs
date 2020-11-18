@@ -1,4 +1,4 @@
-import math
+import numpy as np
 import sys  # noqa
 
 from apbs.geometry import (
@@ -15,9 +15,7 @@ from . import (
 
 
 class AtomComplexCalc:
-    """
-    Port of Vacc
-    """
+    """Port of Vacc."""
 
     def __init__(
         self, alist: AtomList, clist: CellList, surface_density: float
@@ -34,8 +32,8 @@ class AtomComplexCalc:
         self.alist = alist
         self.surface_density = surface_density
         max_radius = alist.max_radius + clist.max_radius
-        max_area = 4.0 * (max_radius ** 2) * math.pi
-        nsphere = math.ceil(max_area * surface_density)
+        max_area = 4.0 * (max_radius ** 2) * np.pi
+        nsphere = np.ceil(max_area * surface_density)
 
         # TODO: calculate reference shpere (see VaccSurf_refSphere)
 
@@ -43,7 +41,7 @@ class AtomComplexCalc:
     def stride(self) -> Coordinate:
         return self.clist.stride
 
-    def accessable_outside_inflated_venderwalls(
+    def accessible_outside_inflated_vdw_radius(
         self, center: Coordinate, radius: float, atom_id_to_ignore: int
     ) -> bool:
         """
@@ -58,8 +56,7 @@ class AtomComplexCalc:
         """
         if radius > self.clist.max_radius:
             raise RuntimeError(
-                "Got radius %f greater than max radius %f from"
-                " cell list." % (radius, self.clist.max_radius)
+                f"Got radius {radius} greater than max radius {self.clist.max_radius} from cell list."
             )
 
         c = (center - self.lower_corner) / self.stride
@@ -84,8 +81,11 @@ class AtomComplexCalc:
         """Create a new surface from the points that do fall on the reference
         surface.
 
-        :param atom: Atom from which surface will be constructed.
+        :param Atom atom: Atom from which surface will be constructed.
+        :param Surface ref: The reference surface.
+        :param float prad: The previous radius
         :return: Returns surface generated from the atom.
+        :rtype: Surface
 
         .. note:: Although this seems like a candidate for a static method, the
         `accessable_outside_inflated_venderwalls_rad` method of this class
@@ -95,7 +95,7 @@ class AtomComplexCalc:
 
         arad = atom.radius
         apos = atom.position
-        atomID = atom.id
+        atom_id = atom.id
         surf: Surface
 
         if arad < Constants.very_small_eps:
@@ -112,9 +112,7 @@ class AtomComplexCalc:
             pos.z = rad(ref.zs[i]) + apos.z
 
             # need to implement
-            if self.accessable_outside_inflated_venderwalls_rad(
-                pos, prad, atomID
-            ):
+            if self.accessible_outside_inflated_vdw_radius(pos, prad, atom_id):
                 npoints += 1
                 ref.is_on_surf[i] = True
             else:
@@ -127,12 +125,7 @@ class AtomComplexCalc:
                 surf.coords[-1].is_on_surf = True
 
         surf.area = (
-            4.0
-            * math.pi
-            * rad
-            * rad
-            * float(surf.npoints)
-            / float(ref.npoints)
+            4.0 * np.pi * rad * rad * float(surf.npoints) / float(ref.npoints)
         )
 
         return surf

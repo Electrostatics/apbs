@@ -72,7 +72,8 @@
 #endif
 
 #ifdef ENABLE_BEM
-  #include "TABIPBstruct.h"
+  #include "TABIPBWrap.h"
+#include "../externals/bem/src/tabipb_wrap/TABIPBWrap.h"
 #endif
 
 #ifdef ENABLE_GEOFLOW
@@ -868,3 +869,9 @@ VEXTERNC int solvePBSAM(
                                 PBSAMparm *samparm
 );
 #endif
+
+/**
+ * @brief Dump compile-time options to I/O
+ * @ingroup Frontend
+ */
+VEXTERNC void dump_options();

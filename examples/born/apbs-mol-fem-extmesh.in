@@ -1,9 +1,5 @@
 #############################################################################
-### BORN ION SOLVATION ENERGY -- FE method
-### $Id: apbs-mol-fem.in 1026 2006-12-29 16:02:16Z sobolevnrm $
-###
-### Please see APBS documentation (http://apbs.sourceforge.net/doc/) for 
-### input file sytax.
+# BORN ION SOLVATION ENERGY -- FE method
 #############################################################################
 read 
 	mol pqr ion.pqr
