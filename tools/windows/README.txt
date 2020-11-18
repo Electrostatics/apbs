@@ -1,1 +1,0 @@
-Files for Windows Visual Studio + Intel compilers build.  These files are used by the APBS developers and are unsupported.  Caveat emptor.

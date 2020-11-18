@@ -17,22 +17,26 @@ jobs:
         os: [ubuntu-latest, macOS-latest]
         # os: [ubuntu-latest, macOS-latest, windows-latest]
         python-version: [3.8]
-        # cflag-options:
-          # - ' -DENABLE_GEOFLOW=ON  -DENABLE_BEM=ON  -DENABLE_FETK=ON  -DENABLE_PBSAM=ON  -DENABLE_PBAM=ON  -DENABLE_PYTHON=ON  -DBUILD_SHARED_LIBS=ON  -DBUILD_DOC=OFF'
-          # - ' -DENABLE_GEOFLOW=ON  -DENABLE_BEM=ON  -DENABLE_FETK=ON  -DENABLE_PBSAM=ON  -DENABLE_PBAM=ON  -DENABLE_PYTHON=ON  -DBUILD_SHARED_LIBS=OFF -DBUILD_DOC=OFF'
-          # - ' -DENABLE_GEOFLOW=ON  -DENABLE_BEM=ON  -DENABLE_FETK=ON  -DENABLE_PBSAM=OFF -DENABLE_PBAM=OFF -DENABLE_PYTHON=ON  -DBUILD_SHARED_LIBS=ON  -DCMAKE_C_FLAGS="-fPIC" -DBUILD_DOC=OFF'
-          # - ' -DENABLE_GEOFLOW=ON  -DENABLE_BEM=OFF -DENABLE_FETK=ON  -DENABLE_PBSAM=OFF -DENABLE_PBAM=OFF -DENABLE_PYTHON=ON  -DBUILD_SHARED_LIBS=ON  -DCMAKE_C_FLAGS="-fPIC" -DBUILD_DOC=OFF'
     steps:
       - uses: actions/checkout@v1
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Prereqs
+      - name: Mac Prereqs
+        if: matrix.os == 'macOS-latest'
         uses: mstksg/get-package@v1
         with:
-          brew: gcc@9 bison flex swig readline
-          apt-get: bison flex swig libreadline-dev
+          brew: gcc@9 bison flex swig readline libomp lapack
+      - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          for apt_file in `grep -lr microsoft /etc/apt/sources.list.d/`; do sudo rm $apt_file; done
+          sudo apt-get install -yq software-properties-common build-essential gcc-9 g++-9 bison flex swig libreadline-dev libomp5 libomp-dev
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+          gcc --version
+          g++ --version
       - name: Build and Install
         run: |
           ./.build.sh

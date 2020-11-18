@@ -84,7 +84,7 @@ Input File|Description|APBS Version|Results (kJ/mol)|Analytical (kJ/mol)
 
 <a name=1></a><sup>1</sup> The discrepancy in values between versions 0.4.0 and 0.3.2 is most likely due to three factors:
 
--   A bug fix in Vacc\_molAcc which removed spurious regions of high internal dielectric values
+-   A bug fix in Vacc_molAcc which removed spurious regions of high internal dielectric values
 -   A switch in the algorithm used to compute the dielectric smoothing for srfm smol.
 -   The addition of the Vacc sphere density (sdens keyword) as a variable and a change in the default sdens value from 3.0 to 10.0
 
