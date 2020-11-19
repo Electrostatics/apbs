@@ -9,8 +9,82 @@ from . import (
         bin,
         lib,
         )
+import platform
 
-version_str = "0.0.1"
+def check_vcredist():
+    '''Checks availability of Visual C++ libraries
+
+    .. note::
+        A lockfile is created when the visual c++ redistributable is found on the system.
+
+    .. warning::
+        If the visual c++ redistributable is deleted from the system, the lockfile will still
+        exist even though the binaries will not have the needed libraries.
+    '''
+
+    import os
+    touch = lambda filename: os.close(os.open(filename, os.O_CREAT))
+
+    # When installed, this path should be in the bowels of python site-packages dir, hopefully
+    # safe from users
+    lockfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'has_vcredist.lock')
+
+    # If we've already gone through the install process, we don't need to again.
+    if os.path.exists(lockfile):
+        return
+
+    proc = subprocess.run('where powershell', capture_output=True)
+    if len(proc.stdout) == 0:
+        raise RuntimeError('Could not find powershell executable on path.')
+    pwsh: str = pwsh.stdout.decode().strip()
+
+    # Checks if any appropriate visual C++ redistributables are already installed on the system
+    proc = subprocess.run([pwsh, 'Get-WmiObject -Class Win32_Product -Filter "Name LIKE \'%Visual C++ 2019%\'"'.split(' ')])
+    if len(proc.stdout) == 0:
+        print('''APBS Error:
+
+        The Microsoft Visual C++ redistributable was not found on your system and the APBS python module will likely
+        not function as intended. Would you like the Visual C++ redistributable to be downloaded and ran for you?
+
+        Note: This will open a pop-up window which you will have to navigate yourself.''')
+        ans = input('y to accept, anything else to decline. >>>')
+        if ans.lower() == 'y':
+            import urllib.request
+            import platform
+            redist = None
+            if 'arm' in platform.machine().lower():
+                arch = 'arm64'
+            elif '32' in platform.architecture()[0]:
+                arch = 'x64'
+            else:
+                arch = 'x86'
+            vc_redist_link = f'https://aka.ms/vs/16/release/vc_redist.{arch}.exe'
+            vc_redist_fn = vc_redist_link.split('/')[-1]
+
+            print('Fetching redistributable from link: ', vc_redist_link)
+            with urllib.request.urlopen(vc_redist_link) as f:
+                redist = f.read()
+
+            print('Writing to file: ', vc_redist_fn)
+            with open(vc_redist_fn, 'wb') as f:
+                f.write(redist)
+
+            print('Running redistributable')
+            subprocess.run([vc_redist_fn,])
+            
+        else:
+            print('Continuing to use APBS will likely result in errors. If you would like to download and run'
+                    ' the redistributable yourself, please visit the link below and find the correct binary for your system:'
+                    '\nhttps://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads')
+            return
+
+    # The redistributable was either already found or we've gone through the install process,
+    # which means we can create the lockfile.
+    touch(lockfile)
+
+
+if platform.system() == 'Windows':
+    check_vcredist()
 
 header = """
 
