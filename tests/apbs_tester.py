@@ -14,6 +14,7 @@ import subprocess
 from optparse import OptionParser
 from configparser import ConfigParser, NoOptionError
 from functools import reduce
+from sys import executable
 from apbs_check_forces import check_forces
 from apbs_check_results import check_results
 from apbs_check_intermediate_energies import check_energies
@@ -37,9 +38,8 @@ def find_binary(binary_name, logger):
     logger.message(f"START_DIR:{start_dir}\n")
     paths = pathlib.Path(start_dir).rglob(f"**/{binary_name}")
     for idx in paths:
-        if idx.is_file():
-            if os.access(str(idx), os.X_OK):
-                return str(idx)
+        if idx.is_file() and os.access(str(idx), os.X_OK):
+            return str(idx)
 
     raise FileNotFoundError(f"Can't find file, {binary_name}")
 
@@ -69,8 +69,7 @@ def test_binary(binary_name, logger):
 
     if not os.access(binary, os.X_OK):
         raise PermissionError(
-            f"The apbs binary, {binary}, "
-            + "is not executable!"
+            f"The apbs binary, {binary}, " + "is not executable!"
         )
 
     try:
@@ -185,22 +184,26 @@ def run_test(
 
     # Run the setup, if any
     if setup:
-        subprocess.call(setup.split())
+        if re.match("^python", setup, flags=re.IGNORECASE):
+            call_args = [sys.executable, *setup.split()[1:]]
+            print(call_args)
+            subprocess.call(call_args)
+        else:
+            subprocess.call(setup.split())
 
     for (base_name, expected_results) in test_files:
 
         # Get the name of the input file from the base name
         input_file = f"{base_name}.in"
 
+        logger.message("-" * 80 + "\n")
         # If the expected results is 'forces', do a forces test on the input
         if expected_results == "forces":
-            logger.message("-" * 80 + "\n")
             logger.message(f"Testing forces from {input_file}\n\n")
             logger.log(f"Testing forces from {input_file}\n")
             start_time = datetime.datetime.now()
             check_forces(input_file, "polarforces", "apolarforces", logger)
         else:
-            logger.message("-" * 80 + "\n")
             logger.message(f"Testing input file {input_file}\n\n")
             logger.log(f"Testing {input_file}\n")
 
