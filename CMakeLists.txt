@@ -234,13 +234,14 @@ endif()
 
 
 ################################################################################
-# Optionally copy NanoShaper exectutable
-# the actual grab is later for PBSAM enable
+# Optionally copy NanoShaper executable                                        #
+# the actual grab is later for BEM enable                                      #
 ################################################################################
 option(GET_NanoShaper "Put NanoShaper executable in the build directory" OFF)
 
+
 ################################################################################
-# Optionally build BEM: TABI-PB method                                          #
+# Optionally build BEM: TABI-PB method                                         #
 ################################################################################
 option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
 
@@ -256,27 +257,61 @@ if(ENABLE_BEM)
         ExternalProject_add(${TABI}
             SOURCE_DIR ${TABI_PATH}
             CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+                       -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
+                       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target TABIPBlib
             INSTALL_COMMAND "")
     else()
         ExternalProject_add(${TABI}
             SOURCE_DIR ${TABI_PATH}
             CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+                       -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
+                       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
             INSTALL_COMMAND "")
     endif()
 
     ExternalProject_Get_Property(${TABI} binary_dir)
-    list(APPEND APBS_LIB_DIRS "${binary_dir}")
+    list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
     list(APPEND APBS_LIBS TABIPBlib)
     include_directories(${EXTERNALS_PATH}/${TABI})
     include_directories(${EXTERNALS_PATH}/${TABI}/src)
+    include_directories(${EXTERNALS_PATH}/${TABI}/src/tabipb_wrap)
 
     if(BUILD_SHARED_LIBS)
-        install(FILES ${binary_dir}/libTABIPBlib${CMAKE_SHARED_LIBRARY_SUFFIX}
+        install(FILES ${binary_dir}/lib/libTABIPBlib${CMAKE_SHARED_LIBRARY_SUFFIX}
                 DESTINATION ${LIBRARY_INSTALL_PATH})
     endif()
 endif() # ENABLE_BEM
+
+
+################################################################################
+# Getting nanoshaper binary
+################################################################################
+set(MESH_ROOT_URL_PATH "https://github.com/lwwilson1/mesh_routines/releases/download/v1.6")
+
+if(GET_NanoShaper)
+    set(NANOSHAPER_FULL_URL_PATH)
+    set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper")
+    message(STATUS "Copying NanoShaper executable")
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_OSX")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_Linux64")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper32.exe")
+        set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper.exe")
+    endif()
+
+    if(NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+        file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME})
+        message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+    endif()
+
+    install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}
+            DESTINATION ${EXECUTABLE_INSTALL_PATH})
+    message(STATUS "NanoShaper install: ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
+endif()
 
 
 ################################################################################
@@ -545,35 +580,6 @@ if(ENABLE_PBSAM)
         install(FILES ${binary_dir}/pbsam/src/libPBSAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
                 DESTINATION ${LIBRARY_INSTALL_PATH})
     endif()
-endif()
-
-
-################################################################################
-# Getting nanoshaper binary
-################################################################################
-set(MESH_ROOT_URL_PATH "https://github.com/lwwilson1/mesh_routines/releases/download/v1.6")
-
-if(GET_NanoShaper)
-    set(NANOSHAPER_FULL_URL_PATH)
-    set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper")
-    message(STATUS "Copying NanoShaper exectuable")
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
-        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_OSX")
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
-        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_Linux64")
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
-        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper32.exe")
-        set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper.exe")
-    endif()
-
-    if (NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
-        file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME})
-        message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
-    endif()
-
-    install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}
-            DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    message(STATUS "NanoShaper install: ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
 endif()
 
 
