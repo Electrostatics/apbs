@@ -1,4 +1,7 @@
-version: 3.0.{build}
+version: 3.1.{build}
+
+skip_commits:
+  message: /\[chore\]/
 
 branches:
   only:
