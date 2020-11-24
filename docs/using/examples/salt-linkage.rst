@@ -59,7 +59,7 @@ APBS implementation
 
 This example follows the calculations from their paper.
 
-The PQR files are included in the :file:`examples/protein-rna/` directory of the apbs-pdb2pqr repository.
+The PQR files are included in the :file:`examples/protein-rna/` directory of the apbs repository.
 This directory also includes a :file:`template.txt` file that serves as a template for the APBS input files with ``IONSTR`` as a placeholder for the ionic strength.
 This file is also shown here:
 

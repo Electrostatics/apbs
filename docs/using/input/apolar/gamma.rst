@@ -15,4 +15,4 @@ This term can be set to zero to eliminate the :abbr:`SASA (solvent-accessible su
 .. todo::
 
    Resolve unit confusion with geometric flow :ref:`gamma` keyword.
-   https://github.com/Electrostatics/apbs-pdb2pqr/issues/490
+   https://github.com/Electrostatics/apbs/issues/490

@@ -11,7 +11,7 @@ This fast method coarse-grains all molecules of the system into single spheres l
 .. todo::
 
    If there's only one mode to PBAM, let's call it ``pbam`` instead of ``pbam-auto``.
-   Documented in https://github.com/Electrostatics/apbs-pdb2pqr/issues/498
+   Documented in https://github.com/Electrostatics/apbs/issues/498
 
 The current implementation of PB-AM in APBS includes:
 

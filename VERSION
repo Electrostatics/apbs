@@ -1,0 +1,13 @@
+# This is the version of the code base - only set it here!
+#   Instructions
+#   The first number is the Major number of the release
+#     - Only increment the Major number when:
+#       - Interfaces change breaking backwards compatibility
+#       - Features like old code are abandoned
+#   The second number is the Minor number of the release
+#     - Only increment the Minor number when:
+#       - Adding new functionality
+#   The third number is the Micro number of the release
+#     - Only increment the Micro number when:
+#       - Fixing bugs, adding tests, changing packaging
+3_1_0

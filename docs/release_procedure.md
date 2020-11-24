@@ -1,7 +1,7 @@
 APBS Release Procedure
 -----------------------
  1. Change Version Number
-	 - [ ] Edit [apbs/CMakeLists.txt]([https://github.com/Electrostatics/apbs-pdb2pqr/blob/master/apbs/CMakeLists.txt)
+	 - [ ] Edit [CMakeLists.txt]([https://github.com/Electrostatics/apbs/blob/master/apbs/CMakeLists.txt)
 		Increment the value for the APBS_VERSION variable:
 	     set(APBS_VERSION "M.m.u")
 	     Where:
@@ -10,7 +10,7 @@ APBS Release Procedure
 		 - u is the Micro version - increment for adding small changes like new tests or fixing small bugs
 
  2. Update the ChangeLog
-	 - [ ] Edit [apbs/doc/ChangeLog]([https://github.com/Electrostatics/apbs-pdb2pqr/blob/master/apbs/doc/ChangeLog.md)
+	 - [ ] Edit [doc/ChangeLog]([https://github.com/Electrostatics/apbs/blob/master/apbs/doc/ChangeLog.md)
 	   - Document major/minor changes for this release
    
   3. Update License info
@@ -36,8 +36,8 @@ APBS Release Procedure
             #!/bin/bash
             mkdir ~/git
             cd ~/git
-            git clone https://github.com/Electrostatics/apbs-pdb2pqr.git
-            cd apbs-pdb2pqr
+            git clone https://github.com/Electrostatics/apbs.git
+            cd apbs
             git submodule init
             git submodule update
 ```
@@ -46,28 +46,7 @@ APBS Release Procedure
      - Ensure that all tests run without segmentation faults and results are acceptable
 
 ```bash
-		#!/bin/bash
-		
-		export INSTALL_DIR=$HOME/apbs-install
-		cd ~/git/apbs-pdb2pqr
-		rm -rf build                                    || exit 1
-		mkdir build                                     || exit 1
-		cd build                                        || exit 1
-		#  Configure the software to be built
-		cmake                                     \
-		      -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
-		      -DENABLE_GEOFLOW=ON                 \
-		      -DENABLE_BEM=ON                     \
-		      -DENABLE_FETK=ON                    \
-		      -DENABLE_PBSAM=OFF                  \
-		      -DENABLE_PBAM=OFF                   \
-		      -DENABLE_PYTHON=OFF                 \
-		      -DBUILD_SHARED_LIBS=OFF             \
-		      -DCMAKE_C_FLAGS="-fPIC"             \
-		      -DBUILD_DOC=ON                      \
-		      ..                                        || exit 1
-		#  Build and install the software
-		VERBOSE=1 make -j 1 install                     || exit 1
+		run ./.build.sh
 ```
      
  * Upload Binary Packages
@@ -79,7 +58,7 @@ APBS Release Procedure
    - Add entire install structure to archive file
 ```bash
 	     #!/bin/bash
-	     VERSION=`cat ~/git/apbs-pdb2pqr/VERSION | sed -e "s/_/./g"`
+	     VERSION=`cat ~/git/apbs/VERSION | sed -e "s/_/./g"`
 	     PLATFORM=`uname -s`
 	     ARCHITECTURE=`uname -m`
 	     tar -czf APBS-${VERSION}-${PLATFORM}-${ARCHITECTURE}.tgz ~/apbs-install
@@ -89,13 +68,13 @@ APBS Release Procedure
  * Upload Source Packages
 ```bash
 	     #!/bin/bash
-	     VERSION=`cat ~/git/apbs-pdb2pqr/VERSION | sed -e "s/_/./g"`
-	     cd ~/git/apbs-pdb2pqr/apbs
+	     VERSION=`cat ~/git/apbs/VERSION | sed -e "s/_/./g"`
+	     cd ~/git/apbs/apbs
 	     #  Use git to remove all non-versioned files and directories
 	     #  NOTE: Use -dfn flags first for a dry run and make sure right files are rm'ed
 	     git clean -dfq
 	     #  NOTE: Add the whole apbs directory to an arcive
-	     tar -czf APBS-${VERSION}-source.tar.gz ~/git/apbs-pdb2pqr
+	     tar -czf APBS-${VERSION}-source.tar.gz ~/git/apbs
 ```
    - Upload the archive to apbs project on https://sourceforge.net/projects/apbs/files/apbs/
      
@@ -103,8 +82,8 @@ APBS Release Procedure
    - Build documentation
 ```bash
 	     #!/bin/bash
-	     VERSION=`cat ~/git/apbs-pdb2pqr/VERSION | sed -e "s/_/./g"`
-	     cd ~/git/apbs-pdb2pqr/apbs/doc
+	     VERSION=`cat ~/git/apbs/VERSION | sed -e "s/_/./g"`
+	     cd ~/git/apbs/apbs/doc
 	     #  Use git to remove all non-versioned files and directories
 	     #  NOTE: Use -dfn flags first for a dry run and make sure right files are rm'ed
 	     git clean -dfq

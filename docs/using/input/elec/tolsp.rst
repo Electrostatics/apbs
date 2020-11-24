@@ -9,4 +9,4 @@ The PB-SAM authors recommend a value of 2.5.
 .. todo::
    
    We need documentation for ``tolsp``.
-   Documented in https://github.com/Electrostatics/apbs-pdb2pqr/issues/504
+   Documented in https://github.com/Electrostatics/apbs/issues/504

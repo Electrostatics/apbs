@@ -25,5 +25,5 @@ Specify the filename and location of a 2D cross sectional potential to be writte
 .. todo::
    
    The PB-(S)AM ``grid2d`` keyword should not exist; please replace it ASAP with the :ref:`write` command.
-   Documented in https://github.com/Electrostatics/apbs-pdb2pqr/issues/493
+   Documented in https://github.com/Electrostatics/apbs/issues/493
 

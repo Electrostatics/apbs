@@ -92,7 +92,8 @@
 #undef PACKAGE_NAME
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "APBS 1.3.1"
+/* #define PACKAGE_STRING "APBS 1.3.1" */
+#undef PACKAGE_STRING
 
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME

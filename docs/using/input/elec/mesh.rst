@@ -26,5 +26,5 @@ Note that the executable NanoShaper_ must be included in your path to use them.
 .. todo::
 
    The integer flag values for ``mesh`` should be replaced by human-readable strings.
-   Documented in https://github.com/Electrostatics/apbs-pdb2pqr/issues/496
+   Documented in https://github.com/Electrostatics/apbs/issues/496
    

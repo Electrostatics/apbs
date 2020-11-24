@@ -1,5 +1,37 @@
 cmake_minimum_required (VERSION 3.12)
 
+###############################################################################
+#  Get the Current Version Number so that it can be embedded in files later
+###############################################################################
+file(STRINGS "${CMAKE_CURRENT_LIST_DIR}/VERSION" _VERSION_DATA REGEX ^[0-9]+_[0-9]+_[0-9]+)
+string(REPLACE "_" ";" _VERSION_LIST ${_VERSION_DATA})
+list(GET _VERSION_LIST 0 MAJOR_VERSION)
+list(GET _VERSION_LIST 1 MINOR_VERSION)
+list(GET _VERSION_LIST 2 MICRO_VERSION)
+
+set(CMAKE_PROJECT_VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION})
+
+###############################################################################
+##  From:
+##    https://cliutils.gitlab.io/modern-cmake/chapters/projects/submodule.html
+##
+##  Use git to add, initialize, and update submodules for the user
+###############################################################################
+find_package(Git QUIET)
+if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+    # Update submodules as needed
+    option(GIT_SUBMODULE "Check submodules during build" ON)
+    if(GIT_SUBMODULE)
+        message(STATUS "** Submodule update")
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
+        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+            message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+        endif()
+    endif()
+endif()
+
 ################################################################################
 # TODO:  Add licensing and authorship information
 # TODO:  Test with FEtk build
@@ -18,13 +50,10 @@ include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(ExternalProject)
 include(FeatureSummary)
+include(InstallRequiredSystemLibraries)
 
-set(CMAKE_MAJOR_VERSION "3")
-set(CMAKE_MINOR_VERSION "0")
-set(CMAKE_MICRO_VERSION "0")
-
-set(APBS_VERSION     "${CMAKE_MAJOR_VERSION}.${CMAKE_MICRO_VERSION}")
-set(PACKAGE_STRING   "${APBS_VERSION}")
+set(APBS_VERSION     "${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION}")
+set(PACKAGE_STRING   "APBS ${APBS_VERSION}")
 set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
 
 ################################################################################
@@ -33,11 +62,13 @@ set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
 ################################################################################
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
-project("APBS" VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_MICRO_VERSION})
+project("APBS" VERSION ${APBS_VERSION})
+set(CMAKE_PROJECT_DESCRIPTION "Adaptive Poisson-Boltzmann Solver")
+set(CMAKE_PROJECT_HOMEPAGE_URL "http://www.poissonboltzmann.org/")
 
 set_package_properties(APBS PROPERTIES
-    URL "http://www.poissonboltzmann.org/"
-    DESCRIPTION "Adaptive Poisson-Boltzmann Solver"
+    URL "${CMAKE_PROJECT_HOMEPAGE_URL}"
+    DESCRIPTION "${CMAKE_PROJECT_DESCRIPTION}"
     PURPOSE "APBS solves the equations of continuum electrostatics for large \
              biomolecular assemblages. This software was designed 'from the \
              ground up' using modern design principles to ensure its ability \
@@ -49,6 +80,19 @@ set_package_properties(APBS PROPERTIES
              open-source APBS license ensures its accessibility to the entire \
              biomedical community.")
 
+###############################################################################
+##  NOTE: For Debugging and generally nice information to have
+###############################################################################
+string(TIMESTAMP COMPILE_TIME)
+string(TIMESTAMP COMPILE_YEAR "%Y")
+
+message(STATUS "#############################################################")
+message(STATUS "** PROJECT NAME:  ${CMAKE_PROJECT_NAME}")
+message(STATUS "** PROJECT DESC:  ${CMAKE_PROJECT_DESCRIPTION}")
+message(STATUS "** PROJECT URL:   ${CMAKE_PROJECT_HOMEPAGE_URL}")
+message(STATUS "** VERSION_DATA:  ${CMAKE_PROJECT_VERSION}")
+message(STATUS "** CURRENT_TIME:  ${COMPILE_TIME}")
+message(STATUS "** CURRENT_YEAR:  ${COMPILE_YEAR}")
 
 OPTION(BUILD_SHARED_LIBS "Build shared libraries." OFF)
 
@@ -234,6 +278,19 @@ endif()
 
 
 ################################################################################
+# Create APBS configuration file
+################################################################################
+configure_file(
+    src/.config/apbscfg.h.in
+    ${APBS_BUILD}/src/apbscfg.h
+    @ONLY
+)
+#file(READ ${APBS_BUILD}/src/apbscfg.h APBS_CFG)
+#message(STATUS "** APBS_CFG")
+#message(FATAL_ERROR ${APBS_CFG})
+
+
+################################################################################
 # Optionally copy NanoShaper executable                                        #
 # the actual grab is later for BEM enable                                      #
 ################################################################################
@@ -280,7 +337,7 @@ if(ENABLE_BEM)
 
     if(BUILD_SHARED_LIBS)
         install(FILES ${binary_dir}/lib/libTABIPBlib${CMAKE_SHARED_LIBRARY_SUFFIX}
-                DESTINATION ${LIBRARY_INSTALL_PATH})
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
     endif()
 endif() # ENABLE_BEM
 
@@ -346,7 +403,7 @@ option(ENABLE_FETK "Enable the finite element solver" OFF)
 
 
 #  HACK START - This used to be in tools/windows/configuration headers/*.h
-file(COPY tools/apbscfg.h DESTINATION ${APBS_BUILD}/src)
+#file(COPY tools/apbscfg.h DESTINATION ${APBS_BUILD}/src)
 file(COPY tools/maloccf.h DESTINATION ${APBS_BUILD}/src)
 #  if should be done something like the following:
 #configure_file(
@@ -367,7 +424,7 @@ if(ENABLE_FETK)
         message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
     else()
         message(STATUS "Building FETK components.")
-        set(CONFIG_OPTS --prefix=<INSTALL_DIR>)
+        set(CONFIG_OPTS --prefix=<INSTALL_DIR> --without-doxygen --with-doxygen=no)
 
         set(MPI_ENV "")
         if(HAVE_MPI_H)
@@ -433,7 +490,7 @@ if(ENABLE_FETK)
 
         if(BUILD_SHARED_LIBS)
             install(DIRECTORY ${install_dir}/lib/
-                    DESTINATION ${LIBRARY_INSTALL_PATH})
+                    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
         endif()
 
         SET(HAVE_MC_H 1)
@@ -487,7 +544,7 @@ if(ENABLE_GEOFLOW)
 
     if(BUILD_SHARED_LIBS)
         install(FILES ${binary_dir}/lib/libGeometricFlowLib${CMAKE_SHARED_LIBRARY_SUFFIX}
-                DESTINATION ${LIBRARY_INSTALL_PATH})
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
     endif()
 endif()
 
@@ -528,7 +585,7 @@ if(ENABLE_PBAM)
 
     if(BUILD_SHARED_LIBS)
         install(FILES ${binary_dir}/pbam/src/libPBAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
-                DESTINATION ${LIBRARY_INSTALL_PATH})
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
     endif()
 endif()
 
@@ -578,7 +635,7 @@ if(ENABLE_PBSAM)
 
     if(BUILD_SHARED_LIBS)
         install(FILES ${binary_dir}/pbsam/src/libPBSAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
-                DESTINATION ${LIBRARY_INSTALL_PATH})
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
     endif()
 endif()
 
@@ -748,7 +805,7 @@ add_subdirectory(src)
 ################################################################################
 # Build APBS documentation                                                     #
 ################################################################################
-option(BUILD_DOC "Build/Rebuild documentation using doxygen" OFF)
+option(BUILD_DOC "Build/Rebuild documentation" ON)
 
 if(BUILD_DOC)
     message(STATUS "Building documentation enabled")
@@ -775,14 +832,6 @@ install(DIRECTORY ${APBS_ROOT}/docs
         PATTERN "programmer" EXCLUDE
         PATTERN "CMakeLists.txt" EXCLUDE)
 
-if(BUILD_DOC)
-    install(DIRECTORY ${APBS_BUILD}/docs/programmer
-            DESTINATION ${SHARE_INSTALL_PATH}/docs
-            PATTERN "Doxyfile" EXCLUDE
-            PATTERN "latex" EXCLUDE
-            PATTERN "mainpage.h" EXCLUDE)
-endif()
-
 install(DIRECTORY ${APBS_ROOT}/examples
         DESTINATION ${SHARE_INSTALL_PATH})
 
@@ -797,7 +846,9 @@ if(BUILD_TOOLS)
             DESTINATION ${SHARE_INSTALL_PATH}
             USE_SOURCE_PERMISSIONS
             PATTERN "CMakeLists.txt"
-            PATTERN "matlab" EXCLUDE)
+            PATTERN "matlab"      EXCLUDE
+            PATTERN "__pycache__" EXCLUDE
+            PATTERN "*.py[co]"    EXCLUDE)
 
     if(NOT "${APBS_ROOT}" STREQUAL "${APBS_BUILD}")
     install(DIRECTORY ${APBS_BUILD}/tools/bin
