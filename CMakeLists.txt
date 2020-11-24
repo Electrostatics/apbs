@@ -11,6 +11,7 @@ list(GET _VERSION_LIST 2 MICRO_VERSION)
 
 set(CMAKE_PROJECT_VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION})
 
+
 ###############################################################################
 ##  From:
 ##    https://cliutils.gitlab.io/modern-cmake/chapters/projects/submodule.html
