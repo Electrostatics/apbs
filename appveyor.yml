@@ -16,7 +16,7 @@ environment:
   APPVEYOR_RDP_PASSWORD: "RedRum666!"
 
 artifacts:
-  - path: '**\APBS*.zip'
+  - path: "APBS*.zip"
     name: APBS.zip
 
 matrix:
