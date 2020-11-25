@@ -18,11 +18,10 @@ jobs:
         # os: [ubuntu-latest, macOS-latest, windows-latest]
         python-version: [3.8]
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v1
 
         # FROM: https://mobilefirstcloudfirst.net/category/github-actions/
-      - name: Install hub cli
+      - name: Install hub
         uses: geertvdc/setup-hub@master
 
       - name: Set up Python
