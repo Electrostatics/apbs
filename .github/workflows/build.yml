@@ -19,22 +19,15 @@ jobs:
         python-version: [3.8]
     steps:
       - uses: actions/checkout@v1
-
-        # FROM: https://mobilefirstcloudfirst.net/category/github-actions/
-      - name: Install hub
-        uses: geertvdc/setup-hub@master
-
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
-
       - name: Mac Prereqs
         if: matrix.os == 'macOS-latest'
         uses: mstksg/get-package@v1
         with:
           brew: gcc@9 bison flex swig readline libomp lapack
-
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -44,24 +37,15 @@ jobs:
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
           gcc --version
           g++ --version
-
       - name: Build and Install
+        run: |
+          ./.build.sh
         env:
           # https://codecov.io/gh/Electrostatics/apbs
           CODECOV_TOKEN: "e3a1e24c-5598-4f47-9353-7fa0ac57f98e"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "HUB VERSION"
-          hub --version
-          echo ""
-          version=$(hub release -L 1| awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{$NF=sprintf("%0*d", length($NF), ($NF+1)); print}')
-          echo "VERSION = $version"
 
-          echo "=============== START BUILD in $HOME ===============
-          mkdir -p $HOME/artifacts 
-          ./.build.sh
-          cp APBS*.zip $HOME/artifacts
-
-          # create release
-          cd $GITHUB_WORKSPACE
-          hub release create -m $version -a $HOME/artifacts/APBS*.zip $version
+      - name: Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: Package ${{ matrix.os }}
+          path: $HOME/artifacts/APBS*.zip

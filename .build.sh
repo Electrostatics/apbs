@@ -106,3 +106,5 @@ ctest -C Release --output-on-failure                      #|| exit 1
 echo "==================================== PACKAGE ============================================ "
 cpack -C Release -G ZIP                                   || exit 1
 unzip -l APBS*.zip
+mkdir -p $HOME/artifacts
+mv APBS*.zip $HOME/artifacts
