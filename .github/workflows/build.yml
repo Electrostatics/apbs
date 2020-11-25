@@ -24,7 +24,6 @@ jobs:
         # FROM: https://mobilefirstcloudfirst.net/category/github-actions/
       - name: Install hub cli
         uses: geertvdc/setup-hub@master
-        run: hub --version
 
       - name: Set up Python
         uses: actions/setup-python@v1
@@ -53,6 +52,9 @@ jobs:
           CODECOV_TOKEN: "e3a1e24c-5598-4f47-9353-7fa0ac57f98e"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo "HUB VERSION"
+          hub --version
+          echo ""
           version=$(hub release -L 1| awk -F. -v OFS=. 'NF==1{print ++$NF}; NF>1{$NF=sprintf("%0*d", length($NF), ($NF+1)); print}')
           echo "VERSION = $version"
 
