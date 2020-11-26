@@ -14,6 +14,22 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+# Start TODO: This is part of issue https://github.com/Electrostatics/apbs/issues/41
+# Based on https://devblogs.microsoft.com/cppblog/clear-functional-c-documentation-with-sphinx-breathe-doxygen-cmake/
+
+# import subprocess, os
+
+# # Check if we're running on Read the Docs' servers
+# read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+# breathe_default_project = "src"
+# breathe_projects = {}
+
+# if read_the_docs_build:
+#     subprocess.call('doxygen', shell=True)
+#     breathe_projects['src'] = output_dir + '/xml'
+# End TODO:
+
 
 # -- Project information -----------------------------------------------------
 
@@ -31,6 +47,7 @@ release = '__PROJECT_VERSION__'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'breathe',
     'sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.viewcode',
     'sphinx.ext.napoleon', 'sphinx.ext.todo', 'sphinx.ext.autosummary',
     'sphinx_rtd_theme', 'sphinx.ext.mathjax', 'sphinx_sitemap'

@@ -1,6 +1,7 @@
 .. _registering: http://eepurl.com/by4eQr
 .. _SourceForge: http://sourceforge.net/projects/apbs
 .. _GitHub releases: https://github.com/Electrostatics/apbs/releases
+.. _Visual C++ Redistributable Package:  https://aka.ms/vs/16/release/vc_redist.x64.exe
 
 ============
 Getting APBS
@@ -25,6 +26,8 @@ Installing from pre-compiled binaries
 -------------------------------------
 
 The best way to install APBS is via download of a pre-compiled binary from `SourceForge`_ or `GitHub releases`_ (after `registering`_, of course).
+
+.. caution:: On Windows 10, if you get a popup error when running the APBS binaries, you will need to install the `Visual C++ Redistributable Package`_
 
 ^^^^^^^^^^^^^^^^^^
 What's in the box?
@@ -73,5 +76,5 @@ Current platform support
 +------------+---------+---------+------------+------+-------+------+---------+-------------+
 | MacOSX     | 3.7+    | Yes     | Yes        | Yes  | Yes   | Yes  | Yes     | Yes         |
 +------------+---------+---------+------------+------+-------+------+---------+-------------+
-| Windows 10 | 3.7+    | Yes     | Yes        | No   | No    | Yes  | Yes     | No          |
+| Windows 10 | 3.7+    | Yes     | Yes        | No   | No    | Yes  | No      | No          |
 +------------+---------+---------+------------+------+-------+------+---------+-------------+
