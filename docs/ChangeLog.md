@@ -1,7 +1,7 @@
-APBS 3.0 CHANGELOG
+APBS 3.1 CHANGELOG
 ==================
 
-These are notes for APBS version 3.0
+These are notes for APBS version 3.1
 ------------------------------------
 
 * Binary releases may be found on [GitHub](https://github.com/Electrostatics/apbs/releases) and on [SourceForge](http://sourceforge.net/projects/apbs/files/apbs).
@@ -18,10 +18,11 @@ These are notes for APBS version 3.0
 * Added binary DX format support to the appropriate APBS tools.
 * Test suite amended and expanded.
 * Removed hard-coded limitation to number of grid points used to determine surface accessibility.
+* Moved [PDB2PQR](https://github.com/Electrostatics/pdb2pqr) components to it's own repository which can be installed separately.
 
 ### Known Bugs / Limitations
 
-* PBSAM not building in windows due to C standard restrictions in the Microsoft compiler implementation.
+* FETK not building in windows due to C standard restrictions in the Microsoft compiler implementation.
 
 ### Minor Updates
 
@@ -36,6 +37,7 @@ These are notes for APBS version 3.0
 * GEOFLOW ELEC type has been change from 'geoflow-auto' to 'geoflow'.
 * Fixed miscellaneous Windows build issues.
 * Update the build configurations for the Pythons libraries.
+* Removed unused files that no longer worked (e.g. Makefile in example directories)
 
 ### Notes
 
