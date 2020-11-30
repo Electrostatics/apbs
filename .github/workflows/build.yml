@@ -53,6 +53,6 @@ jobs:
       - name: Package
         uses: actions/upload-artifact@v2
         with:
-          name: Package ${{ matrix.os }}
+          name: APBS-${{ matrix.os }}.zip
           path: "~/**/artifacts/APBS*.zip"
           retention-days: 5
