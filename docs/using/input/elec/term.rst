@@ -33,7 +33,7 @@ where the ``options`` are determined by the ``type`` as follows:
   .. todo::
 
      Add a constant keyword (e.g., like ``position``) before the ``{pos}`` argument of ``term``.
-     Documented in https://github.com/Electrostatics/apbs-pdb2pqr/issues/503
+     Documented in https://github.com/Electrostatics/apbs/issues/503
 
 ``time {val}``
   Specify a time termination condition where ``val`` is a floating point number for the trajectory time limit (in picoseconds).

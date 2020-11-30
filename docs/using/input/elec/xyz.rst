@@ -20,4 +20,4 @@ The syntax is:
 .. todo::
    
    It would be nice to incorporate the ``xyz`` functionality into the :ref:`read` block.
-   Documented in https://github.com/Electrostatics/apbs-pdb2pqr/issues/505
+   Documented in https://github.com/Electrostatics/apbs/issues/505

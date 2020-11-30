@@ -6,7 +6,7 @@ Release history
 APBS 3.0 (May 2020)
 -------------------
 
-* Binary releases may be found in `GitHub releases <https://github.com/Electrostatics/apbs-pdb2pqr/releases>`_ and on `SourceForge <http://sourceforge.net/projects/apbs/files/apbs>`_.
+* Binary releases may be found in `GitHub releases <https://github.com/Electrostatics/apbs/releases>`_ and on `SourceForge <http://sourceforge.net/projects/apbs/files/apbs>`_.
 
 ^^^^^^^^^^^^
 New Features
@@ -20,7 +20,7 @@ New Features
 
   * Examples are located with the APBS examples in the bem/, bem-pKa/, and bem-binding-energies/ folders
   * Included NanoShaper alternative to MSMS.
-  * More information and documentation may be found in the `Contributions <http://www.poissonboltzmann.org/external_contributions/extern-tabi/>`_ section of the APBS-PDB2PQR website
+  * More information and documentation may be found in the `Contributions <http://www.poissonboltzmann.org/external_contributions/extern-tabi/>`_ section of the APBS website
 
 * Added binary DX format support to the appropriate APBS tools.
 * Test suite amended and expanded.
@@ -66,7 +66,7 @@ APBS 1.5 (Oct 2016)
 
 Dearest APBS users,
 
-We are pleased to announce the latest release of APBS 1.5. The latest version of APBS includes several notable features and bug fixes. This release includes the addition of Poisson-Boltzmann Analytical-Method (PB-AM), Poisson-Boltzmann Semi-Analytical Method (PB-SAM) and the Treecode-Accelerated Boundary Integral Poisson-Boltzmann method (TABI). Additionally, we have made improvements to the build system and the system tests, as well as miscellaneous bug fixes. A full change log may be found `here <https://github.com/Electrostatics/apbs-pdb2pqr/blob/master/apbs/doc/ChangeLog.md>`_.
+We are pleased to announce the latest release of APBS 1.5. The latest version of APBS includes several notable features and bug fixes. This release includes the addition of Poisson-Boltzmann Analytical-Method (PB-AM), Poisson-Boltzmann Semi-Analytical Method (PB-SAM) and the Treecode-Accelerated Boundary Integral Poisson-Boltzmann method (TABI). Additionally, we have made improvements to the build system and the system tests, as well as miscellaneous bug fixes. A full change log may be found `here <https://github.com/Electrostatics/apbs/blob/master/apbs/doc/ChangeLog.md>`_.
 
 For help with installation, building, or running APBS, please visit https://gitter.im/Electrostatics/help.
 
@@ -149,16 +149,16 @@ New features
 ^^^^^^^^^^^^
 
 * Poisson-Boltzmann Semi-Analytical Method (PB-SAM) packaged and build with APBS.
-* New Geometric flow API and improvements: https://github.com/Electrostatics/apbs-pdb2pqr/issues/235
-* Support for BinaryDX file format: https://github.com/Electrostatics/apbs-pdb2pqr/issues/216
+* New Geometric flow API and improvements: https://github.com/Electrostatics/apbs/issues/235
+* Support for BinaryDX file format: https://github.com/Electrostatics/apbs/issues/216
 * SOR solver added for mg-auto input file option.
-* DXMath improvements https://github.com/Electrostatics/apbs-pdb2pqr/issues/168 and https://github.com/Electrostatics/apbs-pdb2pqr/issues/216
+* DXMath improvements https://github.com/Electrostatics/apbs/issues/168 and https://github.com/Electrostatics/apbs/issues/216
 * Test suite improvements:
 
   * APBS build in Travis-CI
   * Geometric Flow test added.
-  * Protein RNA test enabled https://github.com/Electrostatics/apbs-pdb2pqr/issues/149
-  * Intermediate result testing https://github.com/Electrostatics/apbs-pdb2pqr/issues/64
+  * Protein RNA test enabled https://github.com/Electrostatics/apbs/issues/149
+  * Intermediate result testing https://github.com/Electrostatics/apbs/issues/64
 
 * Example READMEs converted to markdown and updated with latest results.
 
@@ -166,17 +166,17 @@ New features
 Bug fixes
 ^^^^^^^^^
 
-* OpenMPI (mg-para) functionality restored: https://github.com/Electrostatics/apbs-pdb2pqr/issues/190
-* Fized parsing PQR files that contained records other than ATOM and HETATM: https://github.com/Electrostatics/apbs-pdb2pqr/issues/77 and https://github.com/Electrostatics/apbs-pdb2pqr/issues/214
+* OpenMPI (mg-para) functionality restored: https://github.com/Electrostatics/apbs/issues/190
+* Fized parsing PQR files that contained records other than ATOM and HETATM: https://github.com/Electrostatics/apbs/issues/77 and https://github.com/Electrostatics/apbs/issues/214
 * Geometrix Flow boundary indexing bug fixed.
 * Build fixes:
 
   * Out of source CMake build are again working.
-  * Python library may be built:  https://github.com/Electrostatics/apbs-pdb2pqr/issues/372
+  * Python library may be built:  https://github.com/Electrostatics/apbs/issues/372
   * CentOS 5 binary builds for glibc compability.
   * Pull requests merged.
 
-*  Removed irrelevant warning messages: https://github.com/Electrostatics/apbs-pdb2pqr/issues/378
+*  Removed irrelevant warning messages: https://github.com/Electrostatics/apbs/issues/378
 
 ^^^^^
 Notes
@@ -217,7 +217,7 @@ Detailed changes
 * Multigrid bug fix for volumes with large problem domain.
 * We have added a preliminary implementation of geometric flow.
 * Finite element method support has been re-enabled.
-* Migration of the APBS source tree to `GitHub <http://github.com/Electrostatics/apbs-pdb2pqr>`_ for better collaboration, issue tracking, and source code management.
+* Migration of the APBS source tree to `GitHub <http://github.com/Electrostatics/apbs>`_ for better collaboration, issue tracking, and source code management.
 * Improved test suite.
 
 ---------------------

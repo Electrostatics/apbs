@@ -32,7 +32,7 @@ Specify the diffusion coefficients for each molecule in the system for a PB-(S)A
 .. todo::
    
    What are the units for ``dRot``?
-   Documented as https://github.com/Electrostatics/apbs-pdb2pqr/issues/486
+   Documented as https://github.com/Electrostatics/apbs/issues/486
 
 .. note::
 
@@ -41,4 +41,4 @@ Specify the diffusion coefficients for each molecule in the system for a PB-(S)A
 .. todo::
    
    Add a ``mol id`` flag rather than have an implicit ordering of the ``diff`` keywords.
-   Documented in https://github.com/Electrostatics/apbs-pdb2pqr/issues/487
+   Documented in https://github.com/Electrostatics/apbs/issues/487

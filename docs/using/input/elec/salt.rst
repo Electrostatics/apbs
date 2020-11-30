@@ -14,5 +14,5 @@ where ``saltConc`` is the floating point value of the monovalent salt concentrat
 .. todo::
 
    The PB-(S)AM ``salt`` keyword should be eradicated and replaced with the :ref:`ion` keyword.
-   Documented in https://github.com/Electrostatics/apbs-pdb2pqr/issues/501
+   Documented in https://github.com/Electrostatics/apbs/issues/501
    

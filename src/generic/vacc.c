@@ -56,8 +56,6 @@
 
 #include "vacc.h"
 
-VEMBED(rcsid="$Id$")
-
 #if !defined(VINLINE_VACC)
 
 VPUBLIC unsigned long int Vacc_memChk(Vacc *thee) {

@@ -70,6 +70,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/conf.py
 
 # PyBuilder
 .pybuilder/
@@ -155,3 +156,7 @@ examples
 
 # Personal notes
 NOTES.txt
+junk.sh
+
+# PYBIND11
+pybind11

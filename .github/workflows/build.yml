@@ -1,9 +1,11 @@
 ---
-name: Build
+name: Build APBS
+
 on:
   pull_request:
   push:
     branches: [master]
+
 jobs:
   build:
     name: Compile Code
@@ -17,17 +19,20 @@ jobs:
         os: [ubuntu-latest, macOS-latest]
         # os: [ubuntu-latest, macOS-latest, windows-latest]
         python-version: [3.8]
+
     steps:
       - uses: actions/checkout@v1
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Mac Prereqs
         if: matrix.os == 'macOS-latest'
         uses: mstksg/get-package@v1
         with:
           brew: gcc@9 bison flex swig readline libomp lapack
+
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -37,9 +42,17 @@ jobs:
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
           gcc --version
           g++ --version
+
       - name: Build and Install
         run: |
           ./.build.sh
         env:
           # https://codecov.io/gh/Electrostatics/apbs
           CODECOV_TOKEN: "e3a1e24c-5598-4f47-9353-7fa0ac57f98e"
+
+      - name: Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: Package ${{ matrix.os }}
+          path: "~/**/artifacts/APBS*.zip"
+          retention-days: 5

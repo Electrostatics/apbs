@@ -43,10 +43,10 @@ Keywords for this calculation type include:
 .. todo::
    
    Add LPBE/NPBE support to geometric flow or remove the ``ion`` and ``lpbe`` keywords.
-   Documented in https://github.com/Electrostatics/apbs-pdb2pqr/issues/491
+   Documented in https://github.com/Electrostatics/apbs/issues/491
 
 .. todo::
    
    If there's only one mode, then we can change the keyword from ``geoflow-auto`` to just ``geoflow``.
-   Documented in https://github.com/Electrostatics/apbs-pdb2pqr/issues/492
+   Documented in https://github.com/Electrostatics/apbs/issues/492
 

@@ -15,4 +15,4 @@ where ``prefix`` refers to the filename :file:{prefix}.vert`.
 .. todo::
    
    The PB-SAM ``surf`` command is redundant with and should be replaced by the existing :ref:`usemesh` command.
-   Documented in https://github.com/Electrostatics/apbs-pdb2pqr/issues/502
+   Documented in https://github.com/Electrostatics/apbs/issues/502

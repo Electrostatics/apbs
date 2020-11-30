@@ -1,27 +1,28 @@
-APBS 3.0 CHANGELOG
+APBS 3.1 CHANGELOG
 ==================
 
-These are notes for APBS version 3.0
+These are notes for APBS version 3.1
 ------------------------------------
 
-* Binary releases may be found on [GitHub](https://github.com/Electrostatics/apbs-pdb2pqr/releases) and on [SourceForge](http://sourceforge.net/projects/apbs/files/apbs).
+* Binary releases may be found on [GitHub](https://github.com/Electrostatics/apbs/releases) and on [SourceForge](http://sourceforge.net/projects/apbs/files/apbs).
 
 ### New Features
 
 * Poisson-Boltzmann Analytical Method (PBAM, see [Lotan & Head-Gordon](http://pubs.acs.org/doi/full/10.1021/ct050263p)) and Semi-Analytical Method (PBSAM, see [Yap & Head-Gordon](http://pubs.acs.org/doi/abs/10.1021/ct100145f)) integrated with APBS. PBSAM is currently only available in the Linux and OS X distributions.
     - Examples are located with the APBS examples in the pbam/ and pbsam/ directories.
-    - More information and documentation may be found in the [PBAM](http://www.poissonboltzmann.org/external_contributions/extern-pbam/) and [PBSAM](http://www.poissonboltzmann.org/external_contributions/extern-pbsam/) sections of the APBS-PDB2PQR website.
+    - More information and documentation may be found in the [PBAM](http://www.poissonboltzmann.org/external_contributions/extern-pbam/) and [PBSAM](http://www.poissonboltzmann.org/external_contributions/extern-pbsam/) sections of the APBS website.
 * Tree-Code Accelerated Boundary Integral Poisson-Boltzmann Method (TABI-PB) integrated with APBS.(See [Geng & Krasny](http://www.sciencedirect.com/science/article/pii/S0021999113002404))
     - Examples are located with the APBS examples in the bem/, bem-pKa/, and bem-binding-energies/ folders
     - Included NanoShaper alternative to MSMS.
-    - More information and documentation may be found in the [Contributions](http://www.poissonboltzmann.org/external_contributions/extern-tabi/) section of the APBS-PDB2PQR website
+    - More information and documentation may be found in the [Contributions](http://www.poissonboltzmann.org/external_contributions/extern-tabi/) section of the APBS website
 * Added binary DX format support to the appropriate APBS tools.
 * Test suite amended and expanded.
 * Removed hard-coded limitation to number of grid points used to determine surface accessibility.
+* Moved [PDB2PQR](https://github.com/Electrostatics/pdb2pqr) components to it's own repository which can be installed separately.
 
 ### Known Bugs / Limitations
 
-* PBSAM not building in windows due to C standard restrictions in the Microsoft compiler implementation.
+* FETK not building in windows due to C standard restrictions in the Microsoft compiler implementation.
 
 ### Minor Updates
 
@@ -36,6 +37,7 @@ These are notes for APBS version 3.0
 * GEOFLOW ELEC type has been change from 'geoflow-auto' to 'geoflow'.
 * Fixed miscellaneous Windows build issues.
 * Update the build configurations for the Pythons libraries.
+* Removed unused files that no longer worked (e.g. Makefile in example directories)
 
 ### Notes
 

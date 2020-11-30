@@ -37,4 +37,4 @@ where ``type`` is the type of calculation to be perfomed:
   .. todo::
 
      The dynamics part of the PB-(S)AM code should be moved out of the ``ELEC`` section.
-     Documented in https://github.com/Electrostatics/apbs-pdb2pqr/issues/500
+     Documented in https://github.com/Electrostatics/apbs/issues/500
