@@ -47,6 +47,7 @@ echo "==================================== Get External SubModules =============
 #git submodule init
 #git submodule update
 #git submodule sync
+git ls-tree HEAD externals
 
 echo "==================================== CLEAN =============================================== "
 rm -rf $BUILD_DIR                                         || exit 1
