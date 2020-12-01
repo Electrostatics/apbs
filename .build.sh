@@ -39,14 +39,14 @@ pip3 install -U pip
 pip3 install -U pytest
 pip3 install -U virtualenv
 pip3 install -U numpy
-pip3 install --use-feature=2020-resolver -r requirements.txt
+pip3 install -r requirements.txt
 #  Just build APBS for now
 echo "==================================== PWD FOR TOP DIR ==================================== "
 pwd
 echo "==================================== Get External SubModules ==================================== "
-git submodule init
-git submodule update
-git submodule sync
+#git submodule init
+#git submodule update
+#git submodule sync
 
 echo "==================================== CLEAN =============================================== "
 rm -rf $BUILD_DIR                                         || exit 1

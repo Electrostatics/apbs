@@ -81,8 +81,7 @@ build_script:
 
   #  Get the external projects configured
   - cd c:\projects\source
-  - git submodule init
-  - git submodule update
+  - git submodule update --init --recursive
 
   - echo "*****************************************************************************"
   - echo PYBIND11_BUILD

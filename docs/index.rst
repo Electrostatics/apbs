@@ -39,15 +39,6 @@ Contents
    formats/index
    releases
 
-
-.. TODO: This is part of issue https://github.com/Electrostatics/apbs/issues/41
-   # Based on https://devblogs.microsoft.com/cppblog/clear-functional-c-documentation-with-sphinx-breathe-doxygen-cmake/
-   Docs
-   ====
-   .. doxygenstruct:: src
-      :members:
-
-
 ------------------
 Indices and tables
 ------------------

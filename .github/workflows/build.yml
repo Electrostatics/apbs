@@ -21,7 +21,12 @@ jobs:
         python-version: [3.8]
 
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout reposistory
+        uses: actions/checkout@master
+
+      - name: Checkout submodules
+        run: git submodule update --init --recursive
+
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
@@ -53,6 +58,6 @@ jobs:
       - name: Package
         uses: actions/upload-artifact@v2
         with:
-          name: Package ${{ matrix.os }}
+          name: APBS-${{ matrix.os }}.zip
           path: "~/**/artifacts/APBS*.zip"
           retention-days: 5
