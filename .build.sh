@@ -44,9 +44,9 @@ pip3 install -r requirements.txt
 echo "==================================== PWD FOR TOP DIR ==================================== "
 pwd
 echo "==================================== Get External SubModules ==================================== "
-git submodule init
-git submodule update
-git submodule sync
+#git submodule init
+#git submodule update
+#git submodule sync
 
 echo "==================================== CLEAN =============================================== "
 rm -rf $BUILD_DIR                                         || exit 1

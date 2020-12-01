@@ -21,7 +21,14 @@ jobs:
         python-version: [3.8]
 
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout reposistory
+        uses: actions/checkout@master
+
+      - name: Checkout submodules
+        uses: textbook/git-checkout-submodule-action@master
+        with:
+          remote: true
+
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
