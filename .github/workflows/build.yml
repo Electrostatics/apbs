@@ -25,9 +25,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Checkout submodules
-        uses: textbook/git-checkout-submodule-action@master
-        with:
-          remote: true
+        run: git submodule update --init --recursive
 
       - name: Set up Python
         uses: actions/setup-python@v1
