@@ -38,7 +38,7 @@ copyright = '2020, Nathan Baker and many others'
 author = 'Nathan Baker and many others'
 
 # The full version, including alpha/beta/rc tags
-release = '3.1.2'
+release = '3.1.3'
 
 
 # -- General configuration ---------------------------------------------------

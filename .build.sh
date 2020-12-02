@@ -2,8 +2,8 @@
 
 ostype="$(uname -s)"
 case "${ostype}" in
-      # Darwin*)    export CC=clang; export CXX=clang++;;
-      Darwin*)    export CC=gcc-9; export CXX=g++-9;;
+      # Darwin*)    export CC=gcc-9; export CXX=g++-9;;
+      Darwin*)    export CC=clang; export CXX=clang++;;
       Linux*)     export CC=gcc-9; export CXX=g++-9;;
 esac
 
