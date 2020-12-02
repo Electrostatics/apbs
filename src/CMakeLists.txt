@@ -78,6 +78,27 @@ if(ENABLE_iAPBS)
     INSTALL(FILES ${APBS_BUILD}/src/apbscfg.h DESTINATION ${HEADER_INSTALL_PATH})
 endif()
 
+
+################################################################################
+#  We have to fix the dynamically linked libraries 
+################################################################################
+if(APPLE)
+  set(HARDPATH "${PROJECT_BINARY_DIR}/fetk/lib")
+  foreach (hardlib ${APBS_LIBS})
+    set(HARDNAME "lib${hardlib}.1.dylib")
+    message(STATUS "#############################################################")
+    message(STATUS "#############################################################")
+    message(STATUS "#############################################################")
+    message(STATUS "#############################################################")
+    message(STATUS "** Change path for hardlib - ${hardlib}")
+    message(STATUS "COMMAND install_name_tool -change ${HARDPATH}/${HARDNAME} @executable_path/../lib/${HARDNAME} ${PROJECT_BINARY_DIR}/bin/apbs")
+    message(STATUS "#############################################################")
+    add_custom_command(TARGET apbs POST_BUILD
+                       COMMAND install_name_tool -change ${HARDPATH}/${HARDNAME} @executable_path/../lib/${HARDNAME} ${PROJECT_BINARY_DIR}/bin/apbs
+    )
+  endforeach()
+endif()
+
 INSTALL(FILES apbs.h routines.h DESTINATION ${HEADER_INSTALL_PATH})
 INSTALL(TARGETS apbs DESTINATION ${EXECUTABLE_INSTALL_PATH})
 

@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required (VERSION 3.14)
 
 ###############################################################################
 #  Get the Current Version Number so that it can be embedded in files later
@@ -62,6 +62,12 @@ set(CMAKE_BUILD_TYPE "RELWITHDEBINFO")
 #  https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 ################################################################################
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+#include(GNUInstallDirs)
+#file(RELATIVE_PATH relDir
+#     ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}
+#     ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}
+#)
+#set(CMAKE_INSTALL_RPATH $ORIGIN $ORIGIN/${relDir})
 
 project("APBS" VERSION ${APBS_VERSION})
 set(CMAKE_PROJECT_DESCRIPTION "Adaptive Poisson-Boltzmann Solver")
@@ -110,7 +116,7 @@ else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -fpermissive -fPIC")
 endif()
-if(APPLE AND BUILD_SHARED_LIBS)
+if(APPLE AND BUILD_SHARED_LIBS AND (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU"))
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -undefined dynamic_lookup")
 endif()
 
@@ -420,6 +426,8 @@ file(COPY tools/maloccf.h DESTINATION ${APBS_BUILD}/src)
 # repository.  Also note, that in order for this to work on Windows, we've had #
 # to add CMake support to MALOC, and that FETK has no such support, in general.#
 ################################################################################
+# add_library(apbs_fetk_libraries INTERFACE)
+
 if(ENABLE_FETK)
     if(WIN32)
         message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
@@ -475,6 +483,7 @@ if(ENABLE_FETK)
         include_directories(${install_dir}/include)
 
         list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
+        # target_link_libraries(apbs_fetk_libraries INTERFACE maloc amd punc mc gamer superlu umfpack blas vf2c tetgen triangle readline)
         list(APPEND APBS_LIBS
                                   maloc
                                   amd
