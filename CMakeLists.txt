@@ -849,7 +849,8 @@ install(DIRECTORY ${APBS_ROOT}/tests
         DESTINATION ${SHARE_INSTALL_PATH}
         FILES_MATCHING
         PATTERN "*.py"
-        PATTERN "README")
+        PATTERN "*.cfg"
+        PATTERN "README.*")
 
 if(BUILD_TOOLS)
     install(DIRECTORY ${APBS_ROOT}/tools
