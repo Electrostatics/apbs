@@ -73,7 +73,7 @@ def test_binary(binary_name, logger):
         )
 
     try:
-        command = [binary, "--version"]
+        command = [binary.replace(" ", "\ "), "--version"]
         with subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         ) as proc:
@@ -99,7 +99,7 @@ def process_serial(binary, input_file):
     output_file = open(output_name, "w")
 
     # Construct the system command and make the call
-    command = [binary, input_file]
+    command = [binary.replace(" ", "\ "), input_file]
     print(f"BINARY: {binary}")
     print(f"INPUT:  {input_file}")
     with subprocess.Popen(
