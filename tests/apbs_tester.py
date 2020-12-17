@@ -24,6 +24,8 @@ from apbs_logger import Logger
 sys.path.insert(0, "../tools/manip")
 from inputgen import split_input  # noqa E402
 
+SEARCH_PATH = os.environ.get("PATH").split(":")
+
 # Matches a floating point number such as -1.23456789E-20
 FLOAT_PATTERN = r"([+-]?\d+\.\d+E[+-]\d+)"
 
@@ -51,19 +53,28 @@ def test_binary(binary_name, logger):
 
     logger.message(f"BINARY_NAME:{binary_name}\n")
     # Attempts to find apbs in the system path first
-    binary = ""
+    binary = None
 
     # Try a number of ways to find the apbs binary
     if pathlib.Path(binary_name).exists():
         # Attempt number 1 - The full path was passed in
         binary = binary_name
+    elif binary is None:
+        # Attempt number 2 - Iterate through user's path
+        for path in SEARCH_PATH:
+            print(f"CHECKING:{path}/{binary_name}")
+            if pathlib.Path(str(f"{path}/{binary_name}")).exists():
+                binary = str(f"{path}/{binary_name}")
+                break
     else:
-        # Attempt number 2 - Just the binary name was passed in
+        # Attempt number 3 - Just the binary name was passed in
         binary = find_binary(binary_name, logger)
+
+    print(f"BINARY:{binary}")
 
     if binary is None:
         raise FileNotFoundError(
-            f"Couldn't detect an apbs binary {binary_name}"
+            f"Couldn't detect an apbs binary {binary_name} "
             + "in the path or local bin directory"
         )
 
