@@ -3,8 +3,8 @@ APBS validation and test cases
 ==============================
 
 This directory serves as the root directory for the APBS test suite.  This
-directory contains python source files used for testing an an input file
-containing the input files for apbs and the expected results for each test case.
+directory contains python source files used for testing an input file
+containing the input files used by the apbs executable and the expected results for each test case.
 
 The default input file is called `test_cases.cfg`, and the main testing program is called
 `apbs_tester.py`.
@@ -22,7 +22,7 @@ A usage description for `apbs_tester.py` can be obtained by running:
 
 .. code-block:: console
 
-   python3 apbs_tester.py [options]
+   python3 apbs_tester.py -h
 
 -------------
 Test Sections
@@ -42,19 +42,19 @@ where:
 * After the first element, the remaining elements are *property*/*value* pairs
 
 * The first property is the :makevar:`input_dir`.
-  This is the location of all input files reference in other properties.
+  This is the location of all input files referenced in other properties.
 
 * A property has a *name* that is also the basename of the input file concatenated with the file extension, :file:`{input-file}.in`.
 
-* The property name will also be used for the output from :file:`apbs some-input.in` to create the output file, :file:`some-input.out`
+* The property *name* will also be used for the output from :file:`apbs some-input.in` to create the output file, :file:`some-input.out`
 
-* If the *value* of the property is :makevar:`forces` a forces test will be run.
+* If the *value* of the property is :makevar:`forces` the test will calcalate forces.
 
-* If the *value* of the property is a list of floats, these are expected outputs.
+* If the *value* of the property is a list of floating point numbers, the values are expected outputs.
 
-* If a :makevar:`*` is used in place of a float, the output will be ignored. Some test cases have multiple outputs.
+* If a :makevar:`*` is used in place of a floating point number, the output will be ignored. Some test cases have multiple outputs.
   The test function parses each of these, but if a :makevar:`*` is used, the output will be ignored in testing.
-  Most often, the first outputs are intermediate followed by a final output, and the test case is only concerned with the final output.
+  Most often, the first outputs are intermediate values followed by a final output, and the test case is only concerned with the final output.
 
 --------
 Examples
