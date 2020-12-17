@@ -24,14 +24,14 @@ from apbs_logger import Logger
 sys.path.insert(0, "../tools/manip")
 from inputgen import split_input  # noqa E402
 
-SEARCH_PATH = os.environ.get("PATH").split(":")
+SEARCH_PATH = os.environ.get("PATH").split(os.pathsep)
 
 # Matches a floating point number such as -1.23456789E-20
 FLOAT_PATTERN = r"([+-]?\d+\.\d+E[+-]\d+)"
 
 
 def find_binary(binary_name, logger):
-    # This is an attempt to find the apbs binary on a Windows system
+    # This is an attempt to locate the apbs binary on a Windows system
     # built with Visual Studio that creates binaries based on the
     # current configuration.
     # On Linux/Mac systems the apbs binary will bin ../build/bin/apbs
@@ -42,8 +42,14 @@ def find_binary(binary_name, logger):
     for idx in paths:
         if idx.is_file() and os.access(str(idx), os.X_OK):
             return str(idx)
+    # Or, last chance, search the users PATH for the apbs binary
+    for path in SEARCH_PATH:
+        filename = pathlib.Path(path) / binary_name
+        print(f"CHECKING:{filename}")
+        if filename.exists() and os.access(str(filename), os.X_OK):
+            return str(filename)
 
-    raise FileNotFoundError(f"Can't find file, {binary_name}")
+    return None
 
 
 def test_binary(binary_name, logger):
@@ -51,7 +57,7 @@ def test_binary(binary_name, logger):
     Ensures that the apbs binary is available
     """
 
-    logger.message(f"BINARY_NAME:{binary_name}\n")
+    logger.message(f"TESTING WITH BINARY_NAME:{binary_name}\n")
     # Attempts to find apbs in the system path first
     binary = None
 
@@ -59,18 +65,9 @@ def test_binary(binary_name, logger):
     if pathlib.Path(binary_name).exists():
         # Attempt number 1 - The full path was passed in
         binary = binary_name
-    elif binary is None:
-        # Attempt number 2 - Iterate through user's path
-        for path in SEARCH_PATH:
-            print(f"CHECKING:{path}/{binary_name}")
-            if pathlib.Path(str(f"{path}/{binary_name}")).exists():
-                binary = str(f"{path}/{binary_name}")
-                break
     else:
-        # Attempt number 3 - Just the binary name was passed in
+        # Attempt number 2 - Just the binary name was passed in
         binary = find_binary(binary_name, logger)
-
-    print(f"BINARY:{binary}")
 
     if binary is None:
         raise FileNotFoundError(
@@ -82,6 +79,8 @@ def test_binary(binary_name, logger):
         raise PermissionError(
             f"The apbs binary, {binary}, " + "is not executable!"
         )
+
+    print(f"NOTE: Using apbs binary:{binary}")
 
     try:
         command = [binary.replace(" ", "\ "), "--version"]
@@ -191,6 +190,7 @@ def run_test(
     net_time = datetime.timedelta(0)
 
     # Change the current working directory to the test directory
+    save_current_directory = os.getcwd()
     os.chdir(test_directory)
 
     # Run the setup, if any
@@ -290,7 +290,7 @@ def run_test(
     logger.message("-" * 80 + "\n")
     logger.log(f"Time:           {stopwatch} seconds\n")
 
-    os.chdir("../../tests")
+    os.chdir(save_current_directory)
 
 
 def main():
@@ -403,12 +403,7 @@ def main():
 
         # Verify that the test is described in the test cases file
         if test_name not in config.sections():
-            print(
-                "  "
-                + test_name
-                + " section not found in "
-                + options.test_config
-            )
+            print(f"  {test_name} section not found in {options.test_config}")
             return 1
 
         # Grab the test directory
