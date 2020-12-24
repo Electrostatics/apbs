@@ -31,9 +31,6 @@ target_link_libraries(value ${LIBS})
 add_executable(multivalue multivalue.c)
 target_link_libraries(multivalue ${LIBS})
 
-add_executable(benchmark benchmark.c)
-target_link_libraries(benchmark ${LIBS})
-
 add_executable(similarity similarity.c)
 target_link_libraries(similarity ${LIBS})
 

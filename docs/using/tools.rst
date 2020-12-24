@@ -2,13 +2,6 @@
 Conversion utilities
 --------------------
 
-^^^^^^^^^^^^^^^
-amber2charmm.sh
-^^^^^^^^^^^^^^^
-
-A bash script for converting AMBER atom names to CHARMM names.
-Found in :file:`tools/conversion`
-
 ^^^^^^
 del2dx
 ^^^^^^
@@ -30,22 +23,9 @@ dx2uhbd
 Converts OpenDX format map files to UHBD format.
 Found in :file:`tools/mesh`
 
-^^^^^^^^^^^
-qcd2pqr.awk
-^^^^^^^^^^^
-
-An awk script for converting from UHBD QCD format to PQR format.
-
 ----------------------
 Benchmarking utilities
 ----------------------
-
-^^^^^^^^^
-benchmark
-^^^^^^^^^
-
-Benchmark file I/O for reading/writing scalar data.
-Found in :file:`tools/mesh`
 
 ^^^^^^^^^^^^
 uhbd_asc2bin
@@ -53,13 +33,6 @@ uhbd_asc2bin
 
 Converts UHBD ASCII-format files to binary format.
 Found in :file:`tools/mesh`
-
-^^^^^^^^^^^^^^^^
-WHATIF2AMBER.sed
-^^^^^^^^^^^^^^^^
-
-A sed script for converting WHATIF atoms names to the AMBER naming scheme.
-Found in :file:`tools/conversion`
 
 ----------------------------
 Setup and analysis utilities
@@ -109,13 +82,6 @@ The file names, scalar values, and operations must be separated by tabs, line br
 Comments can be included between the character # and a new line (in the usual shell script fashion).
 Found in :file:`tools/mesh`
 
-^^^^^^^^^^^
-inputgen.py
-^^^^^^^^^^^
-
-Create an APBS input file using :ref:`psize` data.
-Found in :file:`tools/manip`
-
 ^^^^^^^^^^^^^^^^^^^^
 mergedx and mergedx2
 ^^^^^^^^^^^^^^^^^^^^
@@ -142,15 +108,6 @@ multivalue
 
 This program evaluates OpenDX scalar data at a series of user-specified points and returns the value of the data at each point.
 Found in :file:`tools/mesh`
-
-.. _psize:
-
-^^^^^^^^
-psize.py
-^^^^^^^^
-
-Suggest grid sizes and spacings for APBS given an input molecule.
-Found in :file:`tools/manip`
 
 ^^^^^^^^^^
 similarity
