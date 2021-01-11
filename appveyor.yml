@@ -136,6 +136,12 @@ build_script:
   - ctest -C Release --verbose --output-on-failure
 
   - echo "*****************************************************************************"
+  - echo APBS_TEST PBAM EXAMPLE
+  - echo "*****************************************************************************"
+  - cd C:\Program Files\APBS\share\apbs\tests
+  - python apbs_tester.py -e "C:\Program Files\APBS\bin\apbs.exe" -c test_cases.cfg -t pbam
+
+  - echo "*****************************************************************************"
   - echo APBS_PACKAGE
   - echo "*****************************************************************************"
   - cpack -C Release -G ZIP

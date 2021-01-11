@@ -83,7 +83,7 @@ def test_binary(binary_name, logger):
     print(f"NOTE: Using apbs binary:{binary}")
 
     try:
-        command = [binary.replace(" ", "\ "), "--version"]
+        command = [r"{}".format(binary), "--version"]
         with subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         ) as proc:
@@ -109,9 +109,10 @@ def process_serial(binary, input_file):
     output_file = open(output_name, "w")
 
     # Construct the system command and make the call
-    command = [binary.replace(" ", "\ "), input_file]
-    print(f"BINARY: {binary}")
-    print(f"INPUT:  {input_file}")
+    command = [r"{}".format(binary), input_file]
+    print(f"BINARY:  {binary}")
+    print(f"INPUT:   {input_file}")
+    print(f"COMMAND: {command}")
     with subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     ) as proc:
