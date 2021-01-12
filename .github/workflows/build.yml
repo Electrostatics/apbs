@@ -37,9 +37,6 @@ jobs:
         run: |
           brew install bison flex swig libomp lapack
           brew upgrade gcc@9
-        uses: mstksg/get-package@v1
-        with:
-          brew: gcc@9 bison flex swig readline libomp lapack
 
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
         if: matrix.os == 'ubuntu-latest'
