@@ -20,14 +20,23 @@ class AtomList:
 
         :param List atoms: A list of Atoms
         """
-        self._atoms: Tuple[Atom] = atoms if atoms is not None else []
+        self._atoms: List[Atom] = atoms if atoms is not None else []
         self.charge: float = None
         self.maxrad: float = None
 
         self._center = Coordinate()
         self._min_coord = Coordinate()
         self._max_coord = Coordinate()
-        self._dp = dict()
+        self._dp = {}
+
+    def __getattr__(self, method):
+        return getattr(self._atoms, method)
+
+    def __len__(self):
+        return len(self._atoms)
+
+    def __getitem__(self, item):
+        return self._atoms[item]
 
     def center(self) -> Coordinate:
         """Molecule center
