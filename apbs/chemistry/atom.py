@@ -78,6 +78,11 @@ class Atom:
         self.id: int = int(kwargs.get("id", 0))
         if "id" not in kwargs:
             raise ValueError("The Atom id must be set to non-zero value")
+        if self.field_name not in ["ATOM", "HETATM"]:
+            raise ValueError(
+                f"The Atom fieldname must be ATOM or HETATM, not "
+                f"{self.field_name}"
+            )
 
     def __str__(self):
         return f"Atom< name< {self.field_name} >, {self.position}, radius< {self.radius} >, charge< {self.charge} > >"
