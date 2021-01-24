@@ -1,10 +1,11 @@
-from string import whitespace
+# -*- coding: utf-8 -*-
+
+from apbs.chemistry import Atom, AtomList
 from pyparsing import (
     Group,
     LineEnd,
     LineStart,
     Literal,
-    Regex,
     Word,
     ZeroOrMore,
     alphas,
@@ -12,8 +13,8 @@ from pyparsing import (
     nums,
     printables,
 )
+
 import re
-from apbs.chemistry import Atom, AtomList
 
 
 class PQRReader:
@@ -32,7 +33,7 @@ class PQRReader:
             LineStart()
             + skip_val("field_name")
             + anything("anything")
-            + LineEnd()
+            + LineEnd(),
         )
         atom_value = Group(
             LineStart()
@@ -48,7 +49,7 @@ class PQRReader:
             + float_val("z")
             + float_val("charge")
             + float_val("radius")
-            + LineEnd()
+            + LineEnd(),
         )
         # NOTE: Skips blank or lines with only whitespace (tabs, spaces, etc.)
         self.atom = ZeroOrMore(atom_value | skip_value)
