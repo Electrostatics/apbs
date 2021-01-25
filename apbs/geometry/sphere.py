@@ -13,7 +13,7 @@ class Sphere:
 
         Shamelessly copied over from the vacc routine.
         """
-        s: Surface
+        surface: Surface
 
         frac = npoints / 4.0
         ntheta = np.ceil(np.sqrt(np.pi * frac))
@@ -22,27 +22,27 @@ class Sphere:
 
         # Count number of points to be used
         nactual: int = 0
-        for i in range(ntheta):
-            theta = dtheta * float(i)
+        for idx in range(ntheta):
+            theta = dtheta * float(idx)
             sintheta = np.sin(theta)
             costheta = np.cos(theta)
             nphi = np.ceil(sintheta * nphimax)
             nactual += nphi
 
-        s = Surface(1.0, nactual)
+        surface = Surface(1.0, nactual)
         nactual = 0
-        for i in range(ntheta):
-            theta = dtheta * float(i)
+        for idx in range(ntheta):
+            theta = dtheta * float(idx)
             sintheta = np.sin(theta)
             costheta = np.cos(theta)
             nphi = np.ceil(sintheta * nphimax)
             if nphi != 0:
                 dphi = 2 * np.pi / float(nphi)
-                for j in range(nphi):
-                    phi = dphi * float(j)
+                for jdx in range(nphi):
+                    phi = dphi * float(jdx)
                     sinphi = np.sin(phi)
                     cosphi = np.cos(phi)
-                    s[nactual] = SurfacePoint(
+                    surface[nactual] = SurfacePoint(
                         cosphi * sintheta,
                         sinphi * sintheta,
                         costheta,
@@ -50,5 +50,5 @@ class Sphere:
                     )
                     nactual += 1
 
-        s.npoints = nactual
-        return s
+        surface.npoints = nactual
+        return surface
