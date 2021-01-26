@@ -47,8 +47,8 @@ class AtomList:
         :rtype: Coordinate
         """
         if "center" not in self._dp.keys():
-            ma = self.max_coord()
-            mi = self.min_coord()
+            ma = self.max_coord
+            mi = self.min_coord
             self._dp["center"] = Coordinate(
                 (ma.x + mi.x) * 0.5,
                 (ma.y + mi.y) * 0.5,
