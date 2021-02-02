@@ -187,6 +187,86 @@ class ApbsLegacyInput:
     dime_coord_val = Group(number * 3)
     dime_value = Group(dime_val + dime_coord_val)
 
+    ekey_val = CaselessLiteral("ekey")
+    ekey_options_val = oneOf("simp global frac", caseless=True)
+    ekey_value = Group(ekey_val + ekey_options_val)
+
+    etol_val = CaselessLiteral("etol")
+    etol_coord_val = number
+    etol_value = Group(etol_val + etol_coord_val)
+
+    fgcent_val = CaselessLiteral("fgcent")
+    fgcent_mol_val = CaselessLiteral("mol") + number
+    fgcent_coord_val = Group(number * 3)
+    fgcent_value = Group(fgcent_val + (fgcent_mol_val | fgcent_coord_val))
+
+    fglen_val = CaselessLiteral("fglen")
+    fglen_coord_val = Group(number * 3)
+    fglen_value = Group(fglen_val + fglen_coord_val)
+
+    gamma_val = CaselessLiteral("gamma")
+    gamma_coord_val = number
+    gamma_value = Group(gamma_val + gamma_coord_val)
+
+    gcent_val = CaselessLiteral("gcent")
+    gcent_mol_val = CaselessLiteral("mol") + number
+    gcent_coord_val = Group(number * 3)
+    gcent_value = Group(gcent_val + (gcent_mol_val | gcent_coord_val))
+
+    glen_val = CaselessLiteral("glen")
+    glen_coord_val = Group(number * 3)
+    glen_value = Group(glen_val + glen_coord_val)
+
+    grid_val = CaselessLiteral("grid")
+    grid_coord_val = Group(number * 3)
+    grid_value = Group(grid_val + grid_coord_val)
+
+    ion_val = CaselessLiteral("ion")
+    # charge
+    # conc
+    # radius
+    ion_options_val = Group(number * 3)
+    ion_value = Group(ion_val + ion_options_val)
+
+    elec_maxsolve_val = CaselessLiteral("maxsolve")
+    elec_maxsolve_value = Group(elec_maxsolve_val + number)
+
+    elec_maxvert_val = CaselessLiteral("maxvert")
+    elec_maxvert_value = Group(elec_maxvert_val + number)
+
+    elec_mol_val = CaselessLiteral("mol")
+    elec_mol_value = Group(elec_mol_val + number)
+
+    elec_nlev_val = CaselessLiteral("nlev")
+    elec_nlev_value = Group(elec_nlev_val + number)
+
+    elec_pbe_options_val = oneOf("lpbe lrpbe npbe nrpbe", caseless=True)
+    elec_pbe_value = Group(elec_pbe_options_val)
+
+    # TODO: Combine with dime
+    pdime_val = CaselessLiteral("pdime")
+    pdime_coord_val = Group(number * 3)
+    pdime_value = Group(pdime_val + pdime_coord_val)
+
+    ofrac_val = CaselessLiteral("ofrac")
+    ofrac_value = Group(ofrac_val + number)
+
+    # NOTE: Should be a value between 78-80?
+    sdie_val = CaselessLiteral("sdie")
+    sdie_value = Group(sdie_val + number)
+
+    sdens_val = CaselessLiteral("sdens")
+    sdens_value = Group(sdens_val + number)
+
+    srad_val = CaselessLiteral("srad")
+    srad_value = Group(srad_val + number)
+
+    swin_val = CaselessLiteral("swin")
+    swin_value = Group(swin_val + number)
+
+    srfm_options_val = oneOf("mol smol spl2", caseless=True)
+    srfm_value = Group(srfm_options_val)
+
     elec_body = Group(
         ZeroOrMore(elec_name_value)
         + ZeroOrMore(elec_type_value)
@@ -200,7 +280,29 @@ class ApbsLegacyInput:
         + ZeroOrMore(cglen_value)
         + ZeroOrMore(chgm_value)
         + ZeroOrMore(dime_value)
+        + ZeroOrMore(ekey_value)
+        + ZeroOrMore(etol_value)
+        + ZeroOrMore(fgcent_value)
+        + ZeroOrMore(fglen_value)
+        + ZeroOrMore(gamma_value)
+        + ZeroOrMore(gcent_value)
+        + ZeroOrMore(glen_value)
+        + ZeroOrMore(grid_value)
+        + ZeroOrMore(ion_value)
+        + ZeroOrMore(elec_maxsolve_value)
+        + ZeroOrMore(elec_maxvert_value)
+        + ZeroOrMore(elec_mol_value)
+        + ZeroOrMore(elec_nlev_value)
+        + ZeroOrMore(elec_pbe_value)
+        + ZeroOrMore(pdime_value)
+        + ZeroOrMore(ofrac_value)
+        + ZeroOrMore(sdie_value)
+        + ZeroOrMore(sdens_value)
+        + ZeroOrMore(srad_value)
+        + ZeroOrMore(swin_value)
+        + ZeroOrMore(srfm_value)
     )
+
     elec_value = Group(Suppress(elec_val) + elec_body + Suppress(end_val))
 
     all_values = Group(
