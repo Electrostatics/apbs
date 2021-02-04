@@ -1,37 +1,17 @@
-from typing import Literal
-from numpy import array, NAN
 from pyparsing import (
     CaselessLiteral,
-    CharsNotIn,
-    Combine,
-    Dict,
-    Forward,
     Group,
-    OnlyOnce,
-    Keyword,
-    LineEnd,
-    LineStart,
-    MatchFirst,
-    NotAny,
     OneOrMore,
-    Optional,
     ParseException,
-    ParseResults,
-    QuotedString,
     Regex,
     Suppress,
-    White,
     Word,
     ZeroOrMore,
     alphas,
     alphanums,
-    downcaseTokens,
-    empty,
-    lineEnd,
     nums,
     oneOf,
     printables,
-    replaceWith,
     restOfLine,
 )
 
@@ -63,21 +43,6 @@ number = Regex(
     flags=VERBOSE,
 )
 # number.setParseAction(convertNumber)
-
-pyValue_list = [
-    number,
-    Keyword("True").setParseAction(replaceWith(True)),
-    Keyword("False").setParseAction(replaceWith(False)),
-    Keyword("NAN", caseless=True).setParseAction(replaceWith(NAN)),
-    Keyword("None").setParseAction(replaceWith(None)),
-    QuotedString('"""', multiline=True),
-    QuotedString("'''", multiline=True),
-    QuotedString('"'),
-    QuotedString("'"),
-]
-
-# Common patterns
-pyValue = MatchFirst(e.setWhitespaceChars(" \t\r") for e in pyValue_list)
 
 
 class ApbsLegacyInput:
@@ -131,12 +96,12 @@ class ApbsLegacyInput:
     charge_value = Group(charge_val + dx_format_val + path_val)
 
     read_body = Group(
-        ZeroOrMore(mol_value)
+        OneOrMore(mol_value)
         & ZeroOrMore(parm_value)
         & ZeroOrMore(diel_value)
         & ZeroOrMore(kappa_value)
         & ZeroOrMore(charge_value)
-    )
+    ).setResultsName("read")
     read_value = Group(Suppress(read_val) + read_body + Suppress(end_val))
 
     # ELEC section specific grammar
@@ -299,8 +264,8 @@ class ApbsLegacyInput:
     )
 
     elec_body = (
-        ZeroOrMore(elec_name_value)
-        & ZeroOrMore(elec_type_value)
+        OneOrMore(elec_type_value)
+        & ZeroOrMore(elec_name_value)
         & ZeroOrMore(akeyPRE_value)
         & ZeroOrMore(akeySOLVE_value)
         & ZeroOrMore(async_value)
@@ -345,13 +310,12 @@ class ApbsLegacyInput:
     print_what_val = oneOf(
         "elecEnergy elecForce apolEnergy apolForce", caseless=True
     )
-    print_operand = identifier
     print_expr = (
-        print_operand
-        + OneOrMore(oneOf("+ -") + print_operand)
-        + ZeroOrMore(oneOf("+ -") + print_operand)
+        identifier
+        + OneOrMore(oneOf("+ -") + identifier)
+        + ZeroOrMore(oneOf("+ -") + identifier)
     )
-    print_body = print_what_val + print_expr
+    print_body = Group(print_what_val + print_expr)
 
     print_value = Group(Suppress(print_val) + print_body + Suppress(end_val))
 
@@ -359,96 +323,41 @@ class ApbsLegacyInput:
         OneOrMore(read_value)
         + OneOrMore(elec_value)
         + OneOrMore(print_value)
-        + quit_val
+        + Suppress(quit_val)
     )
 
     def __init__(self):
-        # self.read_section = Group(
-        #    self.read_value + self.read_body + self.end_value
-        # )
         pass
 
-    def paramParser(self):
-        """Create a pattern matching any definition of parameters with the form
-
-        variable_name value [value] [value]
-
-        Value can be any standard python value (int, number, None, False, True, NaN
-        or quoted strings) or a raw string, which can be multiline if additional
-        lines start with a whitespace.
-
-        Return a Dict element to allow accessing data using the varible name as a key.
-
-        This Dict has two special fields :
-            names_ : the list of column names found
-            units_ : a dict in the form {key : unit}
-        """
-
-        def formatBloc(t):
-            """Format the result to have a list of (key, values) easily usable with Dict
-
-            Add two fields :
-                names_ : the list of column names found
-                units_ : a dict in the form {key : unit}
-            """
-            rows = []
-
-            # store units and names
-            units = {}
-            names = []
-
-            for row in t:
-                print(f"ROW: {row}")
-                if row.name == self.end_val:
-                    break
-                rows.append(ParseResults([row.name, row.value]))
-                names.append(row.name)
-                if row.unit:
-                    units[row.name] = row.unit[0]
-
-            # rows.append(ParseResults(["names_", names]))
-            # rows.append(ParseResults(["unit_", units]))
-
-            return rows
-
-        # print(self.all_values)
-        self.read_body.setDebug()
-        self.elec_body.setDebug()
-        self.print_expr.setDebug()
-        # paramBloc = self.all_values
-        # .setParseAction(formatBloc)
-        # return Dict(paramBloc)
-
-        return Dict(self.all_values)
-
     def loads(self, input_data: str):
-        """Parse an input file as a string"""
+        """Parse the input as a string
 
-        # Group section name and content
-        section = Group(self.all_values + self.paramParser())
-
-        # Build the final parser and suppress empty sections
-        parser = Dict(OneOrMore(section))
-        parser.ignore(self.comment + restOfLine)
-
-        return parser.parseString(input_data, parseAll=False)
-
-    def load(self, filename: str):
-        """
-        Read Legacy Input file and pass it to loads as a string
-
-        :param str filename: The path/filename to the APBS legacy config file
+        :param str filename: The APBS legacy input configuration file
         :return: the ApbsConfig object
         :rtype: ApbsConfig
         """
-        from pathlib import Path
+        parser = self.all_values
+        parser.ignore(self.comment + restOfLine)
 
-        curr_dir = Path(__file__).parent
-        fname = curr_dir / filename
-        with fname.open() as fp:
+        results = self.all_values.searchString(input_data)
+        print(results.dump())
+        for item in results:
+            print(f"ITEM: {item.read}")
+            return item
+
+    def load(self, filename: str):
+        """
+        Read Legacy Input congifuration file and pass it to loads as a string
+
+        :param str filename: The APBS legacy input configuration file
+        :return: the ApbsConfig object
+        :rtype: ApbsConfig
+        """
+        with filename.open() as fp:
             data = fp.read()
         try:
             data = self.loads(data)
+            return data
 
         except ParseException as pe:
             # complete the error message
@@ -466,6 +375,10 @@ class ApbsLegacyInput:
 
 if __name__ == "__main__":
     # execute only if run as a script
+    relfilename = "../../examples/actin-dimer/apbs-mol-auto.in"
     test = ApbsLegacyInput()
-    print(test.load("../../examples/actin-dimer/apbs-mol-auto.in"))
-    # print(test.load("../../examples/helix/Apbs_solv-TEMPLATE.in"))
+    from pathlib import Path
+
+    curr_dir = Path(__file__).parent
+    absfilename = curr_dir / relfilename
+    print(test.load(absfilename))
