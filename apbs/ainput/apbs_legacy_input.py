@@ -89,7 +89,7 @@ class ApbsLegacyInput:
     #   3. are keyword and non-path values case sensitive?
     #      A: No
 
-    identifier = Word(alphas, alphanums + r"_")
+    identifier = Word(alphas, alphanums + r"_") | integer_val
     anything = Word(printables + " " + "\t")
     comment = "#"
     path_val = anything
@@ -132,155 +132,158 @@ class ApbsLegacyInput:
 
     read_body = Group(
         ZeroOrMore(mol_value)
-        + ZeroOrMore(parm_value)
-        + ZeroOrMore(diel_value)
-        + ZeroOrMore(kappa_value)
-        + ZeroOrMore(charge_value)
+        & ZeroOrMore(parm_value)
+        & ZeroOrMore(diel_value)
+        & ZeroOrMore(kappa_value)
+        & ZeroOrMore(charge_value)
     )
     read_value = Group(Suppress(read_val) + read_body + Suppress(end_val))
 
     # ELEC section specific grammar
     elec_name_val = CaselessLiteral("name")
-    elec_name_value = elec_name_val + Word(alphanums)
+    elec_name_value = Group(elec_name_val + identifier)
 
+    # TODO: There must be one (and only one?) of these
+    #       plus there are keywords that unique to each option
     elec_type_options_val = oneOf(
         "mg-auto mg-para mg-manual fe-manual mg-dummy", caseless=True
     )
-    elec_type_value = elec_type_options_val
+    elec_type_value = Group(elec_type_options_val)
 
     # ELEC Keywords
     akeyPRE_val = CaselessLiteral("akeyPRE")
     akeyPRE_options_val = oneOf("unif geom", caseless=True)
-    akeyPRE_value = akeyPRE_val + akeyPRE_options_val
+    akeyPRE_value = Group(akeyPRE_val + akeyPRE_options_val)
 
     akeySOLVE_val = CaselessLiteral("akeySOLVE")
     akeySOLVE_options_val = oneOf("resi", caseless=True)
-    akeySOLVE_value = akeySOLVE_val + akeySOLVE_options_val
+    akeySOLVE_value = Group(akeySOLVE_val + akeySOLVE_options_val)
 
     async_val = CaselessLiteral("async")
-    async_value = async_val + integer_val
+    async_value = Group(async_val + integer_val)
 
     bcfl_val = CaselessLiteral("bcfl")
     bcfl_options_val = oneOf("zero sdh mdh focus", caseless=True)
-    bcfl_value = bcfl_val + bcfl_options_val
+    bcfl_value = Group(bcfl_val + bcfl_options_val)
 
+    # TODO: Should be able to combine calcenergy and calcforce?
     calcenergy_val = CaselessLiteral("calcenergy")
     calcenergy_options_val = oneOf("no total comps", caseless=True)
-    calcenergy_value = calcenergy_val + calcenergy_options_val
+    calcenergy_value = Group(calcenergy_val + calcenergy_options_val)
 
     calcforce_val = CaselessLiteral("calcforce")
     calcforce_options_val = oneOf("no total comps", caseless=True)
-    calcforce_value = calcforce_val + calcforce_options_val
+    calcforce_value = Group(calcforce_val + calcforce_options_val)
 
     cgcent_val = CaselessLiteral("cgcent")
-    cgcent_mol_val = CaselessLiteral("mol") + integer_val
-    cgcent_coord_val = number * 3
-    cgcent_value = cgcent_val + (cgcent_mol_val | cgcent_coord_val)
+    cgcent_mol_val = Group(CaselessLiteral("mol") + integer_val)
+    cgcent_coord_val = Group(number * 3)
+    cgcent_value = Group(cgcent_val + (cgcent_mol_val | cgcent_coord_val))
 
     cglen_val = CaselessLiteral("cglen")
-    cglen_coord_val = integer_val + integer_val + integer_val
-    cglen_value = cglen_val + cgcent_coord_val
+    cglen_coord_val = Group(integer_val * 3)
+    cglen_value = Group(cglen_val + cgcent_coord_val)
 
     chgm_val = CaselessLiteral("chgm")
     chgm_options_val = oneOf("spl0 spl2", caseless=True)
-    chgm_value = chgm_val + chgm_options_val
+    chgm_value = Group(chgm_val + chgm_options_val)
 
     dime_val = CaselessLiteral("dime")
-    dime_coord_val = integer_val + integer_val + integer_val
-    dime_value = dime_val + dime_coord_val
+    dime_coord_val = Group(integer_val * 3)
+    dime_value = Group(dime_val + dime_coord_val)
 
     ekey_val = CaselessLiteral("ekey")
     ekey_options_val = oneOf("simp global frac", caseless=True)
-    ekey_value = ekey_val + ekey_options_val
+    ekey_value = Group(ekey_val + ekey_options_val)
 
     etol_val = CaselessLiteral("etol")
-    etol_coord_val = number
-    etol_value = etol_val + etol_coord_val
+    etol_value = Group(etol_val + number)
 
     fgcent_val = CaselessLiteral("fgcent")
     fgcent_mol_val = Group(CaselessLiteral("mol") + number)
     fgcent_coord_val = Group(number * 3)
-    fgcent_value = fgcent_val + (fgcent_mol_val | fgcent_coord_val)
+    fgcent_value = Group(fgcent_val + (fgcent_mol_val | fgcent_coord_val))
 
     fglen_val = CaselessLiteral("fglen")
-    fglen_coord_val = number * 3
-    fglen_value = fglen_val + fglen_coord_val
+    fglen_coord_val = Group(number * 3)
+    fglen_value = Group(fglen_val + fglen_coord_val)
 
     gamma_val = CaselessLiteral("gamma")
-    gamma_coord_val = number
-    gamma_value = gamma_val + gamma_coord_val
+    gamma_value = Group(gamma_val + number)
 
     gcent_val = CaselessLiteral("gcent")
     gcent_mol_val = CaselessLiteral("mol") + number
-    gcent_coord_val = number * 3
-    gcent_value = gcent_val + (gcent_mol_val | gcent_coord_val)
+    gcent_coord_val = Group(number * 3)
+    gcent_value = Group(gcent_val + (gcent_mol_val | gcent_coord_val))
 
     glen_val = CaselessLiteral("glen")
-    glen_coord_val = number * 3
-    glen_value = glen_val + glen_coord_val
+    glen_coord_val = Group(number * 3)
+    glen_value = Group(glen_val + glen_coord_val)
 
     grid_val = CaselessLiteral("grid")
-    grid_coord_val = number * 3
-    grid_value = grid_val + grid_coord_val
+    grid_coord_val = Group(number * 3)
+    grid_value = Group(grid_val + grid_coord_val)
 
+    # Are charge, conc, and radius ALL required?
     ion_val = CaselessLiteral("ion")
-    ion_charge_val = CaselessLiteral("charge") + number
-    ion_conc_val = CaselessLiteral("conc") + number
-    ion_radius_val = CaselessLiteral("radius") + number
-    ion_value = ion_val + ion_charge_val & ion_conc_val & ion_radius_val
+    ion_charge_val = Group(CaselessLiteral("charge") + number)
+    ion_conc_val = Group(CaselessLiteral("conc") + number)
+    ion_radius_val = Group(CaselessLiteral("radius") + number)
+    ion_value = Group(ion_val + ion_charge_val & ion_conc_val & ion_radius_val)
 
     elec_maxsolve_val = CaselessLiteral("maxsolve")
-    elec_maxsolve_value = elec_maxsolve_val + number
+    elec_maxsolve_value = Group(elec_maxsolve_val + number)
 
     elec_maxvert_val = CaselessLiteral("maxvert")
-    elec_maxvert_value = elec_maxvert_val + number
+    elec_maxvert_value = Group(elec_maxvert_val + number)
 
     elec_mol_val = CaselessLiteral("mol")
-    elec_mol_value = elec_mol_val + number
+    elec_mol_value = Group(elec_mol_val + number)
 
     elec_nlev_val = CaselessLiteral("nlev")
-    elec_nlev_value = elec_nlev_val + number
+    elec_nlev_value = Group(elec_nlev_val + number)
 
+    # TODO: I think only 1 of these are allowed (not ZeroOrMore)
     elec_pbe_options_val = oneOf("lpbe lrpbe npbe nrpbe", caseless=True)
-    elec_pbe_value = elec_pbe_options_val
+    elec_pbe_value = Group(elec_pbe_options_val)
 
     pdie_val = CaselessLiteral("pdie")
-    pdie_value = pdie_val + number
+    pdie_value = Group(pdie_val + number)
 
     # TODO: Combine with dime?
     pdime_val = CaselessLiteral("pdime")
-    pdime_coord_val = number * 3
-    pdime_value = pdime_val + pdime_coord_val
+    pdime_coord_val = Group(number * 3)
+    pdime_value = Group(pdime_val + pdime_coord_val)
 
     ofrac_val = CaselessLiteral("ofrac")
-    ofrac_value = ofrac_val + number
+    ofrac_value = Group(ofrac_val + number)
 
     # NOTE: Should be a value between 78-80?
     sdie_val = CaselessLiteral("sdie")
-    sdie_value = sdie_val + number
+    sdie_value = Group(sdie_val + number)
 
     sdens_val = CaselessLiteral("sdens")
-    sdens_value = sdens_val + number
+    sdens_value = Group(sdens_val + number)
 
     srad_val = CaselessLiteral("srad")
-    srad_value = srad_val + number
+    srad_value = Group(srad_val + number)
 
     swin_val = CaselessLiteral("swin")
-    swin_value = swin_val + number
+    swin_value = Group(swin_val + number)
 
     srfm_val = CaselessLiteral("srfm")
     srfm_options_val = oneOf("mol smol spl2", caseless=True)
-    srfm_value = srfm_val + srfm_options_val
+    srfm_value = Group(srfm_val + srfm_options_val)
 
     targetRes_val = CaselessLiteral("targetRes")
-    targetRes_value = targetRes_val + number
+    targetRes_value = Group(targetRes_val + number)
 
     temp_val = CaselessLiteral("temp")
-    temp_value = temp_val + number
+    temp_value = Group(temp_val + number)
 
     usemap_val = CaselessLiteral("usemap")
     usemap_options_val = oneOf("diel kappa charge", caseless=True)
-    usemap_value = usemap_val + integer_val
+    usemap_value = Group(usemap_val + integer_val)
 
     write_val = CaselessLiteral("write")
     write_type_options_val = oneOf(
@@ -288,15 +291,12 @@ class ApbsLegacyInput:
         caseless=True,
     )
     write_format_options_val = oneOf("dx avs uhbd", caseless=True)
-    write_value = (
+    write_value = Group(
         usemap_val
         + write_type_options_val
         + write_format_options_val
         + path_val
     )
-
-    DUMMY_val = CaselessLiteral("DUMMY")
-    DUMMY_value = DUMMY_val + number
 
     elec_body = (
         ZeroOrMore(elec_name_value)
@@ -341,10 +341,26 @@ class ApbsLegacyInput:
 
     elec_value = Group(Suppress(elec_val) + elec_body + Suppress(end_val))
 
-    all_values = OneOrMore(read_value) + OneOrMore(elec_value) + quit_val
+    # PRINT section specific grammar
+    print_what_val = oneOf(
+        "elecEnergy elecForce apolEnergy apolForce", caseless=True
+    )
+    print_operand = identifier
+    print_expr = (
+        print_operand
+        + OneOrMore(oneOf("+ -") + print_operand)
+        + ZeroOrMore(oneOf("+ -") + print_operand)
+    )
+    print_body = print_what_val + print_expr
 
-    # PRINT...END
-    # QUIT
+    print_value = Group(Suppress(print_val) + print_body + Suppress(end_val))
+
+    all_values = (
+        OneOrMore(read_value)
+        + OneOrMore(elec_value)
+        + OneOrMore(print_value)
+        + quit_val
+    )
 
     def __init__(self):
         # self.read_section = Group(
@@ -395,12 +411,15 @@ class ApbsLegacyInput:
 
             return rows
 
-        print(self.all_values)
-        paramBloc = (
-            OneOrMore(self.all_values).setParseAction(formatBloc).setDebug()
-        )
+        # print(self.all_values)
+        self.read_body.setDebug()
+        self.elec_body.setDebug()
+        self.print_expr.setDebug()
+        # paramBloc = self.all_values
+        # .setParseAction(formatBloc)
+        # return Dict(paramBloc)
 
-        return Dict(paramBloc)
+        return Dict(self.all_values)
 
     def loads(self, input_data: str):
         """Parse an input file as a string"""
@@ -412,7 +431,7 @@ class ApbsLegacyInput:
         parser = Dict(OneOrMore(section))
         parser.ignore(self.comment + restOfLine)
 
-        return parser.parseString(input_data, parseAll=True)
+        return parser.parseString(input_data, parseAll=False)
 
     def load(self, filename: str):
         """
