@@ -1,7 +1,9 @@
+import json
 from pyparsing import (
     CaselessLiteral,
     Group,
     OneOrMore,
+    Optional,
     ParseException,
     Regex,
     Suppress,
@@ -29,7 +31,7 @@ def convertNumber(t):
 
 
 # number : match any number and return asscoiated python value
-integer_val = Word(nums)
+integer_val = Optional("-") + Word(nums)
 number = Regex(
     r"""
        [+-]?                           # optional sign
@@ -42,7 +44,7 @@ number = Regex(
        """,
     flags=VERBOSE,
 )
-# number.setParseAction(convertNumber)
+number.setParseAction(convertNumber)
 
 
 class ApbsLegacyInput:
@@ -67,6 +69,24 @@ class ApbsLegacyInput:
     quit_val = CaselessLiteral("QUIT")
 
     # READ section specific grammar
+    # https://apbs.readthedocs.io/en/latest/using/input/read.html
+    read_format_val = oneOf("dx gz", caseless=True)
+    # charge format path
+    #     is path considered relative?
+    charge_val = CaselessLiteral("charge")
+    charge_value = Group(charge_val + read_format_val + path_val)
+    # diel format(dx) path-x, path-y, path-z
+    #     are path-x, path-y, path-z considered relative?
+    #     where to find non-zero ionic strength
+    diel_val = CaselessLiteral("diel")
+    diel_value = Group(
+        diel_val + read_format_val + path_val + path_val + path_val
+    )
+    # kappa format path
+    #     dependant on a previous diel
+    #     is path considered relative?
+    kappa_val = CaselessLiteral("kappa")
+    kappa_value = Group(kappa_val + read_format_val + path_val)
     # mol format(pqr|pdb) path
     #     is path considered relative?
     mol_val = CaselessLiteral("mol")
@@ -75,45 +95,110 @@ class ApbsLegacyInput:
     # parm format(flat) path
     #     is path considered relative?
     parm_val = CaselessLiteral("parm")
-    parm_format_val = CaselessLiteral("flat")
+    parm_format_val = oneOf("flat xml", caseless=True)
     parm_value = Group(parm_val + parm_format_val + path_val)
-    # diel format(dx) path-x, path-y, path-z
-    #     are path-x, path-y, path-z considered relative?
-    #     where to find non-zero ionic strength
-    diel_val = CaselessLiteral("diel")
-    dx_format_val = CaselessLiteral("dx")
-    diel_value = Group(
-        diel_val + dx_format_val + path_val + path_val + path_val
-    )
-    # kappa format(dx) path
-    #     dependant on a previous diel
+    # pot format(dx|gz) path
     #     is path considered relative?
-    kappa_val = CaselessLiteral("kappa")
-    kappa_value = Group(kappa_val + dx_format_val + path_val)
-    # charge format(dx) path
-    #     is path considered relative?
-    charge_val = CaselessLiteral("charge")
-    charge_value = Group(charge_val + dx_format_val + path_val)
+    pot_val = CaselessLiteral("parm")
+    pot_value = Group(pot_val + read_format_val + path_val)
 
     read_body = Group(
         OneOrMore(mol_value)
-        & ZeroOrMore(parm_value)
+        & ZeroOrMore(charge_value)
         & ZeroOrMore(diel_value)
         & ZeroOrMore(kappa_value)
-        & ZeroOrMore(charge_value)
-    ).setResultsName("read")
-    read_value = Group(Suppress(read_val) + read_body + Suppress(end_val))
+        & ZeroOrMore(parm_value)
+        & ZeroOrMore(pot_value)
+    )
+    read_value = Group(read_val + read_body + Suppress(end_val))
 
     # ELEC section specific grammar
+    # https://apbs.readthedocs.io/en/latest/using/input/elec/index.html
     elec_name_val = CaselessLiteral("name")
     elec_name_value = Group(elec_name_val + identifier)
 
     # TODO: There must be one (and only one?) of these
     #       plus there are keywords that unique to each option
     elec_type_options_val = oneOf(
-        "mg-auto mg-para mg-manual fe-manual mg-dummy", caseless=True
+        "mg-auto mg-para mg-manual geoflow-auto tabi pbam-auto pbsam-auto fe-manual mg-dummy",
+        caseless=True,
     )
     elec_type_value = Group(elec_type_options_val)
+
+    elec_mol_val = CaselessLiteral("mol")
+    elec_mol_value = Group(elec_mol_val + number)
+
+    # General Keywords used by multiple ELEC types
+    # Are charge, conc, and radius ALL required?
+    ion_val = CaselessLiteral("ion")
+    ion_charge_val = Group(CaselessLiteral("charge") + number)
+    ion_conc_val = Group(CaselessLiteral("conc") + number)
+    ion_radius_val = Group(CaselessLiteral("radius") + number)
+    ion_value = Group(ion_val + ion_charge_val & ion_conc_val & ion_radius_val)
+
+    pdie_val = CaselessLiteral("pdie")
+    # TODO: Number must be >= 1
+    pdie_value = Group(pdie_val + number)
+
+    sdens_val = CaselessLiteral("sdens")
+    sdens_value = Group(sdens_val + number)
+
+    # NOTE: Should be a value between 78-80?
+    sdie_val = CaselessLiteral("sdie")
+    sdie_value = Group(sdie_val + number)
+
+    srad_val = CaselessLiteral("srad")
+    srad_value = Group(srad_val + number)
+
+    temp_val = CaselessLiteral("temp")
+    temp_value = Group(temp_val + number)
+
+    usemap_val = CaselessLiteral("usemap")
+    # tabi Keywords
+    # https://apbs.readthedocs.io/en/latest/using/input/elec/tabi.html
+    tabi_val = CaselessLiteral("tabi")
+    # ion - use general ELEC keyword for ion_value
+    # mac
+    mac_val = CaselessLiteral("mac")
+    # TODO: This should be replaced which a check to make
+    # sure that "number is between 0.0 and 1.0"
+    mac_value = Group(mac_val + number)
+    # mesh
+    mesh_val = CaselessLiteral("mesh")
+    mesh_options_val = oneOf("0 1 2")
+    mesh_value = Group(mesh_val + mesh_options_val)
+    # mol - use general ELEC keyword for elec_mol_value
+    # outdata
+    outdata_val = CaselessLiteral("outdata")
+    outdata_options_val = oneOf("0 1")
+    outdata_value = Group(outdata_val + outdata_options_val)
+    # pdie - use general ELEC keyword for pdie_value
+    # sdens - use general ELEC keyword for sdens_value
+    # sdie - use general ELEC keyword for sdie_value
+    # srad - use general ELEC keyword for srad_value
+    # temp - use general ELEC keyword for temp_value
+    # tree_n0
+    tree_n0_val = CaselessLiteral("tree_n0")
+    tree_n0_value = Group(tree_n0_val + integer_val)
+    # tree_order
+    tree_order_val = CaselessLiteral("tree_order")
+    tree_order_value = Group(tree_order_val + integer_val)
+
+    tabi_body = (
+        tabi_val
+        & ZeroOrMore(ion_value)
+        & ZeroOrMore(mac_value)
+        & ZeroOrMore(mesh_value)
+        & ZeroOrMore(mol_value)
+        & ZeroOrMore(outdata_value)
+        & ZeroOrMore(pdie_value)
+        & ZeroOrMore(sdens_value)
+        & ZeroOrMore(sdie_value)
+        & ZeroOrMore(srad_value)
+        & ZeroOrMore(temp_value)
+        & ZeroOrMore(tree_n0_value)
+        & ZeroOrMore(tree_order_value)
+    )
 
     # ELEC Keywords
     akeyPRE_val = CaselessLiteral("akeyPRE")
@@ -189,21 +274,11 @@ class ApbsLegacyInput:
     grid_coord_val = Group(number * 3)
     grid_value = Group(grid_val + grid_coord_val)
 
-    # Are charge, conc, and radius ALL required?
-    ion_val = CaselessLiteral("ion")
-    ion_charge_val = Group(CaselessLiteral("charge") + number)
-    ion_conc_val = Group(CaselessLiteral("conc") + number)
-    ion_radius_val = Group(CaselessLiteral("radius") + number)
-    ion_value = Group(ion_val + ion_charge_val & ion_conc_val & ion_radius_val)
-
     elec_maxsolve_val = CaselessLiteral("maxsolve")
     elec_maxsolve_value = Group(elec_maxsolve_val + number)
 
     elec_maxvert_val = CaselessLiteral("maxvert")
     elec_maxvert_value = Group(elec_maxvert_val + number)
-
-    elec_mol_val = CaselessLiteral("mol")
-    elec_mol_value = Group(elec_mol_val + number)
 
     elec_nlev_val = CaselessLiteral("nlev")
     elec_nlev_value = Group(elec_nlev_val + number)
@@ -212,9 +287,6 @@ class ApbsLegacyInput:
     elec_pbe_options_val = oneOf("lpbe lrpbe npbe nrpbe", caseless=True)
     elec_pbe_value = Group(elec_pbe_options_val)
 
-    pdie_val = CaselessLiteral("pdie")
-    pdie_value = Group(pdie_val + number)
-
     # TODO: Combine with dime?
     pdime_val = CaselessLiteral("pdime")
     pdime_coord_val = Group(number * 3)
@@ -222,16 +294,6 @@ class ApbsLegacyInput:
 
     ofrac_val = CaselessLiteral("ofrac")
     ofrac_value = Group(ofrac_val + number)
-
-    # NOTE: Should be a value between 78-80?
-    sdie_val = CaselessLiteral("sdie")
-    sdie_value = Group(sdie_val + number)
-
-    sdens_val = CaselessLiteral("sdens")
-    sdens_value = Group(sdens_val + number)
-
-    srad_val = CaselessLiteral("srad")
-    srad_value = Group(srad_val + number)
 
     swin_val = CaselessLiteral("swin")
     swin_value = Group(swin_val + number)
@@ -243,10 +305,6 @@ class ApbsLegacyInput:
     targetRes_val = CaselessLiteral("targetRes")
     targetRes_value = Group(targetRes_val + number)
 
-    temp_val = CaselessLiteral("temp")
-    temp_value = Group(temp_val + number)
-
-    usemap_val = CaselessLiteral("usemap")
     usemap_options_val = oneOf("diel kappa charge", caseless=True)
     usemap_value = Group(usemap_val + integer_val)
 
@@ -261,6 +319,11 @@ class ApbsLegacyInput:
         + write_type_options_val
         + write_format_options_val
         + path_val
+    )
+
+    elec_body = (
+        tabi_body
+        #        | fe_manual_body
     )
 
     elec_body = (
@@ -304,7 +367,7 @@ class ApbsLegacyInput:
         & ZeroOrMore(write_value)
     )
 
-    elec_value = Group(Suppress(elec_val) + elec_body + Suppress(end_val))
+    elec_value = Group(elec_val + elec_body + Suppress(end_val))
 
     # PRINT section specific grammar
     print_what_val = oneOf(
@@ -317,8 +380,9 @@ class ApbsLegacyInput:
     )
     print_body = Group(print_what_val + print_expr)
 
-    print_value = Group(Suppress(print_val) + print_body + Suppress(end_val))
+    print_value = Group(print_val + print_body + Suppress(end_val))
 
+    # all_values = OneOrMore(print_value) + Suppress(quit_val)
     all_values = (
         OneOrMore(read_value)
         + OneOrMore(elec_value)
