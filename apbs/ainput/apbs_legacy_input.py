@@ -1,10 +1,15 @@
 import json
+import pprint
+from string import ascii_lowercase
+from typing import List
 from pyparsing import (
     CaselessLiteral,
     Group,
+    LineEnd,
     OneOrMore,
     Optional,
     ParseException,
+    ParseResults,
     Regex,
     Suppress,
     Word,
@@ -30,6 +35,7 @@ def convertNumber(t):
         return [int(t[0])]
 
 
+EOL = LineEnd().suppress()
 # number : match any number and return asscoiated python value
 integer_val = Optional("-") + Word(nums)
 number = Regex(
@@ -46,30 +52,50 @@ number = Regex(
 )
 number.setParseAction(convertNumber)
 
+identifier = Word(alphas, alphanums + r"_") | integer_val
+anything = Word(printables + " " + "\t")
+comment = "#"
+path_val = anything
+end_val = CaselessLiteral("END")
 
-class ApbsLegacyInput:
+final_output = {}
 
-    # Questions:
-    #   1. Can READ, ELEC, and PRINT have leading/trailing spaces?
-    #      A: Yes
-    #   2. do keyword and values HAVE to be on the same line?
-    #   3. are keyword and non-path values case sensitive?
-    #      A: No
 
-    identifier = Word(alphas, alphanums + r"_") | integer_val
-    anything = Word(printables + " " + "\t")
-    comment = "#"
-    path_val = anything
+def formatBlock(t: ParseResults, section: str, groups: list):
+    """Convert lists of lists to a dictionary"""
 
-    # Section Keywords
-    read_val = CaselessLiteral("READ")
-    elec_val = CaselessLiteral("ELEC")
-    print_val = CaselessLiteral("PRINT")
-    end_val = CaselessLiteral("END")
-    quit_val = CaselessLiteral("QUIT")
+    final_output[section] = {}
+
+    # print(f"T: {t}")
+    for row in t[0]:
+        # print(f"TYPE: {type(row)}")
+        for item in row:
+            # print(f"type item: {type(item)} {item}")
+            if isinstance(item, ParseResults):
+                key = item[0].lower()
+                print(f"key: {key}")
+                if key in groups:
+                    if key not in final_output[section].keys():
+                        print(f"ADD KEY: {key}")
+                        final_output[section][key] = {}
+                    subkey = f"{item[1]}".lower()
+                    if subkey not in final_output[section][key].keys():
+                        print(f"ADD SUBKEY: {subkey}")
+                        final_output[section][key][subkey] = []
+                    if item[2] is not None:
+                        print(
+                            f"VALUES: KEY: {key}, SUBKEY: {subkey}, item2: {item[2]}"
+                        )
+                        final_output[section][key][subkey].append(item[2])
+    print(f"FORMATREAD: {final_output}")
+    return final_output
+
+
+def readParser():
 
     # READ section specific grammar
     # https://apbs.readthedocs.io/en/latest/using/input/read.html
+    read_val = CaselessLiteral("READ")
     read_format_val = oneOf("dx gz", caseless=True)
     # charge format path
     #     is path considered relative?
@@ -89,9 +115,9 @@ class ApbsLegacyInput:
     kappa_value = Group(kappa_val + read_format_val + path_val)
     # mol format(pqr|pdb) path
     #     is path considered relative?
-    mol_val = CaselessLiteral("mol")
-    mol_format_val = oneOf("pqr pdb", caseless=True)
-    mol_value = Group(mol_val + mol_format_val + path_val)
+    read_mol_val = CaselessLiteral("mol")
+    read_mol_format_val = oneOf("pqr pdb", caseless=True)
+    read_mol_value = Group(read_mol_val + read_mol_format_val + path_val)
     # parm format(flat) path
     #     is path considered relative?
     parm_val = CaselessLiteral("parm")
@@ -99,18 +125,85 @@ class ApbsLegacyInput:
     parm_value = Group(parm_val + parm_format_val + path_val)
     # pot format(dx|gz) path
     #     is path considered relative?
-    pot_val = CaselessLiteral("parm")
+    pot_val = CaselessLiteral("pot")
     pot_value = Group(pot_val + read_format_val + path_val)
 
     read_body = Group(
-        OneOrMore(mol_value)
+        OneOrMore(read_mol_value)
         & ZeroOrMore(charge_value)
         & ZeroOrMore(diel_value)
         & ZeroOrMore(kappa_value)
         & ZeroOrMore(parm_value)
         & ZeroOrMore(pot_value)
     )
-    read_value = Group(read_val + read_body + Suppress(end_val))
+
+    def formatRead(t: ParseResults):
+        groups = ["charge", "diel", "kappa", "mol", "param", "pot"]
+        return formatBlock(t, "READ", groups)
+
+    read_value = Group(
+        Suppress(read_val) + read_body + Suppress(end_val)
+    ).setParseAction(formatRead)
+
+    return read_value
+
+
+def printParser():
+    """Setup the grammar for the PRINT section."""
+
+    # PRINT section specific grammar
+    print_val = CaselessLiteral("PRINT")
+    print_what_val = oneOf(
+        "elecEnergy elecForce apolEnergy apolForce", caseless=True
+    )
+    print_expr = (
+        identifier
+        + OneOrMore(oneOf("+ -") + identifier)
+        + ZeroOrMore(oneOf("+ -") + identifier)
+    )
+    print_body = Group(print_what_val + print_expr)
+
+    def formatPrint(t: ParseResults):
+        section = "PRINT"
+        if section not in final_output.keys():
+            final_output[section] = {}
+
+        for row in t[0]:
+            print(f"TYPE: {type(row)}")
+            for item in row:
+                print(f"type item: {type(item)} {item}")
+                if isinstance(item, str):
+                    key = item.lower()
+                    print(f"key: {key}")
+                    if key not in final_output[section].keys():
+                        final_output[section][key] = row[1:]
+                        break
+            else:
+                break
+            break
+
+        print(f"FORMATPRINT: {final_output}")
+        return final_output
+
+    print_value = Group(
+        Suppress(print_val) + print_body + Suppress(end_val)
+    ).setParseAction(formatPrint)
+
+    return print_value
+
+
+class ApbsLegacyInput:
+
+    # Questions:
+    #   1. Can READ, ELEC, and PRINT have leading/trailing spaces?
+    #      A: Yes
+    #   2. do keyword and values HAVE to be on the same line?
+    #   3. are keyword and non-path values case sensitive?
+    #      A: No
+
+    # Section Keywords
+    elec_val = CaselessLiteral("ELEC")
+    quit_val = CaselessLiteral("QUIT")
 
     # ELEC section specific grammar
     # https://apbs.readthedocs.io/en/latest/using/input/elec/index.html
@@ -154,6 +247,7 @@ class ApbsLegacyInput:
     temp_value = Group(temp_val + number)
 
     usemap_val = CaselessLiteral("usemap")
+
     # tabi Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/tabi.html
     tabi_val = CaselessLiteral("tabi")
@@ -190,7 +284,7 @@ class ApbsLegacyInput:
         & ZeroOrMore(ion_value)
         & ZeroOrMore(mac_value)
         & ZeroOrMore(mesh_value)
-        & ZeroOrMore(mol_value)
+        & ZeroOrMore(elec_mol_value)
         & ZeroOrMore(outdata_value)
         & ZeroOrMore(pdie_value)
         & ZeroOrMore(sdens_value)
@@ -677,29 +771,15 @@ class ApbsLegacyInput:
 
     elec_value = Group(elec_val + elec_body + Suppress(end_val))
 
-    # PRINT section specific grammar
-    print_what_val = oneOf(
-        "elecEnergy elecForce apolEnergy apolForce", caseless=True
-    )
-    print_expr = (
-        identifier
-        + OneOrMore(oneOf("+ -") + identifier)
-        + ZeroOrMore(oneOf("+ -") + identifier)
-    )
-    print_body = Group(print_what_val + print_expr)
-
-    print_value = Group(print_val + print_body + Suppress(end_val))
-
-    # all_values = OneOrMore(print_value) + Suppress(quit_val)
     all_values = (
-        OneOrMore(read_value)
-        + OneOrMore(elec_value)
-        + ZeroOrMore(print_value)
+        OneOrMore(readParser())
+        + ZeroOrMore(elec_value)
+        + ZeroOrMore(printParser())
         + Suppress(quit_val)
     )
 
     def __init__(self):
-        pass
+        self.results = {}
 
     def loads(self, input_data: str):
         """Parse the input as a string
@@ -709,13 +789,9 @@ class ApbsLegacyInput:
         :rtype: ApbsConfig
         """
         parser = self.all_values
-        parser.ignore(self.comment + restOfLine)
+        parser.ignore(comment + restOfLine)
 
-        results = self.all_values.searchString(input_data)
-        print(results.dump())
-        for item in results:
-            print(f"ITEM: {item.read}")
-            return item
+        return self.all_values.searchString(input_data)[0]
 
     def load(self, filename: str):
         """
@@ -732,23 +808,26 @@ class ApbsLegacyInput:
             return data
 
         except ParseException as pe:
-            # complete the error message
-            msg = "ERROR during parsing of %s,  line %d:" % (
-                filename,
-                pe.lineno,
-            )
-            msg += "\n" + "-" * 40 + "\n"
-            msg += pe.line + "\n"
-            msg += " " * (pe.col - 1) + "^\n"
-            msg += "-" * 40 + "\n" + pe.msg
-            pe.msg = msg
-            raise
+            self.display_error(filename, pe)
+
+    def display_error(self, filename, pe):
+        # complete the error message
+        msg = "ERROR during parsing of %s,  line %d:" % (
+            filename,
+            pe.lineno,
+        )
+        msg += "\n" + "-" * 40 + "\n"
+        msg += pe.line + "\n"
+        msg += " " * (pe.col - 1) + "^\n"
+        msg += "-" * 40 + "\n" + pe.msg
+        pe.msg = msg
+        raise pe
 
 
 if __name__ == "__main__":
     # execute only if run as a script
-    # relfilename = "../../examples/actin-dimer/apbs-mol-auto.in"
     relfilename = "../../examples/pbsam-barn_bars/barn_bars_electro.in"
+    relfilename = "../../examples/actin-dimer/apbs-mol-auto.in"
     test = ApbsLegacyInput()
     from pathlib import Path
 
