@@ -1,7 +1,4 @@
-import json
 import pprint
-from string import ascii_lowercase
-from typing import List
 from pyparsing import (
     CaselessLiteral,
     Group,
@@ -64,7 +61,8 @@ final_output = {}
 def formatBlock(t: ParseResults, section: str, groups: list):
     """Convert lists of lists to a dictionary"""
 
-    final_output[section] = {}
+    if section not in final_output.keys():
+        final_output[section] = {}
 
     # print(f"T: {t}")
     for row in t[0]:
@@ -86,7 +84,8 @@ def formatBlock(t: ParseResults, section: str, groups: list):
                         print(
                             f"VALUES: KEY: {key}, SUBKEY: {subkey}, item2: {item[2]}"
                         )
-                        final_output[section][key][subkey].append(item[2])
+                        item2 = ", ".join(item[2].split())
+                        final_output[section][key][subkey].append(item2)
     print(f"FORMATREAD: {final_output}")
     return final_output
 
@@ -97,10 +96,12 @@ def readParser():
     # https://apbs.readthedocs.io/en/latest/using/input/read.html
     read_val = CaselessLiteral("READ")
     read_format_val = oneOf("dx gz", caseless=True)
+
     # charge format path
     #     is path considered relative?
     charge_val = CaselessLiteral("charge")
     charge_value = Group(charge_val + read_format_val + path_val)
+
     # diel format(dx) path-x, path-y, path-z
     #     are path-x, path-y, path-z considered relative?
     #     where to find non-zero ionic strength
@@ -108,16 +109,19 @@ def readParser():
     diel_value = Group(
         diel_val + read_format_val + path_val + path_val + path_val
     )
+
     # kappa format path
     #     dependant on a previous diel
     #     is path considered relative?
     kappa_val = CaselessLiteral("kappa")
     kappa_value = Group(kappa_val + read_format_val + path_val)
+
     # mol format(pqr|pdb) path
     #     is path considered relative?
-    read_mol_val = CaselessLiteral("mol")
-    read_mol_format_val = oneOf("pqr pdb", caseless=True)
-    read_mol_value = Group(read_mol_val + read_mol_format_val + path_val)
+    mol_val = CaselessLiteral("mol")
+    mol_format_val = oneOf("pqr pdb", caseless=True)
+    mol_value = Group(mol_val + mol_format_val + path_val)
+
     # parm format(flat) path
     #     is path considered relative?
     parm_val = CaselessLiteral("parm")
@@ -129,7 +133,7 @@ def readParser():
     pot_value = Group(pot_val + read_format_val + path_val)
 
     read_body = Group(
-        OneOrMore(read_mol_value)
+        OneOrMore(mol_value)
         & ZeroOrMore(charge_value)
         & ZeroOrMore(diel_value)
         & ZeroOrMore(kappa_value)
@@ -152,16 +156,16 @@ def printParser():
     """Setup the grammar for the PRINT section."""
 
     # PRINT section specific grammar
-    print_val = CaselessLiteral("PRINT")
-    print_what_val = oneOf(
+    val = CaselessLiteral("PRINT")
+    what_val = oneOf(
         "elecEnergy elecForce apolEnergy apolForce", caseless=True
     )
-    print_expr = (
+    expr = (
         identifier
         + OneOrMore(oneOf("+ -") + identifier)
         + ZeroOrMore(oneOf("+ -") + identifier)
     )
-    print_body = Group(print_what_val + print_expr)
+    body = Group(what_val - expr)
 
     def formatPrint(t: ParseResults):
         section = "PRINT"
@@ -182,127 +186,54 @@ def printParser():
                 break
             break
 
-        print(f"FORMATPRINT: {final_output}")
+        pprint.pp(final_output)
         return final_output
 
-    print_value = Group(
-        Suppress(print_val) + print_body + Suppress(end_val)
-    ).setParseAction(formatPrint)
+    value = Group(Suppress(val) + body + Suppress(end_val)).setParseAction(
+        formatPrint
+    )
 
-    return print_value
+    return value
 
 
-class ApbsLegacyInput:
+def elecParser():
 
-    # Questions:
-    #   1. Can READ, ELEC, and PRINT have leading/trailing spaces?
-    #      A: Yes
-    #   2. do keyword and values HAVE to be on the same line?
-    #   3. are keyword and non-path values case sensitive?
-    #      A: No
+    body = (
+        tabiParser.tabi_body
+        | fe_manualParser.fe_manual_body
+        | geoflow_autoParser.geoflow_auto_body
+        | mg_autoParser.mg_auto_body
+        | mg_manualParser.mg_manual_body
+        | mg_paraParser.mg_para_body
+        | mg_dummyParser.mg_dummy_body
+        | pbam_autoParser.pbam_auto_body
+        | pbsam_autoParser.pbsam_auto_body
+    )
 
-    # Section Keywords
-    elec_val = CaselessLiteral("ELEC")
-    quit_val = CaselessLiteral("QUIT")
+    val = CaselessLiteral("ELEC")
+    value = Group(Suppress(val) + body + Suppress(end_val))
+
+    return value
+
+
+class elecToken:
 
     # ELEC section specific grammar
     # https://apbs.readthedocs.io/en/latest/using/input/elec/index.html
-    elec_name_val = CaselessLiteral("name")
-    elec_name_value = Group(elec_name_val + identifier)
 
     # TODO: There must be one (and only one?) of these
     #       plus there are keywords that unique to each option
-    elec_type_options_val = oneOf(
+    type_options_val = oneOf(
         "mg-auto mg-para mg-manual geoflow-auto tabi pbam-auto pbsam-auto fe-manual mg-dummy",
         caseless=True,
     )
-    elec_type_value = Group(elec_type_options_val)
+    type_value = Group(type_options_val)
 
-    elec_mol_val = CaselessLiteral("mol")
-    elec_mol_value = Group(elec_mol_val + number)
+    # The following tokens are used by at least 2 of the parser types with
+    # the same format and rules
 
-    # General Keywords used by multiple ELEC types
-    # Are charge, conc, and radius ALL required?
-    ion_val = CaselessLiteral("ion")
-    ion_charge_val = Group(CaselessLiteral("charge") + number)
-    ion_conc_val = Group(CaselessLiteral("conc") + number)
-    ion_radius_val = Group(CaselessLiteral("radius") + number)
-    ion_value = Group(ion_val + ion_charge_val & ion_conc_val & ion_radius_val)
-
-    pdie_val = CaselessLiteral("pdie")
-    # TODO: Number must be >= 1
-    pdie_value = Group(pdie_val + number)
-
-    sdens_val = CaselessLiteral("sdens")
-    sdens_value = Group(sdens_val + number)
-
-    # NOTE: Should be a value between 78-80?
-    sdie_val = CaselessLiteral("sdie")
-    sdie_value = Group(sdie_val + number)
-
-    srad_val = CaselessLiteral("srad")
-    srad_value = Group(srad_val + number)
-
-    temp_val = CaselessLiteral("temp")
-    temp_value = Group(temp_val + number)
-
-    usemap_val = CaselessLiteral("usemap")
-
-    # tabi Keywords
-    # https://apbs.readthedocs.io/en/latest/using/input/elec/tabi.html
-    tabi_val = CaselessLiteral("tabi")
-    # ion - use general ELEC keyword for ion_value
-    # mac
-    mac_val = CaselessLiteral("mac")
-    # TODO: This should be replaced which a check to make
-    # sure that "number is between 0.0 and 1.0"
-    mac_value = Group(mac_val + number)
-    # mesh
-    mesh_val = CaselessLiteral("mesh")
-    mesh_options_val = oneOf("0 1 2")
-    mesh_value = Group(mesh_val + mesh_options_val)
-    # mol - use general ELEC keyword for elec_mol_value
-    # outdata
-    outdata_val = CaselessLiteral("outdata")
-    outdata_options_val = oneOf("0 1")
-    outdata_value = Group(outdata_val + outdata_options_val)
-    # pdie - use general ELEC keyword for pdie_value
-    # sdens - use general ELEC keyword for sdens_value
-    # sdie - use general ELEC keyword for sdie_value
-    # srad - use general ELEC keyword for srad_value
-    # temp - use general ELEC keyword for temp_value
-    # tree_n0
-    tree_n0_val = CaselessLiteral("tree_n0")
-    tree_n0_value = Group(tree_n0_val + integer_val)
-    # tree_order
-    tree_order_val = CaselessLiteral("tree_order")
-    tree_order_value = Group(tree_order_val + integer_val)
-
-    tabi_body = (
-        tabi_val
-        & ZeroOrMore(elec_name_value)
-        & ZeroOrMore(ion_value)
-        & ZeroOrMore(mac_value)
-        & ZeroOrMore(mesh_value)
-        & ZeroOrMore(elec_mol_value)
-        & ZeroOrMore(outdata_value)
-        & ZeroOrMore(pdie_value)
-        & ZeroOrMore(sdens_value)
-        & ZeroOrMore(sdie_value)
-        & ZeroOrMore(srad_value)
-        & ZeroOrMore(temp_value)
-        & ZeroOrMore(tree_n0_value)
-        & ZeroOrMore(tree_order_value)
-    )
-
-    # ELEC Keywords
-    akeyPRE_val = CaselessLiteral("akeyPRE")
-    akeyPRE_options_val = oneOf("unif geom", caseless=True)
-    akeyPRE_value = Group(akeyPRE_val + akeyPRE_options_val)
-
-    akeySOLVE_val = CaselessLiteral("akeySOLVE")
-    akeySOLVE_options_val = oneOf("resi", caseless=True)
-    akeySOLVE_value = Group(akeySOLVE_val + akeySOLVE_options_val)
+    name_val = CaselessLiteral("name")
+    name_value = Group(name_val + identifier)
 
     async_val = CaselessLiteral("async")
     async_value = Group(async_val + integer_val)
@@ -327,7 +258,7 @@ class ApbsLegacyInput:
 
     cglen_val = CaselessLiteral("cglen")
     cglen_coord_val = Group(integer_val * 3)
-    cglen_value = Group(cglen_val + cgcent_coord_val)
+    cglen_value = Group(cglen_val + cglen_coord_val)
 
     chgm_val = CaselessLiteral("chgm")
     chgm_options_val = oneOf("spl0 spl2", caseless=True)
@@ -336,14 +267,6 @@ class ApbsLegacyInput:
     dime_val = CaselessLiteral("dime")
     dime_coord_val = Group(integer_val * 3)
     dime_value = Group(dime_val + dime_coord_val)
-
-    domainLength_val = CaselessLiteral("domainLength")
-    domainLength_coord_val = Group(number * 3)
-    domainLength_value = Group(domainLength_val + domainLength_coord_val)
-
-    ekey_val = CaselessLiteral("ekey")
-    ekey_options_val = oneOf("simp global frac", caseless=True)
-    ekey_value = Group(ekey_val + ekey_options_val)
 
     etol_val = CaselessLiteral("etol")
     etol_value = Group(etol_val + number)
@@ -356,9 +279,6 @@ class ApbsLegacyInput:
     fglen_val = CaselessLiteral("fglen")
     fglen_coord_val = Group(number * 3)
     fglen_value = Group(fglen_val + fglen_coord_val)
-
-    gamma_val = CaselessLiteral("gamma")
-    gamma_value = Group(gamma_val + number)
 
     gcent_val = CaselessLiteral("gcent")
     gcent_mol_val = CaselessLiteral("mol") + number
@@ -373,40 +293,49 @@ class ApbsLegacyInput:
     grid_coord_val = Group(number * 3)
     grid_value = Group(grid_val + grid_coord_val)
 
-    elec_maxsolve_val = CaselessLiteral("maxsolve")
-    elec_maxsolve_value = Group(elec_maxsolve_val + number)
+    # General Keywords used by multiple ELEC types
+    # Are charge, conc, and radius ALL required?
+    ion_val = CaselessLiteral("ion")
+    ion_charge_val = Group(CaselessLiteral("charge") + number)
+    ion_conc_val = Group(CaselessLiteral("conc") + number)
+    ion_radius_val = Group(CaselessLiteral("radius") + number)
+    ion_value = Group(ion_val + ion_charge_val & ion_conc_val & ion_radius_val)
 
-    elec_maxvert_val = CaselessLiteral("maxvert")
-    elec_maxvert_value = Group(elec_maxvert_val + number)
+    mol_val = CaselessLiteral("mol")
+    mol_value = Group(mol_val + number)
 
-    elec_nlev_val = CaselessLiteral("nlev")
-    elec_nlev_value = Group(elec_nlev_val + number)
+    nlev_val = CaselessLiteral("nlev")
+    nlev_value = Group(nlev_val + number)
 
     # TODO: I think only 1 of these are allowed (not ZeroOrMore)
-    elec_pbe_options_val = oneOf("lpbe lrpbe npbe nrpbe", caseless=True)
-    elec_pbe_value = Group(elec_pbe_options_val)
+    pbe_options_val = oneOf("lpbe lrpbe npbe nrpbe", caseless=True)
+    pbe_value = Group(pbe_options_val)
 
-    # TODO: Combine with dime?
-    pdime_val = CaselessLiteral("pdime")
-    pdime_coord_val = Group(number * 3)
-    pdime_value = Group(pdime_val + pdime_coord_val)
+    pdie_val = CaselessLiteral("pdie")
+    # TODO: Number must be >= 1
+    pdie_value = Group(pdie_val + number)
 
-    ofrac_val = CaselessLiteral("ofrac")
-    ofrac_value = Group(ofrac_val + number)
+    sdens_val = CaselessLiteral("sdens")
+    sdens_value = Group(sdens_val + number)
 
-    swin_val = CaselessLiteral("swin")
-    swin_value = Group(swin_val + number)
+    # NOTE: Should be a value between 78-80?
+    sdie_val = CaselessLiteral("sdie")
+    sdie_value = Group(sdie_val + number)
+
+    srad_val = CaselessLiteral("srad")
+    srad_value = Group(srad_val + number)
 
     srfm_val = CaselessLiteral("srfm")
     srfm_options_val = oneOf("mol smol spl2", caseless=True)
     srfm_value = Group(srfm_val + srfm_options_val)
 
-    targetNum_val = CaselessLiteral("targetNum")
-    targetNum_value = Group(targetNum_val + integer_val)
+    swin_val = CaselessLiteral("swin")
+    swin_value = Group(swin_val + number)
 
-    targetRes_val = CaselessLiteral("targetRes")
-    targetRes_value = Group(targetRes_val + number)
+    temp_val = CaselessLiteral("temp")
+    temp_value = Group(temp_val + number)
 
+    usemap_val = CaselessLiteral("usemap")
     usemap_options_val = oneOf("diel kappa charge", caseless=True)
     usemap_value = Group(usemap_val + integer_val)
 
@@ -423,40 +352,121 @@ class ApbsLegacyInput:
         + path_val
     )
 
+    writemat_val = CaselessLiteral("writemat")
+    writemat_options_val = oneOf("poisson", caseless=True)
+    writemat_value = Group(writemat_val + writemat_options_val + path_val)
+
+
+class tabiParser(elecToken):
+
+    # tabi Keywords
+    # https://apbs.readthedocs.io/en/latest/using/input/elec/tabi.html
+    tabi_val = CaselessLiteral("tabi")
+
+    mac_val = CaselessLiteral("mac")
+    # TODO: This should be replaced which a check to make
+    # sure that "number is between 0.0 and 1.0"
+    mac_value = Group(mac_val + number)
+
+    mesh_val = CaselessLiteral("mesh")
+    mesh_options_val = oneOf("0 1 2")
+    mesh_value = Group(mesh_val + mesh_options_val)
+
+    outdata_val = CaselessLiteral("outdata")
+    outdata_options_val = oneOf("0 1")
+    outdata_value = Group(outdata_val + outdata_options_val)
+
+    tree_n0_val = CaselessLiteral("tree_n0")
+    tree_n0_value = Group(tree_n0_val + integer_val)
+
+    tree_order_val = CaselessLiteral("tree_order")
+    tree_order_value = Group(tree_order_val + integer_val)
+
+    tabi_body = (
+        tabi_val
+        & ZeroOrMore(elecToken.name_value)
+        & ZeroOrMore(elecToken.ion_value)
+        & ZeroOrMore(mac_value)
+        & ZeroOrMore(mesh_value)
+        & ZeroOrMore(elecToken.mol_value)
+        & ZeroOrMore(outdata_value)
+        & ZeroOrMore(elecToken.pdie_value)
+        & ZeroOrMore(elecToken.sdens_value)
+        & ZeroOrMore(elecToken.sdie_value)
+        & ZeroOrMore(elecToken.srad_value)
+        & ZeroOrMore(elecToken.temp_value)
+        & ZeroOrMore(tree_n0_value)
+        & ZeroOrMore(tree_order_value)
+    )
+
+
+class fe_manualParser(elecToken):
+
     # fe-manual Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/fe-manual.html
     fe_manual_val = CaselessLiteral("fe-manual")
 
+    akeyPRE_val = CaselessLiteral("akeyPRE")
+    akeyPRE_options_val = oneOf("unif geom", caseless=True)
+    akeyPRE_value = Group(akeyPRE_val + akeyPRE_options_val)
+
+    akeySOLVE_val = CaselessLiteral("akeySOLVE")
+    akeySOLVE_options_val = oneOf("resi", caseless=True)
+    akeySOLVE_value = Group(akeySOLVE_val + akeySOLVE_options_val)
+
+    domainLength_val = CaselessLiteral("domainLength")
+    domainLength_coord_val = Group(number * 3)
+    domainLength_value = Group(domainLength_val + domainLength_coord_val)
+
+    ekey_val = CaselessLiteral("ekey")
+    ekey_options_val = oneOf("simp global frac", caseless=True)
+    ekey_value = Group(ekey_val + ekey_options_val)
+
+    maxsolve_val = CaselessLiteral("maxsolve")
+    maxsolve_value = Group(maxsolve_val + number)
+
+    maxvert_val = CaselessLiteral("maxvert")
+    maxvert_value = Group(maxvert_val + number)
+
+    targetNum_val = CaselessLiteral("targetNum")
+    targetNum_value = Group(targetNum_val + integer_val)
+
+    targetRes_val = CaselessLiteral("targetRes")
+    targetRes_value = Group(targetRes_val + number)
+
     fe_manual_body = (
         fe_manual_val
-        & ZeroOrMore(elec_name_value)
+        & ZeroOrMore(elecToken.name_value)
         & ZeroOrMore(akeyPRE_value)
         & ZeroOrMore(akeySOLVE_value)
-        & ZeroOrMore(async_value)
-        & ZeroOrMore(bcfl_value)
-        & ZeroOrMore(calcenergy_value)
-        & ZeroOrMore(calcforce_value)
-        & ZeroOrMore(chgm_value)
+        & ZeroOrMore(elecToken.async_value)
+        & ZeroOrMore(elecToken.bcfl_value)
+        & ZeroOrMore(elecToken.calcenergy_value)
+        & ZeroOrMore(elecToken.calcforce_value)
+        & ZeroOrMore(elecToken.chgm_value)
         & ZeroOrMore(domainLength_value)
         & ZeroOrMore(ekey_value)
-        & ZeroOrMore(etol_value)
-        & ZeroOrMore(ion_value)
-        & ZeroOrMore(elec_pbe_value)  # lpbe lrpbe npbe nrpbe
-        & ZeroOrMore(elec_maxsolve_value)
-        & ZeroOrMore(elec_maxvert_value)
-        & ZeroOrMore(elec_mol_value)
-        & ZeroOrMore(pdie_value)
-        & ZeroOrMore(sdens_value)
-        & ZeroOrMore(sdie_value)
-        & ZeroOrMore(srad_value)
-        & ZeroOrMore(srfm_value)
-        & ZeroOrMore(swin_value)
+        & ZeroOrMore(elecToken.etol_value)
+        & ZeroOrMore(elecToken.ion_value)
+        & ZeroOrMore(elecToken.pbe_value)  # lpbe lrpbe npbe nrpbe
+        & ZeroOrMore(maxsolve_value)
+        & ZeroOrMore(maxvert_value)
+        & ZeroOrMore(elecToken.mol_value)
+        & ZeroOrMore(elecToken.pdie_value)
+        & ZeroOrMore(elecToken.sdens_value)
+        & ZeroOrMore(elecToken.sdie_value)
+        & ZeroOrMore(elecToken.srad_value)
+        & ZeroOrMore(elecToken.srfm_value)
+        & ZeroOrMore(elecToken.swin_value)
         & ZeroOrMore(targetNum_value)
         & ZeroOrMore(targetRes_value)
-        & ZeroOrMore(temp_value)
-        & ZeroOrMore(usemap_value)
-        & ZeroOrMore(write_value)
+        & ZeroOrMore(elecToken.temp_value)
+        & ZeroOrMore(elecToken.usemap_value)
+        & ZeroOrMore(elecToken.write_value)
     )
+
+
+class geoflow_autoParser(elecToken):
 
     # geoflow-auto Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/geoflow-auto.html
@@ -464,6 +474,9 @@ class ApbsLegacyInput:
 
     bconc_val = CaselessLiteral("bconc")
     bconc_value = Group(bconc_val + number)
+
+    gamma_val = CaselessLiteral("gamma")
+    gamma_value = Group(gamma_val + number)
 
     press_val = CaselessLiteral("press")
     press_value = Group(press_val + number)
@@ -474,54 +487,56 @@ class ApbsLegacyInput:
 
     geoflow_auto_body = (
         geoflow_auto_val
-        & ZeroOrMore(elec_name_value)
-        & ZeroOrMore(bcfl_value)
+        & ZeroOrMore(elecToken.name_value)
+        & ZeroOrMore(elecToken.bcfl_value)
         & ZeroOrMore(bconc_value)
-        & ZeroOrMore(etol_value)
+        & ZeroOrMore(elecToken.etol_value)
         & ZeroOrMore(gamma_value)
-        & ZeroOrMore(elec_pbe_value)  # lpbe lrpbe npbe nrpbe
-        & ZeroOrMore(elec_mol_value)
-        & ZeroOrMore(pdie_value)
+        & ZeroOrMore(elecToken.pbe_value)  # lpbe lrpbe npbe nrpbe
+        & ZeroOrMore(elecToken.mol_value)
+        & ZeroOrMore(elecToken.pdie_value)
         & ZeroOrMore(press_value)
-        & ZeroOrMore(sdie_value)
+        & ZeroOrMore(elecToken.sdie_value)
         & ZeroOrMore(vdwdisp_value)
     )
+
+
+class mg_autoParser(elecToken):
 
     # mg-auto Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-auto.html
     mg_auto_val = CaselessLiteral("mg-auto")
 
-    writemat_val = CaselessLiteral("writemat")
-    writemat_options_val = oneOf("poisson", caseless=True)
-    writemat_value = Group(writemat_val + writemat_options_val + path_val)
-
     mg_auto_body = (
         mg_auto_val
-        & ZeroOrMore(elec_name_value)
-        & ZeroOrMore(bcfl_value)
-        & ZeroOrMore(calcenergy_value)
-        & ZeroOrMore(calcforce_value)
-        & ZeroOrMore(cgcent_value)
-        & ZeroOrMore(cglen_value)
-        & ZeroOrMore(chgm_value)
-        & ZeroOrMore(dime_value)
-        & ZeroOrMore(etol_value)
-        & ZeroOrMore(fgcent_value)
-        & ZeroOrMore(fglen_value)
-        & ZeroOrMore(ion_value)
-        & ZeroOrMore(elec_pbe_value)  # lpbe lrpbe npbe nrpbe
-        & ZeroOrMore(elec_mol_value)
-        & ZeroOrMore(pdie_value)
-        & ZeroOrMore(sdens_value)
-        & ZeroOrMore(sdie_value)
-        & ZeroOrMore(srad_value)
-        & ZeroOrMore(srfm_value)
-        & ZeroOrMore(swin_value)
-        & ZeroOrMore(temp_value)
-        & ZeroOrMore(usemap_value)
-        & ZeroOrMore(write_value)
-        & ZeroOrMore(writemat_value)
+        & ZeroOrMore(elecToken.name_value)
+        & ZeroOrMore(elecToken.bcfl_value)
+        & ZeroOrMore(elecToken.calcenergy_value)
+        & ZeroOrMore(elecToken.calcforce_value)
+        & ZeroOrMore(elecToken.cgcent_value)
+        & ZeroOrMore(elecToken.cglen_value)
+        & ZeroOrMore(elecToken.chgm_value)
+        & ZeroOrMore(elecToken.dime_value)
+        & ZeroOrMore(elecToken.etol_value)
+        & ZeroOrMore(elecToken.fgcent_value)
+        & ZeroOrMore(elecToken.fglen_value)
+        & ZeroOrMore(elecToken.ion_value)
+        & ZeroOrMore(elecToken.pbe_value)  # lpbe lrpbe npbe nrpbe
+        & ZeroOrMore(elecToken.mol_value)
+        & ZeroOrMore(elecToken.pdie_value)
+        & ZeroOrMore(elecToken.sdens_value)
+        & ZeroOrMore(elecToken.sdie_value)
+        & ZeroOrMore(elecToken.srad_value)
+        & ZeroOrMore(elecToken.srfm_value)
+        & ZeroOrMore(elecToken.swin_value)
+        & ZeroOrMore(elecToken.temp_value)
+        & ZeroOrMore(elecToken.usemap_value)
+        & ZeroOrMore(elecToken.write_value)
+        & ZeroOrMore(elecToken.writemat_value)
     )
+
+
+class mg_manualParser(elecToken):
 
     # mg-manual Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-manual.html
@@ -532,66 +547,80 @@ class ApbsLegacyInput:
 
     mg_manual_body = (
         mg_manual_val
-        & ZeroOrMore(elec_name_value)
-        & ZeroOrMore(bcfl_value)
-        & ZeroOrMore(calcenergy_value)
-        & ZeroOrMore(calcforce_value)
-        & ZeroOrMore(chgm_value)
-        & ZeroOrMore(dime_value)
-        & ZeroOrMore(etol_value)
-        & ZeroOrMore(gcent_value)
-        & ZeroOrMore(glen_value)
-        & ZeroOrMore(grid_value)
-        & ZeroOrMore(ion_value)
-        & ZeroOrMore(elec_pbe_value)  # lpbe lrpbe npbe nrpbe
-        & ZeroOrMore(elec_mol_value)
+        & ZeroOrMore(elecToken.name_value)
+        & ZeroOrMore(elecToken.bcfl_value)
+        & ZeroOrMore(elecToken.calcenergy_value)
+        & ZeroOrMore(elecToken.calcforce_value)
+        & ZeroOrMore(elecToken.chgm_value)
+        & ZeroOrMore(elecToken.dime_value)
+        & ZeroOrMore(elecToken.etol_value)
+        & ZeroOrMore(elecToken.gcent_value)
+        & ZeroOrMore(elecToken.glen_value)
+        & ZeroOrMore(elecToken.grid_value)
+        & ZeroOrMore(elecToken.ion_value)
+        & ZeroOrMore(elecToken.pbe_value)  # lpbe lrpbe npbe nrpbe
+        & ZeroOrMore(elecToken.mol_value)
         & ZeroOrMore(nlev_value)
-        & ZeroOrMore(pdie_value)
-        & ZeroOrMore(sdens_value)
-        & ZeroOrMore(sdie_value)
-        & ZeroOrMore(srad_value)
-        & ZeroOrMore(srfm_value)
-        & ZeroOrMore(swin_value)
-        & ZeroOrMore(temp_value)
-        & ZeroOrMore(usemap_value)
-        & ZeroOrMore(write_value)
-        & ZeroOrMore(writemat_value)
+        & ZeroOrMore(elecToken.pdie_value)
+        & ZeroOrMore(elecToken.sdens_value)
+        & ZeroOrMore(elecToken.sdie_value)
+        & ZeroOrMore(elecToken.srad_value)
+        & ZeroOrMore(elecToken.srfm_value)
+        & ZeroOrMore(elecToken.swin_value)
+        & ZeroOrMore(elecToken.temp_value)
+        & ZeroOrMore(elecToken.usemap_value)
+        & ZeroOrMore(elecToken.write_value)
+        & ZeroOrMore(elecToken.writemat_value)
     )
+
+
+class mg_paraParser(elecToken):
 
     # mg-para Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-para.html
     mg_para_val = CaselessLiteral("mg-para")
 
+    # TODO: Combine with dime?
+    pdime_val = CaselessLiteral("pdime")
+    pdime_coord_val = Group(number * 3)
+    pdime_value = Group(pdime_val + pdime_coord_val)
+
+    ofrac_val = CaselessLiteral("ofrac")
+    ofrac_value = Group(ofrac_val + number)
+
     mg_para_body = (
         mg_para_val
-        & ZeroOrMore(elec_name_value)
-        & ZeroOrMore(async_value)
-        & ZeroOrMore(bcfl_value)
-        & ZeroOrMore(calcenergy_value)
-        & ZeroOrMore(calcforce_value)
-        & ZeroOrMore(cgcent_value)
-        & ZeroOrMore(cglen_value)
-        & ZeroOrMore(chgm_value)
-        & ZeroOrMore(dime_value)
-        & ZeroOrMore(etol_value)
-        & ZeroOrMore(fgcent_value)
-        & ZeroOrMore(fglen_value)
-        & ZeroOrMore(ion_value)
-        & ZeroOrMore(elec_pbe_value)
-        & ZeroOrMore(elec_mol_value)
+        & ZeroOrMore(elecToken.name_value)
+        & ZeroOrMore(elecToken.async_value)
+        & ZeroOrMore(elecToken.bcfl_value)
+        & ZeroOrMore(elecToken.calcenergy_value)
+        & ZeroOrMore(elecToken.calcforce_value)
+        & ZeroOrMore(elecToken.cgcent_value)
+        & ZeroOrMore(elecToken.cglen_value)
+        & ZeroOrMore(elecToken.chgm_value)
+        & ZeroOrMore(elecToken.dime_value)
+        & ZeroOrMore(elecToken.etol_value)
+        & ZeroOrMore(elecToken.fgcent_value)
+        & ZeroOrMore(elecToken.fglen_value)
+        & ZeroOrMore(elecToken.ion_value)
+        & ZeroOrMore(elecToken.pbe_value)
+        & ZeroOrMore(elecToken.mol_value)
         & ZeroOrMore(ofrac_value)
-        & ZeroOrMore(pdie_value)
+        & ZeroOrMore(elecToken.pdie_value)
         & ZeroOrMore(pdime_value)
-        & ZeroOrMore(sdens_value)
-        & ZeroOrMore(sdie_value)
-        & ZeroOrMore(srad_value)
-        & ZeroOrMore(srfm_value)
-        & ZeroOrMore(swin_value)
-        & ZeroOrMore(temp_value)
-        & ZeroOrMore(usemap_value)
-        & ZeroOrMore(write_value)
-        & ZeroOrMore(writemat_value)
+        & ZeroOrMore(elecToken.sdens_value)
+        & ZeroOrMore(elecToken.sdie_value)
+        & ZeroOrMore(elecToken.srad_value)
+        & ZeroOrMore(elecToken.srfm_value)
+        & ZeroOrMore(elecToken.swin_value)
+        & ZeroOrMore(elecToken.temp_value)
+        & ZeroOrMore(elecToken.usemap_value)
+        & ZeroOrMore(elecToken.write_value)
+        & ZeroOrMore(elecToken.writemat_value)
     )
+
+
+class mg_dummyParser(elecToken):
 
     # mg-dummy Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-dummy.html
@@ -599,29 +628,30 @@ class ApbsLegacyInput:
 
     mg_dummy_body = (
         mg_dummy_val
-        & ZeroOrMore(elec_name_value)
-        & ZeroOrMore(bcfl_value)
-        & ZeroOrMore(chgm_value)
-        & ZeroOrMore(dime_value)
-        & ZeroOrMore(gcent_value)
-        & ZeroOrMore(glen_value)
-        & ZeroOrMore(grid_value)
-        & ZeroOrMore(ion_value)
-        & ZeroOrMore(elec_pbe_value)
-        & ZeroOrMore(elec_mol_value)
-        & ZeroOrMore(pdie_value)
-        & ZeroOrMore(sdens_value)
-        & ZeroOrMore(sdie_value)
-        & ZeroOrMore(srad_value)
-        & ZeroOrMore(srfm_value)
-        & ZeroOrMore(swin_value)
-        & ZeroOrMore(temp_value)
-        & ZeroOrMore(write_value)
+        & ZeroOrMore(elecToken.name_value)
+        & ZeroOrMore(elecToken.bcfl_value)
+        & ZeroOrMore(elecToken.chgm_value)
+        & ZeroOrMore(elecToken.dime_value)
+        & ZeroOrMore(elecToken.gcent_value)
+        & ZeroOrMore(elecToken.glen_value)
+        & ZeroOrMore(elecToken.grid_value)
+        & ZeroOrMore(elecToken.ion_value)
+        & ZeroOrMore(elecToken.pbe_value)
+        & ZeroOrMore(elecToken.mol_value)
+        & ZeroOrMore(elecToken.pdie_value)
+        & ZeroOrMore(elecToken.sdens_value)
+        & ZeroOrMore(elecToken.sdie_value)
+        & ZeroOrMore(elecToken.srad_value)
+        & ZeroOrMore(elecToken.srfm_value)
+        & ZeroOrMore(elecToken.swin_value)
+        & ZeroOrMore(elecToken.temp_value)
+        & ZeroOrMore(elecToken.write_value)
     )
 
-    # pbam-auto Keywords
-    # https://apbs.readthedocs.io/en/latest/using/input/elec/pbam-auto.html
-    pbam_auto_val = CaselessLiteral("pbam-auto")
+
+class pbToken:
+
+    # pbam-auto and pbsam-auto specific Keywords
 
     thr3dmap_val = CaselessLiteral("3dmap")
     thr3dmap_value = Group(thr3dmap_val + path_val)
@@ -691,33 +721,44 @@ class ApbsLegacyInput:
     xyz_val = CaselessLiteral("xyz")
     xyz_value = Group(xyz_val + identifier + path_val)
 
+
+class pbam_autoParser(elecToken, pbToken):
+
+    # pbam-auto Keywords
+    # https://apbs.readthedocs.io/en/latest/using/input/elec/pbam-auto.html
+    pbam_auto_val = CaselessLiteral("pbam-auto")
+
     pbam_auto_body = (
         pbam_auto_val
-        & ZeroOrMore(elec_name_value)
-        & ZeroOrMore(thr3dmap_value)
-        & ZeroOrMore(diff_value)
-        & ZeroOrMore(dx_value)
-        & ZeroOrMore(grid2d_value)
-        & ZeroOrMore(gridpts_value)
-        & ZeroOrMore(elec_mol_value)
-        & ZeroOrMore(ntraj_value)
-        & ZeroOrMore(pbc_value)
-        & ZeroOrMore(pdie_value)
-        & ZeroOrMore(randorient_value)
-        & ZeroOrMore(runname_value)
-        & ZeroOrMore(runtype_value)
-        & ZeroOrMore(salt_value)
-        & ZeroOrMore(sdie_value)
-        & ZeroOrMore(temp_value)
-        & ZeroOrMore(term_value)
-        & ZeroOrMore(termcombine_value)
-        & ZeroOrMore(units_value)
-        & ZeroOrMore(xyz_value)
+        & ZeroOrMore(elecToken.name_value)
+        & ZeroOrMore(pbToken.thr3dmap_value)
+        & ZeroOrMore(pbToken.diff_value)
+        & ZeroOrMore(pbToken.dx_value)
+        & ZeroOrMore(pbToken.grid2d_value)
+        & ZeroOrMore(pbToken.gridpts_value)
+        & ZeroOrMore(elecToken.mol_value)
+        & ZeroOrMore(pbToken.ntraj_value)
+        & ZeroOrMore(pbToken.pbc_value)
+        & ZeroOrMore(elecToken.pdie_value)
+        & ZeroOrMore(pbToken.randorient_value)
+        & ZeroOrMore(pbToken.runname_value)
+        & ZeroOrMore(pbToken.runtype_value)
+        & ZeroOrMore(pbToken.salt_value)
+        & ZeroOrMore(elecToken.sdie_value)
+        & ZeroOrMore(elecToken.temp_value)
+        & ZeroOrMore(pbToken.term_value)
+        & ZeroOrMore(pbToken.termcombine_value)
+        & ZeroOrMore(pbToken.units_value)
+        & ZeroOrMore(pbToken.xyz_value)
     )
 
-    # pbsam-auto Keywords
+
+class pbsam_autoParser(elecToken, pbToken):
+
     # https://apbs.readthedocs.io/en/latest/using/input/elec/pbsam-auto.html
     pbsam_auto_val = CaselessLiteral("pbsam-auto")
+
+    # pbsam-auto specific Keywords
 
     exp_val = CaselessLiteral("exp")
     exp_value = Group(exp_val + path_val)
@@ -733,47 +774,45 @@ class ApbsLegacyInput:
 
     pbsam_auto_body = (
         pbsam_auto_val
-        & ZeroOrMore(elec_name_value)
-        & ZeroOrMore(thr3dmap_value)
-        & ZeroOrMore(diff_value)
-        & ZeroOrMore(dx_value)
+        & ZeroOrMore(elecToken.name_value)
+        & ZeroOrMore(pbToken.thr3dmap_value)
+        & ZeroOrMore(pbToken.diff_value)
+        & ZeroOrMore(pbToken.dx_value)
         & ZeroOrMore(exp_value)
-        & ZeroOrMore(grid2d_value)
+        & ZeroOrMore(pbToken.grid2d_value)
         & ZeroOrMore(imat_value)
-        & ZeroOrMore(ntraj_value)
-        & ZeroOrMore(pbc_value)
-        & ZeroOrMore(pdie_value)
-        & ZeroOrMore(randorient_value)
-        & ZeroOrMore(runname_value)
-        & ZeroOrMore(runtype_value)
-        & ZeroOrMore(salt_value)
-        & ZeroOrMore(sdie_value)
+        & ZeroOrMore(pbToken.ntraj_value)
+        & ZeroOrMore(pbToken.pbc_value)
+        & ZeroOrMore(elecToken.pdie_value)
+        & ZeroOrMore(pbToken.randorient_value)
+        & ZeroOrMore(pbToken.runname_value)
+        & ZeroOrMore(pbToken.runtype_value)
+        & ZeroOrMore(pbToken.salt_value)
+        & ZeroOrMore(elecToken.sdie_value)
         & ZeroOrMore(surf_value)
-        & ZeroOrMore(temp_value)
-        & ZeroOrMore(term_value)
-        & ZeroOrMore(termcombine_value)
+        & ZeroOrMore(elecToken.temp_value)
+        & ZeroOrMore(pbToken.term_value)
+        & ZeroOrMore(pbToken.termcombine_value)
         & ZeroOrMore(tolsp_value)
-        & ZeroOrMore(units_value)
-        & ZeroOrMore(xyz_value)
+        & ZeroOrMore(pbToken.units_value)
+        & ZeroOrMore(pbToken.xyz_value)
     )
 
-    elec_body = (
-        tabi_body
-        | fe_manual_body
-        | geoflow_auto_body
-        | mg_auto_body
-        | mg_manual_body
-        | mg_para_body
-        | mg_dummy_body
-        | pbam_auto_body
-        | pbsam_auto_body
-    )
 
-    elec_value = Group(elec_val + elec_body + Suppress(end_val))
+class ApbsLegacyInput:
 
+    # Questions:
+    #   1. Can READ, ELEC, and PRINT have leading/trailing spaces?
+    #      A: Yes
+    #   2. do keyword and values HAVE to be on the same line?
+    #   3. are keyword and non-path values case sensitive?
+    #      A: No
+
+    # ELEC Keywords
+    quit_val = CaselessLiteral("QUIT")
     all_values = (
         OneOrMore(readParser())
-        + ZeroOrMore(elec_value)
+        + ZeroOrMore(elecParser())
         + ZeroOrMore(printParser())
         + Suppress(quit_val)
     )
