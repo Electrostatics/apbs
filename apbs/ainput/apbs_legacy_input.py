@@ -80,7 +80,7 @@ def formatBlock(t: ParseResults, section: str, groups: list):
                         # )
                         item2 = ", ".join(item[2].split())
                         FINAL_OUTPUT[section][key][subkey].append(item2)
-    print(f"FORMATREAD: {FINAL_OUTPUT}")
+
     return FINAL_OUTPUT
 
 
@@ -258,14 +258,26 @@ def elecParser():
             FINAL_OUTPUT[section] = {}
 
         for row in t[0]:
-            print(f"TYPE: {type(row)}")
-            for item in row:
-                print(f"type item: {type(item)} {item}")
-                if isinstance(item, str):
-                    key = item.lower()
-                    print(f"key: {key}")
-                    if key not in FINAL_OUTPUT[section].keys():
-                        FINAL_OUTPUT[section][key] = row[1:]
+            # print(f"ELEC TYPE: {type(row)} ROW: {row}")
+            if isinstance(row, str):
+                FINAL_OUTPUT[section]["type"] = row
+                continue
+            if len(row) == 1:
+                FINAL_OUTPUT[section]["pbe"] = row[0]
+                continue
+            if len(row) == 2:
+                # print(f"KEY: {row[0]} TYPE {type(row[1])}")
+                value = row[1]
+                if isinstance(row[1], ParseResults):
+                    value = (row[1]).asList()
+                FINAL_OUTPUT[section][row[0]] = value
+                continue
+            # print(f"WHAT KEY: {row[0]}")
+            if row[0] not in FINAL_OUTPUT.keys():
+                FINAL_OUTPUT[section][row[0]] = []
+            for item in row[1:]:
+                # print(f"WHAT: {item}")
+                FINAL_OUTPUT[section][row[0]].append([item[0], item[1]])
 
         return FINAL_OUTPUT
 
