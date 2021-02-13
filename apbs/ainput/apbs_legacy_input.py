@@ -1,6 +1,6 @@
 import pprint
+from pyparsing import CaselessLiteral as CLiteral
 from pyparsing import (
-    CaselessLiteral,
     Group,
     LineEnd,
     OneOrMore,
@@ -44,11 +44,12 @@ NUMBER_VAL = Regex(
        """,
     flags=VERBOSE,
 ).setParseAction(convertNumber)
+# NUMBER_VAL = Word(nums).setParseAction(lambda s, l, t: [float(t[0])])
 
 IDENTIFIER = Word(alphas, alphanums + r"_") | INTEGER_VAL
 PATH_VAL = Word(printables + " " + "\t")
 COMMENT = "#"
-END_VAL = CaselessLiteral("END")
+END_VAL = CLiteral("END")
 FINAL_OUTPUT = {}
 
 
@@ -88,69 +89,56 @@ def readParser():
 
     # READ section specific grammar
     # https://apbs.readthedocs.io/en/latest/using/input/read.html
-    read_val = CaselessLiteral("READ")
-    read_format_val = oneOf("dx gz", caseless=True)
 
-    # charge format path
-    #     is path considered relative?
-    charge_val = CaselessLiteral("charge")
-    charge_value = Group(charge_val + read_format_val + PATH_VAL)
+    read_format = oneOf("dx gz", caseless=True)
+
+    # charge format - is path considered relative?
+    charge = Group(CLiteral("charge") + read_format + PATH_VAL)
 
     # diel format(dx) path-x, path-y, path-z
     #     are path-x, path-y, path-z considered relative?
     #     where to find non-zero ionic strength
-    diel_val = CaselessLiteral("diel")
-    diel_value = Group(
-        diel_val + read_format_val + PATH_VAL + PATH_VAL + PATH_VAL
+    diel = Group(
+        CLiteral("diel") + read_format + PATH_VAL + PATH_VAL + PATH_VAL
     )
 
-    # kappa format path
-    #     dependant on a previous diel
-    #     is path considered relative?
-    kappa_val = CaselessLiteral("kappa")
-    kappa_value = Group(kappa_val + read_format_val + PATH_VAL)
+    # kappa format path - is path considered relative?
+    kappa = Group(CLiteral("kappa") + read_format + PATH_VAL)
 
-    # mol format(pqr|pdb) path
-    #     is path considered relative?
-    mol_val = CaselessLiteral("mol")
-    mol_format_val = oneOf("pqr pdb", caseless=True)
-    mol_value = Group(mol_val + mol_format_val + PATH_VAL)
+    # mol format(pqr|pdb) path - is path considered relative?
+    mol_format = oneOf("pqr pdb", caseless=True)
+    mol = Group(CLiteral("mol") + mol_format + PATH_VAL)
 
-    # parm format(flat) path
-    #     is path considered relative?
-    parm_val = CaselessLiteral("parm")
-    parm_format_val = oneOf("flat xml", caseless=True)
-    parm_value = Group(parm_val + parm_format_val + PATH_VAL)
-    # pot format(dx|gz) path
-    #     is path considered relative?
-    pot_val = CaselessLiteral("pot")
-    pot_value = Group(pot_val + read_format_val + PATH_VAL)
+    # parm format(flat) path - is path considered relative?
+    parm_format = oneOf("flat xml", caseless=True)
+    parm = Group(CLiteral("parm") + parm_format + PATH_VAL)
 
-    read_body = Group(
-        OneOrMore(mol_value)
-        & ZeroOrMore(charge_value)
-        & ZeroOrMore(diel_value)
-        & ZeroOrMore(kappa_value)
-        & ZeroOrMore(parm_value)
-        & ZeroOrMore(pot_value)
+    # pot format(dx|gz) path - is path considered relative?
+    pot = Group(CLiteral("pot") + read_format + PATH_VAL)
+
+    body = Group(
+        OneOrMore(mol)
+        & ZeroOrMore(charge)
+        & ZeroOrMore(diel)
+        & ZeroOrMore(kappa)
+        & ZeroOrMore(parm)
+        & ZeroOrMore(pot)
     )
 
     def formatRead(t: ParseResults):
         groups = ["charge", "diel", "kappa", "mol", "param", "pot"]
         return formatBlock(t, "READ", groups)
 
-    read_value = Group(
-        Suppress(read_val) + read_body + Suppress(END_VAL)
+    return Group(
+        Suppress(CLiteral("READ")) + body + Suppress(END_VAL)
     ).setParseAction(formatRead)
-
-    return read_value
 
 
 def printParser():
     """Setup the grammar for the PRINT section."""
 
     # PRINT section specific grammar
-    val = CaselessLiteral("PRINT")
+    val = CLiteral("PRINT")
     choice_val = oneOf(
         "elecEnergy elecForce apolEnergy apolForce", caseless=True
     )
@@ -191,7 +179,7 @@ def printParser():
 
 def apolarParser():
 
-    val = CaselessLiteral("APOLAR")
+    val = CLiteral("APOLAR")
 
     body = (
         val
@@ -237,7 +225,7 @@ def apolarParser():
 
 def elecParser():
 
-    val = CaselessLiteral("ELEC")
+    val = CLiteral("ELEC")
 
     body = (
         tabiParser.body
@@ -290,50 +278,49 @@ def elecParser():
 
 class genericToken:
 
-    bconc_val = CaselessLiteral("bconc")
+    bconc_val = CLiteral("bconc")
     bconc_value = Group(bconc_val + NUMBER_VAL)
 
     # TODO: Should be able to combine calcenergy and calcforce?
-    calcenergy_val = CaselessLiteral("calcenergy")
+    calcenergy_val = CLiteral("calcenergy")
     calcenergy_options_val = oneOf("no total comps", caseless=True)
     calcenergy_value = Group(calcenergy_val + calcenergy_options_val)
 
-    calcforce_val = CaselessLiteral("calcforce")
+    calcforce_val = CLiteral("calcforce")
     calcforce_options_val = oneOf("no total comps", caseless=True)
     calcforce_value = Group(calcforce_val + calcforce_options_val)
 
-    gamma_val = CaselessLiteral("gamma")
+    gamma_val = CLiteral("gamma")
     gamma_value = Group(gamma_val + NUMBER_VAL)
 
-    grid_val = CaselessLiteral("grid")
+    grid_val = CLiteral("grid")
     grid_coord_val = Group(NUMBER_VAL * 3)
     grid_value = Group(grid_val + grid_coord_val)
 
-    mol_val = CaselessLiteral("mol")
+    mol_val = CLiteral("mol")
     mol_value = Group(mol_val + NUMBER_VAL)
 
-    sdens_val = CaselessLiteral("sdens")
+    sdens_val = CLiteral("sdens")
     sdens_value = Group(sdens_val + NUMBER_VAL)
 
-    srad_val = CaselessLiteral("srad")
+    srad_val = CLiteral("srad")
     srad_value = Group(srad_val + NUMBER_VAL)
 
-    swin_val = CaselessLiteral("swin")
+    swin_val = CLiteral("swin")
     swin_value = Group(swin_val + NUMBER_VAL)
 
-    temp_val = CaselessLiteral("temp")
+    temp_val = CLiteral("temp")
     temp_value = Group(temp_val + NUMBER_VAL)
 
 
 class apolarToken:
 
-    dpos_val = CaselessLiteral("dpos")
-    dpos_value = Group(dpos_val + NUMBER_VAL)
+    dpos_value = Group(CLiteral("dpos") - NUMBER_VAL)
 
-    press_val = CaselessLiteral("press")
+    press_val = CLiteral("press")
     press_value = Group(press_val + NUMBER_VAL)
 
-    srfm_val = CaselessLiteral("srfm")
+    srfm_val = CLiteral("srfm")
     srfm_options_val = oneOf("sacc", caseless=True)
     srfm_value = Group(srfm_val + srfm_options_val)
 
@@ -354,85 +341,85 @@ class elecToken:
     # The following tokens are used by at least 2 of the parser types with
     # the same format and rules
 
-    name_val = CaselessLiteral("name")
+    name_val = CLiteral("name")
     name_value = Group(name_val + IDENTIFIER)
 
-    async_val = CaselessLiteral("async")
+    async_val = CLiteral("async")
     async_value = Group(async_val + INTEGER_VAL)
 
-    bcfl_val = CaselessLiteral("bcfl")
+    bcfl_val = CLiteral("bcfl")
     bcfl_options_val = oneOf("zero sdh mdh focus", caseless=True)
     bcfl_value = Group(bcfl_val + bcfl_options_val)
 
-    cgcent_val = CaselessLiteral("cgcent")
-    cgcent_mol_val = Group(CaselessLiteral("mol") + INTEGER_VAL)
+    cgcent_val = CLiteral("cgcent")
+    cgcent_mol_val = Group(CLiteral("mol") + INTEGER_VAL)
     cgcent_coord_val = Group(NUMBER_VAL * 3)
     cgcent_value = Group(cgcent_val + (cgcent_mol_val | cgcent_coord_val))
 
-    cglen_val = CaselessLiteral("cglen")
+    cglen_val = CLiteral("cglen")
     cglen_coord_val = Group(INTEGER_VAL * 3)
     cglen_value = Group(cglen_val + cglen_coord_val)
 
-    chgm_val = CaselessLiteral("chgm")
+    chgm_val = CLiteral("chgm")
     chgm_options_val = oneOf("spl0 spl2", caseless=True)
     chgm_value = Group(chgm_val + chgm_options_val)
 
-    dime_val = CaselessLiteral("dime")
+    dime_val = CLiteral("dime")
     dime_coord_val = Group(INTEGER_VAL * 3)
     dime_value = Group(dime_val + dime_coord_val)
 
-    etol_val = CaselessLiteral("etol")
+    etol_val = CLiteral("etol")
     etol_value = Group(etol_val + NUMBER_VAL)
 
-    fgcent_val = CaselessLiteral("fgcent")
-    fgcent_mol_val = Group(CaselessLiteral("mol") + NUMBER_VAL)
+    fgcent_val = CLiteral("fgcent")
+    fgcent_mol_val = Group(CLiteral("mol") + NUMBER_VAL)
     fgcent_coord_val = Group(NUMBER_VAL * 3)
     fgcent_value = Group(fgcent_val + (fgcent_mol_val | fgcent_coord_val))
 
-    fglen_val = CaselessLiteral("fglen")
+    fglen_val = CLiteral("fglen")
     fglen_coord_val = Group(NUMBER_VAL * 3)
     fglen_value = Group(fglen_val + fglen_coord_val)
 
-    gcent_val = CaselessLiteral("gcent")
-    gcent_mol_val = CaselessLiteral("mol") + NUMBER_VAL
+    gcent_val = CLiteral("gcent")
+    gcent_mol_val = CLiteral("mol") + NUMBER_VAL
     gcent_coord_val = Group(NUMBER_VAL * 3)
     gcent_value = Group(gcent_val + (gcent_mol_val | gcent_coord_val))
 
-    glen_val = CaselessLiteral("glen")
+    glen_val = CLiteral("glen")
     glen_coord_val = Group(NUMBER_VAL * 3)
     glen_value = Group(glen_val + glen_coord_val)
 
     # Are charge, conc, and radius ALL required?
-    ion_val = CaselessLiteral("ion")
-    ion_charge_val = Group(CaselessLiteral("charge") + NUMBER_VAL)
-    ion_conc_val = Group(CaselessLiteral("conc") + NUMBER_VAL)
-    ion_radius_val = Group(CaselessLiteral("radius") + NUMBER_VAL)
+    ion_val = CLiteral("ion")
+    ion_charge_val = Group(CLiteral("charge") + NUMBER_VAL)
+    ion_conc_val = Group(CLiteral("conc") + NUMBER_VAL)
+    ion_radius_val = Group(CLiteral("radius") + NUMBER_VAL)
     ion_value = Group(ion_val + ion_charge_val & ion_conc_val & ion_radius_val)
 
-    nlev_val = CaselessLiteral("nlev")
+    nlev_val = CLiteral("nlev")
     nlev_value = Group(nlev_val + NUMBER_VAL)
 
     # TODO: I think only 1 of these are allowed (not ZeroOrMore)
     pbe_options_val = oneOf("lpbe lrpbe npbe nrpbe", caseless=True)
     pbe_value = Group(pbe_options_val)
 
-    pdie_val = CaselessLiteral("pdie")
+    pdie_val = CLiteral("pdie")
     # TODO: Number must be >= 1
     pdie_value = Group(pdie_val + NUMBER_VAL)
 
     # NOTE: Should be a value between 78-80?
-    sdie_val = CaselessLiteral("sdie")
+    sdie_val = CLiteral("sdie")
     sdie_value = Group(sdie_val + NUMBER_VAL)
 
-    srfm_val = CaselessLiteral("srfm")
+    srfm_val = CLiteral("srfm")
     srfm_options_val = oneOf("mol smol spl2", caseless=True)
     srfm_value = Group(srfm_val + srfm_options_val)
 
-    usemap_val = CaselessLiteral("usemap")
+    usemap_val = CLiteral("usemap")
     usemap_options_val = oneOf("diel kappa charge", caseless=True)
     usemap_value = Group(usemap_val + INTEGER_VAL)
 
-    write_val = CaselessLiteral("write")
+    write_val = CLiteral("write")
     write_type_options_val = oneOf(
         "charge pot smol sspl vdw ivdw lap edens ndens qdens dielx diely dielz kappa",
         caseless=True,
@@ -445,7 +432,7 @@ class elecToken:
         + PATH_VAL
     )
 
-    writemat_val = CaselessLiteral("writemat")
+    writemat_val = CLiteral("writemat")
     writemat_options_val = oneOf("poisson", caseless=True)
     writemat_value = Group(writemat_val + writemat_options_val + PATH_VAL)
 
@@ -454,25 +441,25 @@ class tabiParser:
 
     # tabi Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/tabi.html
-    tabi_val = CaselessLiteral("tabi")
+    tabi_val = CLiteral("tabi")
 
-    mac_val = CaselessLiteral("mac")
+    mac_val = CLiteral("mac")
     # TODO: This should be replaced which a check to make
     # sure that "NUMBER_VAL is between 0.0 and 1.0"
     mac_value = Group(mac_val + NUMBER_VAL)
 
-    mesh_val = CaselessLiteral("mesh")
+    mesh_val = CLiteral("mesh")
     mesh_options_val = oneOf("0 1 2")
     mesh_value = Group(mesh_val + mesh_options_val)
 
-    outdata_val = CaselessLiteral("outdata")
+    outdata_val = CLiteral("outdata")
     outdata_options_val = oneOf("0 1")
     outdata_value = Group(outdata_val + outdata_options_val)
 
-    tree_n0_val = CaselessLiteral("tree_n0")
+    tree_n0_val = CLiteral("tree_n0")
     tree_n0_value = Group(tree_n0_val + INTEGER_VAL)
 
-    tree_order_val = CaselessLiteral("tree_order")
+    tree_order_val = CLiteral("tree_order")
     tree_order_value = Group(tree_order_val + INTEGER_VAL)
 
     body = (
@@ -497,34 +484,34 @@ class fe_manualParser:
 
     # fe-manual Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/fe-manual.html
-    fe_manual_val = CaselessLiteral("fe-manual")
+    fe_manual_val = CLiteral("fe-manual")
 
-    akeyPRE_val = CaselessLiteral("akeyPRE")
+    akeyPRE_val = CLiteral("akeyPRE")
     akeyPRE_options_val = oneOf("unif geom", caseless=True)
     akeyPRE_value = Group(akeyPRE_val + akeyPRE_options_val)
 
-    akeySOLVE_val = CaselessLiteral("akeySOLVE")
+    akeySOLVE_val = CLiteral("akeySOLVE")
     akeySOLVE_options_val = oneOf("resi", caseless=True)
     akeySOLVE_value = Group(akeySOLVE_val + akeySOLVE_options_val)
 
-    domainLength_val = CaselessLiteral("domainLength")
+    domainLength_val = CLiteral("domainLength")
     domainLength_coord_val = Group(NUMBER_VAL * 3)
     domainLength_value = Group(domainLength_val + domainLength_coord_val)
 
-    ekey_val = CaselessLiteral("ekey")
+    ekey_val = CLiteral("ekey")
     ekey_options_val = oneOf("simp global frac", caseless=True)
     ekey_value = Group(ekey_val + ekey_options_val)
 
-    maxsolve_val = CaselessLiteral("maxsolve")
+    maxsolve_val = CLiteral("maxsolve")
     maxsolve_value = Group(maxsolve_val + NUMBER_VAL)
 
-    maxvert_val = CaselessLiteral("maxvert")
+    maxvert_val = CLiteral("maxvert")
     maxvert_value = Group(maxvert_val + NUMBER_VAL)
 
-    targetNum_val = CaselessLiteral("targetNum")
+    targetNum_val = CLiteral("targetNum")
     targetNum_value = Group(targetNum_val + INTEGER_VAL)
 
-    targetRes_val = CaselessLiteral("targetRes")
+    targetRes_val = CLiteral("targetRes")
     targetRes_value = Group(targetRes_val + NUMBER_VAL)
 
     body = (
@@ -563,12 +550,12 @@ class geoflow_autoParser:
 
     # geoflow-auto Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/geoflow-auto.html
-    geoflow_auto_val = CaselessLiteral("geoflow-auto")
+    geoflow_auto_val = CLiteral("geoflow-auto")
 
-    press_val = CaselessLiteral("press")
+    press_val = CLiteral("press")
     press_value = Group(press_val + NUMBER_VAL)
 
-    vdwdisp_val = CaselessLiteral("vdwdisp")
+    vdwdisp_val = CLiteral("vdwdisp")
     vdwdisp_options_val = oneOf("0 1")
     vdwdisp_value = Group(vdwdisp_val + vdwdisp_options_val)
 
@@ -592,7 +579,7 @@ class mg_autoParser:
 
     # mg-auto Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-auto.html
-    mg_auto_val = CaselessLiteral("mg-auto")
+    mg_auto_val = CLiteral("mg-auto")
 
     body = (
         mg_auto_val
@@ -627,9 +614,9 @@ class mg_manualParser:
 
     # mg-manual Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-manual.html
-    mg_manual_val = CaselessLiteral("mg-manual")
+    mg_manual_val = CLiteral("mg-manual")
 
-    nlev_val = CaselessLiteral("nlev")
+    nlev_val = CLiteral("nlev")
     nlev_value = Group(nlev_val + INTEGER_VAL)
 
     body = (
@@ -665,14 +652,14 @@ class mg_paraParser:
 
     # mg-para Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-para.html
-    mg_para_val = CaselessLiteral("mg-para")
+    mg_para_val = CLiteral("mg-para")
 
     # TODO: Combine with dime?
-    pdime_val = CaselessLiteral("pdime")
+    pdime_val = CLiteral("pdime")
     pdime_coord_val = Group(NUMBER_VAL * 3)
     pdime_value = Group(pdime_val + pdime_coord_val)
 
-    ofrac_val = CaselessLiteral("ofrac")
+    ofrac_val = CLiteral("ofrac")
     ofrac_value = Group(ofrac_val + NUMBER_VAL)
 
     body = (
@@ -711,7 +698,7 @@ class mg_dummyParser:
 
     # mg-dummy Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-dummy.html
-    mg_dummy_val = CaselessLiteral("mg-dummy")
+    mg_dummy_val = CLiteral("mg-dummy")
 
     body = (
         mg_dummy_val
@@ -740,58 +727,58 @@ class pbToken:
 
     # pbam-auto and pbsam-auto specific Keywords
 
-    thr3dmap_val = CaselessLiteral("3dmap")
+    thr3dmap_val = CLiteral("3dmap")
     thr3dmap_value = Group(thr3dmap_val + PATH_VAL)
 
-    diff_val = CaselessLiteral("diff")
-    diff_move_type_val = CaselessLiteral("move")
-    diff_rot_type_val = CaselessLiteral("rot")
-    diff_stat_type_val = CaselessLiteral("stat")
+    diff_val = CLiteral("diff")
+    diff_move_type_val = CLiteral("move")
+    diff_rot_type_val = CLiteral("rot")
+    diff_stat_type_val = CLiteral("stat")
     diff_move_val = diff_move_type_val + NUMBER_VAL + NUMBER_VAL
     diff_rot_val = diff_rot_type_val + NUMBER_VAL
     diff_value = Group(
         diff_val + (diff_stat_type_val | diff_move_val | diff_rot_val)
     )
 
-    dx_val = CaselessLiteral("dx")
+    dx_val = CLiteral("dx")
     dx_value = Group(dx_val + PATH_VAL)
 
-    grid2d_val = CaselessLiteral("grid2d")
+    grid2d_val = CLiteral("grid2d")
     grid2d_options_val = oneOf("x y z", caseless=True)
     grid2d_value = Group(
         grid2d_val + PATH_VAL + grid2d_options_val + NUMBER_VAL
     )
 
-    gridpts_val = CaselessLiteral("gridpts")
+    gridpts_val = CLiteral("gridpts")
     gridpts_value = Group(gridpts_val + INTEGER_VAL)
 
-    ntraj_val = CaselessLiteral("ntraj")
+    ntraj_val = CLiteral("ntraj")
     ntraj_value = Group(ntraj_val + INTEGER_VAL)
 
-    pbc_val = CaselessLiteral("pbc")
+    pbc_val = CLiteral("pbc")
     pbc_value = Group(pbc_val + NUMBER_VAL)
 
-    randorient_val = CaselessLiteral("randorient")
+    randorient_val = CLiteral("randorient")
     randorient_value = Group(randorient_val)
 
-    runname_val = CaselessLiteral("runname")
+    runname_val = CLiteral("runname")
     runname_value = Group(runname_val + Word(alphanums))
 
-    runtype_val = CaselessLiteral("runtype")
+    runtype_val = CLiteral("runtype")
     runtype_options_val = oneOf(
         "energyforce electrostatics dynamics", caseless=True
     )
     runtype_value = Group(runtype_val + runtype_options_val)
 
-    salt_val = CaselessLiteral("salt")
+    salt_val = CLiteral("salt")
     # TODO: value of NUMBER_VAL should be 0.00 to 0.15?
     salt_value = Group(salt_val + NUMBER_VAL)
 
-    term_val = CaselessLiteral("term")
-    term_contact_type_val = CaselessLiteral("contact")
+    term_val = CLiteral("term")
+    term_contact_type_val = CLiteral("contact")
     term_pos_type_val = oneOf("x<= x>= y<= y>= z<= z>= r<= r>=", caseless=True)
-    term_time_type_val = CaselessLiteral("time")
-    term_contact_val = CaselessLiteral("contact") + PATH_VAL
+    term_time_type_val = CLiteral("time")
+    term_contact_val = CLiteral("contact") + PATH_VAL
     # TODO: is the val an integer or float
     term_pos_val = term_pos_type_val + NUMBER_VAL + IDENTIFIER
     term_time_val = term_time_type_val + NUMBER_VAL
@@ -799,15 +786,15 @@ class pbToken:
         term_val + (term_contact_val | term_pos_val | term_time_val)
     )
 
-    termcombine_val = CaselessLiteral("termcombine")
+    termcombine_val = CLiteral("termcombine")
     termcombine_option_val = oneOf("and or", caseless=True)
     termcombine_value = Group(termcombine_val + termcombine_option_val)
 
-    units_val = CaselessLiteral("units")
+    units_val = CLiteral("units")
     units_option_val = oneOf("kcalmol jmol kT", caseless=True)
     units_value = Group(units_val + units_option_val)
 
-    xyz_val = CaselessLiteral("xyz")
+    xyz_val = CLiteral("xyz")
     xyz_value = Group(xyz_val + IDENTIFIER + PATH_VAL)
 
 
@@ -815,7 +802,7 @@ class pbam_autoParser:
 
     # pbam-auto Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/pbam-auto.html
-    pbam_auto_val = CaselessLiteral("pbam-auto")
+    pbam_auto_val = CLiteral("pbam-auto")
 
     body = (
         pbam_auto_val
@@ -845,20 +832,20 @@ class pbam_autoParser:
 class pbsam_autoParser:
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/pbsam-auto.html
-    pbsam_auto_val = CaselessLiteral("pbsam-auto")
+    pbsam_auto_val = CLiteral("pbsam-auto")
 
     # pbsam-auto specific Keywords
 
-    exp_val = CaselessLiteral("exp")
+    exp_val = CLiteral("exp")
     exp_value = Group(exp_val + PATH_VAL)
 
-    imat_val = CaselessLiteral("imat")
+    imat_val = CLiteral("imat")
     imat_value = Group(imat_val + PATH_VAL)
 
-    surf_val = CaselessLiteral("surf")
+    surf_val = CLiteral("surf")
     surf_value = Group(surf_val + PATH_VAL)
 
-    tolsp_val = CaselessLiteral("tolsp")
+    tolsp_val = CLiteral("tolsp")
     tolsp_value = Group(tolsp_val + NUMBER_VAL)
 
     body = (
@@ -898,11 +885,10 @@ class ApbsLegacyInput:
     #      A: No
 
     # ELEC Keywords
-    quit_val = CaselessLiteral("QUIT")
+    quit_val = CLiteral("QUIT")
     all_values = (
         OneOrMore(readParser())
-        + ZeroOrMore(apolarParser())
-        + ZeroOrMore(elecParser())
+        + OneOrMore(apolarParser() | elecParser())
         + ZeroOrMore(printParser())
         + Suppress(quit_val)
     )
