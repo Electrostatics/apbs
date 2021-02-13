@@ -90,31 +90,29 @@ def readParser():
     # READ section specific grammar
     # https://apbs.readthedocs.io/en/latest/using/input/read.html
 
-    read_format = oneOf("dx gz", caseless=True)
+    file_fmt = oneOf("dx gz", caseless=True)
 
     # charge format - is path considered relative?
-    charge = Group(CLiteral("charge") + read_format + PATH_VAL)
+    charge = Group(CLiteral("charge") - file_fmt - PATH_VAL)
 
     # diel format(dx) path-x, path-y, path-z
     #     are path-x, path-y, path-z considered relative?
     #     where to find non-zero ionic strength
-    diel = Group(
-        CLiteral("diel") + read_format + PATH_VAL + PATH_VAL + PATH_VAL
-    )
+    diel = Group(CLiteral("diel") + file_fmt - PATH_VAL - PATH_VAL - PATH_VAL)
 
     # kappa format path - is path considered relative?
-    kappa = Group(CLiteral("kappa") + read_format + PATH_VAL)
+    kappa = Group(CLiteral("kappa") - file_fmt - PATH_VAL)
 
     # mol format(pqr|pdb) path - is path considered relative?
     mol_format = oneOf("pqr pdb", caseless=True)
-    mol = Group(CLiteral("mol") + mol_format + PATH_VAL)
+    mol = Group(CLiteral("mol") - mol_format - PATH_VAL)
 
     # parm format(flat) path - is path considered relative?
     parm_format = oneOf("flat xml", caseless=True)
-    parm = Group(CLiteral("parm") + parm_format + PATH_VAL)
+    parm = Group(CLiteral("parm") - parm_format - PATH_VAL)
 
     # pot format(dx|gz) path - is path considered relative?
-    pot = Group(CLiteral("pot") + read_format + PATH_VAL)
+    pot = Group(CLiteral("pot") - file_fmt - PATH_VAL)
 
     body = Group(
         OneOrMore(mol)
@@ -130,7 +128,7 @@ def readParser():
         return formatBlock(t, "READ", groups)
 
     return Group(
-        Suppress(CLiteral("READ")) + body + Suppress(END_VAL)
+        Suppress(CLiteral("READ")) - body - Suppress(END_VAL)
     ).setParseAction(formatRead)
 
 
@@ -139,15 +137,13 @@ def printParser():
 
     # PRINT section specific grammar
     val = CLiteral("PRINT")
-    choice_val = oneOf(
-        "elecEnergy elecForce apolEnergy apolForce", caseless=True
-    )
+    choices = oneOf("elecEnergy elecForce apolEnergy apolForce", caseless=True)
     expr = (
         IDENTIFIER
         + OneOrMore(oneOf("+ -") + IDENTIFIER)
         + ZeroOrMore(oneOf("+ -") + IDENTIFIER)
     )
-    body = Group(choice_val - expr)
+    body = Group(choices - expr)
 
     def formatPrint(t: ParseResults):
         section = "PRINT"
