@@ -53,11 +53,14 @@ END_VAL = CLiteral("END")
 FINAL_OUTPUT = {}
 
 
-def formatBlock(t: ParseResults, section: str, groups: list):
+def formatGroupBlock(t: ParseResults, section: str, groups: list):
     """Convert lists of lists to a dictionary"""
 
+    # print(f"IDX: {idx}")
     if section not in FINAL_OUTPUT.keys():
         FINAL_OUTPUT[section] = {}
+    idx = len(FINAL_OUTPUT[section])
+    FINAL_OUTPUT[section][idx] = {}
 
     # print(f"T: {t}")
     for row in t[0]:
@@ -68,19 +71,19 @@ def formatBlock(t: ParseResults, section: str, groups: list):
                 key = item[0].lower()
                 # print(f"key: {key}")
                 if key in groups:
-                    if key not in FINAL_OUTPUT[section].keys():
+                    if key not in FINAL_OUTPUT[section][idx].keys():
                         # print(f"ADD KEY: {key}")
-                        FINAL_OUTPUT[section][key] = {}
+                        FINAL_OUTPUT[section][idx][key] = {}
                     subkey = f"{item[1]}".lower()
-                    if subkey not in FINAL_OUTPUT[section][key].keys():
+                    if subkey not in FINAL_OUTPUT[section][idx][key].keys():
                         # print(f"ADD SUBKEY: {subkey}")
-                        FINAL_OUTPUT[section][key][subkey] = []
+                        FINAL_OUTPUT[section][idx][key][subkey] = []
                     if item[2] is not None:
                         # print(
-                        #    f"VALUES: KEY: {key}, SUBKEY: {subkey}, item2: {item[2]}"
+                        #     f"VALUES: KEY: {key}, SUBKEY: {subkey}, item2: {item[2]}"
                         # )
                         item2 = ", ".join(item[2].split())
-                        FINAL_OUTPUT[section][key][subkey].append(item2)
+                        FINAL_OUTPUT[section][idx][key][subkey].append(item2)
 
     return FINAL_OUTPUT
 
@@ -125,7 +128,7 @@ def readParser():
 
     def formatRead(t: ParseResults):
         groups = ["charge", "diel", "kappa", "mol", "param", "pot"]
-        return formatBlock(t, "READ", groups)
+        return formatGroupBlock(t, "READ", groups)
 
     return Group(
         Suppress(CLiteral("READ")) - body - Suppress(END_VAL)
@@ -146,9 +149,12 @@ def printParser():
     body = Group(choices - expr)
 
     def formatPrint(t: ParseResults):
+
         section = "PRINT"
         if section not in FINAL_OUTPUT.keys():
             FINAL_OUTPUT[section] = {}
+        idx = len(FINAL_OUTPUT[section])
+        FINAL_OUTPUT[section][idx] = {}
 
         for row in t[0]:
             # print(f"TYPE: {type(row)}")
@@ -157,8 +163,8 @@ def printParser():
                 if isinstance(item, str):
                     key = item.lower()
                     # print(f"key: {key}")
-                    if key not in FINAL_OUTPUT[section].keys():
-                        FINAL_OUTPUT[section][key] = row[1:]
+                    if key not in FINAL_OUTPUT[section][idx].keys():
+                        FINAL_OUTPUT[section][idx][key] = row[1:]
                         break
             else:
                 break
@@ -173,55 +179,66 @@ def printParser():
     return value
 
 
+def formatBlock(t: ParseResults, section: str):
+
+    if section not in FINAL_OUTPUT.keys():
+        FINAL_OUTPUT[section] = {}
+    idx = len(FINAL_OUTPUT[section])
+    FINAL_OUTPUT[section][idx] = {}
+
+    for row in t[0]:
+        # print(f"ELEC TYPE: {type(row)} ROW: {row}")
+        if isinstance(row, str):
+            FINAL_OUTPUT[section][idx]["type"] = row
+            continue
+        if len(row) == 1:
+            FINAL_OUTPUT[section][idx]["pbe"] = row[0]
+            continue
+        if len(row) == 2:
+            # print(f"KEY: {row[0]} TYPE {type(row[1])}")
+            value = row[1]
+            if isinstance(row[1], ParseResults):
+                value = (row[1]).asList()
+            FINAL_OUTPUT[section][idx][row[0]] = value
+            continue
+        # print(f"WHAT KEY: {row[0]}")
+        if row[0] not in FINAL_OUTPUT.keys():
+            FINAL_OUTPUT[section][idx][row[0]] = []
+        for item in row[1:]:
+            # print(f"WHAT: {item}")
+            FINAL_OUTPUT[section][idx][row[0]].append([item[0], item[1]])
+
+    return FINAL_OUTPUT
+
+
 def apolarParser():
 
-    val = CLiteral("APOLAR")
-
     body = (
-        val
-        & ZeroOrMore(genericToken.bconc_value)
-        & ZeroOrMore(genericToken.calcenergy_value)
-        & ZeroOrMore(genericToken.calcforce_value)
-        & ZeroOrMore(apolarToken.dpos_value)
-        & ZeroOrMore(genericToken.gamma_value)
-        & ZeroOrMore(genericToken.grid_value)
-        & ZeroOrMore(genericToken.mol_value)
-        & ZeroOrMore(apolarToken.press_value)
-        & ZeroOrMore(genericToken.sdens_value)
-        & ZeroOrMore(genericToken.srad_value)
-        & ZeroOrMore(apolarToken.srfm_value)
-        & ZeroOrMore(genericToken.swin_value)
-        & ZeroOrMore(genericToken.temp_value)
+        ZeroOrMore(elecToken.name)
+        & ZeroOrMore(genericToken.bconc)
+        & ZeroOrMore(genericToken.calcenergy)
+        & ZeroOrMore(genericToken.calcforce)
+        & ZeroOrMore(apolarToken.dpos)
+        & ZeroOrMore(genericToken.gamma)
+        & ZeroOrMore(genericToken.grid)
+        & ZeroOrMore(genericToken.mol)
+        & ZeroOrMore(apolarToken.press)
+        & ZeroOrMore(genericToken.sdens)
+        & ZeroOrMore(genericToken.srad)
+        & ZeroOrMore(apolarToken.srfm)
+        & ZeroOrMore(genericToken.swin)
+        & ZeroOrMore(genericToken.temp)
     )
 
     def formatApolar(t: ParseResults):
+        return formatBlock(t, "APOLAR")
 
-        section = "APOLAR"
-        if section not in FINAL_OUTPUT.keys():
-            FINAL_OUTPUT[section] = {}
-
-        for row in t[0]:
-            print(f"TYPE: {type(row)}")
-            for item in row:
-                print(f"type item: {type(item)} {item}")
-                if isinstance(item, str):
-                    key = item.lower()
-                    print(f"key: {key}")
-                    if key not in FINAL_OUTPUT[section].keys():
-                        FINAL_OUTPUT[section][key] = row[1:]
-
-        return FINAL_OUTPUT
-
-    value = Group(Suppress(val) + body + Suppress(END_VAL)).setParseAction(
-        formatApolar
-    )
-
-    return value
+    return Group(
+        Suppress(CLiteral("APOLAR")) - body - Suppress(END_VAL)
+    ).setParseAction(formatApolar)
 
 
 def elecParser():
-
-    val = CLiteral("ELEC")
 
     body = (
         tabiParser.body
@@ -236,89 +253,36 @@ def elecParser():
     )
 
     def formatElec(t: ParseResults):
+        return formatBlock(t, "ELEC")
 
-        section = "ELEC"
-        if section not in FINAL_OUTPUT.keys():
-            FINAL_OUTPUT[section] = {}
-
-        for row in t[0]:
-            # print(f"ELEC TYPE: {type(row)} ROW: {row}")
-            if isinstance(row, str):
-                FINAL_OUTPUT[section]["type"] = row
-                continue
-            if len(row) == 1:
-                FINAL_OUTPUT[section]["pbe"] = row[0]
-                continue
-            if len(row) == 2:
-                # print(f"KEY: {row[0]} TYPE {type(row[1])}")
-                value = row[1]
-                if isinstance(row[1], ParseResults):
-                    value = (row[1]).asList()
-                FINAL_OUTPUT[section][row[0]] = value
-                continue
-            # print(f"WHAT KEY: {row[0]}")
-            if row[0] not in FINAL_OUTPUT.keys():
-                FINAL_OUTPUT[section][row[0]] = []
-            for item in row[1:]:
-                # print(f"WHAT: {item}")
-                FINAL_OUTPUT[section][row[0]].append([item[0], item[1]])
-
-        return FINAL_OUTPUT
-
-    value = Group(Suppress(val) + body + Suppress(END_VAL)).setParseAction(
-        formatElec
-    )
-
-    return value
+    return Group(
+        Suppress(CLiteral("ELEC")) - body - Suppress(END_VAL)
+    ).setParseAction(formatElec)
 
 
 class genericToken:
 
-    bconc_val = CLiteral("bconc")
-    bconc_value = Group(bconc_val + NUMBER_VAL)
-
-    # TODO: Should be able to combine calcenergy and calcforce?
-    calcenergy_val = CLiteral("calcenergy")
-    calcenergy_options_val = oneOf("no total comps", caseless=True)
-    calcenergy_value = Group(calcenergy_val + calcenergy_options_val)
-
-    calcforce_val = CLiteral("calcforce")
-    calcforce_options_val = oneOf("no total comps", caseless=True)
-    calcforce_value = Group(calcforce_val + calcforce_options_val)
-
-    gamma_val = CLiteral("gamma")
-    gamma_value = Group(gamma_val + NUMBER_VAL)
-
-    grid_val = CLiteral("grid")
-    grid_coord_val = Group(NUMBER_VAL * 3)
-    grid_value = Group(grid_val + grid_coord_val)
-
-    mol_val = CLiteral("mol")
-    mol_value = Group(mol_val + NUMBER_VAL)
-
-    sdens_val = CLiteral("sdens")
-    sdens_value = Group(sdens_val + NUMBER_VAL)
-
-    srad_val = CLiteral("srad")
-    srad_value = Group(srad_val + NUMBER_VAL)
-
-    swin_val = CLiteral("swin")
-    swin_value = Group(swin_val + NUMBER_VAL)
-
-    temp_val = CLiteral("temp")
-    temp_value = Group(temp_val + NUMBER_VAL)
+    bconc = Group(CLiteral("bconc") - NUMBER_VAL)
+    calc_options = oneOf("no total comps", caseless=True)
+    calcenergy = Group(CLiteral("calcenergy") - calc_options)
+    calcforce = Group(CLiteral("calcforce") - calc_options)
+    gamma = Group(CLiteral("gamma") - NUMBER_VAL)
+    grid_coord = Group(NUMBER_VAL * 3)
+    grid = Group(CLiteral("grid") - grid_coord)
+    mol = Group(CLiteral("mol") - NUMBER_VAL)
+    sdens = Group(CLiteral("sdens") - NUMBER_VAL)
+    srad = Group(CLiteral("srad") - NUMBER_VAL)
+    swin = Group(CLiteral("swin") - NUMBER_VAL)
+    temp = Group(CLiteral("temp") - NUMBER_VAL)
 
 
 class apolarToken:
 
-    dpos_value = Group(CLiteral("dpos") - NUMBER_VAL)
-
-    press_val = CLiteral("press")
-    press_value = Group(press_val + NUMBER_VAL)
-
-    srfm_val = CLiteral("srfm")
-    srfm_options_val = oneOf("sacc", caseless=True)
-    srfm_value = Group(srfm_val + srfm_options_val)
+    # APOLAR section specific grammar
+    # https://apbs.readthedocs.io/en/latest/using/input/apolar/index.html
+    dpos = Group(CLiteral("dpos") - NUMBER_VAL)
+    press = Group(CLiteral("press") - NUMBER_VAL)
+    srfm = Group(CLiteral("srfm") - oneOf("sacc", caseless=True))
 
 
 class elecToken:
@@ -326,153 +290,96 @@ class elecToken:
     # ELEC section specific grammar
     # https://apbs.readthedocs.io/en/latest/using/input/elec/index.html
 
-    # TODO: There must be one (and only one?) of these
-    #       plus there are keywords that unique to each option
-    type_options_val = oneOf(
-        "mg-auto mg-para mg-manual geoflow-auto tabi pbam-auto pbsam-auto fe-manual mg-dummy",
-        caseless=True,
-    )
-    type_value = Group(type_options_val)
-
     # The following tokens are used by at least 2 of the parser types with
     # the same format and rules
 
-    name_val = CLiteral("name")
-    name_value = Group(name_val + IDENTIFIER)
+    name = Group(CLiteral("name") - IDENTIFIER)
+    grid_floats = Group(NUMBER_VAL * 3)
+    grid_ints = Group(INTEGER_VAL * 3)
+    mol_id = Group(CLiteral("mol") + INTEGER_VAL)
 
-    async_val = CLiteral("async")
-    async_value = Group(async_val + INTEGER_VAL)
-
-    bcfl_val = CLiteral("bcfl")
-    bcfl_options_val = oneOf("zero sdh mdh focus", caseless=True)
-    bcfl_value = Group(bcfl_val + bcfl_options_val)
-
-    cgcent_val = CLiteral("cgcent")
-    cgcent_mol_val = Group(CLiteral("mol") + INTEGER_VAL)
-    cgcent_coord_val = Group(NUMBER_VAL * 3)
-    cgcent_value = Group(cgcent_val + (cgcent_mol_val | cgcent_coord_val))
-
-    cglen_val = CLiteral("cglen")
-    cglen_coord_val = Group(INTEGER_VAL * 3)
-    cglen_value = Group(cglen_val + cglen_coord_val)
-
-    chgm_val = CLiteral("chgm")
-    chgm_options_val = oneOf("spl0 spl2", caseless=True)
-    chgm_value = Group(chgm_val + chgm_options_val)
-
-    dime_val = CLiteral("dime")
-    dime_coord_val = Group(INTEGER_VAL * 3)
-    dime_value = Group(dime_val + dime_coord_val)
-
-    etol_val = CLiteral("etol")
-    etol_value = Group(etol_val + NUMBER_VAL)
-
-    fgcent_val = CLiteral("fgcent")
-    fgcent_mol_val = Group(CLiteral("mol") + NUMBER_VAL)
-    fgcent_coord_val = Group(NUMBER_VAL * 3)
-    fgcent_value = Group(fgcent_val + (fgcent_mol_val | fgcent_coord_val))
-
-    fglen_val = CLiteral("fglen")
-    fglen_coord_val = Group(NUMBER_VAL * 3)
-    fglen_value = Group(fglen_val + fglen_coord_val)
-
-    gcent_val = CLiteral("gcent")
-    gcent_mol_val = CLiteral("mol") + NUMBER_VAL
-    gcent_coord_val = Group(NUMBER_VAL * 3)
-    gcent_value = Group(gcent_val + (gcent_mol_val | gcent_coord_val))
-
-    glen_val = CLiteral("glen")
-    glen_coord_val = Group(NUMBER_VAL * 3)
-    glen_value = Group(glen_val + glen_coord_val)
+    async_value = Group(CLiteral("async") - INTEGER_VAL)
+    bcfl_options = oneOf("zero sdh mdh focus", caseless=True)
+    bcfl = Group(CLiteral("bcfl") - bcfl_options)
+    cgcent = Group(CLiteral("cgcent") - (mol_id | grid_floats))
+    cglen = Group(CLiteral("cglen") - grid_ints)
+    chgm_options = oneOf("spl0 spl2", caseless=True)
+    chgm = Group(CLiteral("chgm") - chgm_options)
+    dime = Group(CLiteral("dime") - grid_ints)
+    etol = Group(CLiteral("etol") - NUMBER_VAL)
+    fgcent = Group(CLiteral("fgcent") - (mol_id | grid_floats))
+    fglen = Group(CLiteral("fglen") - grid_floats)
+    gcent = Group(CLiteral("gcent") - (mol_id | grid_floats))
+    glen = Group(CLiteral("glen") - grid_floats)
 
     # Are charge, conc, and radius ALL required?
-    ion_val = CLiteral("ion")
-    ion_charge_val = Group(CLiteral("charge") + NUMBER_VAL)
-    ion_conc_val = Group(CLiteral("conc") + NUMBER_VAL)
-    ion_radius_val = Group(CLiteral("radius") + NUMBER_VAL)
-    ion_value = Group(ion_val + ion_charge_val & ion_conc_val & ion_radius_val)
+    ion_charge = Group(CLiteral("charge") - NUMBER_VAL)
+    ion_conc = Group(CLiteral("conc") - NUMBER_VAL)
+    ion_radius = Group(CLiteral("radius") - NUMBER_VAL)
+    ion = Group(CLiteral("ion") - ion_charge & ion_conc & ion_radius)
 
-    nlev_val = CLiteral("nlev")
-    nlev_value = Group(nlev_val + NUMBER_VAL)
+    nlev = Group(CLiteral("nlev") - NUMBER_VAL)
 
     # TODO: I think only 1 of these are allowed (not ZeroOrMore)
-    pbe_options_val = oneOf("lpbe lrpbe npbe nrpbe", caseless=True)
-    pbe_value = Group(pbe_options_val)
+    pbe = Group(oneOf("lpbe lrpbe npbe nrpbe", caseless=True))
 
-    pdie_val = CLiteral("pdie")
     # TODO: Number must be >= 1
-    pdie_value = Group(pdie_val + NUMBER_VAL)
+    pdie = Group(CLiteral("pdie") - NUMBER_VAL)
 
     # NOTE: Should be a value between 78-80?
-    sdie_val = CLiteral("sdie")
-    sdie_value = Group(sdie_val + NUMBER_VAL)
+    sdie = Group(CLiteral("sdie") - NUMBER_VAL)
 
-    srfm_val = CLiteral("srfm")
-    srfm_options_val = oneOf("mol smol spl2", caseless=True)
-    srfm_value = Group(srfm_val + srfm_options_val)
+    srfm_options = oneOf("mol smol spl2", caseless=True)
+    srfm = Group(CLiteral("srfm") - srfm_options)
 
-    usemap_val = CLiteral("usemap")
-    usemap_options_val = oneOf("diel kappa charge", caseless=True)
-    usemap_value = Group(usemap_val + INTEGER_VAL)
+    usemap_options = oneOf("diel kappa charge", caseless=True)
+    usemap = Group(CLiteral("usemap") - usemap_options - INTEGER_VAL)
 
-    write_val = CLiteral("write")
-    write_type_options_val = oneOf(
+    write_type_options = oneOf(
         "charge pot smol sspl vdw ivdw lap edens ndens qdens dielx diely dielz kappa",
         caseless=True,
     )
-    write_format_options_val = oneOf("dx avs uhbd", caseless=True)
-    write_value = Group(
-        usemap_val
-        + write_type_options_val
-        + write_format_options_val
-        + PATH_VAL
+    write_format_options = oneOf("dx avs uhbd", caseless=True)
+    write = Group(
+        CLiteral("write")
+        - write_type_options
+        - write_format_options
+        - PATH_VAL
     )
 
-    writemat_val = CLiteral("writemat")
-    writemat_options_val = oneOf("poisson", caseless=True)
-    writemat_value = Group(writemat_val + writemat_options_val + PATH_VAL)
+    writemat = Group(
+        CLiteral("writemat") - oneOf("poisson", caseless=True) - PATH_VAL
+    )
 
 
 class tabiParser:
 
     # tabi Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/tabi.html
-    tabi_val = CLiteral("tabi")
 
-    mac_val = CLiteral("mac")
     # TODO: This should be replaced which a check to make
     # sure that "NUMBER_VAL is between 0.0 and 1.0"
-    mac_value = Group(mac_val + NUMBER_VAL)
-
-    mesh_val = CLiteral("mesh")
-    mesh_options_val = oneOf("0 1 2")
-    mesh_value = Group(mesh_val + mesh_options_val)
-
-    outdata_val = CLiteral("outdata")
-    outdata_options_val = oneOf("0 1")
-    outdata_value = Group(outdata_val + outdata_options_val)
-
-    tree_n0_val = CLiteral("tree_n0")
-    tree_n0_value = Group(tree_n0_val + INTEGER_VAL)
-
-    tree_order_val = CLiteral("tree_order")
-    tree_order_value = Group(tree_order_val + INTEGER_VAL)
+    mac = Group(CLiteral("mac") - NUMBER_VAL)
+    mesh = Group(CLiteral("mesh") - oneOf("0 1 2"))
+    outdata = Group(CLiteral("outdata") - oneOf("0 1"))
+    tree_n0 = Group(CLiteral("tree_n0") - INTEGER_VAL)
+    tree_order = Group(CLiteral("tree_order") - INTEGER_VAL)
 
     body = (
-        tabi_val
-        & ZeroOrMore(elecToken.name_value)
-        & ZeroOrMore(elecToken.ion_value)
-        & ZeroOrMore(mac_value)
-        & ZeroOrMore(mesh_value)
-        & ZeroOrMore(genericToken.mol_value)
-        & ZeroOrMore(outdata_value)
-        & ZeroOrMore(elecToken.pdie_value)
-        & ZeroOrMore(genericToken.sdens_value)
-        & ZeroOrMore(elecToken.sdie_value)
-        & ZeroOrMore(genericToken.srad_value)
-        & ZeroOrMore(genericToken.temp_value)
-        & ZeroOrMore(tree_n0_value)
-        & ZeroOrMore(tree_order_value)
+        CLiteral("tabi")
+        & ZeroOrMore(elecToken.name)
+        & ZeroOrMore(elecToken.ion)
+        & ZeroOrMore(mac)
+        & ZeroOrMore(mesh)
+        & ZeroOrMore(genericToken.mol)
+        & ZeroOrMore(outdata)
+        & ZeroOrMore(elecToken.pdie)
+        & ZeroOrMore(genericToken.sdens)
+        & ZeroOrMore(elecToken.sdie)
+        & ZeroOrMore(genericToken.srad)
+        & ZeroOrMore(genericToken.temp)
+        & ZeroOrMore(tree_n0)
+        & ZeroOrMore(tree_order)
     )
 
 
@@ -480,65 +387,48 @@ class fe_manualParser:
 
     # fe-manual Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/fe-manual.html
-    fe_manual_val = CLiteral("fe-manual")
 
-    akeyPRE_val = CLiteral("akeyPRE")
-    akeyPRE_options_val = oneOf("unif geom", caseless=True)
-    akeyPRE_value = Group(akeyPRE_val + akeyPRE_options_val)
-
-    akeySOLVE_val = CLiteral("akeySOLVE")
-    akeySOLVE_options_val = oneOf("resi", caseless=True)
-    akeySOLVE_value = Group(akeySOLVE_val + akeySOLVE_options_val)
-
-    domainLength_val = CLiteral("domainLength")
-    domainLength_coord_val = Group(NUMBER_VAL * 3)
-    domainLength_value = Group(domainLength_val + domainLength_coord_val)
-
-    ekey_val = CLiteral("ekey")
-    ekey_options_val = oneOf("simp global frac", caseless=True)
-    ekey_value = Group(ekey_val + ekey_options_val)
-
-    maxsolve_val = CLiteral("maxsolve")
-    maxsolve_value = Group(maxsolve_val + NUMBER_VAL)
-
-    maxvert_val = CLiteral("maxvert")
-    maxvert_value = Group(maxvert_val + NUMBER_VAL)
-
-    targetNum_val = CLiteral("targetNum")
-    targetNum_value = Group(targetNum_val + INTEGER_VAL)
-
-    targetRes_val = CLiteral("targetRes")
-    targetRes_value = Group(targetRes_val + NUMBER_VAL)
+    akeyPRE_options = oneOf("unif geom", caseless=True)
+    akeyPRE = Group(CLiteral("akeyPRE") - akeyPRE_options)
+    akeySOLVE_options = oneOf("resi", caseless=True)
+    akeySOLVE = Group(CLiteral("akeySOLVE") - akeySOLVE_options)
+    domainLength = Group(CLiteral("domainLength") - elecToken.grid_floats)
+    ekey_options = oneOf("simp global frac", caseless=True)
+    ekey = Group(CLiteral("ekey") - ekey_options)
+    maxsolve = Group(CLiteral("maxsolve") - NUMBER_VAL)
+    maxvert = Group(CLiteral("maxvert") - NUMBER_VAL)
+    targetNum = Group(CLiteral("targetNum") - INTEGER_VAL)
+    targetRes = Group(CLiteral("targetRes") - NUMBER_VAL)
 
     body = (
-        fe_manual_val
-        & ZeroOrMore(elecToken.name_value)
-        & ZeroOrMore(akeyPRE_value)
-        & ZeroOrMore(akeySOLVE_value)
+        CLiteral("fe-manual")
+        & ZeroOrMore(elecToken.name)
+        & ZeroOrMore(akeyPRE)
+        & ZeroOrMore(akeySOLVE)
         & ZeroOrMore(elecToken.async_value)
-        & ZeroOrMore(elecToken.bcfl_value)
-        & ZeroOrMore(genericToken.calcenergy_value)
-        & ZeroOrMore(genericToken.calcforce_value)
-        & ZeroOrMore(elecToken.chgm_value)
-        & ZeroOrMore(domainLength_value)
-        & ZeroOrMore(ekey_value)
-        & ZeroOrMore(elecToken.etol_value)
-        & ZeroOrMore(elecToken.ion_value)
-        & ZeroOrMore(elecToken.pbe_value)  # lpbe lrpbe npbe nrpbe
-        & ZeroOrMore(maxsolve_value)
-        & ZeroOrMore(maxvert_value)
-        & ZeroOrMore(genericToken.mol_value)
-        & ZeroOrMore(elecToken.pdie_value)
-        & ZeroOrMore(genericToken.sdens_value)
-        & ZeroOrMore(elecToken.sdie_value)
-        & ZeroOrMore(genericToken.srad_value)
-        & ZeroOrMore(elecToken.srfm_value)
-        & ZeroOrMore(genericToken.swin_value)
-        & ZeroOrMore(targetNum_value)
-        & ZeroOrMore(targetRes_value)
-        & ZeroOrMore(genericToken.temp_value)
-        & ZeroOrMore(elecToken.usemap_value)
-        & ZeroOrMore(elecToken.write_value)
+        & ZeroOrMore(elecToken.bcfl)
+        & ZeroOrMore(genericToken.calcenergy)
+        & ZeroOrMore(genericToken.calcforce)
+        & ZeroOrMore(elecToken.chgm)
+        & ZeroOrMore(domainLength)
+        & ZeroOrMore(ekey)
+        & ZeroOrMore(elecToken.etol)
+        & ZeroOrMore(elecToken.ion)
+        & ZeroOrMore(elecToken.pbe)  # lpbe lrpbe npbe nrpbe
+        & ZeroOrMore(maxsolve)
+        & ZeroOrMore(maxvert)
+        & ZeroOrMore(genericToken.mol)
+        & ZeroOrMore(elecToken.pdie)
+        & ZeroOrMore(genericToken.sdens)
+        & ZeroOrMore(elecToken.sdie)
+        & ZeroOrMore(genericToken.srad)
+        & ZeroOrMore(elecToken.srfm)
+        & ZeroOrMore(genericToken.swin)
+        & ZeroOrMore(targetNum)
+        & ZeroOrMore(targetRes)
+        & ZeroOrMore(genericToken.temp)
+        & ZeroOrMore(elecToken.usemap)
+        & ZeroOrMore(elecToken.write)
     )
 
 
@@ -546,28 +436,23 @@ class geoflow_autoParser:
 
     # geoflow-auto Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/geoflow-auto.html
-    geoflow_auto_val = CLiteral("geoflow-auto")
 
-    press_val = CLiteral("press")
-    press_value = Group(press_val + NUMBER_VAL)
-
-    vdwdisp_val = CLiteral("vdwdisp")
-    vdwdisp_options_val = oneOf("0 1")
-    vdwdisp_value = Group(vdwdisp_val + vdwdisp_options_val)
+    press = Group(CLiteral("press") - NUMBER_VAL)
+    vdwdisp = Group(CLiteral("vdwdisp") - oneOf("0 1"))
 
     body = (
-        geoflow_auto_val
-        & ZeroOrMore(elecToken.name_value)
-        & ZeroOrMore(elecToken.bcfl_value)
-        & ZeroOrMore(genericToken.bconc_value)
-        & ZeroOrMore(elecToken.etol_value)
-        & ZeroOrMore(genericToken.gamma_value)
-        & ZeroOrMore(elecToken.pbe_value)  # lpbe lrpbe npbe nrpbe
-        & ZeroOrMore(genericToken.mol_value)
-        & ZeroOrMore(elecToken.pdie_value)
-        & ZeroOrMore(press_value)
-        & ZeroOrMore(elecToken.sdie_value)
-        & ZeroOrMore(vdwdisp_value)
+        CLiteral("geoflow-auto")
+        & ZeroOrMore(elecToken.name)
+        & ZeroOrMore(elecToken.bcfl)
+        & ZeroOrMore(genericToken.bconc)
+        & ZeroOrMore(elecToken.etol)
+        & ZeroOrMore(genericToken.gamma)
+        & ZeroOrMore(elecToken.pbe)  # lpbe lrpbe npbe nrpbe
+        & ZeroOrMore(genericToken.mol)
+        & ZeroOrMore(elecToken.pdie)
+        & ZeroOrMore(press)
+        & ZeroOrMore(elecToken.sdie)
+        & ZeroOrMore(vdwdisp)
     )
 
 
@@ -575,34 +460,33 @@ class mg_autoParser:
 
     # mg-auto Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-auto.html
-    mg_auto_val = CLiteral("mg-auto")
 
     body = (
-        mg_auto_val
-        & ZeroOrMore(elecToken.name_value)
-        & ZeroOrMore(elecToken.bcfl_value)
-        & ZeroOrMore(genericToken.calcenergy_value)
-        & ZeroOrMore(genericToken.calcforce_value)
-        & ZeroOrMore(elecToken.cgcent_value)
-        & ZeroOrMore(elecToken.cglen_value)
-        & ZeroOrMore(elecToken.chgm_value)
-        & ZeroOrMore(elecToken.dime_value)
-        & ZeroOrMore(elecToken.etol_value)
-        & ZeroOrMore(elecToken.fgcent_value)
-        & ZeroOrMore(elecToken.fglen_value)
-        & ZeroOrMore(elecToken.ion_value)
-        & ZeroOrMore(elecToken.pbe_value)  # lpbe lrpbe npbe nrpbe
-        & ZeroOrMore(genericToken.mol_value)
-        & ZeroOrMore(elecToken.pdie_value)
-        & ZeroOrMore(genericToken.sdens_value)
-        & ZeroOrMore(elecToken.sdie_value)
-        & ZeroOrMore(genericToken.srad_value)
-        & ZeroOrMore(elecToken.srfm_value)
-        & ZeroOrMore(genericToken.swin_value)
-        & ZeroOrMore(genericToken.temp_value)
-        & ZeroOrMore(elecToken.usemap_value)
-        & ZeroOrMore(elecToken.write_value)
-        & ZeroOrMore(elecToken.writemat_value)
+        CLiteral("mg-auto")
+        & ZeroOrMore(elecToken.name)
+        & ZeroOrMore(elecToken.bcfl)
+        & ZeroOrMore(genericToken.calcenergy)
+        & ZeroOrMore(genericToken.calcforce)
+        & ZeroOrMore(elecToken.cgcent)
+        & ZeroOrMore(elecToken.cglen)
+        & ZeroOrMore(elecToken.chgm)
+        & ZeroOrMore(elecToken.dime)
+        & ZeroOrMore(elecToken.etol)
+        & ZeroOrMore(elecToken.fgcent)
+        & ZeroOrMore(elecToken.fglen)
+        & ZeroOrMore(elecToken.ion)
+        & ZeroOrMore(elecToken.pbe)  # lpbe lrpbe npbe nrpbe
+        & ZeroOrMore(genericToken.mol)
+        & ZeroOrMore(elecToken.pdie)
+        & ZeroOrMore(genericToken.sdens)
+        & ZeroOrMore(elecToken.sdie)
+        & ZeroOrMore(genericToken.srad)
+        & ZeroOrMore(elecToken.srfm)
+        & ZeroOrMore(genericToken.swin)
+        & ZeroOrMore(genericToken.temp)
+        & ZeroOrMore(elecToken.usemap)
+        & ZeroOrMore(elecToken.write)
+        & ZeroOrMore(elecToken.writemat)
     )
 
 
@@ -610,37 +494,35 @@ class mg_manualParser:
 
     # mg-manual Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-manual.html
-    mg_manual_val = CLiteral("mg-manual")
 
-    nlev_val = CLiteral("nlev")
-    nlev_value = Group(nlev_val + INTEGER_VAL)
+    nlev = Group(CLiteral("nlev") - INTEGER_VAL)
 
     body = (
-        mg_manual_val
-        & ZeroOrMore(elecToken.name_value)
-        & ZeroOrMore(elecToken.bcfl_value)
-        & ZeroOrMore(genericToken.calcenergy_value)
-        & ZeroOrMore(genericToken.calcforce_value)
-        & ZeroOrMore(elecToken.chgm_value)
-        & ZeroOrMore(elecToken.dime_value)
-        & ZeroOrMore(elecToken.etol_value)
-        & ZeroOrMore(elecToken.gcent_value)
-        & ZeroOrMore(elecToken.glen_value)
-        & ZeroOrMore(genericToken.grid_value)
-        & ZeroOrMore(elecToken.ion_value)
-        & ZeroOrMore(elecToken.pbe_value)  # lpbe lrpbe npbe nrpbe
-        & ZeroOrMore(genericToken.mol_value)
-        & ZeroOrMore(nlev_value)
-        & ZeroOrMore(elecToken.pdie_value)
-        & ZeroOrMore(genericToken.sdens_value)
-        & ZeroOrMore(elecToken.sdie_value)
-        & ZeroOrMore(genericToken.srad_value)
-        & ZeroOrMore(elecToken.srfm_value)
-        & ZeroOrMore(genericToken.swin_value)
-        & ZeroOrMore(genericToken.temp_value)
-        & ZeroOrMore(elecToken.usemap_value)
-        & ZeroOrMore(elecToken.write_value)
-        & ZeroOrMore(elecToken.writemat_value)
+        CLiteral("mg-manual")
+        & ZeroOrMore(elecToken.name)
+        & ZeroOrMore(elecToken.bcfl)
+        & ZeroOrMore(genericToken.calcenergy)
+        & ZeroOrMore(genericToken.calcforce)
+        & ZeroOrMore(elecToken.chgm)
+        & ZeroOrMore(elecToken.dime)
+        & ZeroOrMore(elecToken.etol)
+        & ZeroOrMore(elecToken.gcent)
+        & ZeroOrMore(elecToken.glen)
+        & ZeroOrMore(genericToken.grid)
+        & ZeroOrMore(elecToken.ion)
+        & ZeroOrMore(elecToken.pbe)  # lpbe lrpbe npbe nrpbe
+        & ZeroOrMore(genericToken.mol)
+        & ZeroOrMore(nlev)
+        & ZeroOrMore(elecToken.pdie)
+        & ZeroOrMore(genericToken.sdens)
+        & ZeroOrMore(elecToken.sdie)
+        & ZeroOrMore(genericToken.srad)
+        & ZeroOrMore(elecToken.srfm)
+        & ZeroOrMore(genericToken.swin)
+        & ZeroOrMore(genericToken.temp)
+        & ZeroOrMore(elecToken.usemap)
+        & ZeroOrMore(elecToken.write)
+        & ZeroOrMore(elecToken.writemat)
     )
 
 
@@ -648,45 +530,40 @@ class mg_paraParser:
 
     # mg-para Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-para.html
-    mg_para_val = CLiteral("mg-para")
 
     # TODO: Combine with dime?
-    pdime_val = CLiteral("pdime")
-    pdime_coord_val = Group(NUMBER_VAL * 3)
-    pdime_value = Group(pdime_val + pdime_coord_val)
-
-    ofrac_val = CLiteral("ofrac")
-    ofrac_value = Group(ofrac_val + NUMBER_VAL)
+    pdime = Group(CLiteral("pdime") - elecToken.grid_floats)
+    ofrac = Group(CLiteral("ofrac") - NUMBER_VAL)
 
     body = (
-        mg_para_val
-        & ZeroOrMore(elecToken.name_value)
+        CLiteral("mg-para")
+        & ZeroOrMore(elecToken.name)
         & ZeroOrMore(elecToken.async_value)
-        & ZeroOrMore(elecToken.bcfl_value)
-        & ZeroOrMore(genericToken.calcenergy_value)
-        & ZeroOrMore(genericToken.calcforce_value)
-        & ZeroOrMore(elecToken.cgcent_value)
-        & ZeroOrMore(elecToken.cglen_value)
-        & ZeroOrMore(elecToken.chgm_value)
-        & ZeroOrMore(elecToken.dime_value)
-        & ZeroOrMore(elecToken.etol_value)
-        & ZeroOrMore(elecToken.fgcent_value)
-        & ZeroOrMore(elecToken.fglen_value)
-        & ZeroOrMore(elecToken.ion_value)
-        & ZeroOrMore(elecToken.pbe_value)
-        & ZeroOrMore(genericToken.mol_value)
-        & ZeroOrMore(ofrac_value)
-        & ZeroOrMore(elecToken.pdie_value)
-        & ZeroOrMore(pdime_value)
-        & ZeroOrMore(genericToken.sdens_value)
-        & ZeroOrMore(elecToken.sdie_value)
-        & ZeroOrMore(genericToken.srad_value)
-        & ZeroOrMore(elecToken.srfm_value)
-        & ZeroOrMore(genericToken.swin_value)
-        & ZeroOrMore(genericToken.temp_value)
-        & ZeroOrMore(elecToken.usemap_value)
-        & ZeroOrMore(elecToken.write_value)
-        & ZeroOrMore(elecToken.writemat_value)
+        & ZeroOrMore(elecToken.bcfl)
+        & ZeroOrMore(genericToken.calcenergy)
+        & ZeroOrMore(genericToken.calcforce)
+        & ZeroOrMore(elecToken.cgcent)
+        & ZeroOrMore(elecToken.cglen)
+        & ZeroOrMore(elecToken.chgm)
+        & ZeroOrMore(elecToken.dime)
+        & ZeroOrMore(elecToken.etol)
+        & ZeroOrMore(elecToken.fgcent)
+        & ZeroOrMore(elecToken.fglen)
+        & ZeroOrMore(elecToken.ion)
+        & ZeroOrMore(elecToken.pbe)
+        & ZeroOrMore(genericToken.mol)
+        & ZeroOrMore(ofrac)
+        & ZeroOrMore(elecToken.pdie)
+        & ZeroOrMore(pdime)
+        & ZeroOrMore(genericToken.sdens)
+        & ZeroOrMore(elecToken.sdie)
+        & ZeroOrMore(genericToken.srad)
+        & ZeroOrMore(elecToken.srfm)
+        & ZeroOrMore(genericToken.swin)
+        & ZeroOrMore(genericToken.temp)
+        & ZeroOrMore(elecToken.usemap)
+        & ZeroOrMore(elecToken.write)
+        & ZeroOrMore(elecToken.writemat)
     )
 
 
@@ -694,28 +571,27 @@ class mg_dummyParser:
 
     # mg-dummy Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-dummy.html
-    mg_dummy_val = CLiteral("mg-dummy")
 
     body = (
-        mg_dummy_val
-        & ZeroOrMore(elecToken.name_value)
-        & ZeroOrMore(elecToken.bcfl_value)
-        & ZeroOrMore(elecToken.chgm_value)
-        & ZeroOrMore(elecToken.dime_value)
-        & ZeroOrMore(elecToken.gcent_value)
-        & ZeroOrMore(elecToken.glen_value)
-        & ZeroOrMore(genericToken.grid_value)
-        & ZeroOrMore(elecToken.ion_value)
-        & ZeroOrMore(elecToken.pbe_value)
-        & ZeroOrMore(genericToken.mol_value)
-        & ZeroOrMore(elecToken.pdie_value)
-        & ZeroOrMore(genericToken.sdens_value)
-        & ZeroOrMore(elecToken.sdie_value)
-        & ZeroOrMore(genericToken.srad_value)
-        & ZeroOrMore(elecToken.srfm_value)
-        & ZeroOrMore(genericToken.swin_value)
-        & ZeroOrMore(genericToken.temp_value)
-        & ZeroOrMore(elecToken.write_value)
+        CLiteral("mg-dummy")
+        & ZeroOrMore(elecToken.name)
+        & ZeroOrMore(elecToken.bcfl)
+        & ZeroOrMore(elecToken.chgm)
+        & ZeroOrMore(elecToken.dime)
+        & ZeroOrMore(elecToken.gcent)
+        & ZeroOrMore(elecToken.glen)
+        & ZeroOrMore(genericToken.grid)
+        & ZeroOrMore(elecToken.ion)
+        & ZeroOrMore(elecToken.pbe)
+        & ZeroOrMore(genericToken.mol)
+        & ZeroOrMore(elecToken.pdie)
+        & ZeroOrMore(genericToken.sdens)
+        & ZeroOrMore(elecToken.sdie)
+        & ZeroOrMore(genericToken.srad)
+        & ZeroOrMore(elecToken.srfm)
+        & ZeroOrMore(genericToken.swin)
+        & ZeroOrMore(genericToken.temp)
+        & ZeroOrMore(elecToken.write)
     )
 
 
@@ -723,151 +599,114 @@ class pbToken:
 
     # pbam-auto and pbsam-auto specific Keywords
 
-    thr3dmap_val = CLiteral("3dmap")
-    thr3dmap_value = Group(thr3dmap_val + PATH_VAL)
-
-    diff_val = CLiteral("diff")
-    diff_move_type_val = CLiteral("move")
-    diff_rot_type_val = CLiteral("rot")
-    diff_stat_type_val = CLiteral("stat")
-    diff_move_val = diff_move_type_val + NUMBER_VAL + NUMBER_VAL
-    diff_rot_val = diff_rot_type_val + NUMBER_VAL
-    diff_value = Group(
-        diff_val + (diff_stat_type_val | diff_move_val | diff_rot_val)
+    thr3dmap = Group(CLiteral("3dmap") - PATH_VAL)
+    diff = Group(
+        CLiteral("diff")
+        - (
+            CLiteral("stat")
+            | CLiteral("move") - NUMBER_VAL - NUMBER_VAL
+            | CLiteral("rot") - NUMBER_VAL
+        )
     )
-
-    dx_val = CLiteral("dx")
-    dx_value = Group(dx_val + PATH_VAL)
-
-    grid2d_val = CLiteral("grid2d")
-    grid2d_options_val = oneOf("x y z", caseless=True)
-    grid2d_value = Group(
-        grid2d_val + PATH_VAL + grid2d_options_val + NUMBER_VAL
+    dx = Group(CLiteral("dx") - PATH_VAL)
+    grid2d = Group(
+        CLiteral("grid2d")
+        - PATH_VAL
+        - oneOf("x y z", caseless=True)
+        - NUMBER_VAL
     )
-
-    gridpts_val = CLiteral("gridpts")
-    gridpts_value = Group(gridpts_val + INTEGER_VAL)
-
-    ntraj_val = CLiteral("ntraj")
-    ntraj_value = Group(ntraj_val + INTEGER_VAL)
-
-    pbc_val = CLiteral("pbc")
-    pbc_value = Group(pbc_val + NUMBER_VAL)
-
-    randorient_val = CLiteral("randorient")
-    randorient_value = Group(randorient_val)
-
-    runname_val = CLiteral("runname")
-    runname_value = Group(runname_val + Word(alphanums))
-
-    runtype_val = CLiteral("runtype")
-    runtype_options_val = oneOf(
+    gridpts = Group(CLiteral("gridpts") - INTEGER_VAL)
+    ntraj = Group(CLiteral("ntraj") - INTEGER_VAL)
+    pbc = Group(CLiteral("pbc") - NUMBER_VAL)
+    randorient = Group(CLiteral("randorient"))
+    runname = Group(CLiteral("runname") - Word(alphanums + "_"))
+    runtype_options = oneOf(
         "energyforce electrostatics dynamics", caseless=True
     )
-    runtype_value = Group(runtype_val + runtype_options_val)
+    runtype = Group(CLiteral("runtype") - runtype_options)
 
-    salt_val = CLiteral("salt")
     # TODO: value of NUMBER_VAL should be 0.00 to 0.15?
-    salt_value = Group(salt_val + NUMBER_VAL)
+    salt = Group(CLiteral("salt") - NUMBER_VAL)
 
-    term_val = CLiteral("term")
-    term_contact_type_val = CLiteral("contact")
-    term_pos_type_val = oneOf("x<= x>= y<= y>= z<= z>= r<= r>=", caseless=True)
-    term_time_type_val = CLiteral("time")
-    term_contact_val = CLiteral("contact") + PATH_VAL
+    term_pos_options = oneOf("x<= x>= y<= y>= z<= z>= r<= r>=", caseless=True)
+    term_contact = CLiteral("contact") + PATH_VAL
     # TODO: is the val an integer or float
-    term_pos_val = term_pos_type_val + NUMBER_VAL + IDENTIFIER
-    term_time_val = term_time_type_val + NUMBER_VAL
-    term_value = Group(
-        term_val + (term_contact_val | term_pos_val | term_time_val)
+    term_pos = term_pos_options + NUMBER_VAL + IDENTIFIER
+    term_time = CLiteral("time") - NUMBER_VAL
+    term = Group(CLiteral("term") - (term_contact | term_pos | term_time))
+
+    termcombine = Group(
+        CLiteral("termcombine") - oneOf("and or", caseless=True)
     )
-
-    termcombine_val = CLiteral("termcombine")
-    termcombine_option_val = oneOf("and or", caseless=True)
-    termcombine_value = Group(termcombine_val + termcombine_option_val)
-
-    units_val = CLiteral("units")
-    units_option_val = oneOf("kcalmol jmol kT", caseless=True)
-    units_value = Group(units_val + units_option_val)
-
-    xyz_val = CLiteral("xyz")
-    xyz_value = Group(xyz_val + IDENTIFIER + PATH_VAL)
+    units = Group(CLiteral("units") - oneOf("kcalmol jmol kT", caseless=True))
+    xyz = Group(CLiteral("xyz") - IDENTIFIER - PATH_VAL)
 
 
 class pbam_autoParser:
 
     # pbam-auto Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/pbam-auto.html
-    pbam_auto_val = CLiteral("pbam-auto")
 
     body = (
-        pbam_auto_val
-        & ZeroOrMore(elecToken.name_value)
-        & ZeroOrMore(pbToken.thr3dmap_value)
-        & ZeroOrMore(pbToken.diff_value)
-        & ZeroOrMore(pbToken.dx_value)
-        & ZeroOrMore(pbToken.grid2d_value)
-        & ZeroOrMore(pbToken.gridpts_value)
-        & ZeroOrMore(genericToken.mol_value)
-        & ZeroOrMore(pbToken.ntraj_value)
-        & ZeroOrMore(pbToken.pbc_value)
-        & ZeroOrMore(elecToken.pdie_value)
-        & ZeroOrMore(pbToken.randorient_value)
-        & ZeroOrMore(pbToken.runname_value)
-        & ZeroOrMore(pbToken.runtype_value)
-        & ZeroOrMore(pbToken.salt_value)
-        & ZeroOrMore(elecToken.sdie_value)
-        & ZeroOrMore(genericToken.temp_value)
-        & ZeroOrMore(pbToken.term_value)
-        & ZeroOrMore(pbToken.termcombine_value)
-        & ZeroOrMore(pbToken.units_value)
-        & ZeroOrMore(pbToken.xyz_value)
+        CLiteral("pbam-auto")
+        & ZeroOrMore(elecToken.name)
+        & ZeroOrMore(pbToken.thr3dmap)
+        & ZeroOrMore(pbToken.diff)
+        & ZeroOrMore(pbToken.dx)
+        & ZeroOrMore(pbToken.grid2d)
+        & ZeroOrMore(pbToken.gridpts)
+        & ZeroOrMore(genericToken.mol)
+        & ZeroOrMore(pbToken.ntraj)
+        & ZeroOrMore(pbToken.pbc)
+        & ZeroOrMore(elecToken.pdie)
+        & ZeroOrMore(pbToken.randorient)
+        & ZeroOrMore(pbToken.runname)
+        & ZeroOrMore(pbToken.runtype)
+        & ZeroOrMore(pbToken.salt)
+        & ZeroOrMore(elecToken.sdie)
+        & ZeroOrMore(genericToken.temp)
+        & ZeroOrMore(pbToken.term)
+        & ZeroOrMore(pbToken.termcombine)
+        & ZeroOrMore(pbToken.units)
+        & ZeroOrMore(pbToken.xyz)
     )
 
 
 class pbsam_autoParser:
 
+    # pbsam-auto Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/pbsam-auto.html
-    pbsam_auto_val = CLiteral("pbsam-auto")
 
     # pbsam-auto specific Keywords
-
-    exp_val = CLiteral("exp")
-    exp_value = Group(exp_val + PATH_VAL)
-
-    imat_val = CLiteral("imat")
-    imat_value = Group(imat_val + PATH_VAL)
-
-    surf_val = CLiteral("surf")
-    surf_value = Group(surf_val + PATH_VAL)
-
-    tolsp_val = CLiteral("tolsp")
-    tolsp_value = Group(tolsp_val + NUMBER_VAL)
+    exp = Group(CLiteral("exp") - PATH_VAL)
+    imat = Group(CLiteral("imat") - PATH_VAL)
+    surf = Group(CLiteral("surf") - PATH_VAL)
+    tolsp = Group(CLiteral("tolsp") - NUMBER_VAL)
 
     body = (
-        pbsam_auto_val
-        & ZeroOrMore(elecToken.name_value)
-        & ZeroOrMore(pbToken.thr3dmap_value)
-        & ZeroOrMore(pbToken.diff_value)
-        & ZeroOrMore(pbToken.dx_value)
-        & ZeroOrMore(exp_value)
-        & ZeroOrMore(pbToken.grid2d_value)
-        & ZeroOrMore(imat_value)
-        & ZeroOrMore(pbToken.ntraj_value)
-        & ZeroOrMore(pbToken.pbc_value)
-        & ZeroOrMore(elecToken.pdie_value)
-        & ZeroOrMore(pbToken.randorient_value)
-        & ZeroOrMore(pbToken.runname_value)
-        & ZeroOrMore(pbToken.runtype_value)
-        & ZeroOrMore(pbToken.salt_value)
-        & ZeroOrMore(elecToken.sdie_value)
-        & ZeroOrMore(surf_value)
-        & ZeroOrMore(genericToken.temp_value)
-        & ZeroOrMore(pbToken.term_value)
-        & ZeroOrMore(pbToken.termcombine_value)
-        & ZeroOrMore(tolsp_value)
-        & ZeroOrMore(pbToken.units_value)
-        & ZeroOrMore(pbToken.xyz_value)
+        CLiteral("pbsam-auto")
+        & ZeroOrMore(elecToken.name)
+        & ZeroOrMore(pbToken.thr3dmap)
+        & ZeroOrMore(pbToken.diff)
+        & ZeroOrMore(pbToken.dx)
+        & ZeroOrMore(exp)
+        & ZeroOrMore(pbToken.grid2d)
+        & ZeroOrMore(imat)
+        & ZeroOrMore(pbToken.ntraj)
+        & ZeroOrMore(pbToken.pbc)
+        & ZeroOrMore(elecToken.pdie)
+        & ZeroOrMore(pbToken.randorient)
+        & ZeroOrMore(pbToken.runname)
+        & ZeroOrMore(pbToken.runtype)
+        & ZeroOrMore(pbToken.salt)
+        & ZeroOrMore(elecToken.sdie)
+        & ZeroOrMore(surf)
+        & ZeroOrMore(genericToken.temp)
+        & ZeroOrMore(pbToken.term)
+        & ZeroOrMore(pbToken.termcombine)
+        & ZeroOrMore(tolsp)
+        & ZeroOrMore(pbToken.units)
+        & ZeroOrMore(pbToken.xyz)
     )
 
 
@@ -881,12 +720,11 @@ class ApbsLegacyInput:
     #      A: No
 
     # ELEC Keywords
-    quit_val = CLiteral("QUIT")
     all_values = (
         OneOrMore(readParser())
         + OneOrMore(apolarParser() | elecParser())
         + ZeroOrMore(printParser())
-        + Suppress(quit_val)
+        + Suppress(CLiteral("QUIT"))
     )
 
     def __init__(self):
