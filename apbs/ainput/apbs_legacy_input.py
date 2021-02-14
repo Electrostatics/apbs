@@ -1,6 +1,7 @@
 import pprint
 from pyparsing import CaselessLiteral as CLiteral
 from pyparsing import (
+    Combine,
     Group,
     LineEnd,
     OneOrMore,
@@ -16,41 +17,21 @@ from pyparsing import (
     nums,
     oneOf,
     printables,
+    pyparsing_common,
     restOfLine,
 )
 from re import VERBOSE
 
 
-def convertNumber(t: ParseResults):
-    """Convert a string matching a NUMBER_VAL to a python NUMBER_VAL"""
-    if t.float1 or t.float2 or t.float3:
-        return [float(t[0])]
-    else:
-        return [int(t[0])]
-
-
 # GLOBAL Values
-EOL = LineEnd().suppress()
-INTEGER_VAL = Optional("-") + Word(nums)
-NUMBER_VAL = Regex(
-    r"""
-       [+-]?                           # optional sign
-        (
-           (?:\d+(?P<float1>\.\d*)?)   # match 2 or 2.02
-         |                             # or
-           (?P<float2>\.\d+)           # match .02
-        )
-        (?P<float3>[Ee][+-]?\d+)?      # optional exponent
-       """,
-    flags=VERBOSE,
-).setParseAction(convertNumber)
-# NUMBER_VAL = Word(nums).setParseAction(lambda s, l, t: [float(t[0])])
-
-IDENTIFIER = Word(alphas, alphanums + r"_") | INTEGER_VAL
-PATH_VAL = Word(printables + " " + "\t")
 COMMENT = "#"
 END_VAL = CLiteral("END")
+EOL = LineEnd().suppress()
 FINAL_OUTPUT = {}
+INTEGER_VAL = Combine(Optional("-") + Word(nums))
+IDENTIFIER = Word(alphas, alphanums + r"_") | INTEGER_VAL
+NUMBER_VAL = pyparsing_common.real | INTEGER_VAL
+PATH_VAL = Word(printables + " " + "\t")
 
 
 def formatGroupBlock(t: ParseResults, section: str, groups: list):
@@ -101,7 +82,7 @@ def readParser():
     # diel format(dx) path-x, path-y, path-z
     #     are path-x, path-y, path-z considered relative?
     #     where to find non-zero ionic strength
-    diel = Group(CLiteral("diel") + file_fmt - PATH_VAL - PATH_VAL - PATH_VAL)
+    diel = Group(CLiteral("diel") - file_fmt - PATH_VAL - PATH_VAL - PATH_VAL)
 
     # kappa format path - is path considered relative?
     kappa = Group(CLiteral("kappa") - file_fmt - PATH_VAL)
@@ -172,7 +153,7 @@ def printParser():
 
         return FINAL_OUTPUT
 
-    value = Group(Suppress(val) + body + Suppress(END_VAL)).setParseAction(
+    value = Group(Suppress(val) - body - Suppress(END_VAL)).setParseAction(
         formatPrint
     )
 
@@ -202,11 +183,16 @@ def formatBlock(t: ParseResults, section: str):
             FINAL_OUTPUT[section][idx][row[0]] = value
             continue
         # print(f"WHAT KEY: {row[0]}")
-        if row[0] not in FINAL_OUTPUT.keys():
-            FINAL_OUTPUT[section][idx][row[0]] = []
+        if row[0] not in FINAL_OUTPUT[section][idx].keys():
+            FINAL_OUTPUT[section][idx][row[0]] = {}
+            # print(f"ION: {row[0]}")
+        sub_value = len(FINAL_OUTPUT[section][idx][row[0]])
         for item in row[1:]:
-            # print(f"WHAT: {item}")
-            FINAL_OUTPUT[section][idx][row[0]].append([item[0], item[1]])
+            # print(f"SV: {sub_value}")
+            # print(f"ITEM: {item[0]} {item[1]}")
+            if sub_value not in FINAL_OUTPUT[section][idx][row[0]].keys():
+                FINAL_OUTPUT[section][idx][row[0]][sub_value] = {}
+            FINAL_OUTPUT[section][idx][row[0]][sub_value][item[0]] = item[1]
 
     return FINAL_OUTPUT
 
@@ -296,7 +282,7 @@ class elecToken:
     name = Group(CLiteral("name") - IDENTIFIER)
     grid_floats = Group(NUMBER_VAL * 3)
     grid_ints = Group(INTEGER_VAL * 3)
-    mol_id = Group(CLiteral("mol") + INTEGER_VAL)
+    mol_id = Group(CLiteral("mol") - INTEGER_VAL)
 
     async_value = Group(CLiteral("async") - INTEGER_VAL)
     bcfl_options = oneOf("zero sdh mdh focus", caseless=True)
@@ -614,7 +600,7 @@ class pbToken:
         - PATH_VAL
         - oneOf("x y z", caseless=True)
         - NUMBER_VAL
-    )
+    )  # .setDebug()
     gridpts = Group(CLiteral("gridpts") - INTEGER_VAL)
     ntraj = Group(CLiteral("ntraj") - INTEGER_VAL)
     pbc = Group(CLiteral("pbc") - NUMBER_VAL)
@@ -629,9 +615,9 @@ class pbToken:
     salt = Group(CLiteral("salt") - NUMBER_VAL)
 
     term_pos_options = oneOf("x<= x>= y<= y>= z<= z>= r<= r>=", caseless=True)
-    term_contact = CLiteral("contact") + PATH_VAL
+    term_contact = CLiteral("contact") - PATH_VAL
     # TODO: is the val an integer or float
-    term_pos = term_pos_options + NUMBER_VAL + IDENTIFIER
+    term_pos = term_pos_options - NUMBER_VAL - IDENTIFIER
     term_time = CLiteral("time") - NUMBER_VAL
     term = Group(CLiteral("term") - (term_contact | term_pos | term_time))
 
@@ -712,14 +698,6 @@ class pbsam_autoParser:
 
 class ApbsLegacyInput:
 
-    # Questions:
-    #   1. Can READ, ELEC, and PRINT have leading/trailing spaces?
-    #      A: Yes
-    #   2. do keyword and values HAVE to be on the same line?
-    #   3. are keyword and non-path values case sensitive?
-    #      A: No
-
-    # ELEC Keywords
     all_values = (
         OneOrMore(readParser())
         + OneOrMore(apolarParser() | elecParser())
@@ -741,7 +719,7 @@ class ApbsLegacyInput:
         parser.ignore(COMMENT + restOfLine)
 
         # return self.all_values.searchString(input_data)[0]
-        return self.all_values.searchString(input_data)
+        return self.all_values.searchString(input_data)[0][0]
 
     def load(self, filename: str):
         """
@@ -771,18 +749,50 @@ class ApbsLegacyInput:
         msg += " " * (pe.col - 1) + "^\n"
         msg += "-" * 40 + "\n" + pe.msg
         pe.msg = msg
-        raise pe
+        # raise pe
+
+
+def printBlock(prefix: str, item: str):
+
+    print(
+        "\n" * 70
+        + "=" * 70
+        + "\n"
+        + "=" * 2
+        + " " * 2
+        + f"{prefix}: {item}"
+        + "\n"
+        + "=" * 70
+    )
 
 
 if __name__ == "__main__":
     # execute only if run as a script
     relfilename = "../../examples/pbsam-barn_bars/barn_bars_electro.in"
+    relfilename = "../../examples/solv/apbs-smol.in"
     relfilename = "../../examples/actin-dimer/apbs-mol-auto.in"
     test = ApbsLegacyInput()
     from pathlib import Path
 
     curr_dir = Path(__file__).parent
     absfilename = curr_dir / relfilename
-    # print(test.load(absfilename))
+    printBlock("FILE", absfilename)
     test.load(absfilename)
     pprint.pp(FINAL_OUTPUT)
+    exit()
+
+    # Using readlines()
+    filename = Path("junk")
+    with open(filename, "r") as file1:
+        Lines = file1.readlines()
+    for file in Lines:
+        file = file.strip()
+        printBlock("FILE", file)
+        test = ApbsLegacyInput()
+        try:
+            test.load(Path(file))
+            pprint.pp(FINAL_OUTPUT)
+        except Exception as e:
+            test.display_error(file, e)
+            print("CRAP")
+            exit()
