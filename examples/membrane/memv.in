@@ -9,9 +9,10 @@ glen 300 300 300
 lpbe
 pdie 5
 sdie 80
-bcfl mem
-ion 1.0 0.1 2.0
-ion -1.0 0.1 2.0
+# WARN: bcfl - mem option is no longer supported
+# bcfl mem
+ion charge 1.0 conc 0.1 radius 2.0
+ion charge -1.0 conc 0.1 radius 2.0
 gcent 0 0 0
 mol 1
 chgm spl2
@@ -22,10 +23,14 @@ sdens 10.0
 temp 298.15
 calcenergy comps
 calcforce no
-zmem -10
-lmem 20
-mdie 2.0
-memv -2.0
+# WARN: zmem is no longer supported
+# zmem -10
+# WARN: lmem is no longer supported
+# lmem 20
+# WARN: mdie is no longer supported
+# mdie 2.0
+# WARN: memv is no longer supported
+# memv -2.0
 end
 
 print elecEnergy foo

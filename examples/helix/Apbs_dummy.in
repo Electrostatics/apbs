@@ -11,7 +11,8 @@ end
 elec name solvated1
 	mg-dummy
 	dime 97 97 97 
-	nlev 4
+	# WARN: nlev only works with mg-manual
+	# nlev 4
 	glen 300 300 300 
 	gcent mol 1
 	mol 1
@@ -33,8 +34,10 @@ elec name solvated1
 	swin 0.3
 	sdens 10.0
 	temp 298.15
-	calcenergy total
-	calcforce no
+	# WARN: calcenergy not allowed in mg-dummy
+	# calcenergy total
+	# WARN: calcforce not allowed in mg-dummy
+	# calcforce no
 	write dielx dx dielx_L		   # spatially dependent diel. constant
 	write diely dx diely_L		   # out using the Conoly/Molecular surfac
 	write dielz dx dielz_L
@@ -46,7 +49,8 @@ end
 elec name solvated2
 	mg-dummy
 	dime 97 97 97 
-	nlev 4
+	# WARN: nlev only works with mg-manual
+	# nlev 4
 	glen 200 200 200 
 	gcent mol 1
 	mol 1
@@ -68,8 +72,10 @@ elec name solvated2
 	swin 0.3
 	sdens 10.0
 	temp 298.15
-	calcenergy total
-	calcforce no
+	# WARN: calcenergy not allowed in mg-dummy
+	# calcenergy total
+	# WARN: calcforce not allowed in mg-dummy
+	# calcforce no
 	write dielx dx dielx_M			# spatially dependent diel. constant
 	write diely dx diely_M			# out using the Conoly/Molecular surfac
 	write dielz dx dielz_M
@@ -81,7 +87,8 @@ end
 elec name solvated3
 	mg-dummy
 	dime 97 97 97
-	nlev 4
+	# WARN: nlev only works with mg-manual
+	# nlev 4
 	glen 100 100 100
 	gcent mol 1
 	mol 1
@@ -103,8 +110,10 @@ elec name solvated3
 	swin 0.3
 	sdens 10.0
 	temp 298.15
-	calcenergy total
-	calcforce no
+	# WARN: calcenergy not allowed in mg-dummy
+	# calcenergy total
+	# WARN: calcforce not allowed in mg-dummy
+	# calcforce no
 	write dielx dx dielx_S			# spatially dependent diel. constant
 	write diely dx diely_S			# out using the Conoly/Molecular surfac
 	write dielz dx dielz_S
