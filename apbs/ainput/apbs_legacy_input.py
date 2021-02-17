@@ -1,3 +1,4 @@
+from pathlib import Path
 import pprint
 from pyparsing import CaselessLiteral as CLiteral
 from pyparsing import (
@@ -6,64 +7,70 @@ from pyparsing import (
     LineEnd,
     OneOrMore,
     Optional,
-    ParseException,
+    ParseSyntaxException,
     ParseResults,
-    Regex,
     Suppress,
     Word,
     ZeroOrMore,
-    alphas,
     alphanums,
+    empty,
     nums,
     oneOf,
     printables,
     pyparsing_common,
     restOfLine,
 )
-from re import VERBOSE
+from re import VERBOSE, search
 
 
 # GLOBAL Values
 COMMENT = "#"
+DEBUG = False
 END_VAL = CLiteral("END")
 EOL = LineEnd().suppress()
-FINAL_OUTPUT = {}
 INTEGER_VAL = Combine(Optional("-") + Word(nums))
-IDENTIFIER = Word(alphas, alphanums + r"_") | INTEGER_VAL
-NUMBER_VAL = pyparsing_common.real | INTEGER_VAL
-PATH_VAL = Word(printables + " " + "\t")
+IDENTIFIER = Word(alphanums, alphanums + r"_" + r"-") | INTEGER_VAL
+NUMBER_VAL = pyparsing_common.real | INTEGER_VAL  # .setDebug()
+PATH_VAL = Word(printables)  # .setDebug()
+
+FINAL_OUTPUT = {}
 
 
-def formatGroupBlock(t: ParseResults, section: str, groups: list):
+def debug(message: str):
+    if DEBUG:
+        print(message)
+
+
+def formatReadBlock(t: ParseResults, section: str, groups: list):
     """Convert lists of lists to a dictionary"""
 
-    # print(f"IDX: {idx}")
-    if section not in FINAL_OUTPUT.keys():
+    if section not in FINAL_OUTPUT:
         FINAL_OUTPUT[section] = {}
     idx = len(FINAL_OUTPUT[section])
+    debug(f"IDX: {idx}")
     FINAL_OUTPUT[section][idx] = {}
 
-    # print(f"T: {t}")
-    for row in t[0]:
-        # print(f"TYPE: {type(row)}")
-        for item in row:
-            # print(f"type item: {type(item)} {item}")
-            if isinstance(item, ParseResults):
-                key = item[0].lower()
-                # print(f"key: {key}")
+    debug(f"T: {t}")
+    for result in t[0]:
+        debug(f"TYPE: {type(result)}")
+        for field in result:
+            debug(f"type item: {type(field)} {field}")
+            if isinstance(field, ParseResults):
+                key = field[0].lower()
+                debug(f"key: {key}")
                 if key in groups:
-                    if key not in FINAL_OUTPUT[section][idx].keys():
-                        # print(f"ADD KEY: {key}")
+                    if key not in FINAL_OUTPUT[section][idx]:
+                        debug(f"ADD KEY: {key}")
                         FINAL_OUTPUT[section][idx][key] = {}
-                    subkey = f"{item[1]}".lower()
-                    if subkey not in FINAL_OUTPUT[section][idx][key].keys():
-                        # print(f"ADD SUBKEY: {subkey}")
+                    subkey = f"{field[1]}".lower()
+                    if subkey not in FINAL_OUTPUT[section][idx][key]:
+                        debug(f"ADD SUBKEY: {subkey}")
                         FINAL_OUTPUT[section][idx][key][subkey] = []
-                    if item[2] is not None:
-                        # print(
-                        #     f"VALUES: KEY: {key}, SUBKEY: {subkey}, item2: {item[2]}"
-                        # )
-                        item2 = ", ".join(item[2].split())
+                    if field[2] is not None:
+                        debug(
+                            f"VALUES: KEY: {key}, SUBKEY: {subkey}, item2: {field[2]}"
+                        )
+                        item2 = ", ".join(field[2].split())
                         FINAL_OUTPUT[section][idx][key][subkey].append(item2)
 
     return FINAL_OUTPUT
@@ -109,7 +116,7 @@ def readParser():
 
     def formatRead(t: ParseResults):
         groups = ["charge", "diel", "kappa", "mol", "param", "pot"]
-        return formatGroupBlock(t, "READ", groups)
+        return formatReadBlock(t, "READ", groups)
 
     return Group(
         Suppress(CLiteral("READ")) - body - Suppress(END_VAL)
@@ -122,9 +129,8 @@ def printParser():
     # PRINT section specific grammar
     val = CLiteral("PRINT")
     choices = oneOf("elecEnergy elecForce apolEnergy apolForce", caseless=True)
-    expr = (
-        IDENTIFIER
-        + OneOrMore(oneOf("+ -") + IDENTIFIER)
+    expr = IDENTIFIER + Optional(
+        OneOrMore(oneOf("+ -") + IDENTIFIER)
         + ZeroOrMore(oneOf("+ -") + IDENTIFIER)
     )
     body = Group(choices - expr)
@@ -132,18 +138,18 @@ def printParser():
     def formatPrint(t: ParseResults):
 
         section = "PRINT"
-        if section not in FINAL_OUTPUT.keys():
+        if section not in FINAL_OUTPUT:
             FINAL_OUTPUT[section] = {}
         idx = len(FINAL_OUTPUT[section])
         FINAL_OUTPUT[section][idx] = {}
 
         for row in t[0]:
-            # print(f"TYPE: {type(row)}")
+            debug(f"TYPE: {type(row)}")
             for item in row:
-                # print(f"type item: {type(item)} {item}")
+                debug(f"type item: {type(item)} {item}")
                 if isinstance(item, str):
                     key = item.lower()
-                    # print(f"key: {key}")
+                    debug(f"key: {key}")
                     if key not in FINAL_OUTPUT[section][idx].keys():
                         FINAL_OUTPUT[section][idx][key] = row[1:]
                         break
@@ -162,38 +168,74 @@ def printParser():
 
 def formatBlock(t: ParseResults, section: str):
 
-    if section not in FINAL_OUTPUT.keys():
+    if section not in FINAL_OUTPUT:
         FINAL_OUTPUT[section] = {}
     idx = len(FINAL_OUTPUT[section])
     FINAL_OUTPUT[section][idx] = {}
+    debug(f"FO: {FINAL_OUTPUT[section]}")
 
-    for row in t[0]:
-        # print(f"ELEC TYPE: {type(row)} ROW: {row}")
-        if isinstance(row, str):
-            FINAL_OUTPUT[section][idx]["type"] = row
-            continue
-        if len(row) == 1:
-            FINAL_OUTPUT[section][idx]["pbe"] = row[0]
-            continue
-        if len(row) == 2:
-            # print(f"KEY: {row[0]} TYPE {type(row[1])}")
-            value = row[1]
-            if isinstance(row[1], ParseResults):
-                value = (row[1]).asList()
-            FINAL_OUTPUT[section][idx][row[0]] = value
-            continue
-        # print(f"WHAT KEY: {row[0]}")
-        if row[0] not in FINAL_OUTPUT[section][idx].keys():
-            FINAL_OUTPUT[section][idx][row[0]] = {}
-            # print(f"ION: {row[0]}")
-        sub_value = len(FINAL_OUTPUT[section][idx][row[0]])
-        for item in row[1:]:
-            # print(f"SV: {sub_value}")
-            # print(f"ITEM: {item[0]} {item[1]}")
-            if sub_value not in FINAL_OUTPUT[section][idx][row[0]].keys():
-                FINAL_OUTPUT[section][idx][row[0]][sub_value] = {}
-            FINAL_OUTPUT[section][idx][row[0]][sub_value][item[0]] = item[1]
+    retval = {}
 
+    for result in t[0]:
+        debug(f"RESULT TYPE: {type(result)} RESULT VALUE: {result}")
+        debug(f"RESULT LEN: {len(result)}")
+        if isinstance(result, str):
+            if result in "randorient":
+                # NOTE: special case for "randorient" key
+                retval[result] = 1
+                continue
+            # NOTE: We have something like mg-auto so we have to add a "type" key
+            retval["type"] = result
+            continue
+        if len(result) == 1:
+            # NOTE: We have something Group (List) with only 1 value
+            #       like lrpbe so we have to add a "pbe" key
+            debug(f"PBE: {retval}")
+            retval["pbe"] = result[0]
+            continue
+        # NOTE: Normal Key/Value case
+        key = result[0]
+        value = result[1]
+        if len(result) == 2:
+            debug(f"KEY: {key} VALUE: {value}")
+            if isinstance(value, ParseResults):
+                debug(f"ParseResults VALUE: {value}")
+                value = value.asList()
+            if key in retval:
+                debug(f"Already Exits: {retval}")
+                retval[key].append(value)
+                continue
+            debug(f"NORMAL Key/Value: {retval}")
+            # NOTE: It is easier to put the value into an List
+            #       and append multiple values to the key. Later
+            #       we post-process the result to remove the List
+            #       if it only has 1 value.
+            retval[key] = [value]
+            continue
+        # NOTE: More complicated than Key/Value case, probably ion
+        debug(f"WHAT KEY: {result[0]}")
+        if result[0] not in retval:
+            retval[result[0]] = {}
+        sub_idx = len(retval[result[0]])
+        for item in result[1:]:
+            debug(f"SV: {sub_idx}")
+            debug(f"ITEM: {item}")
+            if sub_idx not in retval[result[0]]:
+                retval[result[0]][sub_idx] = {}
+            if item[0] in retval[result[0]][sub_idx]:
+                debug("WARN: We need to change key/value to key/dict")
+            retval[result[0]][sub_idx][item[0]] = item[1]
+
+    # NOTE: Post process retval to replace Key/List with Key/Value
+    #       if the List only has 1 element in it
+    for item in retval:
+        debug(f"TRUE1 KEY/VALUE: {item}")
+        if isinstance(retval[item], list) and len(retval[item]) == 1:
+            retval[item] = retval[item][0]
+            debug(f"TRUE2 KEY/VALUE: {retval[item]}")
+
+    FINAL_OUTPUT[section][idx] = retval
+    debug(f"FO: {FINAL_OUTPUT[section]}")
     return FINAL_OUTPUT
 
 
@@ -285,10 +327,10 @@ class elecToken:
     mol_id = Group(CLiteral("mol") - INTEGER_VAL)
 
     async_value = Group(CLiteral("async") - INTEGER_VAL)
-    bcfl_options = oneOf("zero sdh mdh focus", caseless=True)
+    bcfl_options = oneOf("focus map mdh sdh zero", caseless=True)
     bcfl = Group(CLiteral("bcfl") - bcfl_options)
     cgcent = Group(CLiteral("cgcent") - (mol_id | grid_floats))
-    cglen = Group(CLiteral("cglen") - grid_ints)
+    cglen = Group(CLiteral("cglen") - grid_floats)
     chgm_options = oneOf("spl0 spl2", caseless=True)
     chgm = Group(CLiteral("chgm") - chgm_options)
     dime = Group(CLiteral("dime") - grid_ints)
@@ -319,18 +361,16 @@ class elecToken:
     srfm = Group(CLiteral("srfm") - srfm_options)
 
     usemap_options = oneOf("diel kappa charge", caseless=True)
-    usemap = Group(CLiteral("usemap") - usemap_options - INTEGER_VAL)
+    usemap = Group(CLiteral("usemap") - Group(usemap_options - INTEGER_VAL))
 
     write_type_options = oneOf(
         "charge pot smol sspl vdw ivdw lap edens ndens qdens dielx diely dielz kappa",
         caseless=True,
     )
-    write_format_options = oneOf("dx avs uhbd", caseless=True)
+    write_format_options = oneOf("avs dx flat gz uhbd", caseless=True)
     write = Group(
         CLiteral("write")
-        - write_type_options
-        - write_format_options
-        - PATH_VAL
+        - Group(write_type_options - write_format_options - PATH_VAL)
     )
 
     writemat = Group(
@@ -346,7 +386,7 @@ class tabiParser:
     # TODO: This should be replaced which a check to make
     # sure that "NUMBER_VAL is between 0.0 and 1.0"
     mac = Group(CLiteral("mac") - NUMBER_VAL)
-    mesh = Group(CLiteral("mesh") - oneOf("0 1 2"))
+    mesh = Group(CLiteral("mesh") - oneOf("0 1 2 ses skin"))
     outdata = Group(CLiteral("outdata") - oneOf("0 1"))
     tree_n0 = Group(CLiteral("tree_n0") - INTEGER_VAL)
     tree_order = Group(CLiteral("tree_order") - INTEGER_VAL)
@@ -385,6 +425,7 @@ class fe_manualParser:
     maxvert = Group(CLiteral("maxvert") - NUMBER_VAL)
     targetNum = Group(CLiteral("targetNum") - INTEGER_VAL)
     targetRes = Group(CLiteral("targetRes") - NUMBER_VAL)
+    usemesh = Group(CLiteral("usemesh") - IDENTIFIER)
 
     body = (
         CLiteral("fe-manual")
@@ -400,7 +441,7 @@ class fe_manualParser:
         & ZeroOrMore(ekey)
         & ZeroOrMore(elecToken.etol)
         & ZeroOrMore(elecToken.ion)
-        & ZeroOrMore(elecToken.pbe)  # lpbe lrpbe npbe nrpbe
+        & ZeroOrMore(elecToken.pbe)
         & ZeroOrMore(maxsolve)
         & ZeroOrMore(maxvert)
         & ZeroOrMore(genericToken.mol)
@@ -414,6 +455,7 @@ class fe_manualParser:
         & ZeroOrMore(targetRes)
         & ZeroOrMore(genericToken.temp)
         & ZeroOrMore(elecToken.usemap)
+        & ZeroOrMore(usemesh)
         & ZeroOrMore(elecToken.write)
     )
 
@@ -433,7 +475,7 @@ class geoflow_autoParser:
         & ZeroOrMore(genericToken.bconc)
         & ZeroOrMore(elecToken.etol)
         & ZeroOrMore(genericToken.gamma)
-        & ZeroOrMore(elecToken.pbe)  # lpbe lrpbe npbe nrpbe
+        & ZeroOrMore(elecToken.pbe)
         & ZeroOrMore(genericToken.mol)
         & ZeroOrMore(elecToken.pdie)
         & ZeroOrMore(press)
@@ -461,7 +503,7 @@ class mg_autoParser:
         & ZeroOrMore(elecToken.fgcent)
         & ZeroOrMore(elecToken.fglen)
         & ZeroOrMore(elecToken.ion)
-        & ZeroOrMore(elecToken.pbe)  # lpbe lrpbe npbe nrpbe
+        & ZeroOrMore(elecToken.pbe)
         & ZeroOrMore(genericToken.mol)
         & ZeroOrMore(elecToken.pdie)
         & ZeroOrMore(genericToken.sdens)
@@ -496,7 +538,7 @@ class mg_manualParser:
         & ZeroOrMore(elecToken.glen)
         & ZeroOrMore(genericToken.grid)
         & ZeroOrMore(elecToken.ion)
-        & ZeroOrMore(elecToken.pbe)  # lpbe lrpbe npbe nrpbe
+        & ZeroOrMore(elecToken.pbe)
         & ZeroOrMore(genericToken.mol)
         & ZeroOrMore(nlev)
         & ZeroOrMore(elecToken.pdie)
@@ -590,21 +632,19 @@ class pbToken:
         CLiteral("diff")
         - (
             CLiteral("stat")
-            | CLiteral("move") - NUMBER_VAL - NUMBER_VAL
+            | Group(CLiteral("move") - NUMBER_VAL - NUMBER_VAL)
             | CLiteral("rot") - NUMBER_VAL
         )
     )
     dx = Group(CLiteral("dx") - PATH_VAL)
     grid2d = Group(
         CLiteral("grid2d")
-        - PATH_VAL
-        - oneOf("x y z", caseless=True)
-        - NUMBER_VAL
+        - Group(PATH_VAL - oneOf("x y z", caseless=True) - NUMBER_VAL)
     )  # .setDebug()
     gridpts = Group(CLiteral("gridpts") - INTEGER_VAL)
     ntraj = Group(CLiteral("ntraj") - INTEGER_VAL)
     pbc = Group(CLiteral("pbc") - NUMBER_VAL)
-    randorient = Group(CLiteral("randorient"))
+    randorient = CLiteral("randorient")
     runname = Group(CLiteral("runname") - Word(alphanums + "_"))
     runtype_options = oneOf(
         "energyforce electrostatics dynamics", caseless=True
@@ -615,17 +655,18 @@ class pbToken:
     salt = Group(CLiteral("salt") - NUMBER_VAL)
 
     term_pos_options = oneOf("x<= x>= y<= y>= z<= z>= r<= r>=", caseless=True)
-    term_contact = CLiteral("contact") - PATH_VAL
-    # TODO: is the val an integer or float
-    term_pos = term_pos_options - NUMBER_VAL - IDENTIFIER
-    term_time = CLiteral("time") - NUMBER_VAL
-    term = Group(CLiteral("term") - (term_contact | term_pos | term_time))
+    term_contact = Group(CLiteral("contact") - PATH_VAL)
+    term_pos = Group(term_pos_options - NUMBER_VAL - IDENTIFIER)
+    term_time = Group(CLiteral("time") - NUMBER_VAL)
+    term = Group(
+        CLiteral("term") + (term_contact | term_pos | term_time)
+    )  # .setDebug()
 
     termcombine = Group(
         CLiteral("termcombine") - oneOf("and or", caseless=True)
     )
     units = Group(CLiteral("units") - oneOf("kcalmol jmol kT", caseless=True))
-    xyz = Group(CLiteral("xyz") - IDENTIFIER - PATH_VAL)
+    xyz = Group(CLiteral("xyz") - Group(IDENTIFIER - PATH_VAL))
 
 
 class pbam_autoParser:
@@ -696,17 +737,34 @@ class pbsam_autoParser:
     )
 
 
-class ApbsLegacyInput:
+def display_error(source: str, pe: ParseSyntaxException):
 
-    all_values = (
-        OneOrMore(readParser())
-        + OneOrMore(apolarParser() | elecParser())
-        + ZeroOrMore(printParser())
-        + Suppress(CLiteral("QUIT"))
-    )
+    copy = 60
+    msg = "\n" + "=" * copy + "\n"
+    msg += f"ERROR: {type(pe)}\n"
+    msg += f"Parsing {source}\n"
+    msg += f"Line Number: {pe.lineno}:\n"
+    msg += f"Column: {pe.col}:\n"
+    msg += "=" * copy + "\n"
+    msg += f"Line: \n{pe.line}\n"
+    msg += " " * (pe.col - 1) + "^\n"
+    msg += "=" * copy + "\n"
+    pe.msg = msg
+    raise pe
+
+
+class ApbsLegacyInput:
+    def clean(self):
+        FINAL_OUTPUT = {}
+        del FINAL_OUTPUT
+        FINAL_OUTPUT = {}
 
     def __init__(self):
-        self.results = {}
+        self.all_values = OneOrMore(readParser()) + OneOrMore(
+            apolarParser() | elecParser()
+        ) + ZeroOrMore(printParser()) + Suppress(CLiteral("QUIT")) | (
+            empty - ~Word(printables).setName("<unknown>")
+        )
 
     def loads(self, input_data: str):
         """Parse the input as a string
@@ -718,8 +776,33 @@ class ApbsLegacyInput:
         parser = self.all_values
         parser.ignore(COMMENT + restOfLine)
 
-        # return self.all_values.searchString(input_data)[0]
-        return self.all_values.searchString(input_data)[0][0]
+        value: ParseResults = None
+        debug(f"DEFAULT value: TYPE {type(value)} {value}")
+
+        try:
+            value = self.all_values.searchString(input_data)
+        except ParseSyntaxException as pe:
+            display_error("STRING", pe)
+
+        # NOTE: the ParseResults has 1 or more "wrappers"
+        #       around the dictionary so we just want to
+        #       unwrap the value to get to that actual
+        #       dictionary or str representing the data.
+        debug(f"value: TYPE {type(value)}")
+        if isinstance(value, ParseResults):
+            debug(f"value: TYPE[0]{type(value[0])}")
+            if isinstance(value[0], ParseResults):
+                debug(f"value: TYPE[0][0] {type(value[0][0])}")
+                if isinstance(value[0][0], (dict, str)):
+                    return value[0][0]
+            if isinstance(value[0], (dict, str)):
+                return value[0]
+        if isinstance(value, (dict, str)):
+            return value
+
+        raise Exception(
+            f"Could not parse data into dictionary from TYPE{value}:\n{input_data}"
+        )
 
     def load(self, filename: str):
         """
@@ -730,32 +813,16 @@ class ApbsLegacyInput:
         :rtype: dict
         """
         with filename.open() as fp:
-            data = fp.read()
-        try:
-            data = self.loads(data)
-            return data
-
-        except ParseException as pe:
-            self.display_error(filename, pe)
-
-    def display_error(self, filename, pe):
-        # complete the error message
-        msg = "ERROR during parsing of %s,  line %d:" % (
-            filename,
-            pe.lineno,
-        )
-        msg += "\n" + "-" * 40 + "\n"
-        msg += pe.line + "\n"
-        msg += " " * (pe.col - 1) + "^\n"
-        msg += "-" * 40 + "\n" + pe.msg
-        pe.msg = msg
-        # raise pe
+            try:
+                return self.loads(fp.read())
+            except ParseSyntaxException as pe:
+                display_error(filename, pe)
 
 
 def printBlock(prefix: str, item: str):
 
     print(
-        "\n" * 70
+        "\n" * 1
         + "=" * 70
         + "\n"
         + "=" * 2
@@ -766,33 +833,44 @@ def printBlock(prefix: str, item: str):
     )
 
 
+def get_legacy_input_files(
+    opt_path: str = "", pattern: str = "**/*.in"
+) -> list:
+    search_path = (
+        Path(__file__).absolute().parent.parent.parent / "examples" / opt_path
+    )
+    matches = Path(search_path).glob(pattern)
+    matches = filter(lambda x: not search("TEMPLATE", x.name), matches)
+    return filter(lambda x: not x.name.startswith("dxmath"), matches)
+
+
 if __name__ == "__main__":
     # execute only if run as a script
-    relfilename = "../../examples/pbsam-barn_bars/barn_bars_electro.in"
-    relfilename = "../../examples/solv/apbs-smol.in"
-    relfilename = "../../examples/actin-dimer/apbs-mol-auto.in"
+
+    relfilename = "solv/apbs-smol.in"
+    relfilename = "pbsam-gly/gly_dynamics.in"
+    relfilename = "helix/apbs_solv.in"
+    relfilename = "smpbe/apbs-smpbe-24dup.in"
     test = ApbsLegacyInput()
-    from pathlib import Path
 
-    curr_dir = Path(__file__).parent
-    absfilename = curr_dir / relfilename
-    printBlock("FILE", absfilename)
-    test.load(absfilename)
-    pprint.pp(FINAL_OUTPUT)
-    exit()
+    single = False
 
-    # Using readlines()
-    filename = Path("junk")
-    with open(filename, "r") as file1:
-        Lines = file1.readlines()
-    for file in Lines:
-        file = file.strip()
-        printBlock("FILE", file)
+    example_dir = relfilename.split("/")[0]
+    example_pattern = relfilename.split("/")[1]
+
+    files = []
+
+    if single:
+        files = get_legacy_input_files(example_dir, example_pattern)
+    else:
+        files = get_legacy_input_files()
+
+    for idx, file in enumerate(files):
+        printBlock(f"FILE {idx}:", file)
         test = ApbsLegacyInput()
         try:
-            test.load(Path(file))
-            pprint.pp(FINAL_OUTPUT)
+            pprint.pp(test.load(file))
+            del FINAL_OUTPUT
+            FINAL_OUTPUT = {}
         except Exception as e:
-            test.display_error(file, e)
-            print("CRAP")
-            exit()
+            display_error(file, e)

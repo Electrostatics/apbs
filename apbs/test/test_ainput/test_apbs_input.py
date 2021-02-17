@@ -1,15 +1,22 @@
-import pathlib
+from pathlib import Path
+from re import A
 import pytest
-from pyparsing import ParseException
-from apbs.ainput.apbs_legacy_input import ApbsLegacyInput
+from pyparsing import ParseSyntaxException
+from apbs.ainput.apbs_legacy_input import (
+    ApbsLegacyInput,
+    get_legacy_input_files,
+    printBlock,
+    FINAL_OUTPUT,
+)
 
 
-def search_dir(opt_path):
-    return (
-        pathlib.Path(__file__).parent.parent.parent.parent.absolute()
-        / "examples"
-        / opt_path
-    )
+def get_bad_sample():
+    return r"""
+qdens-complex-0.250.dx
+qdens-pep-0.250.dx -
+qdens-rna-0.250.dx -
+qdens-diff-0.250.dx 
+"""
 
 
 def get_sample():
@@ -106,33 +113,55 @@ class TestApbsLegacyInput:
     def test_basic(self):
         """This test values in the records in the sample data"""
         sut = ApbsLegacyInput()
+        ApbsLegacyInput.FINAL_OUTPUT = {}
         config: ApbsLegacyInput = sut.loads(get_sample())
-        assert config[0][0] in "READ"
+        del ApbsLegacyInput.FINAL_OUTPUT
+        print(f"CONFIG: {config['READ'][0]}")
+        assert "READ" in config
+        assert "mol" in config["READ"][0]
+        assert "pqr" in config["READ"][0]["mol"]
+        assert len(config["READ"][0]["mol"]["pqr"]) == 3
 
     @pytest.mark.xfail(
-        raises=ParseException,
+        raises=ParseSyntaxException,
         reason="This should fail because of typo in data",
     )
     def test_bad(self):
         """This test will fail because there is a typo in the sample data"""
         sut = ApbsLegacyInput()
-        config: ApbsLegacyInput = sut.loads(get_sample())
+        with pytest.raises(ParseSyntaxException):
+            ApbsLegacyInput.FINAL_OUTPUT = {}
+            config: ApbsLegacyInput = sut.loads(get_bad_sample())
+            del ApbsLegacyInput.FINAL_OUTPUT
 
     def test_load(self):
         """Test to load all the data from an example file"""
         sut = ApbsLegacyInput()
-        pqr_imput = search_dir("actin-dimer/apbs-mol-auto.in")
-        config: ApbsLegacyInput = sut.load(pqr_imput)
-        assert len(config) == 5
+        relfilename = "actin-dimer/apbs-mol-auto.in"
+        example_dir = relfilename.split("/")[0]
+        example_pattern = relfilename.split("/")[1]
+        files = []
+        files = get_legacy_input_files(example_dir, example_pattern)
+        for file in files:
+            ApbsLegacyInput.FINAL_OUTPUT = {}
+            config = sut.load(file)
+            del ApbsLegacyInput.FINAL_OUTPUT
+            assert len(config["READ"][0]["mol"]["pqr"]) == 3
 
     @pytest.mark.slow
     def test_load_all(self):
         """Test to load all the data from all the example files"""
-        sut = ApbsLegacyInput()
-        # NOTE: There are 135 files under the examples directory
-        matches = pathlib.Path(search_dir("")).glob("**/*.in")
-        for match in matches:
-            print(f"FILE: {match}")
-            config: ApbsLegacyInput = sut.load(match)
+        # NOTE: There are 100+ sample input files under the examples directory
+        files = get_legacy_input_files()
+        for idx, file in enumerate(files):
+            sut = ApbsLegacyInput()
+            printBlock(f"FILE {idx}:", file)
+            ApbsLegacyInput.FINAL_OUTPUT = {}
+            FINAL_OUTPUT = {}
+            config: ApbsLegacyInput = sut.load(file)
+            del ApbsLegacyInput.FINAL_OUTPUT
+            del FINAL_OUTPUT
             print(config)
             assert len(config) > 0
+            del config
+            del sut
