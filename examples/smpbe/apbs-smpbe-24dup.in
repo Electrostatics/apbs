@@ -24,7 +24,8 @@ elec name duplexA
    chgm spl2
    srad 1.4
    swin 0.3
-   smpbe vol 10 size 1000
+   # WARN: smpbe is not supported in pbsam-auto
+   # smpbe vol 10 size 1000
    sdens 10
    temp 298.1
    calcenergy total
@@ -34,3 +35,5 @@ elec name duplexA
 end
 
 print elecEnergy duplexA end
+
+quit

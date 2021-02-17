@@ -14,7 +14,8 @@ elec name born
    srad 1.4
    swin 0.3
    sdens 10.0
-   smpbe vol 3 size 5
+   # WARN: smpbe is not supported in pbsam-auto
+   # smpbe vol 3 size 5
    temp 298.15
    calcenergy total
    calcforce no
