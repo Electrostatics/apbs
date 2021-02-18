@@ -1,5 +1,3 @@
-from pathlib import Path
-from re import A
 import pytest
 from pyparsing import ParseSyntaxException
 from apbs.ainput.apbs_legacy_input import (
@@ -14,19 +12,19 @@ def get_bad_sample():
 qdens-complex-0.250.dx
 qdens-pep-0.250.dx -
 qdens-rna-0.250.dx -
-qdens-diff-0.250.dx 
+qdens-diff-0.250.dx
 """
 
 
 def get_sample():
     return r"""
-read 
+read
     mol pqr mol1.pqr
     mol pqr mol2.pqr
     mol pqr complex.pqr
 end
 
-# CALCULATE POTENTIAL FOR FIRST COMPONENT 
+# CALCULATE POTENTIAL FOR FIRST COMPONENT
 elec name mol1
     mg-auto
     dime  161 161 161
@@ -71,7 +69,7 @@ elec name mol2
     srad 1.4
     swin 0.3
     sdens 10.0
-    temp 298.15 
+    temp 298.15
     calcenergy total
     calcforce no
 end
@@ -128,6 +126,7 @@ class TestApbsLegacyInput:
         sut = ApbsLegacyInput()
         with pytest.raises(ParseSyntaxException):
             config: ApbsLegacyInput = sut.loads(get_bad_sample())
+            assert len(config) == 0
 
     def test_load(self):
         """Test to load all the data from an example file"""

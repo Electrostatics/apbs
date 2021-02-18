@@ -20,7 +20,7 @@ from pyparsing import (
     pyparsing_common,
     restOfLine,
 )
-from re import VERBOSE, search
+from re import search
 
 # Purpose:
 #   The ApbsLegacyInput class was written to parse input files
