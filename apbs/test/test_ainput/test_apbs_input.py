@@ -6,7 +6,6 @@ from apbs.ainput.apbs_legacy_input import (
     ApbsLegacyInput,
     get_legacy_input_files,
     printBlock,
-    FINAL_OUTPUT,
 )
 
 
@@ -113,9 +112,7 @@ class TestApbsLegacyInput:
     def test_basic(self):
         """This test values in the records in the sample data"""
         sut = ApbsLegacyInput()
-        ApbsLegacyInput.FINAL_OUTPUT = {}
         config: ApbsLegacyInput = sut.loads(get_sample())
-        del ApbsLegacyInput.FINAL_OUTPUT
         print(f"CONFIG: {config['READ'][0]}")
         assert "READ" in config
         assert "mol" in config["READ"][0]
@@ -130,9 +127,7 @@ class TestApbsLegacyInput:
         """This test will fail because there is a typo in the sample data"""
         sut = ApbsLegacyInput()
         with pytest.raises(ParseSyntaxException):
-            ApbsLegacyInput.FINAL_OUTPUT = {}
             config: ApbsLegacyInput = sut.loads(get_bad_sample())
-            del ApbsLegacyInput.FINAL_OUTPUT
 
     def test_load(self):
         """Test to load all the data from an example file"""
@@ -143,9 +138,8 @@ class TestApbsLegacyInput:
         files = []
         files = get_legacy_input_files(example_dir, example_pattern)
         for file in files:
-            ApbsLegacyInput.FINAL_OUTPUT = {}
+            sut = ApbsLegacyInput()
             config = sut.load(file)
-            del ApbsLegacyInput.FINAL_OUTPUT
             assert len(config["READ"][0]["mol"]["pqr"]) == 3
 
     @pytest.mark.slow
@@ -156,12 +150,6 @@ class TestApbsLegacyInput:
         for idx, file in enumerate(files):
             sut = ApbsLegacyInput()
             printBlock(f"FILE {idx}:", file)
-            ApbsLegacyInput.FINAL_OUTPUT = {}
-            FINAL_OUTPUT = {}
             config: ApbsLegacyInput = sut.load(file)
-            del ApbsLegacyInput.FINAL_OUTPUT
-            del FINAL_OUTPUT
             print(config)
             assert len(config) > 0
-            del config
-            del sut
