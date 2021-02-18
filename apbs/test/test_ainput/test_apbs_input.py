@@ -4,8 +4,8 @@ import pytest
 from pyparsing import ParseSyntaxException
 from apbs.ainput.apbs_legacy_input import (
     ApbsLegacyInput,
-    get_legacy_input_files,
-    printBlock,
+    get_example_files,
+    printBanner,
 )
 
 
@@ -136,7 +136,7 @@ class TestApbsLegacyInput:
         example_dir = relfilename.split("/")[0]
         example_pattern = relfilename.split("/")[1]
         files = []
-        files = get_legacy_input_files(example_dir, example_pattern)
+        files = get_example_files(example_dir, example_pattern)
         for file in files:
             sut = ApbsLegacyInput()
             config = sut.load(file)
@@ -146,10 +146,15 @@ class TestApbsLegacyInput:
     def test_load_all(self):
         """Test to load all the data from all the example files"""
         # NOTE: There are 100+ sample input files under the examples directory
-        files = get_legacy_input_files()
+        files = get_example_files()
         for idx, file in enumerate(files):
             sut = ApbsLegacyInput()
-            printBlock(f"FILE {idx}:", file)
+            printBanner(f"FILE {idx}:", file)
             config: ApbsLegacyInput = sut.load(file)
             print(config)
             assert len(config) > 0
+            assert len(config["READ"][0]["mol"]) > 0
+            if "ELEC" in config:
+                assert len(config["ELEC"][0]) > 0
+            if "APOLAR" in config:
+                assert len(config["APOLAR"][0]) > 0

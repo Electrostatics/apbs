@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 from pprint import pprint
 from pyparsing import CaselessLiteral as CLiteral
@@ -21,60 +22,213 @@ from pyparsing import (
 )
 from re import VERBOSE, search
 
+# Purpose:
+#   The ApbsLegacyInput class was written to parse input files
+#   that were developed over the years and has a "less formal" syntax.
+#   The Input file syntax is pretty well documented at
+#   https://apbs.readthedocs.io/en/latest/using/index.html#input-file-syntax
+
+# Approach:
+#   The ApbsLegacyInput class parses an entire input file by the major
+#   sections:
+#      - READ = Holds directives for reading input files for molecules
+#      - ELEC = Holds polar calculation parameters
+#      - APOLAR = Holds apolar calculation parameters
+#      - PRINT = Holds specification for summary output
+#
+#   There are several auxillary classes in this file that are used to
+#   define "groupings" or private "namespaces". For example, the
+#   genericToken class has tokens for can be used across many other
+#   classes. The apolarToken class only has tokens that are in the
+#   APOLAR section. These classes help build a heirarchy or tokens
+#   and grammars that are specified in the documentation.
+#   The list of token classes are:
+#       - genericToken
+#       - apolarToken
+#       - elecToken
+#       - pbToken
+#   There are also classes for specific tokens and grammars for
+#   more targeted parsing. For example, the tabiParser class is only
+#   for parsing the ELEC section where the calculation type is tabi-auto.
+#   The list of parsing classes are:
+#       tabiParser:
+#       fe_manualParser:
+#       geoflow_autoParser:
+#       mg_autoParser:
+#       mg_manualParser:
+#       mg_paraParser:
+#       mg_dummyParser:
+#       pbam_autoParser:
+#       pbsam_autoParser:
+#
+#   Each SECTION has a parser and formatter. The parser specifies the
+#   grammar used to match the section of the input file and generates
+#   a pyparsing.ParseResults value. That value is forwarded to a
+#   formatter to produce a dictionary for that SECTION. For example,
+#   the readParser parses the input file for the READ section. The
+#   readParser forwards the ParseResults to the formatRead method to
+#   produce the 'READ' dictionary in the FINAL_OUTPUT dictionary.
+#
+#   NOTE: Since the formatters have ParseResults that can be any
+#         combination of nested string, key/value, key/list,
+#         key/dictionary, or ParseResults; the code has to check
+#         data types for each item at each level. This code is
+#         combersome and hard to write/read. If the input file format
+#         followed a more traditional eBNF, the grammars would be much
+#         simpler and the formatting code would be much cleaner.
+#
+#   NOTE: Whenever possible, convert integers in config files to python
+#         integers. Likewise, convert floats to python floats.
+
+# Algorithm:
+#   The pyparsing module is used to define methods for grammars for each
+#   section.
+#
+#   For example, the readParser is responsible for parsing the
+#   READ section of the input file and producing a section of the final
+#   dictionary.
+#
+#   The final dictionary holds the entire parsed file and is meant to be
+#   used as a "main" configuration for running the apbs extecutable.
+
+# Caveats:
+#   There are cases where keywords can be used multiple times. In other
+#   words, the keywords are not always "unique" which is problematic in
+#   building a dictionary of key/value pairs. It is also the case that
+#   "sections" like ELEC, APOLAR, and PRINT can be repeated. Technically,
+#   even the READ section can be repeated like the following:
+#       READ mol prq ABC.pqr END
+#       READ mol pdb DEF.pdb END
+#
+#   To deal with this, each section is a "dict" with integer keys that
+#   incrementally build up based on the order the section was read from
+#   the input file. The example above would result in a dictionary section
+#   like the following:
+#       'READ': {0: {'mol': {'pqr': ['ABC.pqr']}},
+#                1: {'mol': {'pqr': ['DEF.pqr']}}}
+#
+#   If the input file had combined the values in on READ section, like the
+#   following:
+#       READ
+#         mol prq ABC.pqr
+#         mol pdb DEF.pdb
+#       END
+#   Then the resulting dictionary would be:
+#       'READ': {0: {'mol': {'pqr': ['ABC.pqr', 'DEF.pqr']}}}
+#
+#   The grammars are used to "group" sections, subsection, keys, and values
+#   together. One problem that was discovered was example files with PRINT
+#   sections that did not have "spaces" between IDENTIFIERS and operators.
+#   For example, the following works correctly:
+#       PRINT elecEnergy mol-1 + mol-2 - complex_mol END
+#   Since IDENTIFIERS can have dashes/hyphens and underscores in them, the
+#   grammar can only support them if the operators are separated from the
+#   IDENTIFIERS by spaces. The following will not parse correctly:
+#       PRINT elecEnergy mol-1+mol-2-complex_mol END
+#
+#   The grammars and parsers convert all input and produce all output in
+#   lowercase alphanumeric representation. This could be a problem for
+#   filenames/pathnames.
+
 
 class ApbsLegacyInput:
     """Class for reading in legacy APBS input files."""
 
     def __init__(self):
-        # GLOBAL Values
+        """Setup parsing tokens and grammar for the APBS input file format."""
+
+        # Tokens used by multiple parsers
         self.COMMENT = "#"
+        # TODO: The DEBUG flag should be set/accessed from a higher
+        #       level debugging object that is set from a config
+        #       file or command line option.
         self.DEBUG = False
         self.END_VAL = CLiteral("END")
 
+        # The FINAL_OUTPUT is a dictionary produced after parsing a file
+        # using the grammar and processing rules.
         self.FINAL_OUTPUT = {}
 
+        # The highest level grammar to parse the READ, ELEC, APOLAR, and
+        # PRINT sections until the QUIT keyword is found.
         self.grammar = OneOrMore(self.readParser()) + OneOrMore(
             self.apolarParser() | self.elecParser()
         ) + ZeroOrMore(self.printParser()) + Suppress(CLiteral("QUIT")) | (
-            empty - ~Word(printables).setName("<unknown>")
+            # The following is one way to "narrow down" errors in an input
+            # file. It was adopted from:
+            # https://web.archive.org/web/20160821175151/http://pyparsing.wikispaces.com/share/view/30875955
+            # The idea is that the parsers above will succeed or the
+            # following will succeed and set the ParseSyntaxException
+            # stating that the token in the file is "unknown" and will
+            # show the line and column where the parser stopped. It does
+            # not always point out subtle errors like when a key is used
+            # in a section that does not support it. For example, using
+            # a keyword from pbam-auto in an ELEC section that specifies
+            # using tabi-auto type.
+            empty
+            - ~Word(printables).setName("<unknown>")
         )
 
     @staticmethod
-    def get_integer_val():
-        return Combine(Optional("-") + Word(nums))
+    def get_integer_grammar():
+        """Convenience function that is used by other classes."""
+        return Combine(Optional("-") + Word(nums))  # .setDebug()
 
     @staticmethod
-    def get_identifier():
+    def get_identifier_grammar():
+        """Convenience function that is used by other classes."""
         return (
             Word(alphanums, alphanums + r"_" + r"-")
-            | ApbsLegacyInput.get_integer_val()
-        )
-
-    @staticmethod
-    def get_number_val():
-        return (
-            pyparsing_common.real | ApbsLegacyInput.get_integer_val()
+            | ApbsLegacyInput.get_integer_grammar()
         )  # .setDebug()
 
     @staticmethod
-    def get_path_val():
+    def get_number_grammar():
+        """Convenience function that is used by other classes."""
+        return (
+            pyparsing_common.real | ApbsLegacyInput.get_integer_grammar()
+        )  # .setDebug()
+
+    @staticmethod
+    def get_path_grammar():
+        """Convenience function that is used by other classes."""
         return Word(printables)  # .setDebug()
 
     def debug(self, message: str):
+        """Convenience function to track down grammar/parsing problems"""
         if self.DEBUG:
             print(message)
 
-    def formatReadBlock(self, t: ParseResults, section: str, groups: list):
+    def formatReadSection(self, results: ParseResults, groups: list) -> dict:
+        """Format the READ section of the APBS input file.
+
+        :param results ParseResults: the pyparsing representation of the matching grammar
+        :param groups list: the section of the FINAL_OUTPUT to generate
+        :return: a dictionary containing the READ section of the input file
+        :rtype: dict
+
+        Example: Convert the following:
+            read
+                mol pqr 24dup.pqr
+            end
+        To:
+            'READ': {0: {'mol': {'pqr': ['24dup.pqr']}}}
+        """
+
+        # TODO: More documentation!
         """Convert lists of lists to a dictionary"""
 
+        section = "READ"
         if section not in self.FINAL_OUTPUT:
             self.FINAL_OUTPUT[section] = {}
         idx = len(self.FINAL_OUTPUT[section])
         self.debug(f"IDX: {idx}")
         self.FINAL_OUTPUT[section][idx] = {}
 
-        self.debug(f"T: {t}")
-        for result in t[0]:
+        # TODO: More error checking
+        #       - What if key not in groups?
+        self.debug(f"RESULTS: {results}")
+        for result in results[0]:
             self.debug(f"TYPE: {type(result)}")
             for field in result:
                 self.debug(f"type item: {type(field)} {field}")
@@ -101,52 +255,27 @@ class ApbsLegacyInput:
         return self.FINAL_OUTPUT
 
     def readParser(self):
-        """Setup the grammar for the READ section."""
+        """Setup the tokens and grammar for the READ section."""
 
-        # READ section specific grammar
         # https://apbs.readthedocs.io/en/latest/using/input/read.html
 
+        PATH_VAL = ApbsLegacyInput.get_path_grammar()
+
+        # tokens/grammars:
         file_fmt = oneOf("dx gz", caseless=True)
-
-        # charge format - is path considered relative?
-        charge = Group(
-            CLiteral("charge") - file_fmt - ApbsLegacyInput.get_path_val()
-        )
-
-        # diel format(dx) path-x, path-y, path-z
-        #     are path-x, path-y, path-z considered relative?
-        #     where to find non-zero ionic strength
+        charge = Group(CLiteral("charge") - file_fmt - PATH_VAL)
         diel = Group(
-            CLiteral("diel")
-            - file_fmt
-            - ApbsLegacyInput.get_path_val()
-            - ApbsLegacyInput.get_path_val()
-            - ApbsLegacyInput.get_path_val()
+            CLiteral("diel") - file_fmt - PATH_VAL - PATH_VAL - PATH_VAL
         )
-
-        # kappa format path - is path considered relative?
-        kappa = Group(
-            CLiteral("kappa") - file_fmt - ApbsLegacyInput.get_path_val()
-        )
-
-        # mol format(pqr|pdb) path - is path considered relative?
+        kappa = Group(CLiteral("kappa") - file_fmt - PATH_VAL)
         mol_format = oneOf("pqr pdb", caseless=True)
-        mol = Group(
-            CLiteral("mol") - mol_format - ApbsLegacyInput.get_path_val()
-        )
-
-        # parm format(flat) path - is path considered relative?
+        mol = Group(CLiteral("mol") - mol_format - PATH_VAL)
         parm_format = oneOf("flat xml", caseless=True)
-        parm = Group(
-            CLiteral("parm") - parm_format - ApbsLegacyInput.get_path_val()
-        )
+        parm = Group(CLiteral("parm") - parm_format - PATH_VAL)
+        pot = Group(CLiteral("pot") - file_fmt - PATH_VAL)
+        groups = ["charge", "diel", "kappa", "mol", "parm", "pot"]
 
-        # pot format(dx|gz) path - is path considered relative?
-        pot = Group(
-            CLiteral("pot") - file_fmt - ApbsLegacyInput.get_path_val()
-        )
-
-        body = Group(
+        grammar = Group(
             OneOrMore(mol)
             & ZeroOrMore(charge)
             & ZeroOrMore(diel)
@@ -155,29 +284,40 @@ class ApbsLegacyInput:
             & ZeroOrMore(pot)
         )
 
-        def formatRead(t: ParseResults):
-            groups = ["charge", "diel", "kappa", "mol", "param", "pot"]
-            return self.formatReadBlock(t, "READ", groups)
+        def formatRead(results: ParseResults):
+            return self.formatReadSection(results, groups)
 
         return Group(
-            Suppress(CLiteral("READ")) - body - Suppress(self.END_VAL)
+            Suppress(CLiteral("READ")) - grammar - Suppress(self.END_VAL)
         ).setParseAction(formatRead)
 
     def printParser(self):
-        """Setup the grammar for the PRINT section."""
+        """Setup the tokens and grammar for the PRINT section."""
 
-        val = CLiteral("PRINT")
+        IDENTIFIER = ApbsLegacyInput.get_identifier_grammar()
+
+        # tokens/grammars:
         choices = oneOf(
             "elecEnergy elecForce apolEnergy apolForce", caseless=True
         )
-        IDENTIFIER = ApbsLegacyInput.get_identifier()
         expr = IDENTIFIER + Optional(
             OneOrMore(oneOf("+ -") + IDENTIFIER)
             + ZeroOrMore(oneOf("+ -") + IDENTIFIER)
         )
-        body = Group(choices - expr)
+        grammar = Group(choices - expr)
 
-        def formatPrint(t: ParseResults):
+        def formatPrint(results: ParseResults):
+            """Format the PRINT section of the APBS input file.
+
+            :param results ParseResults: the pyparsing representation of the matching grammar
+            :return: a dictionary containing the PRINT section of the input file
+            :rtype: dict
+
+            Example: Convert the following:
+                print elecEnergy complex - mol2 - mol1 end
+            To:
+                'PRINT': {0: {'elecenergy': ['complex', '-', 'mol2', '-', 'mol1']}}
+            """
 
             section = "PRINT"
             if section not in self.FINAL_OUTPUT:
@@ -185,7 +325,7 @@ class ApbsLegacyInput:
             idx = len(self.FINAL_OUTPUT[section])
             self.FINAL_OUTPUT[section][idx] = {}
 
-            for row in t[0]:
+            for row in results[0]:
                 self.debug(f"TYPE: {type(row)}")
                 for item in row:
                     self.debug(f"type item: {type(item)} {item}")
@@ -196,18 +336,75 @@ class ApbsLegacyInput:
                             self.FINAL_OUTPUT[section][idx][key] = row[1:]
                             break
                 else:
+                    # NOTE: UGLY but this is how to break out of the inner and
+                    #       outer loop as documented at:
+                    #       https://note.nkmk.me/en/python-break-nested-loops
                     break
                 break
 
             return self.FINAL_OUTPUT
 
         value = Group(
-            Suppress(val) - body - Suppress(self.END_VAL)
+            Suppress(CLiteral("PRINT")) - grammar - Suppress(self.END_VAL)
         ).setParseAction(formatPrint)
 
         return value
 
-    def formatBlock(self, t: ParseResults, section: str):
+    def formatSection(self, t: ParseResults, section: str):
+        """Format the ELEC or APOLAR section of the APBS input file.
+
+        :param results ParseResults: the pyparsing representation of the matching grammar
+        :return: a dictionary containing the ELEC or APOLAR section of the input file
+        :rtype: dict
+
+        Example: Convert the following:
+            elec name mol1
+                mg-auto
+                dime  161 161 161
+                cglen 156 121 162
+                fglen 112  91 116
+                cgcent mol 3
+                fgcent mol 3
+                mol 1
+                npbe
+                bcfl sdh
+                ion charge 1 conc 0.050 radius 2.0
+                ion charge -1 conc 0.050 radius 2.0
+                pdie 2.0
+                sdie 78.4
+                srfm mol
+                chgm spl0
+                srad 1.4
+                swin 0.3
+                sdens 10.0
+                temp 298.15
+                calcenergy total
+                calcforce no
+            end
+        To:
+            'ELEC': {0: {'bcfl': 'sdh',
+                  'calcenergy': 'total',
+                  'calcforce': 'no',
+                  'cgcent': ['mol', '3'],
+                  'cglen': ['156', '121', '162'],
+                  'chgm': 'spl0',
+                  'dime': ['161', '161', '161'],
+                  'fgcent': ['mol', '3'],
+                  'fglen': ['112', '91', '116'],
+                  'ion': {0: {'charge': '1', 'conc': 0.05, 'radius': 2.0},
+                          1: {'charge': '-1', 'conc': 0.05, 'radius': 2.0}},
+                  'mol': '1',
+                  'name': 'mol1',
+                  'pbe': 'npbe',
+                  'pdie': 2.0,
+                  'sdens': 10.0,
+                  'sdie': 78.4,
+                  'srad': 1.4,
+                  'srfm': 'mol',
+                  'swin': 0.3,
+                  'temp': 298.15,
+                  'type': 'mg-auto'}
+        """
 
         if section not in self.FINAL_OUTPUT:
             self.FINAL_OUTPUT[section] = {}
@@ -281,8 +478,13 @@ class ApbsLegacyInput:
         return self.FINAL_OUTPUT
 
     def apolarParser(self):
+        """Setup the tokens and grammar for the APOLAR section.
 
-        body = (
+        :return: a dictionary containing the APOLAR section of the input file
+        :rtype: dict
+        """
+
+        grammar = (
             ZeroOrMore(elecToken.name)
             & ZeroOrMore(genericToken.bconc)
             & ZeroOrMore(genericToken.calcenergy)
@@ -299,53 +501,64 @@ class ApbsLegacyInput:
             & ZeroOrMore(genericToken.temp)
         )
 
-        def formatApolar(t: ParseResults):
-            return self.formatBlock(t, "APOLAR")
+        def formatApolar(results: ParseResults):
+            return self.formatSection(results, "APOLAR")
 
         return Group(
-            Suppress(CLiteral("APOLAR")) - body - Suppress(self.END_VAL)
+            Suppress(CLiteral("APOLAR")) - grammar - Suppress(self.END_VAL)
         ).setParseAction(formatApolar)
 
     def elecParser(self):
+        """Setup the tokens and grammar for the ELEC section.
 
-        body = (
-            tabiParser.body
-            | fe_manualParser.body
-            | geoflow_autoParser.body
-            | mg_autoParser.body
-            | mg_manualParser.body
-            | mg_paraParser.body
-            | mg_dummyParser.body
-            | pbam_autoParser.body
-            | pbsam_autoParser.body
+        :return: a dictionary containing the APOLAR section of the input file
+        :rtype: dict
+        """
+
+        grammar = (
+            tabiParser.grammar
+            | fe_manualParser.grammar
+            | geoflow_autoParser.grammar
+            | mg_autoParser.grammar
+            | mg_manualParser.grammar
+            | mg_paraParser.grammar
+            | mg_dummyParser.grammar
+            | pbam_autoParser.grammar
+            | pbsam_autoParser.grammar
         )
 
-        def formatElec(t: ParseResults):
-            return self.formatBlock(t, "ELEC")
+        def formatElec(results: ParseResults):
+            return self.formatSection(results, "ELEC")
 
         return Group(
-            Suppress(CLiteral("ELEC")) - body - Suppress(self.END_VAL)
+            Suppress(CLiteral("ELEC")) - grammar - Suppress(self.END_VAL)
         ).setParseAction(formatElec)
 
-    def display_error(self, source: str, pe: ParseSyntaxException):
+    def raise_error(self, source: str, pe: ParseSyntaxException):
+        """Parsing failed - try to be produce a helpful error messsage.
 
-        copy = 60
-        msg = "\n" + "=" * copy + "\n"
-        msg += f"ERROR: {type(pe)}\n"
-        msg += f"Parsing {source}\n"
-        msg += f"Line Number: {pe.lineno}:\n"
-        msg += f"Column: {pe.col}:\n"
-        msg += "=" * copy + "\n"
-        msg += f"Line: \n{pe.line}\n"
-        msg += " " * (pe.col - 1) + "^\n"
-        msg += "=" * copy + "\n"
-        pe.msg = msg
+        :param source str: the filename or string representing the data
+        :param pe ParseSyntaxException: the Exception that was caught
+        :return: None
+        :rtype: None
+        """
+
+        repeat_count = 70
+        message = "\n" + "=" * repeat_count + "\n"
+        message += f"ERROR: {type(pe)}\n"
+        message += f"Parsing {source}\n"
+        message += f"Line Number: {pe.lineno}:\n"
+        message += f"Column: {pe.col}:\n"
+        message += "=" * repeat_count + "\n"
+        message += f"Line: \n{pe.line}\n"
+        message += " " * (pe.col - 1) + "^\n"
+        message += "=" * repeat_count + "\n"
+        pe.msg = message
         raise pe
 
-    def clean(self):
-        self.FINAL_OUTPUT = {}
+    def __del__(self):
+        """Wipe out any previous results."""
         del self.FINAL_OUTPUT
-        self.FINAL_OUTPUT = {}
 
     def loads(self, input_data: str):
         """Parse the input as a string
@@ -354,6 +567,7 @@ class ApbsLegacyInput:
         :return: a dictionary configuration files contents
         :rtype: dict
         """
+
         parser = self.grammar
         parser.ignore(self.COMMENT + restOfLine)
 
@@ -363,7 +577,7 @@ class ApbsLegacyInput:
         try:
             value = self.grammar.searchString(input_data)
         except ParseSyntaxException as pe:
-            self.display_error("STRING", pe)
+            self.raise_error("STRING", pe)
 
         # NOTE: the ParseResults has 1 or more "wrappers"
         #       around the dictionary so we just want to
@@ -393,16 +607,19 @@ class ApbsLegacyInput:
         :return: a dictionary configuration files contents
         :rtype: dict
         """
+
         with filename.open() as fp:
             try:
                 return self.loads(fp.read())
             except ParseSyntaxException as pe:
-                self.display_error(filename, pe)
+                self.raise_error(filename, pe)
 
 
 class genericToken:
+    """Generic tokens/grammars that can be used by other classes."""
 
-    NUMBER_VAL = ApbsLegacyInput.get_number_val()
+    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
+
     bconc = Group(CLiteral("bconc") - NUMBER_VAL)
     calc_options = oneOf("no total comps", caseless=True)
     calcenergy = Group(CLiteral("calcenergy") - calc_options)
@@ -418,27 +635,29 @@ class genericToken:
 
 
 class apolarToken:
+    """APOLAR specific tokens/grammars that can be used by other classes."""
 
-    # APOLAR section specific grammar
     # https://apbs.readthedocs.io/en/latest/using/input/apolar/index.html
 
-    NUMBER_VAL = ApbsLegacyInput.get_number_val()
+    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
     dpos = Group(CLiteral("dpos") - NUMBER_VAL)
     press = Group(CLiteral("press") - NUMBER_VAL)
     srfm = Group(CLiteral("srfm") - oneOf("sacc", caseless=True))
 
 
 class elecToken:
+    """ELEC specific tokens/grammars that can be used by other classes."""
 
-    # ELEC section specific grammar
     # https://apbs.readthedocs.io/en/latest/using/input/elec/index.html
 
     # The following tokens are used by at least 2 of the parser types with
     # the same format and rules
 
-    IDENTIFIER = ApbsLegacyInput.get_identifier()
-    INTEGER_VAL = ApbsLegacyInput.get_integer_val()
-    NUMBER_VAL = ApbsLegacyInput.get_number_val()
+    IDENTIFIER = ApbsLegacyInput.get_identifier_grammar()
+    INTEGER_VAL = ApbsLegacyInput.get_integer_grammar()
+    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
+    PATH_VAL = ApbsLegacyInput.get_path_grammar()
+
     name = Group(CLiteral("name") - IDENTIFIER)
     grid_floats = Group(NUMBER_VAL * 3)
     grid_ints = Group(INTEGER_VAL * 3)
@@ -488,29 +707,23 @@ class elecToken:
     write_format_options = oneOf("avs dx flat gz uhbd", caseless=True)
     write = Group(
         CLiteral("write")
-        - Group(
-            write_type_options
-            - write_format_options
-            - ApbsLegacyInput.get_path_val()
-        )
+        - Group(write_type_options - write_format_options - PATH_VAL)
     )
 
     writemat = Group(
-        CLiteral("writemat")
-        - oneOf("poisson", caseless=True)
-        - ApbsLegacyInput.get_path_val()
+        CLiteral("writemat") - oneOf("poisson", caseless=True) - PATH_VAL
     )
 
 
 class tabiParser:
+    """ELEC tabi specific tokens/grammars."""
 
-    # tabi Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/tabi.html
 
-    INTEGER_VAL = ApbsLegacyInput.get_integer_val()
-    NUMBER_VAL = ApbsLegacyInput.get_number_val()
+    INTEGER_VAL = ApbsLegacyInput.get_integer_grammar()
+    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
 
-    # TODO: This should be replaced which a check to make
+    # TODO: Should this be replaced which a check to make
     # sure that "NUMBER_VAL is between 0.0 and 1.0"
     mac = Group(CLiteral("mac") - NUMBER_VAL)
     mesh = Group(CLiteral("mesh") - oneOf("0 1 2 ses skin"))
@@ -518,7 +731,7 @@ class tabiParser:
     tree_n0 = Group(CLiteral("tree_n0") - INTEGER_VAL)
     tree_order = Group(CLiteral("tree_order") - INTEGER_VAL)
 
-    body = (
+    grammar = (
         CLiteral("tabi")
         & ZeroOrMore(elecToken.name)
         & ZeroOrMore(elecToken.ion)
@@ -537,13 +750,13 @@ class tabiParser:
 
 
 class fe_manualParser:
+    """ELEC fe-manual specific tokens/grammars."""
 
-    # fe-manual Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/fe-manual.html
 
-    IDENTIFIER = ApbsLegacyInput.get_identifier()
-    INTEGER_VAL = ApbsLegacyInput.get_integer_val()
-    NUMBER_VAL = ApbsLegacyInput.get_number_val()
+    IDENTIFIER = ApbsLegacyInput.get_identifier_grammar()
+    INTEGER_VAL = ApbsLegacyInput.get_integer_grammar()
+    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
 
     akeyPRE_options = oneOf("unif geom", caseless=True)
     akeyPRE = Group(CLiteral("akeyPRE") - akeyPRE_options)
@@ -558,7 +771,7 @@ class fe_manualParser:
     targetRes = Group(CLiteral("targetRes") - NUMBER_VAL)
     usemesh = Group(CLiteral("usemesh") - IDENTIFIER)
 
-    body = (
+    grammar = (
         CLiteral("fe-manual")
         & ZeroOrMore(elecToken.name)
         & ZeroOrMore(akeyPRE)
@@ -592,16 +805,16 @@ class fe_manualParser:
 
 
 class geoflow_autoParser:
+    """ELEC geoflow-auto specific tokens/grammars."""
 
-    # geoflow-auto Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/geoflow-auto.html
 
-    NUMBER_VAL = ApbsLegacyInput.get_number_val()
+    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
 
     press = Group(CLiteral("press") - NUMBER_VAL)
     vdwdisp = Group(CLiteral("vdwdisp") - oneOf("0 1"))
 
-    body = (
+    grammar = (
         CLiteral("geoflow-auto")
         & ZeroOrMore(elecToken.name)
         & ZeroOrMore(elecToken.bcfl)
@@ -618,11 +831,11 @@ class geoflow_autoParser:
 
 
 class mg_autoParser:
+    """ELEC mg-auto specific tokens/grammars."""
 
-    # mg-auto Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-auto.html
 
-    body = (
+    grammar = (
         CLiteral("mg-auto")
         & ZeroOrMore(elecToken.name)
         & ZeroOrMore(elecToken.bcfl)
@@ -652,15 +865,15 @@ class mg_autoParser:
 
 
 class mg_manualParser:
+    """ELEC mg-manual specific tokens/grammars."""
 
-    # mg-manual Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-manual.html
 
-    INTEGER_VAL = ApbsLegacyInput.get_integer_val()
+    INTEGER_VAL = ApbsLegacyInput.get_integer_grammar()
 
     nlev = Group(CLiteral("nlev") - INTEGER_VAL)
 
-    body = (
+    grammar = (
         CLiteral("mg-manual")
         & ZeroOrMore(elecToken.name)
         & ZeroOrMore(elecToken.bcfl)
@@ -690,17 +903,17 @@ class mg_manualParser:
 
 
 class mg_paraParser:
+    """ELEC mg-para specific tokens/grammars."""
 
-    # mg-para Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-para.html
 
-    NUMBER_VAL = ApbsLegacyInput.get_number_val()
+    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
 
     # TODO: Combine with dime?
     pdime = Group(CLiteral("pdime") - elecToken.grid_floats)
     ofrac = Group(CLiteral("ofrac") - NUMBER_VAL)
 
-    body = (
+    grammar = (
         CLiteral("mg-para")
         & ZeroOrMore(elecToken.name)
         & ZeroOrMore(elecToken.async_value)
@@ -733,11 +946,11 @@ class mg_paraParser:
 
 
 class mg_dummyParser:
+    """ELEC mg-dummy specific tokens/grammars."""
 
-    # mg-dummy Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-dummy.html
 
-    body = (
+    grammar = (
         CLiteral("mg-dummy")
         & ZeroOrMore(elecToken.name)
         & ZeroOrMore(elecToken.bcfl)
@@ -761,14 +974,14 @@ class mg_dummyParser:
 
 
 class pbToken:
+    """ELEC pbam-auto and pbsam-auto specific tokens/grammars."""
 
-    # pbam-auto and pbsam-auto specific Keywords
+    IDENTIFIER = ApbsLegacyInput.get_identifier_grammar()
+    INTEGER_VAL = ApbsLegacyInput.get_integer_grammar()
+    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
+    PATH_VAL = ApbsLegacyInput.get_path_grammar()
 
-    IDENTIFIER = ApbsLegacyInput.get_identifier()
-    INTEGER_VAL = ApbsLegacyInput.get_integer_val()
-    NUMBER_VAL = ApbsLegacyInput.get_number_val()
-
-    thr3dmap = Group(CLiteral("3dmap") - ApbsLegacyInput.get_path_val())
+    thr3dmap = Group(CLiteral("3dmap") - PATH_VAL)
     diff = Group(
         CLiteral("diff")
         - (
@@ -777,14 +990,10 @@ class pbToken:
             | CLiteral("rot") - NUMBER_VAL
         )
     )
-    dx = Group(CLiteral("dx") - ApbsLegacyInput.get_path_val())
+    dx = Group(CLiteral("dx") - PATH_VAL)
     grid2d = Group(
         CLiteral("grid2d")
-        - Group(
-            ApbsLegacyInput.get_path_val()
-            - oneOf("x y z", caseless=True)
-            - NUMBER_VAL
-        )
+        - Group(PATH_VAL - oneOf("x y z", caseless=True) - NUMBER_VAL)
     )  # .setDebug()
     gridpts = Group(CLiteral("gridpts") - INTEGER_VAL)
     ntraj = Group(CLiteral("ntraj") - INTEGER_VAL)
@@ -800,7 +1009,7 @@ class pbToken:
     salt = Group(CLiteral("salt") - NUMBER_VAL)
 
     term_pos_options = oneOf("x<= x>= y<= y>= z<= z>= r<= r>=", caseless=True)
-    term_contact = Group(CLiteral("contact") - ApbsLegacyInput.get_path_val())
+    term_contact = Group(CLiteral("contact") - PATH_VAL)
     term_pos = Group(term_pos_options - NUMBER_VAL - IDENTIFIER)
     term_time = Group(CLiteral("time") - NUMBER_VAL)
     term = Group(
@@ -811,17 +1020,15 @@ class pbToken:
         CLiteral("termcombine") - oneOf("and or", caseless=True)
     )
     units = Group(CLiteral("units") - oneOf("kcalmol jmol kT", caseless=True))
-    xyz = Group(
-        CLiteral("xyz") - Group(IDENTIFIER - ApbsLegacyInput.get_path_val())
-    )
+    xyz = Group(CLiteral("xyz") - Group(IDENTIFIER - PATH_VAL))
 
 
 class pbam_autoParser:
+    """ELEC pbam-auto specific tokens/grammars."""
 
-    # pbam-auto Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/pbam-auto.html
 
-    body = (
+    grammar = (
         CLiteral("pbam-auto")
         & ZeroOrMore(elecToken.name)
         & ZeroOrMore(pbToken.thr3dmap)
@@ -847,19 +1054,20 @@ class pbam_autoParser:
 
 
 class pbsam_autoParser:
+    """ELEC pbsam-auto specific tokens/grammars."""
 
-    # pbsam-auto Keywords
     # https://apbs.readthedocs.io/en/latest/using/input/elec/pbsam-auto.html
 
-    NUMBER_VAL = ApbsLegacyInput.get_number_val()
+    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
+    PATH_VAL = ApbsLegacyInput.get_path_grammar()
 
     # pbsam-auto specific Keywords
-    exp = Group(CLiteral("exp") - ApbsLegacyInput.get_path_val())
-    imat = Group(CLiteral("imat") - ApbsLegacyInput.get_path_val())
-    surf = Group(CLiteral("surf") - ApbsLegacyInput.get_path_val())
+    exp = Group(CLiteral("exp") - PATH_VAL)
+    imat = Group(CLiteral("imat") - PATH_VAL)
+    surf = Group(CLiteral("surf") - PATH_VAL)
     tolsp = Group(CLiteral("tolsp") - NUMBER_VAL)
 
-    body = (
+    grammar = (
         CLiteral("pbsam-auto")
         & ZeroOrMore(elecToken.name)
         & ZeroOrMore(pbToken.thr3dmap)
@@ -886,23 +1094,45 @@ class pbsam_autoParser:
     )
 
 
-def printBlock(prefix: str, item: str):
+def printBanner(prefix: str, item: str):
+    """Helper function to print a banner around a message.
 
-    print(
-        "\n" * 1
-        + "=" * 70
-        + "\n"
-        + "=" * 2
-        + " " * 2
-        + f"{prefix}: {item}"
-        + "\n"
-        + "=" * 70
-    )
+    :param prefix str: the prefix string to put in front of the item
+    :param item str: the string to be displayed
+    :return: None
+    :rtype: None
+
+    Example output of the command:
+        printBanner(f"FILE {idx}", file)
+    where idx is 0 and file is "/LONG_PATH_TO/apbs-mol-auto.in" would
+    produce the output:
+        ======================================================================
+        ==  FILE 0: LONG_PATH_TO/actin-dimer/apbs-mol-auto.in
+        ======================================================================
+    """
+
+    lbanner = "=" * 70
+    sbanner = "=" * 2
+    print(f"\n{lbanner}\n{sbanner}  {prefix}: {item}\n{lbanner}")
 
 
-def get_legacy_input_files(
-    opt_path: str = "", pattern: str = "**/*.in"
-) -> list:
+def get_example_files(opt_path: str = "", pattern: str = "**/*.in") -> list:
+    """Helper function to get one or more example input files.
+
+    :param opt_path str: the relative path under the examples directory
+    :param pattern str: the regular expression to match files
+    :return: list of absolute filenames that match the pattern
+    :rtype: list
+
+    NOTE: This function filters out any filenames that have TEMPLATE or
+          start with dxmath which are not valid APBS input files.
+
+    Example output of the command:
+        get_example_files("actin-dimer", "apbs-mol-auto.in")
+    returns:
+        ["/LONG_PATH_TO/actin-dimer/apbs-mol-auto.in"]
+    """
+
     search_path = (
         Path(__file__).absolute().parent.parent.parent / "examples" / opt_path
     )
@@ -911,30 +1141,63 @@ def get_legacy_input_files(
     return filter(lambda x: not x.name.startswith("dxmath"), matches)
 
 
-if __name__ == "__main__":
-    # execute only if run as a script
+def build_parser(default_values: dict):
+    """Build argument parser.
+    :return:  argument parser
+    :rtype:  argparse.ArgumentParser
+    """
 
+    desc = "ApbsLegacyInput file parser"
+
+    parser = argparse.ArgumentParser(
+        description=desc,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "--all",
+        action="store_const",
+        dest="all",
+        default=False,
+        const="value-to-store",
+        help=("Run on all files found in apbs/examples/* directories"),
+    )
+    return parser
+
+
+def main():
+    """Main driver for running from command line."""
+
+    default_values = {"SINGLE": True}
+
+    parser = build_parser(default_values)
+    args = parser.parse_args()
+
+    # The following are files in the examples directory
+    # that are useful for testing purposes but SHOULD NOT
+    # replace the use of pytest!
     relfilename = "solv/apbs-smol.in"
     relfilename = "pbsam-gly/gly_dynamics.in"
     relfilename = "helix/apbs_solv.in"
     relfilename = "smpbe/apbs-smpbe-24dup.in"
-
-    single = True
+    relfilename = "actin-dimer/apbs-mol-auto.in"
 
     example_dir = relfilename.split("/")[0]
     example_pattern = relfilename.split("/")[1]
 
-    files = []
-
-    if single:
-        files = get_legacy_input_files(example_dir, example_pattern)
+    if args.all:
+        # Parse all the APBS input files found in apbs/examples/*
+        files = get_example_files()
     else:
-        files = get_legacy_input_files()
+        files = get_example_files(example_dir, example_pattern)
 
     for idx, file in enumerate(files):
-        printBlock(f"FILE {idx}:", file)
-        test = ApbsLegacyInput()
+        printBanner(f"FILE {idx}", file)
+        apbs_input = ApbsLegacyInput()
         try:
-            pprint(test.load(file))
+            pprint(apbs_input.load(file))
         except Exception as e:
-            test.display_error(file, e)
+            apbs_input.raise_error(file, e)
+
+
+if __name__ == "__main__":
+    main()
