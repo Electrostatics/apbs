@@ -1,7 +1,16 @@
+"""
+The ApbsLegacyInput class was written to parse input files
+that were developed over the years and has a "less formal" syntax.
+The Input file syntax is pretty well documented at
+https://apbs.readthedocs.io/en/latest/using/index.html#input-file-syntax
+"""
+
 import argparse
 import logging
 from pathlib import Path
 from pprint import pprint
+from re import search
+
 from pyparsing import CaselessLiteral as CLiteral
 from pyparsing import (
     Combine,
@@ -21,15 +30,8 @@ from pyparsing import (
     pyparsing_common,
     restOfLine,
 )
-from re import search
 
 LOGGER = logging.getLogger(__name__)
-
-# Purpose:
-#   The ApbsLegacyInput class was written to parse input files
-#   that were developed over the years and has a "less formal" syntax.
-#   The Input file syntax is pretty well documented at
-#   https://apbs.readthedocs.io/en/latest/using/index.html#input-file-syntax
 
 # Approach:
 #   The ApbsLegacyInput class parses an entire input file by the major
@@ -121,12 +123,12 @@ LOGGER = logging.getLogger(__name__)
 #
 #   The grammars are used to "group" sections, subsection, keys, and values
 #   together. One problem that was discovered was example files with PRINT
-#   sections that did not have "spaces" between IDENTIFIERS and operators.
+#   sections that did not have "spaces" between identifierS and operators.
 #   For example, the following works correctly:
 #       PRINT elecEnergy mol-1 + mol-2 - complex_mol END
-#   Since IDENTIFIERS can have dashes/hyphens and underscores in them, the
+#   Since identifierS can have dashes/hyphens and underscores in them, the
 #   grammar can only support them if the operators are separated from the
-#   IDENTIFIERS by spaces. The following will not parse correctly:
+#   identifierS by spaces. The following will not parse correctly:
 #       PRINT elecEnergy mol-1+mol-2-complex_mol END
 #
 #   The grammars and parsers convert all input and produce all output in
@@ -140,13 +142,9 @@ class ApbsLegacyInput:
     def __init__(self):
         """Setup parsing tokens and grammar for the APBS input file format."""
 
-        # Tokens used by multiple parsers
-        self.COMMENT = "#"
-        self.END_VAL = CLiteral("END")
-
         # The FINAL_OUTPUT is a dictionary produced after parsing a file
         # using the grammar and processing rules.
-        self.FINAL_OUTPUT = {}
+        self.final_output = {}
 
         # The highest level grammar to parse the READ, ELEC, APOLAR, and
         # PRINT sections until the QUIT keyword is found.
@@ -210,65 +208,66 @@ class ApbsLegacyInput:
         """
 
         # TODO: More documentation!
-        """Convert lists of lists to a dictionary"""
 
         section = "READ"
-        if section not in self.FINAL_OUTPUT:
-            self.FINAL_OUTPUT[section] = {}
-        idx = len(self.FINAL_OUTPUT[section])
-        LOGGER.debug(f"IDX: {idx}")
-        self.FINAL_OUTPUT[section][idx] = {}
+        if section not in self.final_output:
+            self.final_output[section] = {}
+        idx = len(self.final_output[section])
+        LOGGER.debug("IDX: %s", idx)
+        self.final_output[section][idx] = {}
 
         # TODO: More error checking
         #       - What if key not in groups?
-        LOGGER.debug(f"RESULTS: {results}")
+        LOGGER.debug("RESULTS: %s", results)
+        # Convert and put data types into a dictionary
         for result in results[0]:
-            LOGGER.debug(f"TYPE: {type(result)}")
+            LOGGER.debug("TYPE: %s", type(result))
             for field in result:
-                LOGGER.debug(f"type item: {type(field)} {field}")
+                LOGGER.debug("type %s, field: %s: ", type(field), field)
                 if isinstance(field, ParseResults):
                     key = field[0].lower()
-                    LOGGER.debug(f"key: {key}")
+                    LOGGER.debug("key: %s", key)
                     if key in groups:
-                        if key not in self.FINAL_OUTPUT[section][idx]:
-                            LOGGER.debug(f"ADD KEY: {key}")
-                            self.FINAL_OUTPUT[section][idx][key] = {}
+                        if key not in self.final_output[section][idx]:
+                            LOGGER.debug("ADD KEY: %s", key)
+                            self.final_output[section][idx][key] = {}
                         subkey = f"{field[1]}".lower()
-                        if subkey not in self.FINAL_OUTPUT[section][idx][key]:
-                            LOGGER.debug(f"ADD SUBKEY: {subkey}")
-                            self.FINAL_OUTPUT[section][idx][key][subkey] = []
+                        if subkey not in self.final_output[section][idx][key]:
+                            LOGGER.debug("ADD SUBKEY: %s", subkey)
+                            self.final_output[section][idx][key][subkey] = []
                         if field[2] is not None:
                             LOGGER.debug(
-                                f"VALUES: KEY: {key}, "
-                                f"SUBKEY: {subkey}, "
-                                f"item2: {field[2]}"
+                                "VALUES: KEY: %s, SUBKEY: %s, field: %s",
+                                key,
+                                subkey,
+                                field[2],
                             )
                             item2 = ", ".join(field[2].split())
-                            self.FINAL_OUTPUT[section][idx][key][
+                            self.final_output[section][idx][key][
                                 subkey
                             ].append(item2)
 
-        return self.FINAL_OUTPUT
+        return self.final_output
 
     def read_parser(self):
         """Setup the tokens and grammar for the READ section."""
 
         # https://apbs.readthedocs.io/en/latest/using/input/read.html
 
-        PATH_VAL = ApbsLegacyInput.get_path_grammar()
+        path_val = ApbsLegacyInput.get_path_grammar()
 
         # tokens/grammars:
         file_fmt = oneOf("dx gz", caseless=True)
-        charge = Group(CLiteral("charge") - file_fmt - PATH_VAL)
+        charge = Group(CLiteral("charge") - file_fmt - path_val)
         diel = Group(
-            CLiteral("diel") - file_fmt - PATH_VAL - PATH_VAL - PATH_VAL
+            CLiteral("diel") - file_fmt - path_val - path_val - path_val
         )
-        kappa = Group(CLiteral("kappa") - file_fmt - PATH_VAL)
+        kappa = Group(CLiteral("kappa") - file_fmt - path_val)
         mol_format = oneOf("pqr pdb", caseless=True)
-        mol = Group(CLiteral("mol") - mol_format - PATH_VAL)
+        mol = Group(CLiteral("mol") - mol_format - path_val)
         parm_format = oneOf("flat xml", caseless=True)
-        parm = Group(CLiteral("parm") - parm_format - PATH_VAL)
-        pot = Group(CLiteral("pot") - file_fmt - PATH_VAL)
+        parm = Group(CLiteral("parm") - parm_format - path_val)
+        pot = Group(CLiteral("pot") - file_fmt - path_val)
         groups = ["charge", "diel", "kappa", "mol", "parm", "pot"]
 
         grammar = Group(
@@ -284,21 +283,21 @@ class ApbsLegacyInput:
             return self.format_read_section(results, groups)
 
         return Group(
-            Suppress(CLiteral("READ")) - grammar - Suppress(self.END_VAL)
+            Suppress(CLiteral("READ")) - grammar - Suppress(CLiteral("END"))
         ).setParseAction(format_read)
 
     def print_parser(self):
         """Setup the tokens and grammar for the PRINT section."""
 
-        IDENTIFIER = ApbsLegacyInput.get_identifier_grammar()
+        identifier = ApbsLegacyInput.get_identifier_grammar()
 
         # tokens/grammars:
         choices = oneOf(
             "elecEnergy elecForce apolEnergy apolForce", caseless=True
         )
-        expr = IDENTIFIER + Optional(
-            OneOrMore(oneOf("+ -") + IDENTIFIER)
-            + ZeroOrMore(oneOf("+ -") + IDENTIFIER)
+        expr = identifier + Optional(
+            OneOrMore(oneOf("+ -") + identifier)
+            + ZeroOrMore(oneOf("+ -") + identifier)
         )
         grammar = Group(choices - expr)
 
@@ -320,20 +319,20 @@ class ApbsLegacyInput:
             """
 
             section = "PRINT"
-            if section not in self.FINAL_OUTPUT:
-                self.FINAL_OUTPUT[section] = {}
-            idx = len(self.FINAL_OUTPUT[section])
-            self.FINAL_OUTPUT[section][idx] = {}
+            if section not in self.final_output:
+                self.final_output[section] = {}
+            idx = len(self.final_output[section])
+            self.final_output[section][idx] = {}
 
             for row in results[0]:
-                LOGGER.debug(f"TYPE: {type(row)}")
+                LOGGER.debug("TYPE: %s", type(row))
                 for item in row:
-                    LOGGER.debug(f"type item: {type(item)} {item}")
+                    LOGGER.debug("type item: %s, item: %s", type(item), item)
                     if isinstance(item, str):
                         key = item.lower()
-                        LOGGER.debug(f"key: {key}")
-                        if key not in self.FINAL_OUTPUT[section][idx].keys():
-                            self.FINAL_OUTPUT[section][idx][key] = row[1:]
+                        LOGGER.debug("key: %s", key)
+                        if key not in self.final_output[section][idx].keys():
+                            self.final_output[section][idx][key] = row[1:]
                             break
                 else:
                     # NOTE: UGLY but this is how to break out of the inner and
@@ -342,15 +341,15 @@ class ApbsLegacyInput:
                     break
                 break
 
-            return self.FINAL_OUTPUT
+            return self.final_output
 
         value = Group(
-            Suppress(CLiteral("PRINT")) - grammar - Suppress(self.END_VAL)
+            Suppress(CLiteral("PRINT")) - grammar - Suppress(CLiteral("END"))
         ).setParseAction(format_print)
 
         return value
 
-    def format_section(self, t: ParseResults, section: str):
+    def format_section(self, results: ParseResults, section: str):
         """Format the ELEC or APOLAR section of the APBS input file.
 
         :param results ParseResults: pyparsing results of the matching grammar
@@ -406,18 +405,18 @@ class ApbsLegacyInput:
                   'type': 'mg-auto'}
         """
 
-        if section not in self.FINAL_OUTPUT:
-            self.FINAL_OUTPUT[section] = {}
-        idx = len(self.FINAL_OUTPUT[section])
-        self.FINAL_OUTPUT[section][idx] = {}
-        LOGGER.debug(f"SECTION OUTPUT: {self.FINAL_OUTPUT[section]}")
+        if section not in self.final_output:
+            self.final_output[section] = {}
+        idx = len(self.final_output[section])
+        self.final_output[section][idx] = {}
+        LOGGER.debug("SECTION OUTPUT: %s", self.final_output[section])
 
         retval = {}
 
-        for result in t[0]:
-            LOGGER.debug(f"RESULT TYPE: {type(result)}")
-            LOGGER.debug(f"RESULT VALUE: {result}")
-            LOGGER.debug(f"RESULT LENGTH: {len(result)}")
+        for result in results[0]:
+            LOGGER.debug("RESULT TYPE: %s", type(result))
+            LOGGER.debug("RESULT VALUE: %s", result)
+            LOGGER.debug("RESULT LENGTH: %s", len(result))
             if isinstance(result, str):
                 if result in "randorient":
                     # NOTE: special case for "randorient" key
@@ -430,22 +429,22 @@ class ApbsLegacyInput:
             if len(result) == 1:
                 # NOTE: We have something Group (List) with only 1 value
                 #       like lrpbe so we have to add a "pbe" key
-                LOGGER.debug(f"FOUND PBE?: {retval}")
+                LOGGER.debug("FOUND PBE?: %s", retval)
                 retval["pbe"] = result[0]
                 continue
             # NOTE: Normal Key/Value case
             key = result[0]
             value = result[1]
             if len(result) == 2:
-                LOGGER.debug(f"KEY: {key} VALUE: {value}")
+                LOGGER.debug("KEY: %s, VALUE: %s", key, value)
                 if isinstance(value, ParseResults):
-                    LOGGER.debug(f"ParseResults VALUE: {value}")
+                    LOGGER.debug("ParseResults VALUE: %s", value)
                     value = value.asList()
                 if key in retval:
-                    LOGGER.debug(f"Key Already Exits: {retval}")
+                    LOGGER.debug("Key Already Exits: %s", retval)
                     retval[key].append(value)
                     continue
-                LOGGER.debug(f"NORMAL Key/Value: {retval}")
+                LOGGER.debug("NORMAL Key/Value: %s", retval)
                 # NOTE: It is easier to put the value into an List
                 #       and append multiple values to the key. Later
                 #       we post-process the result to remove the List
@@ -453,32 +452,32 @@ class ApbsLegacyInput:
                 retval[key] = [value]
                 continue
             # NOTE: More complicated than Key/Value case, probably ion
-            LOGGER.debug(f"COMPLICATED KEY: {result[0]}")
+            LOGGER.debug("COMPLICATED KEY: %s", result[0])
             if result[0] not in retval:
                 retval[result[0]] = {}
             sub_idx = len(retval[result[0]])
             for item in result[1:]:
-                LOGGER.debug(f"SUB_IDX: {sub_idx}")
-                LOGGER.debug(f"ITEM: {item}")
+                LOGGER.debug("SUB_IDX: %s", sub_idx)
+                LOGGER.debug("ITEM: %s", item)
                 if sub_idx not in retval[result[0]]:
                     retval[result[0]][sub_idx] = {}
                 if item[0] in retval[result[0]][sub_idx]:
                     LOGGER.debug(
-                        "NOTE: We need to change key/value to key/dict"
+                        "WARN: We need to change key/value to key/dict"
                     )
                 retval[result[0]][sub_idx][item[0]] = item[1]
 
         # NOTE: Post process retval to replace Key/List with Key/Value
         #       if the List only has 1 element in it
         for item in retval:
-            LOGGER.debug(f"PRE KEY/VALUE: {item}")
+            LOGGER.debug("PRE KEY/VALUE: %s", item)
             if isinstance(retval[item], list) and len(retval[item]) == 1:
                 retval[item] = retval[item][0]
-                LOGGER.debug(f"POST KEY/VALUE: {retval[item]}")
+                LOGGER.debug("POST KEY/VALUE: %s", retval[item])
 
-        self.FINAL_OUTPUT[section][idx] = retval
-        LOGGER.debug(f"FINAL_OUTPUT: {self.FINAL_OUTPUT[section]}")
-        return self.FINAL_OUTPUT
+        self.final_output[section][idx] = retval
+        LOGGER.debug("FINAL_OUTPUT: %s", self.final_output[section])
+        return self.final_output
 
     def apolar_parser(self):
         """Setup the tokens and grammar for the APOLAR section.
@@ -508,7 +507,7 @@ class ApbsLegacyInput:
             return self.format_section(results, "APOLAR")
 
         return Group(
-            Suppress(CLiteral("APOLAR")) - grammar - Suppress(self.END_VAL)
+            Suppress(CLiteral("APOLAR")) - grammar - Suppress(CLiteral("END"))
         ).setParseAction(format_apolar)
 
     def elec_parser(self):
@@ -534,10 +533,10 @@ class ApbsLegacyInput:
             return self.format_section(results, "ELEC")
 
         return Group(
-            Suppress(CLiteral("ELEC")) - grammar - Suppress(self.END_VAL)
+            Suppress(CLiteral("ELEC")) - grammar - Suppress(CLiteral("END"))
         ).setParseAction(format_elec)
 
-    def raise_error(self, source: str, pe: ParseSyntaxException):
+    def raise_error(self, source: str, perr: ParseSyntaxException):
         """Parsing failed - try to be produce a helpful error messsage.
 
         :param source str: the filename or string representing the data
@@ -548,20 +547,20 @@ class ApbsLegacyInput:
 
         repeat_count = 70
         message = "\n" + "=" * repeat_count + "\n"
-        message += f"ERROR: {type(pe)}\n"
+        message += f"ERROR: {type(perr)}\n"
         message += f"Parsing {source}\n"
-        message += f"Line Number: {pe.lineno}:\n"
-        message += f"Column: {pe.col}:\n"
+        message += f"Line Number: {perr.lineno}:\n"
+        message += f"Column: {perr.col}:\n"
         message += "=" * repeat_count + "\n"
-        message += f"Line: \n{pe.line}\n"
-        message += " " * (pe.col - 1) + "^\n"
+        message += f"Line: \n{perr.line}\n"
+        message += " " * (perr.col - 1) + "^\n"
         message += "=" * repeat_count + "\n"
-        pe.msg = message
-        raise pe
+        perr.msg = message
+        raise perr
 
     def __del__(self):
         """Wipe out any previous results."""
-        del self.FINAL_OUTPUT
+        del self.final_output
 
     def loads(self, input_data: str):
         """Parse the input as a string
@@ -572,25 +571,24 @@ class ApbsLegacyInput:
         """
 
         parser = self.grammar
-        parser.ignore(self.COMMENT + restOfLine)
+        parser.ignore("#" + restOfLine)
 
         value: ParseResults = None
-        LOGGER.debug(f"DEFAULT value: TYPE {type(value)} {value}")
 
         try:
             value = self.grammar.searchString(input_data)
-        except ParseSyntaxException as pe:
-            self.raise_error("STRING", pe)
+        except ParseSyntaxException as perr:
+            self.raise_error("STRING", perr)
 
         # NOTE: the ParseResults has 1 or more "wrappers"
         #       around the dictionary so we just want to
         #       unwrap the value to get to that actual
         #       dictionary or str representing the data.
-        LOGGER.debug(f"value: TYPE {type(value)}")
+        LOGGER.debug("value: TYPE {type(value)}")
         if isinstance(value, ParseResults):
-            LOGGER.debug(f"value: TYPE[0]{type(value[0])}")
+            LOGGER.debug("Type of value[0]: %s", type(value[0]))
             if isinstance(value[0], ParseResults):
-                LOGGER.debug(f"value: TYPE[0][0] {type(value[0][0])}")
+                LOGGER.debug("Type of value[0][0] %s", type(value[0][0]))
                 if isinstance(value[0][0], (dict, str)):
                     return value[0][0]
             if isinstance(value[0], (dict, str)):
@@ -612,30 +610,30 @@ class ApbsLegacyInput:
         :rtype: dict
         """
 
-        with filename.open() as fp:
+        with filename.open() as fptr:
             try:
-                return self.loads(fp.read())
-            except ParseSyntaxException as pe:
-                self.raise_error(filename, pe)
+                return self.loads(fptr.read())
+            except ParseSyntaxException as perr:
+                self.raise_error(filename, perr)
 
 
 class GenericToken:
     """Generic tokens/grammars that can be used by other classes."""
 
-    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
+    number_val = ApbsLegacyInput.get_number_grammar()
 
-    bconc = Group(CLiteral("bconc") - NUMBER_VAL)
+    bconc = Group(CLiteral("bconc") - number_val)
     calc_options = oneOf("no total comps", caseless=True)
     calcenergy = Group(CLiteral("calcenergy") - calc_options)
     calcforce = Group(CLiteral("calcforce") - calc_options)
-    gamma = Group(CLiteral("gamma") - NUMBER_VAL)
-    grid_coord = Group(NUMBER_VAL * 3)
+    gamma = Group(CLiteral("gamma") - number_val)
+    grid_coord = Group(number_val * 3)
     grid = Group(CLiteral("grid") - grid_coord)
-    mol = Group(CLiteral("mol") - NUMBER_VAL)
-    sdens = Group(CLiteral("sdens") - NUMBER_VAL)
-    srad = Group(CLiteral("srad") - NUMBER_VAL)
-    swin = Group(CLiteral("swin") - NUMBER_VAL)
-    temp = Group(CLiteral("temp") - NUMBER_VAL)
+    mol = Group(CLiteral("mol") - number_val)
+    sdens = Group(CLiteral("sdens") - number_val)
+    srad = Group(CLiteral("srad") - number_val)
+    swin = Group(CLiteral("swin") - number_val)
+    temp = Group(CLiteral("temp") - number_val)
 
 
 class ApolarToken:
@@ -643,9 +641,9 @@ class ApolarToken:
 
     # https://apbs.readthedocs.io/en/latest/using/input/apolar/index.html
 
-    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
-    dpos = Group(CLiteral("dpos") - NUMBER_VAL)
-    press = Group(CLiteral("press") - NUMBER_VAL)
+    number_val = ApbsLegacyInput.get_number_grammar()
+    dpos = Group(CLiteral("dpos") - number_val)
+    press = Group(CLiteral("press") - number_val)
     srfm = Group(CLiteral("srfm") - oneOf("sacc", caseless=True))
 
 
@@ -657,17 +655,17 @@ class ElecToken:
     # The following tokens are used by at least 2 of the parser types with
     # the same format and rules
 
-    IDENTIFIER = ApbsLegacyInput.get_identifier_grammar()
-    INTEGER_VAL = ApbsLegacyInput.get_integer_grammar()
-    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
-    PATH_VAL = ApbsLegacyInput.get_path_grammar()
+    identifier = ApbsLegacyInput.get_identifier_grammar()
+    integer_val = ApbsLegacyInput.get_integer_grammar()
+    number_val = ApbsLegacyInput.get_number_grammar()
+    path_val = ApbsLegacyInput.get_path_grammar()
 
-    name = Group(CLiteral("name") - IDENTIFIER)
-    grid_floats = Group(NUMBER_VAL * 3)
-    grid_ints = Group(INTEGER_VAL * 3)
-    mol_id = Group(CLiteral("mol") - INTEGER_VAL)
+    name = Group(CLiteral("name") - identifier)
+    grid_floats = Group(number_val * 3)
+    grid_ints = Group(integer_val * 3)
+    mol_id = Group(CLiteral("mol") - integer_val)
 
-    async_value = Group(CLiteral("async") - INTEGER_VAL)
+    async_value = Group(CLiteral("async") - integer_val)
     bcfl_options = oneOf("focus map mdh sdh zero", caseless=True)
     bcfl = Group(CLiteral("bcfl") - bcfl_options)
     cgcent = Group(CLiteral("cgcent") - (mol_id | grid_floats))
@@ -675,34 +673,34 @@ class ElecToken:
     chgm_options = oneOf("spl0 spl2", caseless=True)
     chgm = Group(CLiteral("chgm") - chgm_options)
     dime = Group(CLiteral("dime") - grid_ints)
-    etol = Group(CLiteral("etol") - NUMBER_VAL)
+    etol = Group(CLiteral("etol") - number_val)
     fgcent = Group(CLiteral("fgcent") - (mol_id | grid_floats))
     fglen = Group(CLiteral("fglen") - grid_floats)
     gcent = Group(CLiteral("gcent") - (mol_id | grid_floats))
     glen = Group(CLiteral("glen") - grid_floats)
 
     # Are charge, conc, and radius ALL required?
-    ion_charge = Group(CLiteral("charge") - NUMBER_VAL)
-    ion_conc = Group(CLiteral("conc") - NUMBER_VAL)
-    ion_radius = Group(CLiteral("radius") - NUMBER_VAL)
+    ion_charge = Group(CLiteral("charge") - number_val)
+    ion_conc = Group(CLiteral("conc") - number_val)
+    ion_radius = Group(CLiteral("radius") - number_val)
     ion = Group(CLiteral("ion") - ion_charge & ion_conc & ion_radius)
 
-    nlev = Group(CLiteral("nlev") - NUMBER_VAL)
+    nlev = Group(CLiteral("nlev") - number_val)
 
     # TODO: I think only 1 of these are allowed (not ZeroOrMore)
     pbe = Group(oneOf("lpbe lrpbe npbe nrpbe", caseless=True))
 
     # TODO: Number must be >= 1
-    pdie = Group(CLiteral("pdie") - NUMBER_VAL)
+    pdie = Group(CLiteral("pdie") - number_val)
 
     # NOTE: Should be a value between 78-80?
-    sdie = Group(CLiteral("sdie") - NUMBER_VAL)
+    sdie = Group(CLiteral("sdie") - number_val)
 
     srfm_options = oneOf("mol smol spl2", caseless=True)
     srfm = Group(CLiteral("srfm") - srfm_options)
 
     usemap_options = oneOf("diel kappa charge", caseless=True)
-    usemap = Group(CLiteral("usemap") - Group(usemap_options - INTEGER_VAL))
+    usemap = Group(CLiteral("usemap") - Group(usemap_options - integer_val))
 
     write_type_options = oneOf(
         "charge "
@@ -724,11 +722,11 @@ class ElecToken:
     write_format_options = oneOf("avs dx flat gz uhbd", caseless=True)
     write = Group(
         CLiteral("write")
-        - Group(write_type_options - write_format_options - PATH_VAL)
+        - Group(write_type_options - write_format_options - path_val)
     )
 
     writemat = Group(
-        CLiteral("writemat") - oneOf("poisson", caseless=True) - PATH_VAL
+        CLiteral("writemat") - oneOf("poisson", caseless=True) - path_val
     )
 
 
@@ -737,16 +735,16 @@ class TabiParser:
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/tabi.html
 
-    INTEGER_VAL = ApbsLegacyInput.get_integer_grammar()
-    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
+    integer_val = ApbsLegacyInput.get_integer_grammar()
+    number_val = ApbsLegacyInput.get_number_grammar()
 
     # TODO: Should this be replaced which a check to make
-    # sure that "NUMBER_VAL is between 0.0 and 1.0"
-    mac = Group(CLiteral("mac") - NUMBER_VAL)
+    # sure that "number_val is between 0.0 and 1.0"
+    mac = Group(CLiteral("mac") - number_val)
     mesh = Group(CLiteral("mesh") - oneOf("0 1 2 ses skin"))
     outdata = Group(CLiteral("outdata") - oneOf("0 1"))
-    tree_n0 = Group(CLiteral("tree_n0") - INTEGER_VAL)
-    tree_order = Group(CLiteral("tree_order") - INTEGER_VAL)
+    tree_n0 = Group(CLiteral("tree_n0") - integer_val)
+    tree_order = Group(CLiteral("tree_order") - integer_val)
 
     grammar = (
         CLiteral("tabi")
@@ -771,9 +769,9 @@ class FeManualParser:
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/fe-manual.html
 
-    IDENTIFIER = ApbsLegacyInput.get_identifier_grammar()
-    INTEGER_VAL = ApbsLegacyInput.get_integer_grammar()
-    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
+    identifier = ApbsLegacyInput.get_identifier_grammar()
+    integer_val = ApbsLegacyInput.get_integer_grammar()
+    number_val = ApbsLegacyInput.get_number_grammar()
 
     akeyPRE_options = oneOf("unif geom", caseless=True)
     akeyPRE = Group(CLiteral("akeyPRE") - akeyPRE_options)
@@ -782,11 +780,11 @@ class FeManualParser:
     domainLength = Group(CLiteral("domainLength") - ElecToken.grid_floats)
     ekey_options = oneOf("simp global frac", caseless=True)
     ekey = Group(CLiteral("ekey") - ekey_options)
-    maxsolve = Group(CLiteral("maxsolve") - NUMBER_VAL)
-    maxvert = Group(CLiteral("maxvert") - NUMBER_VAL)
-    targetNum = Group(CLiteral("targetNum") - INTEGER_VAL)
-    targetRes = Group(CLiteral("targetRes") - NUMBER_VAL)
-    usemesh = Group(CLiteral("usemesh") - IDENTIFIER)
+    maxsolve = Group(CLiteral("maxsolve") - number_val)
+    maxvert = Group(CLiteral("maxvert") - number_val)
+    targetNum = Group(CLiteral("targetNum") - integer_val)
+    targetRes = Group(CLiteral("targetRes") - number_val)
+    usemesh = Group(CLiteral("usemesh") - identifier)
 
     grammar = (
         CLiteral("fe-manual")
@@ -826,9 +824,9 @@ class GeoflowAutoParser:
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/geoflow-auto.html
 
-    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
+    number_val = ApbsLegacyInput.get_number_grammar()
 
-    press = Group(CLiteral("press") - NUMBER_VAL)
+    press = Group(CLiteral("press") - number_val)
     vdwdisp = Group(CLiteral("vdwdisp") - oneOf("0 1"))
 
     grammar = (
@@ -886,9 +884,9 @@ class MgManualParser:
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-manual.html
 
-    INTEGER_VAL = ApbsLegacyInput.get_integer_grammar()
+    integer_val = ApbsLegacyInput.get_integer_grammar()
 
-    nlev = Group(CLiteral("nlev") - INTEGER_VAL)
+    nlev = Group(CLiteral("nlev") - integer_val)
 
     grammar = (
         CLiteral("mg-manual")
@@ -924,11 +922,10 @@ class MgParaParser:
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-para.html
 
-    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
+    number_val = ApbsLegacyInput.get_number_grammar()
 
-    # TODO: Combine with dime?
     pdime = Group(CLiteral("pdime") - ElecToken.grid_floats)
-    ofrac = Group(CLiteral("ofrac") - NUMBER_VAL)
+    ofrac = Group(CLiteral("ofrac") - number_val)
 
     grammar = (
         CLiteral("mg-para")
@@ -993,28 +990,28 @@ class MgDummyParser:
 class PbToken:
     """ELEC pbam-auto and pbsam-auto specific tokens/grammars."""
 
-    IDENTIFIER = ApbsLegacyInput.get_identifier_grammar()
-    INTEGER_VAL = ApbsLegacyInput.get_integer_grammar()
-    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
-    PATH_VAL = ApbsLegacyInput.get_path_grammar()
+    identifier = ApbsLegacyInput.get_identifier_grammar()
+    integer_val = ApbsLegacyInput.get_integer_grammar()
+    number_val = ApbsLegacyInput.get_number_grammar()
+    path_val = ApbsLegacyInput.get_path_grammar()
 
-    thr3dmap = Group(CLiteral("3dmap") - PATH_VAL)
+    thr3dmap = Group(CLiteral("3dmap") - path_val)
     diff = Group(
         CLiteral("diff")
         - (
             CLiteral("stat")
-            | Group(CLiteral("move") - NUMBER_VAL - NUMBER_VAL)
-            | CLiteral("rot") - NUMBER_VAL
+            | Group(CLiteral("move") - number_val - number_val)
+            | CLiteral("rot") - number_val
         )
     )
-    dx = Group(CLiteral("dx") - PATH_VAL)
+    dx = Group(CLiteral("dx") - path_val)
     grid2d = Group(
         CLiteral("grid2d")
-        - Group(PATH_VAL - oneOf("x y z", caseless=True) - NUMBER_VAL)
+        - Group(path_val - oneOf("x y z", caseless=True) - number_val)
     )  # .setDebug()
-    gridpts = Group(CLiteral("gridpts") - INTEGER_VAL)
-    ntraj = Group(CLiteral("ntraj") - INTEGER_VAL)
-    pbc = Group(CLiteral("pbc") - NUMBER_VAL)
+    gridpts = Group(CLiteral("gridpts") - integer_val)
+    ntraj = Group(CLiteral("ntraj") - integer_val)
+    pbc = Group(CLiteral("pbc") - number_val)
     randorient = CLiteral("randorient")
     runname = Group(CLiteral("runname") - Word(alphanums + "_"))
     runtype_options = oneOf(
@@ -1022,13 +1019,13 @@ class PbToken:
     )
     runtype = Group(CLiteral("runtype") - runtype_options)
 
-    # TODO: value of NUMBER_VAL should be 0.00 to 0.15?
-    salt = Group(CLiteral("salt") - NUMBER_VAL)
+    # TODO: value of number_val should be 0.00 to 0.15?
+    salt = Group(CLiteral("salt") - number_val)
 
     term_pos_options = oneOf("x<= x>= y<= y>= z<= z>= r<= r>=", caseless=True)
-    term_contact = Group(CLiteral("contact") - PATH_VAL)
-    term_pos = Group(term_pos_options - NUMBER_VAL - IDENTIFIER)
-    term_time = Group(CLiteral("time") - NUMBER_VAL)
+    term_contact = Group(CLiteral("contact") - path_val)
+    term_pos = Group(term_pos_options - number_val - identifier)
+    term_time = Group(CLiteral("time") - number_val)
     term = Group(
         CLiteral("term") + (term_contact | term_pos | term_time)
     )  # .setDebug()
@@ -1037,7 +1034,7 @@ class PbToken:
         CLiteral("termcombine") - oneOf("and or", caseless=True)
     )
     units = Group(CLiteral("units") - oneOf("kcalmol jmol kT", caseless=True))
-    xyz = Group(CLiteral("xyz") - Group(IDENTIFIER - PATH_VAL))
+    xyz = Group(CLiteral("xyz") - Group(identifier - path_val))
 
 
 class PbamAutoParser:
@@ -1075,14 +1072,14 @@ class PbsamAutoParser:
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/pbsam-auto.html
 
-    NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
-    PATH_VAL = ApbsLegacyInput.get_path_grammar()
+    number_val = ApbsLegacyInput.get_number_grammar()
+    path_val = ApbsLegacyInput.get_path_grammar()
 
     # pbsam-auto specific Keywords
-    exp = Group(CLiteral("exp") - PATH_VAL)
-    imat = Group(CLiteral("imat") - PATH_VAL)
-    surf = Group(CLiteral("surf") - PATH_VAL)
-    tolsp = Group(CLiteral("tolsp") - NUMBER_VAL)
+    exp = Group(CLiteral("exp") - path_val)
+    imat = Group(CLiteral("imat") - path_val)
+    surf = Group(CLiteral("surf") - path_val)
+    tolsp = Group(CLiteral("tolsp") - number_val)
 
     grammar = (
         CLiteral("pbsam-auto")
@@ -1158,7 +1155,7 @@ def get_example_files(opt_path: str = "", pattern: str = "**/*.in") -> list:
     return filter(lambda x: not x.name.startswith("dxmath"), matches)
 
 
-def build_parser(default_values: dict):
+def build_parser():
     """Build argument parser.
     :return:  argument parser
     :rtype:  argparse.ArgumentParser
@@ -1184,9 +1181,7 @@ def build_parser(default_values: dict):
 def main():
     """Main driver for running from command line."""
 
-    default_values = {"SINGLE": True}
-
-    parser = build_parser(default_values)
+    parser = build_parser()
     args = parser.parse_args()
 
     # The following are files in the examples directory
@@ -1213,8 +1208,8 @@ def main():
         apbs_input = ApbsLegacyInput()
         try:
             pprint(apbs_input.load(file))
-        except Exception as e:
-            apbs_input.raise_error(file, e)
+        except ParseSyntaxException as perr:
+            apbs_input.raise_error(file, perr)
 
 
 if __name__ == "__main__":
