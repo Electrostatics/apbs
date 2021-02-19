@@ -38,35 +38,35 @@ from re import search
 #
 #   There are several auxillary classes in this file that are used to
 #   define "groupings" or private "namespaces". For example, the
-#   genericToken class has tokens for can be used across many other
-#   classes. The apolarToken class only has tokens that are in the
+#   GenericToken class has tokens for can be used across many other
+#   classes. The ApolarToken class only has tokens that are in the
 #   APOLAR section. These classes help build a heirarchy or tokens
 #   and grammars that are specified in the documentation.
 #   The list of token classes are:
-#       - genericToken
-#       - apolarToken
-#       - elecToken
-#       - pbToken
+#       - GenericToken
+#       - ApolarToken
+#       - ElecToken
+#       - PbToken
 #   There are also classes for specific tokens and grammars for
-#   more targeted parsing. For example, the tabiParser class is only
+#   more targeted parsing. For example, the TabiParser class is only
 #   for parsing the ELEC section where the calculation type is tabi-auto.
 #   The list of parsing classes are:
-#       tabiParser:
-#       fe_manualParser:
-#       geoflow_autoParser:
-#       mg_autoParser:
-#       mg_manualParser:
-#       mg_paraParser:
-#       mg_dummyParser:
-#       pbam_autoParser:
-#       pbsam_autoParser:
+#       TabiParser:
+#       FeManualParser:
+#       GeoflowAutoParser:
+#       MgAutoParser:
+#       MgManualParser:
+#       MgParaParser:
+#       MgDummyParser:
+#       PbamAutoParser:
+#       PbsamAutoParser:
 #
 #   Each SECTION has a parser and formatter. The parser specifies the
 #   grammar used to match the section of the input file and generates
 #   a pyparsing.ParseResults value. That value is forwarded to a
 #   formatter to produce a dictionary for that SECTION. For example,
-#   the readParser parses the input file for the READ section. The
-#   readParser forwards the ParseResults to the formatRead method to
+#   the read_parser parses the input file for the READ section. The
+#   read_parser forwards the ParseResults to the format_read method to
 #   produce the 'READ' dictionary in the FINAL_OUTPUT dictionary.
 #
 #   NOTE: Since the formatters have ParseResults that can be any
@@ -84,7 +84,7 @@ from re import search
 #   The pyparsing module is used to define methods for grammars for each
 #   section.
 #
-#   For example, the readParser is responsible for parsing the
+#   For example, the read_parser is responsible for parsing the
 #   READ section of the input file and producing a section of the final
 #   dictionary.
 #
@@ -151,9 +151,9 @@ class ApbsLegacyInput:
 
         # The highest level grammar to parse the READ, ELEC, APOLAR, and
         # PRINT sections until the QUIT keyword is found.
-        self.grammar = OneOrMore(self.readParser()) + OneOrMore(
-            self.apolarParser() | self.elecParser()
-        ) + ZeroOrMore(self.printParser()) + Suppress(CLiteral("QUIT")) | (
+        self.grammar = OneOrMore(self.read_parser()) + OneOrMore(
+            self.apolar_parser() | self.elec_parser()
+        ) + ZeroOrMore(self.print_parser()) + Suppress(CLiteral("QUIT")) | (
             # The following is one way to "narrow down" errors in an input
             # file. It was adopted from:
             # https://web.archive.org/web/20160821175151/http://pyparsing.wikispaces.com/share/view/30875955
@@ -199,10 +199,10 @@ class ApbsLegacyInput:
         if self.DEBUG:
             print(message)
 
-    def formatReadSection(self, results: ParseResults, groups: list) -> dict:
+    def format_read_section(self, results: ParseResults, groups: list) -> dict:
         """Format the READ section of the APBS input file.
 
-        :param results ParseResults: the pyparsing representation of the matching grammar
+        :param results ParseResults: pyparsing results of the matching grammar
         :param groups list: the section of the FINAL_OUTPUT to generate
         :return: a dictionary containing the READ section of the input file
         :rtype: dict
@@ -245,7 +245,9 @@ class ApbsLegacyInput:
                             self.FINAL_OUTPUT[section][idx][key][subkey] = []
                         if field[2] is not None:
                             self.debug(
-                                f"VALUES: KEY: {key}, SUBKEY: {subkey}, item2: {field[2]}"
+                                f"VALUES: KEY: {key}, "
+                                f"SUBKEY: {subkey}, "
+                                f"item2: {field[2]}"
                             )
                             item2 = ", ".join(field[2].split())
                             self.FINAL_OUTPUT[section][idx][key][
@@ -254,7 +256,7 @@ class ApbsLegacyInput:
 
         return self.FINAL_OUTPUT
 
-    def readParser(self):
+    def read_parser(self):
         """Setup the tokens and grammar for the READ section."""
 
         # https://apbs.readthedocs.io/en/latest/using/input/read.html
@@ -284,14 +286,14 @@ class ApbsLegacyInput:
             & ZeroOrMore(pot)
         )
 
-        def formatRead(results: ParseResults):
-            return self.formatReadSection(results, groups)
+        def format_read(results: ParseResults):
+            return self.format_read_section(results, groups)
 
         return Group(
             Suppress(CLiteral("READ")) - grammar - Suppress(self.END_VAL)
-        ).setParseAction(formatRead)
+        ).setParseAction(format_read)
 
-    def printParser(self):
+    def print_parser(self):
         """Setup the tokens and grammar for the PRINT section."""
 
         IDENTIFIER = ApbsLegacyInput.get_identifier_grammar()
@@ -306,17 +308,21 @@ class ApbsLegacyInput:
         )
         grammar = Group(choices - expr)
 
-        def formatPrint(results: ParseResults):
+        def format_print(results: ParseResults):
             """Format the PRINT section of the APBS input file.
 
-            :param results ParseResults: the pyparsing representation of the matching grammar
-            :return: a dictionary containing the PRINT section of the input file
+            :param results ParseResults: pyparsing results of matching grammar
+            :return: a dictionary of the PRINT section of the input file
             :rtype: dict
 
             Example: Convert the following:
                 print elecEnergy complex - mol2 - mol1 end
             To:
-                'PRINT': {0: {'elecenergy': ['complex', '-', 'mol2', '-', 'mol1']}}
+                'PRINT': {0: {
+                                 'elecenergy':
+                                 ['complex', '-', 'mol2', '-', 'mol1']
+                             }
+                         }
             """
 
             section = "PRINT"
@@ -346,15 +352,15 @@ class ApbsLegacyInput:
 
         value = Group(
             Suppress(CLiteral("PRINT")) - grammar - Suppress(self.END_VAL)
-        ).setParseAction(formatPrint)
+        ).setParseAction(format_print)
 
         return value
 
-    def formatSection(self, t: ParseResults, section: str):
+    def format_section(self, t: ParseResults, section: str):
         """Format the ELEC or APOLAR section of the APBS input file.
 
-        :param results ParseResults: the pyparsing representation of the matching grammar
-        :return: a dictionary containing the ELEC or APOLAR section of the input file
+        :param results ParseResults: pyparsing results of the matching grammar
+        :return: a dictionary of the ELEC or APOLAR section of the input file
         :rtype: dict
 
         Example: Convert the following:
@@ -423,7 +429,8 @@ class ApbsLegacyInput:
                     # NOTE: special case for "randorient" key
                     retval[result] = 1
                     continue
-                # NOTE: We have something like mg-auto so we have to add a "type" key
+                # NOTE: We have something like mg-auto so we have to
+                #       add a "type" key
                 retval["type"] = result
                 continue
             if len(result) == 1:
@@ -477,7 +484,7 @@ class ApbsLegacyInput:
         self.debug(f"FINAL_OUTPUT: {self.FINAL_OUTPUT[section]}")
         return self.FINAL_OUTPUT
 
-    def apolarParser(self):
+    def apolar_parser(self):
         """Setup the tokens and grammar for the APOLAR section.
 
         :return: a dictionary containing the APOLAR section of the input file
@@ -485,30 +492,30 @@ class ApbsLegacyInput:
         """
 
         grammar = (
-            ZeroOrMore(elecToken.name)
-            & ZeroOrMore(genericToken.bconc)
-            & ZeroOrMore(genericToken.calcenergy)
-            & ZeroOrMore(genericToken.calcforce)
-            & ZeroOrMore(apolarToken.dpos)
-            & ZeroOrMore(genericToken.gamma)
-            & ZeroOrMore(genericToken.grid)
-            & ZeroOrMore(genericToken.mol)
-            & ZeroOrMore(apolarToken.press)
-            & ZeroOrMore(genericToken.sdens)
-            & ZeroOrMore(genericToken.srad)
-            & ZeroOrMore(apolarToken.srfm)
-            & ZeroOrMore(genericToken.swin)
-            & ZeroOrMore(genericToken.temp)
+            ZeroOrMore(ElecToken.name)
+            & ZeroOrMore(GenericToken.bconc)
+            & ZeroOrMore(GenericToken.calcenergy)
+            & ZeroOrMore(GenericToken.calcforce)
+            & ZeroOrMore(ApolarToken.dpos)
+            & ZeroOrMore(GenericToken.gamma)
+            & ZeroOrMore(GenericToken.grid)
+            & ZeroOrMore(GenericToken.mol)
+            & ZeroOrMore(ApolarToken.press)
+            & ZeroOrMore(GenericToken.sdens)
+            & ZeroOrMore(GenericToken.srad)
+            & ZeroOrMore(ApolarToken.srfm)
+            & ZeroOrMore(GenericToken.swin)
+            & ZeroOrMore(GenericToken.temp)
         )
 
-        def formatApolar(results: ParseResults):
-            return self.formatSection(results, "APOLAR")
+        def format_apolar(results: ParseResults):
+            return self.format_section(results, "APOLAR")
 
         return Group(
             Suppress(CLiteral("APOLAR")) - grammar - Suppress(self.END_VAL)
-        ).setParseAction(formatApolar)
+        ).setParseAction(format_apolar)
 
-    def elecParser(self):
+    def elec_parser(self):
         """Setup the tokens and grammar for the ELEC section.
 
         :return: a dictionary containing the APOLAR section of the input file
@@ -516,23 +523,23 @@ class ApbsLegacyInput:
         """
 
         grammar = (
-            tabiParser.grammar
-            | fe_manualParser.grammar
-            | geoflow_autoParser.grammar
-            | mg_autoParser.grammar
-            | mg_manualParser.grammar
-            | mg_paraParser.grammar
-            | mg_dummyParser.grammar
-            | pbam_autoParser.grammar
-            | pbsam_autoParser.grammar
+            TabiParser.grammar
+            | FeManualParser.grammar
+            | GeoflowAutoParser.grammar
+            | MgAutoParser.grammar
+            | MgManualParser.grammar
+            | MgParaParser.grammar
+            | MgDummyParser.grammar
+            | PbamAutoParser.grammar
+            | PbsamAutoParser.grammar
         )
 
-        def formatElec(results: ParseResults):
-            return self.formatSection(results, "ELEC")
+        def format_elec(results: ParseResults):
+            return self.format_section(results, "ELEC")
 
         return Group(
             Suppress(CLiteral("ELEC")) - grammar - Suppress(self.END_VAL)
-        ).setParseAction(formatElec)
+        ).setParseAction(format_elec)
 
     def raise_error(self, source: str, pe: ParseSyntaxException):
         """Parsing failed - try to be produce a helpful error messsage.
@@ -563,7 +570,7 @@ class ApbsLegacyInput:
     def loads(self, input_data: str):
         """Parse the input as a string
 
-        :param str input_data: a string containiner an APBS legacy input configuration file
+        :param str input_data: a string of an APBS legacy input file
         :return: a dictionary configuration files contents
         :rtype: dict
         """
@@ -596,7 +603,8 @@ class ApbsLegacyInput:
             return value
 
         raise Exception(
-            f"Could not parse data into dictionary from TYPE{value}:\n{input_data}"
+            f"Could not parse data into dictionary from "
+            f"TYPE{value}:\n{input_data}"
         )
 
     def load(self, filename: str):
@@ -615,7 +623,7 @@ class ApbsLegacyInput:
                 self.raise_error(filename, pe)
 
 
-class genericToken:
+class GenericToken:
     """Generic tokens/grammars that can be used by other classes."""
 
     NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
@@ -634,7 +642,7 @@ class genericToken:
     temp = Group(CLiteral("temp") - NUMBER_VAL)
 
 
-class apolarToken:
+class ApolarToken:
     """APOLAR specific tokens/grammars that can be used by other classes."""
 
     # https://apbs.readthedocs.io/en/latest/using/input/apolar/index.html
@@ -645,7 +653,7 @@ class apolarToken:
     srfm = Group(CLiteral("srfm") - oneOf("sacc", caseless=True))
 
 
-class elecToken:
+class ElecToken:
     """ELEC specific tokens/grammars that can be used by other classes."""
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/index.html
@@ -701,7 +709,20 @@ class elecToken:
     usemap = Group(CLiteral("usemap") - Group(usemap_options - INTEGER_VAL))
 
     write_type_options = oneOf(
-        "charge pot smol sspl vdw ivdw lap edens ndens qdens dielx diely dielz kappa",
+        "charge "
+        "pot "
+        "smol "
+        "sspl "
+        "vdw "
+        "ivdw "
+        "lap "
+        "edens "
+        "ndens "
+        "qdens "
+        "dielx "
+        "diely "
+        "dielz "
+        "kappa",
         caseless=True,
     )
     write_format_options = oneOf("avs dx flat gz uhbd", caseless=True)
@@ -715,7 +736,7 @@ class elecToken:
     )
 
 
-class tabiParser:
+class TabiParser:
     """ELEC tabi specific tokens/grammars."""
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/tabi.html
@@ -733,23 +754,23 @@ class tabiParser:
 
     grammar = (
         CLiteral("tabi")
-        & ZeroOrMore(elecToken.name)
-        & ZeroOrMore(elecToken.ion)
+        & ZeroOrMore(ElecToken.name)
+        & ZeroOrMore(ElecToken.ion)
         & ZeroOrMore(mac)
         & ZeroOrMore(mesh)
-        & ZeroOrMore(genericToken.mol)
+        & ZeroOrMore(GenericToken.mol)
         & ZeroOrMore(outdata)
-        & ZeroOrMore(elecToken.pdie)
-        & ZeroOrMore(genericToken.sdens)
-        & ZeroOrMore(elecToken.sdie)
-        & ZeroOrMore(genericToken.srad)
-        & ZeroOrMore(genericToken.temp)
+        & ZeroOrMore(ElecToken.pdie)
+        & ZeroOrMore(GenericToken.sdens)
+        & ZeroOrMore(ElecToken.sdie)
+        & ZeroOrMore(GenericToken.srad)
+        & ZeroOrMore(GenericToken.temp)
         & ZeroOrMore(tree_n0)
         & ZeroOrMore(tree_order)
     )
 
 
-class fe_manualParser:
+class FeManualParser:
     """ELEC fe-manual specific tokens/grammars."""
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/fe-manual.html
@@ -762,7 +783,7 @@ class fe_manualParser:
     akeyPRE = Group(CLiteral("akeyPRE") - akeyPRE_options)
     akeySOLVE_options = oneOf("resi", caseless=True)
     akeySOLVE = Group(CLiteral("akeySOLVE") - akeySOLVE_options)
-    domainLength = Group(CLiteral("domainLength") - elecToken.grid_floats)
+    domainLength = Group(CLiteral("domainLength") - ElecToken.grid_floats)
     ekey_options = oneOf("simp global frac", caseless=True)
     ekey = Group(CLiteral("ekey") - ekey_options)
     maxsolve = Group(CLiteral("maxsolve") - NUMBER_VAL)
@@ -773,38 +794,38 @@ class fe_manualParser:
 
     grammar = (
         CLiteral("fe-manual")
-        & ZeroOrMore(elecToken.name)
+        & ZeroOrMore(ElecToken.name)
         & ZeroOrMore(akeyPRE)
         & ZeroOrMore(akeySOLVE)
-        & ZeroOrMore(elecToken.async_value)
-        & ZeroOrMore(elecToken.bcfl)
-        & ZeroOrMore(genericToken.calcenergy)
-        & ZeroOrMore(genericToken.calcforce)
-        & ZeroOrMore(elecToken.chgm)
+        & ZeroOrMore(ElecToken.async_value)
+        & ZeroOrMore(ElecToken.bcfl)
+        & ZeroOrMore(GenericToken.calcenergy)
+        & ZeroOrMore(GenericToken.calcforce)
+        & ZeroOrMore(ElecToken.chgm)
         & ZeroOrMore(domainLength)
         & ZeroOrMore(ekey)
-        & ZeroOrMore(elecToken.etol)
-        & ZeroOrMore(elecToken.ion)
-        & ZeroOrMore(elecToken.pbe)
+        & ZeroOrMore(ElecToken.etol)
+        & ZeroOrMore(ElecToken.ion)
+        & ZeroOrMore(ElecToken.pbe)
         & ZeroOrMore(maxsolve)
         & ZeroOrMore(maxvert)
-        & ZeroOrMore(genericToken.mol)
-        & ZeroOrMore(elecToken.pdie)
-        & ZeroOrMore(genericToken.sdens)
-        & ZeroOrMore(elecToken.sdie)
-        & ZeroOrMore(genericToken.srad)
-        & ZeroOrMore(elecToken.srfm)
-        & ZeroOrMore(genericToken.swin)
+        & ZeroOrMore(GenericToken.mol)
+        & ZeroOrMore(ElecToken.pdie)
+        & ZeroOrMore(GenericToken.sdens)
+        & ZeroOrMore(ElecToken.sdie)
+        & ZeroOrMore(GenericToken.srad)
+        & ZeroOrMore(ElecToken.srfm)
+        & ZeroOrMore(GenericToken.swin)
         & ZeroOrMore(targetNum)
         & ZeroOrMore(targetRes)
-        & ZeroOrMore(genericToken.temp)
-        & ZeroOrMore(elecToken.usemap)
+        & ZeroOrMore(GenericToken.temp)
+        & ZeroOrMore(ElecToken.usemap)
         & ZeroOrMore(usemesh)
-        & ZeroOrMore(elecToken.write)
+        & ZeroOrMore(ElecToken.write)
     )
 
 
-class geoflow_autoParser:
+class GeoflowAutoParser:
     """ELEC geoflow-auto specific tokens/grammars."""
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/geoflow-auto.html
@@ -816,55 +837,55 @@ class geoflow_autoParser:
 
     grammar = (
         CLiteral("geoflow-auto")
-        & ZeroOrMore(elecToken.name)
-        & ZeroOrMore(elecToken.bcfl)
-        & ZeroOrMore(genericToken.bconc)
-        & ZeroOrMore(elecToken.etol)
-        & ZeroOrMore(genericToken.gamma)
-        & ZeroOrMore(elecToken.pbe)
-        & ZeroOrMore(genericToken.mol)
-        & ZeroOrMore(elecToken.pdie)
+        & ZeroOrMore(ElecToken.name)
+        & ZeroOrMore(ElecToken.bcfl)
+        & ZeroOrMore(GenericToken.bconc)
+        & ZeroOrMore(ElecToken.etol)
+        & ZeroOrMore(GenericToken.gamma)
+        & ZeroOrMore(ElecToken.pbe)
+        & ZeroOrMore(GenericToken.mol)
+        & ZeroOrMore(ElecToken.pdie)
         & ZeroOrMore(press)
-        & ZeroOrMore(elecToken.sdie)
+        & ZeroOrMore(ElecToken.sdie)
         & ZeroOrMore(vdwdisp)
     )
 
 
-class mg_autoParser:
+class MgAutoParser:
     """ELEC mg-auto specific tokens/grammars."""
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-auto.html
 
     grammar = (
         CLiteral("mg-auto")
-        & ZeroOrMore(elecToken.name)
-        & ZeroOrMore(elecToken.bcfl)
-        & ZeroOrMore(genericToken.calcenergy)
-        & ZeroOrMore(genericToken.calcforce)
-        & ZeroOrMore(elecToken.cgcent)
-        & ZeroOrMore(elecToken.cglen)
-        & ZeroOrMore(elecToken.chgm)
-        & ZeroOrMore(elecToken.dime)
-        & ZeroOrMore(elecToken.etol)
-        & ZeroOrMore(elecToken.fgcent)
-        & ZeroOrMore(elecToken.fglen)
-        & ZeroOrMore(elecToken.ion)
-        & ZeroOrMore(elecToken.pbe)
-        & ZeroOrMore(genericToken.mol)
-        & ZeroOrMore(elecToken.pdie)
-        & ZeroOrMore(genericToken.sdens)
-        & ZeroOrMore(elecToken.sdie)
-        & ZeroOrMore(genericToken.srad)
-        & ZeroOrMore(elecToken.srfm)
-        & ZeroOrMore(genericToken.swin)
-        & ZeroOrMore(genericToken.temp)
-        & ZeroOrMore(elecToken.usemap)
-        & ZeroOrMore(elecToken.write)
-        & ZeroOrMore(elecToken.writemat)
+        & ZeroOrMore(ElecToken.name)
+        & ZeroOrMore(ElecToken.bcfl)
+        & ZeroOrMore(GenericToken.calcenergy)
+        & ZeroOrMore(GenericToken.calcforce)
+        & ZeroOrMore(ElecToken.cgcent)
+        & ZeroOrMore(ElecToken.cglen)
+        & ZeroOrMore(ElecToken.chgm)
+        & ZeroOrMore(ElecToken.dime)
+        & ZeroOrMore(ElecToken.etol)
+        & ZeroOrMore(ElecToken.fgcent)
+        & ZeroOrMore(ElecToken.fglen)
+        & ZeroOrMore(ElecToken.ion)
+        & ZeroOrMore(ElecToken.pbe)
+        & ZeroOrMore(GenericToken.mol)
+        & ZeroOrMore(ElecToken.pdie)
+        & ZeroOrMore(GenericToken.sdens)
+        & ZeroOrMore(ElecToken.sdie)
+        & ZeroOrMore(GenericToken.srad)
+        & ZeroOrMore(ElecToken.srfm)
+        & ZeroOrMore(GenericToken.swin)
+        & ZeroOrMore(GenericToken.temp)
+        & ZeroOrMore(ElecToken.usemap)
+        & ZeroOrMore(ElecToken.write)
+        & ZeroOrMore(ElecToken.writemat)
     )
 
 
-class mg_manualParser:
+class MgManualParser:
     """ELEC mg-manual specific tokens/grammars."""
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-manual.html
@@ -875,34 +896,34 @@ class mg_manualParser:
 
     grammar = (
         CLiteral("mg-manual")
-        & ZeroOrMore(elecToken.name)
-        & ZeroOrMore(elecToken.bcfl)
-        & ZeroOrMore(genericToken.calcenergy)
-        & ZeroOrMore(genericToken.calcforce)
-        & ZeroOrMore(elecToken.chgm)
-        & ZeroOrMore(elecToken.dime)
-        & ZeroOrMore(elecToken.etol)
-        & ZeroOrMore(elecToken.gcent)
-        & ZeroOrMore(elecToken.glen)
-        & ZeroOrMore(genericToken.grid)
-        & ZeroOrMore(elecToken.ion)
-        & ZeroOrMore(elecToken.pbe)
-        & ZeroOrMore(genericToken.mol)
+        & ZeroOrMore(ElecToken.name)
+        & ZeroOrMore(ElecToken.bcfl)
+        & ZeroOrMore(GenericToken.calcenergy)
+        & ZeroOrMore(GenericToken.calcforce)
+        & ZeroOrMore(ElecToken.chgm)
+        & ZeroOrMore(ElecToken.dime)
+        & ZeroOrMore(ElecToken.etol)
+        & ZeroOrMore(ElecToken.gcent)
+        & ZeroOrMore(ElecToken.glen)
+        & ZeroOrMore(GenericToken.grid)
+        & ZeroOrMore(ElecToken.ion)
+        & ZeroOrMore(ElecToken.pbe)
+        & ZeroOrMore(GenericToken.mol)
         & ZeroOrMore(nlev)
-        & ZeroOrMore(elecToken.pdie)
-        & ZeroOrMore(genericToken.sdens)
-        & ZeroOrMore(elecToken.sdie)
-        & ZeroOrMore(genericToken.srad)
-        & ZeroOrMore(elecToken.srfm)
-        & ZeroOrMore(genericToken.swin)
-        & ZeroOrMore(genericToken.temp)
-        & ZeroOrMore(elecToken.usemap)
-        & ZeroOrMore(elecToken.write)
-        & ZeroOrMore(elecToken.writemat)
+        & ZeroOrMore(ElecToken.pdie)
+        & ZeroOrMore(GenericToken.sdens)
+        & ZeroOrMore(ElecToken.sdie)
+        & ZeroOrMore(GenericToken.srad)
+        & ZeroOrMore(ElecToken.srfm)
+        & ZeroOrMore(GenericToken.swin)
+        & ZeroOrMore(GenericToken.temp)
+        & ZeroOrMore(ElecToken.usemap)
+        & ZeroOrMore(ElecToken.write)
+        & ZeroOrMore(ElecToken.writemat)
     )
 
 
-class mg_paraParser:
+class MgParaParser:
     """ELEC mg-para specific tokens/grammars."""
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-para.html
@@ -910,70 +931,70 @@ class mg_paraParser:
     NUMBER_VAL = ApbsLegacyInput.get_number_grammar()
 
     # TODO: Combine with dime?
-    pdime = Group(CLiteral("pdime") - elecToken.grid_floats)
+    pdime = Group(CLiteral("pdime") - ElecToken.grid_floats)
     ofrac = Group(CLiteral("ofrac") - NUMBER_VAL)
 
     grammar = (
         CLiteral("mg-para")
-        & ZeroOrMore(elecToken.name)
-        & ZeroOrMore(elecToken.async_value)
-        & ZeroOrMore(elecToken.bcfl)
-        & ZeroOrMore(genericToken.calcenergy)
-        & ZeroOrMore(genericToken.calcforce)
-        & ZeroOrMore(elecToken.cgcent)
-        & ZeroOrMore(elecToken.cglen)
-        & ZeroOrMore(elecToken.chgm)
-        & ZeroOrMore(elecToken.dime)
-        & ZeroOrMore(elecToken.etol)
-        & ZeroOrMore(elecToken.fgcent)
-        & ZeroOrMore(elecToken.fglen)
-        & ZeroOrMore(elecToken.ion)
-        & ZeroOrMore(elecToken.pbe)
-        & ZeroOrMore(genericToken.mol)
+        & ZeroOrMore(ElecToken.name)
+        & ZeroOrMore(ElecToken.async_value)
+        & ZeroOrMore(ElecToken.bcfl)
+        & ZeroOrMore(GenericToken.calcenergy)
+        & ZeroOrMore(GenericToken.calcforce)
+        & ZeroOrMore(ElecToken.cgcent)
+        & ZeroOrMore(ElecToken.cglen)
+        & ZeroOrMore(ElecToken.chgm)
+        & ZeroOrMore(ElecToken.dime)
+        & ZeroOrMore(ElecToken.etol)
+        & ZeroOrMore(ElecToken.fgcent)
+        & ZeroOrMore(ElecToken.fglen)
+        & ZeroOrMore(ElecToken.ion)
+        & ZeroOrMore(ElecToken.pbe)
+        & ZeroOrMore(GenericToken.mol)
         & ZeroOrMore(ofrac)
-        & ZeroOrMore(elecToken.pdie)
+        & ZeroOrMore(ElecToken.pdie)
         & ZeroOrMore(pdime)
-        & ZeroOrMore(genericToken.sdens)
-        & ZeroOrMore(elecToken.sdie)
-        & ZeroOrMore(genericToken.srad)
-        & ZeroOrMore(elecToken.srfm)
-        & ZeroOrMore(genericToken.swin)
-        & ZeroOrMore(genericToken.temp)
-        & ZeroOrMore(elecToken.usemap)
-        & ZeroOrMore(elecToken.write)
-        & ZeroOrMore(elecToken.writemat)
+        & ZeroOrMore(GenericToken.sdens)
+        & ZeroOrMore(ElecToken.sdie)
+        & ZeroOrMore(GenericToken.srad)
+        & ZeroOrMore(ElecToken.srfm)
+        & ZeroOrMore(GenericToken.swin)
+        & ZeroOrMore(GenericToken.temp)
+        & ZeroOrMore(ElecToken.usemap)
+        & ZeroOrMore(ElecToken.write)
+        & ZeroOrMore(ElecToken.writemat)
     )
 
 
-class mg_dummyParser:
+class MgDummyParser:
     """ELEC mg-dummy specific tokens/grammars."""
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/mg-dummy.html
 
     grammar = (
         CLiteral("mg-dummy")
-        & ZeroOrMore(elecToken.name)
-        & ZeroOrMore(elecToken.bcfl)
-        & ZeroOrMore(elecToken.chgm)
-        & ZeroOrMore(elecToken.dime)
-        & ZeroOrMore(elecToken.gcent)
-        & ZeroOrMore(elecToken.glen)
-        & ZeroOrMore(genericToken.grid)
-        & ZeroOrMore(elecToken.ion)
-        & ZeroOrMore(elecToken.pbe)
-        & ZeroOrMore(genericToken.mol)
-        & ZeroOrMore(elecToken.pdie)
-        & ZeroOrMore(genericToken.sdens)
-        & ZeroOrMore(elecToken.sdie)
-        & ZeroOrMore(genericToken.srad)
-        & ZeroOrMore(elecToken.srfm)
-        & ZeroOrMore(genericToken.swin)
-        & ZeroOrMore(genericToken.temp)
-        & ZeroOrMore(elecToken.write)
+        & ZeroOrMore(ElecToken.name)
+        & ZeroOrMore(ElecToken.bcfl)
+        & ZeroOrMore(ElecToken.chgm)
+        & ZeroOrMore(ElecToken.dime)
+        & ZeroOrMore(ElecToken.gcent)
+        & ZeroOrMore(ElecToken.glen)
+        & ZeroOrMore(GenericToken.grid)
+        & ZeroOrMore(ElecToken.ion)
+        & ZeroOrMore(ElecToken.pbe)
+        & ZeroOrMore(GenericToken.mol)
+        & ZeroOrMore(ElecToken.pdie)
+        & ZeroOrMore(GenericToken.sdens)
+        & ZeroOrMore(ElecToken.sdie)
+        & ZeroOrMore(GenericToken.srad)
+        & ZeroOrMore(ElecToken.srfm)
+        & ZeroOrMore(GenericToken.swin)
+        & ZeroOrMore(GenericToken.temp)
+        & ZeroOrMore(ElecToken.write)
     )
 
 
-class pbToken:
+class PbToken:
     """ELEC pbam-auto and pbsam-auto specific tokens/grammars."""
 
     IDENTIFIER = ApbsLegacyInput.get_identifier_grammar()
@@ -1023,37 +1044,37 @@ class pbToken:
     xyz = Group(CLiteral("xyz") - Group(IDENTIFIER - PATH_VAL))
 
 
-class pbam_autoParser:
+class PbamAutoParser:
     """ELEC pbam-auto specific tokens/grammars."""
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/pbam-auto.html
 
     grammar = (
         CLiteral("pbam-auto")
-        & ZeroOrMore(elecToken.name)
-        & ZeroOrMore(pbToken.thr3dmap)
-        & ZeroOrMore(pbToken.diff)
-        & ZeroOrMore(pbToken.dx)
-        & ZeroOrMore(pbToken.grid2d)
-        & ZeroOrMore(pbToken.gridpts)
-        & ZeroOrMore(genericToken.mol)
-        & ZeroOrMore(pbToken.ntraj)
-        & ZeroOrMore(pbToken.pbc)
-        & ZeroOrMore(elecToken.pdie)
-        & ZeroOrMore(pbToken.randorient)
-        & ZeroOrMore(pbToken.runname)
-        & ZeroOrMore(pbToken.runtype)
-        & ZeroOrMore(pbToken.salt)
-        & ZeroOrMore(elecToken.sdie)
-        & ZeroOrMore(genericToken.temp)
-        & ZeroOrMore(pbToken.term)
-        & ZeroOrMore(pbToken.termcombine)
-        & ZeroOrMore(pbToken.units)
-        & ZeroOrMore(pbToken.xyz)
+        & ZeroOrMore(ElecToken.name)
+        & ZeroOrMore(PbToken.thr3dmap)
+        & ZeroOrMore(PbToken.diff)
+        & ZeroOrMore(PbToken.dx)
+        & ZeroOrMore(PbToken.grid2d)
+        & ZeroOrMore(PbToken.gridpts)
+        & ZeroOrMore(GenericToken.mol)
+        & ZeroOrMore(PbToken.ntraj)
+        & ZeroOrMore(PbToken.pbc)
+        & ZeroOrMore(ElecToken.pdie)
+        & ZeroOrMore(PbToken.randorient)
+        & ZeroOrMore(PbToken.runname)
+        & ZeroOrMore(PbToken.runtype)
+        & ZeroOrMore(PbToken.salt)
+        & ZeroOrMore(ElecToken.sdie)
+        & ZeroOrMore(GenericToken.temp)
+        & ZeroOrMore(PbToken.term)
+        & ZeroOrMore(PbToken.termcombine)
+        & ZeroOrMore(PbToken.units)
+        & ZeroOrMore(PbToken.xyz)
     )
 
 
-class pbsam_autoParser:
+class PbsamAutoParser:
     """ELEC pbsam-auto specific tokens/grammars."""
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/pbsam-auto.html
@@ -1069,32 +1090,32 @@ class pbsam_autoParser:
 
     grammar = (
         CLiteral("pbsam-auto")
-        & ZeroOrMore(elecToken.name)
-        & ZeroOrMore(pbToken.thr3dmap)
-        & ZeroOrMore(pbToken.diff)
-        & ZeroOrMore(pbToken.dx)
+        & ZeroOrMore(ElecToken.name)
+        & ZeroOrMore(PbToken.thr3dmap)
+        & ZeroOrMore(PbToken.diff)
+        & ZeroOrMore(PbToken.dx)
         & ZeroOrMore(exp)
-        & ZeroOrMore(pbToken.grid2d)
+        & ZeroOrMore(PbToken.grid2d)
         & ZeroOrMore(imat)
-        & ZeroOrMore(pbToken.ntraj)
-        & ZeroOrMore(pbToken.pbc)
-        & ZeroOrMore(elecToken.pdie)
-        & ZeroOrMore(pbToken.randorient)
-        & ZeroOrMore(pbToken.runname)
-        & ZeroOrMore(pbToken.runtype)
-        & ZeroOrMore(pbToken.salt)
-        & ZeroOrMore(elecToken.sdie)
+        & ZeroOrMore(PbToken.ntraj)
+        & ZeroOrMore(PbToken.pbc)
+        & ZeroOrMore(ElecToken.pdie)
+        & ZeroOrMore(PbToken.randorient)
+        & ZeroOrMore(PbToken.runname)
+        & ZeroOrMore(PbToken.runtype)
+        & ZeroOrMore(PbToken.salt)
+        & ZeroOrMore(ElecToken.sdie)
         & ZeroOrMore(surf)
-        & ZeroOrMore(genericToken.temp)
-        & ZeroOrMore(pbToken.term)
-        & ZeroOrMore(pbToken.termcombine)
+        & ZeroOrMore(GenericToken.temp)
+        & ZeroOrMore(PbToken.term)
+        & ZeroOrMore(PbToken.termcombine)
         & ZeroOrMore(tolsp)
-        & ZeroOrMore(pbToken.units)
-        & ZeroOrMore(pbToken.xyz)
+        & ZeroOrMore(PbToken.units)
+        & ZeroOrMore(PbToken.xyz)
     )
 
 
-def printBanner(prefix: str, item: str):
+def print_banner(prefix: str, item: str):
     """Helper function to print a banner around a message.
 
     :param prefix str: the prefix string to put in front of the item
@@ -1103,7 +1124,7 @@ def printBanner(prefix: str, item: str):
     :rtype: None
 
     Example output of the command:
-        printBanner(f"FILE {idx}", file)
+        print_banner(f"FILE {idx}", file)
     where idx is 0 and file is "/LONG_PATH_TO/apbs-mol-auto.in" would
     produce the output:
         ======================================================================
@@ -1180,6 +1201,7 @@ def main():
     relfilename = "helix/apbs_solv.in"
     relfilename = "smpbe/apbs-smpbe-24dup.in"
     relfilename = "actin-dimer/apbs-mol-auto.in"
+    relfilename = "pbam/toy_dynamics.in"
 
     example_dir = relfilename.split("/")[0]
     example_pattern = relfilename.split("/")[1]
@@ -1191,7 +1213,7 @@ def main():
         files = get_example_files(example_dir, example_pattern)
 
     for idx, file in enumerate(files):
-        printBanner(f"FILE {idx}", file)
+        print_banner(f"FILE {idx}", file)
         apbs_input = ApbsLegacyInput()
         try:
             pprint(apbs_input.load(file))

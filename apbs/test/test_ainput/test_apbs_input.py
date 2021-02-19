@@ -3,7 +3,7 @@ from pyparsing import ParseSyntaxException
 from apbs.ainput.apbs_legacy_input import (
     ApbsLegacyInput,
     get_example_files,
-    printBanner,
+    print_banner,
 )
 
 
@@ -148,7 +148,7 @@ class TestApbsLegacyInput:
         files = get_example_files()
         for idx, file in enumerate(files):
             sut = ApbsLegacyInput()
-            printBanner(f"FILE {idx}:", file)
+            print_banner(f"FILE {idx}:", file)
             config: ApbsLegacyInput = sut.load(file)
             print(config)
             assert len(config) > 0

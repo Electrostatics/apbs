@@ -24,7 +24,7 @@ elec name duplexA
    chgm spl2
    srad 1.4
    swin 0.3
-   # WARN: smpbe is not supported in pbsam-auto
+   # WARN: smpbe is not supported in mg-auto
    # smpbe vol 10 size 1000
    sdens 10
    temp 298.1
