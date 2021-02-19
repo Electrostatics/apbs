@@ -1,4 +1,5 @@
 import argparse
+import logging
 from pathlib import Path
 from pprint import pprint
 from pyparsing import CaselessLiteral as CLiteral
@@ -21,6 +22,8 @@ from pyparsing import (
     restOfLine,
 )
 from re import search
+
+LOGGER = logging.getLogger(__name__)
 
 # Purpose:
 #   The ApbsLegacyInput class was written to parse input files
@@ -139,10 +142,6 @@ class ApbsLegacyInput:
 
         # Tokens used by multiple parsers
         self.COMMENT = "#"
-        # TODO: The DEBUG flag should be set/accessed from a higher
-        #       level debugging object that is set from a config
-        #       file or command line option.
-        self.DEBUG = False
         self.END_VAL = CLiteral("END")
 
         # The FINAL_OUTPUT is a dictionary produced after parsing a file
@@ -194,11 +193,6 @@ class ApbsLegacyInput:
         """Convenience function that is used by other classes."""
         return Word(printables)  # .setDebug()
 
-    def debug(self, message: str):
-        """Convenience function to track down grammar/parsing problems"""
-        if self.DEBUG:
-            print(message)
-
     def format_read_section(self, results: ParseResults, groups: list) -> dict:
         """Format the READ section of the APBS input file.
 
@@ -222,29 +216,29 @@ class ApbsLegacyInput:
         if section not in self.FINAL_OUTPUT:
             self.FINAL_OUTPUT[section] = {}
         idx = len(self.FINAL_OUTPUT[section])
-        self.debug(f"IDX: {idx}")
+        LOGGER.debug(f"IDX: {idx}")
         self.FINAL_OUTPUT[section][idx] = {}
 
         # TODO: More error checking
         #       - What if key not in groups?
-        self.debug(f"RESULTS: {results}")
+        LOGGER.debug(f"RESULTS: {results}")
         for result in results[0]:
-            self.debug(f"TYPE: {type(result)}")
+            LOGGER.debug(f"TYPE: {type(result)}")
             for field in result:
-                self.debug(f"type item: {type(field)} {field}")
+                LOGGER.debug(f"type item: {type(field)} {field}")
                 if isinstance(field, ParseResults):
                     key = field[0].lower()
-                    self.debug(f"key: {key}")
+                    LOGGER.debug(f"key: {key}")
                     if key in groups:
                         if key not in self.FINAL_OUTPUT[section][idx]:
-                            self.debug(f"ADD KEY: {key}")
+                            LOGGER.debug(f"ADD KEY: {key}")
                             self.FINAL_OUTPUT[section][idx][key] = {}
                         subkey = f"{field[1]}".lower()
                         if subkey not in self.FINAL_OUTPUT[section][idx][key]:
-                            self.debug(f"ADD SUBKEY: {subkey}")
+                            LOGGER.debug(f"ADD SUBKEY: {subkey}")
                             self.FINAL_OUTPUT[section][idx][key][subkey] = []
                         if field[2] is not None:
-                            self.debug(
+                            LOGGER.debug(
                                 f"VALUES: KEY: {key}, "
                                 f"SUBKEY: {subkey}, "
                                 f"item2: {field[2]}"
@@ -332,12 +326,12 @@ class ApbsLegacyInput:
             self.FINAL_OUTPUT[section][idx] = {}
 
             for row in results[0]:
-                self.debug(f"TYPE: {type(row)}")
+                LOGGER.debug(f"TYPE: {type(row)}")
                 for item in row:
-                    self.debug(f"type item: {type(item)} {item}")
+                    LOGGER.debug(f"type item: {type(item)} {item}")
                     if isinstance(item, str):
                         key = item.lower()
-                        self.debug(f"key: {key}")
+                        LOGGER.debug(f"key: {key}")
                         if key not in self.FINAL_OUTPUT[section][idx].keys():
                             self.FINAL_OUTPUT[section][idx][key] = row[1:]
                             break
@@ -416,14 +410,14 @@ class ApbsLegacyInput:
             self.FINAL_OUTPUT[section] = {}
         idx = len(self.FINAL_OUTPUT[section])
         self.FINAL_OUTPUT[section][idx] = {}
-        self.debug(f"SECTION OUTPUT: {self.FINAL_OUTPUT[section]}")
+        LOGGER.debug(f"SECTION OUTPUT: {self.FINAL_OUTPUT[section]}")
 
         retval = {}
 
         for result in t[0]:
-            self.debug(f"RESULT TYPE: {type(result)}")
-            self.debug(f"RESULT VALUE: {result}")
-            self.debug(f"RESULT LENGTH: {len(result)}")
+            LOGGER.debug(f"RESULT TYPE: {type(result)}")
+            LOGGER.debug(f"RESULT VALUE: {result}")
+            LOGGER.debug(f"RESULT LENGTH: {len(result)}")
             if isinstance(result, str):
                 if result in "randorient":
                     # NOTE: special case for "randorient" key
@@ -436,22 +430,22 @@ class ApbsLegacyInput:
             if len(result) == 1:
                 # NOTE: We have something Group (List) with only 1 value
                 #       like lrpbe so we have to add a "pbe" key
-                self.debug(f"FOUND PBE?: {retval}")
+                LOGGER.debug(f"FOUND PBE?: {retval}")
                 retval["pbe"] = result[0]
                 continue
             # NOTE: Normal Key/Value case
             key = result[0]
             value = result[1]
             if len(result) == 2:
-                self.debug(f"KEY: {key} VALUE: {value}")
+                LOGGER.debug(f"KEY: {key} VALUE: {value}")
                 if isinstance(value, ParseResults):
-                    self.debug(f"ParseResults VALUE: {value}")
+                    LOGGER.debug(f"ParseResults VALUE: {value}")
                     value = value.asList()
                 if key in retval:
-                    self.debug(f"Key Already Exits: {retval}")
+                    LOGGER.debug(f"Key Already Exits: {retval}")
                     retval[key].append(value)
                     continue
-                self.debug(f"NORMAL Key/Value: {retval}")
+                LOGGER.debug(f"NORMAL Key/Value: {retval}")
                 # NOTE: It is easier to put the value into an List
                 #       and append multiple values to the key. Later
                 #       we post-process the result to remove the List
@@ -459,29 +453,31 @@ class ApbsLegacyInput:
                 retval[key] = [value]
                 continue
             # NOTE: More complicated than Key/Value case, probably ion
-            self.debug(f"COMPLICATED KEY: {result[0]}")
+            LOGGER.debug(f"COMPLICATED KEY: {result[0]}")
             if result[0] not in retval:
                 retval[result[0]] = {}
             sub_idx = len(retval[result[0]])
             for item in result[1:]:
-                self.debug(f"SUB_IDX: {sub_idx}")
-                self.debug(f"ITEM: {item}")
+                LOGGER.debug(f"SUB_IDX: {sub_idx}")
+                LOGGER.debug(f"ITEM: {item}")
                 if sub_idx not in retval[result[0]]:
                     retval[result[0]][sub_idx] = {}
                 if item[0] in retval[result[0]][sub_idx]:
-                    self.debug("WARN: We need to change key/value to key/dict")
+                    LOGGER.debug(
+                        "NOTE: We need to change key/value to key/dict"
+                    )
                 retval[result[0]][sub_idx][item[0]] = item[1]
 
         # NOTE: Post process retval to replace Key/List with Key/Value
         #       if the List only has 1 element in it
         for item in retval:
-            self.debug(f"PRE KEY/VALUE: {item}")
+            LOGGER.debug(f"PRE KEY/VALUE: {item}")
             if isinstance(retval[item], list) and len(retval[item]) == 1:
                 retval[item] = retval[item][0]
-                self.debug(f"POST KEY/VALUE: {retval[item]}")
+                LOGGER.debug(f"POST KEY/VALUE: {retval[item]}")
 
         self.FINAL_OUTPUT[section][idx] = retval
-        self.debug(f"FINAL_OUTPUT: {self.FINAL_OUTPUT[section]}")
+        LOGGER.debug(f"FINAL_OUTPUT: {self.FINAL_OUTPUT[section]}")
         return self.FINAL_OUTPUT
 
     def apolar_parser(self):
@@ -579,7 +575,7 @@ class ApbsLegacyInput:
         parser.ignore(self.COMMENT + restOfLine)
 
         value: ParseResults = None
-        self.debug(f"DEFAULT value: TYPE {type(value)} {value}")
+        LOGGER.debug(f"DEFAULT value: TYPE {type(value)} {value}")
 
         try:
             value = self.grammar.searchString(input_data)
@@ -590,11 +586,11 @@ class ApbsLegacyInput:
         #       around the dictionary so we just want to
         #       unwrap the value to get to that actual
         #       dictionary or str representing the data.
-        self.debug(f"value: TYPE {type(value)}")
+        LOGGER.debug(f"value: TYPE {type(value)}")
         if isinstance(value, ParseResults):
-            self.debug(f"value: TYPE[0]{type(value[0])}")
+            LOGGER.debug(f"value: TYPE[0]{type(value[0])}")
             if isinstance(value[0], ParseResults):
-                self.debug(f"value: TYPE[0][0] {type(value[0][0])}")
+                LOGGER.debug(f"value: TYPE[0][0] {type(value[0][0])}")
                 if isinstance(value[0][0], (dict, str)):
                     return value[0][0]
             if isinstance(value[0], (dict, str)):
