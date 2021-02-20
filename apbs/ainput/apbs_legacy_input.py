@@ -32,6 +32,7 @@ from pyparsing import (
 )
 
 LOGGER = logging.getLogger(__name__)
+FILENAME = "STRING"
 
 # Approach:
 #   The ApbsLegacyInput class parses an entire input file by the major
@@ -263,6 +264,7 @@ class ApbsLegacyInput:
             CLiteral("diel") - file_fmt - path_val - path_val - path_val
         )
         kappa = Group(CLiteral("kappa") - file_fmt - path_val)
+        mesh = Group(CLiteral("mesh") - CLiteral("mcsf") - path_val)
         mol_format = oneOf("pqr pdb", caseless=True)
         mol = Group(CLiteral("mol") - mol_format - path_val)
         parm_format = oneOf("flat xml", caseless=True)
@@ -272,6 +274,9 @@ class ApbsLegacyInput:
 
         grammar = Group(
             OneOrMore(mol)
+            & ZeroOrMore(
+                mesh
+            )  # .setParseAction(GenericToken.check_depricated)
             & ZeroOrMore(charge)
             & ZeroOrMore(diel)
             & ZeroOrMore(kappa)
@@ -463,7 +468,7 @@ class ApbsLegacyInput:
                     retval[result[0]][sub_idx] = {}
                 if item[0] in retval[result[0]][sub_idx]:
                     LOGGER.debug(
-                        "WARN: We need to change key/value to key/dict"
+                        "WARNING: We need to change key/value to key/dict"
                     )
                 retval[result[0]][sub_idx][item[0]] = item[1]
 
@@ -536,25 +541,42 @@ class ApbsLegacyInput:
             Suppress(CLiteral("ELEC")) - grammar - Suppress(CLiteral("END"))
         ).setParseAction(format_elec)
 
-    def raise_error(self, source: str, perr: ParseSyntaxException):
+    @staticmethod
+    def banner_message(lineno: int, column: int, line: str, msg: str) -> str:
         """Parsing failed - try to be produce a helpful error messsage.
 
-        :param source str: the filename or string representing the data
+        :param filename str: the file being parsed
+        :param lineno int: the line number of a file
+        :param column int: the column number of a lineno
+        :param line str: the line of a file
+        :param msg str: the msg to put in the message
+        :return: formatted message
+        :rtype: None
+        """
+
+        repeat_count = 70
+        message = "=" * repeat_count + "\n"
+        message += f"{msg}\n"
+        message += f"Filename: {FILENAME}\n"
+        message += f"Line Number: {lineno}:\n"
+        message += f"Column: {column}:\n"
+        message += "-" * repeat_count + "\n"
+        message += f"Line: \n{line}\n"
+        message += " " * (column - 1) + "^\n"
+        message += "-" * repeat_count + "\n"
+
+        return message
+
+    def raise_error(self, perr: ParseSyntaxException):
+        """Parsing failed - try to be produce a helpful error messsage.
+
         :param pe ParseSyntaxException: the Exception that was caught
         :return: None
         :rtype: None
         """
 
-        repeat_count = 70
-        message = "\n" + "=" * repeat_count + "\n"
-        message += f"ERROR: {type(perr)}\n"
-        message += f"Parsing {source}\n"
-        message += f"Line Number: {perr.lineno}:\n"
-        message += f"Column: {perr.col}:\n"
-        message += "=" * repeat_count + "\n"
-        message += f"Line: \n{perr.line}\n"
-        message += " " * (perr.col - 1) + "^\n"
-        message += "=" * repeat_count + "\n"
+        msg = f"ERROR: {type(perr)}\n"
+        message = self.banner_message(perr.lineno, perr.col, perr.line, msg)
         perr.msg = message
         raise perr
 
@@ -578,7 +600,7 @@ class ApbsLegacyInput:
         try:
             value = self.grammar.searchString(input_data)
         except ParseSyntaxException as perr:
-            self.raise_error("STRING", perr)
+            self.raise_error(perr)
 
         # NOTE: the ParseResults has 1 or more "wrappers"
         #       around the dictionary so we just want to
@@ -610,15 +632,84 @@ class ApbsLegacyInput:
         :rtype: dict
         """
 
+        global FILENAME
+        FILENAME = filename
+
         with filename.open() as fptr:
             try:
                 return self.loads(fptr.read())
             except ParseSyntaxException as perr:
-                self.raise_error(filename, perr)
+                self.raise_error(perr)
 
 
 class GenericToken:
     """Generic tokens/grammars that can be used by other classes."""
+
+    @staticmethod
+    def check_depricated(
+        instring: str, loc: int, tokenlist: ParseResults
+    ) -> ParseResults:
+        """Possibly using a depricated keyword or value.
+
+        Try to be produce a helpful error messsage.
+
+        :param instring str: the string that may be using a depricated value
+        :param loc int: the character offset into string
+        :return: the original or updated ParseResults
+        :rtype: ParseResults
+        """
+
+        depricated_values = {"ekey": "glob", "bcfl": "mem"}
+        substitute_values = {"glob": "global", "mem": "mdh"}
+        if isinstance(tokenlist, ParseResults):
+            if (
+                isinstance(tokenlist[0], ParseResults)
+                and len(tokenlist[0]) == 2
+            ):
+                # We have a key and value
+                key = tokenlist[0][0]
+                value = tokenlist[0][1]
+                if key in depricated_values:
+                    LOGGER.warning(
+                        "WARNING: Depricated value (%s) for key "
+                        "(%s) at offset (%s)",
+                        value,
+                        key,
+                        loc,
+                    )
+                    if value in substitute_values:
+                        new_value = substitute_values[value]
+                        # NOTE: Unfortunatly, the location is the
+                        #       offset from the begining of instring
+                        #       so we don't have a line count.
+                        #       Find the line number, column, and
+                        #       offending line with this hack :-(
+                        count = 0
+                        idx = 1
+                        lineno = 0
+                        column = 0
+                        line = ""
+                        for data in instring.splitlines():
+                            if count > loc:
+                                break
+                            if key in data and value in data:
+                                line = data
+                                lineno = idx
+                                column = data.find(value) + 1
+                            count += len(data) + 1
+                            idx += 1
+                        LOGGER.warning(
+                            ApbsLegacyInput.banner_message(
+                                lineno,
+                                column,
+                                line,
+                                f"WARNING: Substituting new value, {new_value}"
+                                f", for {value}",
+                            )
+                        )
+                        # Substitute the depricated value with correct value
+                        tokenlist[0][1] = new_value
+        return tokenlist
 
     number_val = ApbsLegacyInput.get_number_grammar()
 
@@ -666,7 +757,7 @@ class ElecToken:
     mol_id = Group(CLiteral("mol") - integer_val)
 
     async_value = Group(CLiteral("async") - integer_val)
-    bcfl_options = oneOf("focus map mdh sdh zero", caseless=True)
+    bcfl_options = oneOf("focus map mdh mem sdh zero", caseless=True)
     bcfl = Group(CLiteral("bcfl") - bcfl_options)
     cgcent = Group(CLiteral("cgcent") - (mol_id | grid_floats))
     cglen = Group(CLiteral("cglen") - grid_floats)
@@ -778,8 +869,10 @@ class FeManualParser:
     akeySOLVE_options = oneOf("resi", caseless=True)
     akeySOLVE = Group(CLiteral("akeySOLVE") - akeySOLVE_options)
     domainLength = Group(CLiteral("domainLength") - ElecToken.grid_floats)
-    ekey_options = oneOf("simp global frac", caseless=True)
-    ekey = Group(CLiteral("ekey") - ekey_options)
+    ekey_options = oneOf("simp glob global frac", caseless=True)
+    ekey = Group(CLiteral("ekey") - ekey_options).setParseAction(
+        GenericToken.check_depricated
+    )
     maxsolve = Group(CLiteral("maxsolve") - number_val)
     maxvert = Group(CLiteral("maxvert") - number_val)
     targetNum = Group(CLiteral("targetNum") - integer_val)
@@ -828,14 +921,19 @@ class GeoflowAutoParser:
 
     press = Group(CLiteral("press") - number_val)
     vdwdisp = Group(CLiteral("vdwdisp") - oneOf("0 1"))
+    keyword = CLiteral("geoflow-auto") | CLiteral("geoflow")
+    # .setParseAction(GenericToken.check_depricated)
 
     grammar = (
-        CLiteral("geoflow-auto")
+        keyword
         & ZeroOrMore(ElecToken.name)
         & ZeroOrMore(ElecToken.bcfl)
         & ZeroOrMore(GenericToken.bconc)
         & ZeroOrMore(ElecToken.etol)
         & ZeroOrMore(GenericToken.gamma)
+        & ZeroOrMore(
+            GenericToken.grid
+        )  # . setParseAction(GenericToken.check_depricated)
         & ZeroOrMore(ElecToken.pbe)
         & ZeroOrMore(GenericToken.mol)
         & ZeroOrMore(ElecToken.pdie)
@@ -968,12 +1066,21 @@ class MgDummyParser:
         CLiteral("mg-dummy")
         & ZeroOrMore(ElecToken.name)
         & ZeroOrMore(ElecToken.bcfl)
+        & ZeroOrMore(
+            GenericToken.calcenergy
+        )  # .setParseAction(GenericToken.check_depricated)
+        & ZeroOrMore(
+            GenericToken.calcforce
+        )  # .setParseAction(GenericToken.check_depricated)
         & ZeroOrMore(ElecToken.chgm)
         & ZeroOrMore(ElecToken.dime)
         & ZeroOrMore(ElecToken.gcent)
         & ZeroOrMore(ElecToken.glen)
         & ZeroOrMore(GenericToken.grid)
         & ZeroOrMore(ElecToken.ion)
+        & ZeroOrMore(
+            ElecToken.nlev
+        )  # .setParseAction(GenericToken.check_depricated)
         & ZeroOrMore(ElecToken.pbe)
         & ZeroOrMore(GenericToken.mol)
         & ZeroOrMore(ElecToken.pdie)
@@ -1042,8 +1149,11 @@ class PbamAutoParser:
 
     # https://apbs.readthedocs.io/en/latest/using/input/elec/pbam-auto.html
 
+    keyword = CLiteral("pbam-auto") | CLiteral("pbam")
+    # .setParseAction(GenericToken.check_depricated)
+
     grammar = (
-        CLiteral("pbam-auto")
+        keyword
         & ZeroOrMore(ElecToken.name)
         & ZeroOrMore(PbToken.thr3dmap)
         & ZeroOrMore(PbToken.diff)
@@ -1081,8 +1191,11 @@ class PbsamAutoParser:
     surf = Group(CLiteral("surf") - path_val)
     tolsp = Group(CLiteral("tolsp") - number_val)
 
+    keyword = CLiteral("pbsam-auto") | CLiteral("pbsam")
+    # .setParseAction(GenericToken.check_depricated)
+
     grammar = (
-        CLiteral("pbsam-auto")
+        keyword
         & ZeroOrMore(ElecToken.name)
         & ZeroOrMore(PbToken.thr3dmap)
         & ZeroOrMore(PbToken.diff)
@@ -1168,6 +1281,14 @@ def build_parser():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
+        "--verbose",
+        action="store_const",
+        dest="verbose",
+        default=False,
+        const="value-to-store",
+        help=("Print out the resulting dictionary"),
+    )
+    parser.add_argument(
         "--all",
         action="store_const",
         dest="all",
@@ -1193,6 +1314,8 @@ def main():
     relfilename = "smpbe/apbs-smpbe-24dup.in"
     relfilename = "actin-dimer/apbs-mol-auto.in"
     relfilename = "pbam/toy_dynamics.in"
+    relfilename = "born/apbs-mol-fem.in"
+    relfilename = "geoflow/1a63.in"
 
     example_dir = relfilename.split("/")[0]
     example_pattern = relfilename.split("/")[1]
@@ -1204,12 +1327,15 @@ def main():
         files = get_example_files(example_dir, example_pattern)
 
     for idx, file in enumerate(files):
-        print_banner(f"FILE {idx}", file)
+        if args.verbose:
+            print_banner(f"FILE {idx}", file)
         apbs_input = ApbsLegacyInput()
         try:
-            pprint(apbs_input.load(file))
+            results = apbs_input.load(file)
+            if args.verbose:
+                pprint(results)
         except ParseSyntaxException as perr:
-            apbs_input.raise_error(file, perr)
+            apbs_input.raise_error(perr)
 
 
 if __name__ == "__main__":
