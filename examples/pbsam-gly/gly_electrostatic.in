@@ -23,7 +23,7 @@ elec name comp_solv        # Gly
     # dime 20
     # WARN: write is not supported in pbsam-auto
     # write pot dx gly_0.1M.dx
-    # write 3dmap  gly_0.1M.map
+    3dmap  gly_0.1M.map
     grid2d gly_0.1M.x0.dat x 0.0
 
 end
