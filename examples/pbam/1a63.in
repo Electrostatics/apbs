@@ -2,7 +2,7 @@ read
     mol pqr 1a63.pqr
 end
 elec name comp_solv        # Toy charges
-    pbam-auto
+    pbam
 
     runtype electrostatics                           # Can be energyforce, electrostatics etc
     runname elec_1a63                                # Output name for files created by program
@@ -17,8 +17,7 @@ elec name comp_solv        # Toy charges
 
     # WARN: write is no longer supported in pbam-auto
     # write pot dx 1a63_0.1M.dx
-    # WARN: write is no longer supported in pbam-auto
-    # write 3dmap  1a63_0.1M.map
+    3dmap  1a63_0.1M.map
     grid2d 1a63_0.1M.x0.dat x 0.0
 
 end

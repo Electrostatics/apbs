@@ -3,7 +3,7 @@ read
     mol pqr neg_charge.pqr
 end
 elec name comp_solv        # Toy charges
-    pbam-auto
+    pbam
 
     runtype electrostatics                            # Can be energyforce, electrostatics etc
     runname elec_toy                                  # Output name for files created by program
@@ -15,8 +15,7 @@ elec name comp_solv        # Toy charges
 
     # WARN: write is not supported in pbam-auto
     # write pot dx toy.dx
-    # WARN: write is not supported in pbam-auto
-    # write 3dmap  toy.map
+    3dmap  toy.map
     grid2d toy.x0.dat x 0.0
 
 end

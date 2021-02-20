@@ -3,14 +3,13 @@
 #############################################################################
 read 
 	mol pqr ion.pqr
-	# WARN: The following no longer works
-	# mesh mcsf mesh.m
+	mesh mcsf mesh.m
 end
 elec name born
 	fe-manual
 	domainLength 12 12 12
 	etol 0.1
-	ekey global
+	ekey glob
 	akeyPRE geom
 	akeySOLVE resi
 	targetNum 10000
@@ -39,7 +38,7 @@ elec name born_ref
 	fe-manual
 	domainLength 12 12 12
 	etol 0.1
-	ekey global
+	ekey glob
 	akeyPRE geom
 	akeySOLVE resi
 	targetNum 10000

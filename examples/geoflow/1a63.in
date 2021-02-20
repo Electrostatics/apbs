@@ -2,14 +2,13 @@ read
     mol pqr 1a63.pqr
 end
 elec name comp_solv        # Solvated complex
-    geoflow-auto
+    geoflow
 
     lpbe
     bcfl mdh                # only supported boundary condition
     mol 1
 
-    # WARN: grid is not longer supported
-    # grid 0.25 0.25 0.25     # grid spacing                    
+    grid 0.25 0.25 0.25     # grid spacing                    
     gamma 0.0001            # surface tension kcal/(mol*A^2) 
     pdie 1.5                # Solute dielectric                 
     sdie 80.00              # Solvent dielectric                
