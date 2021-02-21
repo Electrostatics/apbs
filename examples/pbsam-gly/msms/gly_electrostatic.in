@@ -2,22 +2,25 @@ read
     mol pqr gly_msms.pqr
 end
 elec name comp_solv        # Gly
-    pbsam
+    pbsam-auto
 
     runtype electrostatics  # Can be energyforce, electrostatics etc
     runname elec_gly        # Output name for files created by program
 
     units jmol
     ## info for molecule
-    mesh skin
+    # WARN: mesh is not supported in pbsam-auto
+    # mesh skin
     tolsp 2.5
 
     temp 298.15                                       # System temperature (K)
     pdie 4.0                                          # Solute dielectric                 
     sdie 78.0                                         # Solvent dielectric                
-    ion charge 0.0 conc 0.10 radius 0.0               # Monovalent salt conc in M
+    # WARN: ion is not supported in pbsam-auto
+    # ion charge 0.0 conc 0.10 radius 0.0               # Monovalent salt conc in M
 
-    dime 20
+    # WARN: dime is not supported in pbsam-auto
+    # dime 20
     dx gly_0.1M.dx
     3dmap  gly_0.1M.map
     grid2d gly_0.1M.x0.dat x 0.0
