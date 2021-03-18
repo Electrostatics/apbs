@@ -82,6 +82,7 @@ cd $BUILD_DIR                                             || exit 1
 cmake                                                     \
       -DBUILD_DOC=ON                                      \
       -DBUILD_SHARED_LIBS=OFF                             \
+      -DBUILD_TOOLS=ON                                    \
       -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} ${COVERAGE}"      \
       -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${COVERAGE}"  \
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE                    \
