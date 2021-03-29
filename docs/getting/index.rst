@@ -27,7 +27,18 @@ Installing from pre-compiled binaries
 
 The best way to install APBS is via download of a pre-compiled binary from `SourceForge`_ or `GitHub releases`_ (after `registering`_, of course).
 
-.. caution:: On Windows 10, if you get a popup error when running the APBS binaries, you will need to install the `Visual C++ Redistributable Package`_
+.. caution::
+
+  On Windows 10, if you get a popup error when running the APBS binaries, you will need to install the `Visual C++ Redistributable Package`_
+
+.. caution:: 
+
+  On Linux and MacOS, you may need to set your LD_LIBRARY_PATH and PATH environment variables:
+  For example, in bash with APBS installed in $HOME/apbs, you would set the environment variables in your .bashrc like:
+  .. code-block:: bash
+
+    export LD_LIBRARY_PATH=$HOME/apbs/lib:${LD_LIBRARY_PATH}
+    export PATH=$HOME/apbs/bin:${PATH}
 
 ^^^^^^^^^^^^^^^^^^
 What's in the box?

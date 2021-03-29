@@ -5,6 +5,8 @@ The Input file syntax is pretty well documented at
 https://apbs.readthedocs.io/en/latest/using/index.html#input-file-syntax
 """
 
+from sys import float_info
+
 import argparse
 import logging
 from pathlib import Path
@@ -135,6 +137,35 @@ FILENAME = "STRING"
 #   The grammars and parsers convert all input and produce all output in
 #   lowercase alphanumeric representation. This could be a problem for
 #   filenames/pathnames.
+
+
+def check_range(minv: float = float_info.min, maxv: float = float_info.max):
+    def parseAction(results: ParseResults):
+        key = 0
+        value = 1
+        if isinstance(results[0], ParseResults):
+            if isinstance(results[0][key], str):
+                if isinstance(results[0][value], float):
+                    check_val = results[0][value]
+                    if check_val < minv:
+                        LOGGER.exception(
+                            "ERROR: Value for %s, %s, must be greater than %s",
+                            results[0][key],
+                            results[0][value],
+                            minv,
+                        )
+                        raise ValueError
+                    if check_val > maxv:
+                        LOGGER.exception(
+                            "ERROR: Value for %s, %s, must be less than %s",
+                            results[0][key],
+                            results[0][value],
+                            maxv,
+                        )
+                        raise ValueError
+        return results
+
+    return parseAction
 
 
 class ApbsLegacyInput:
@@ -782,7 +813,9 @@ class ElecToken:
     pbe = Group(oneOf("lpbe lrpbe npbe nrpbe", caseless=True))
 
     # TODO: Number must be >= 1
-    pdie = Group(CLiteral("pdie") - number_val)
+    pdie = Group(CLiteral("pdie") - number_val).setParseAction(
+        check_range(1.0)
+    )
 
     # NOTE: Should be a value between 78-80?
     sdie = Group(CLiteral("sdie") - number_val)
@@ -1335,7 +1368,9 @@ def main():
             if args.verbose:
                 pprint(results)
         except ParseSyntaxException as perr:
-            apbs_input.raise_error(perr)
+            ApbsLegacyInput.raise_error(perr)
+
+    print("FINISH")
 
 
 if __name__ == "__main__":
