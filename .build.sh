@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# echo "==================================== WHICH GCC ==================================== "
+# which gcc
+# ls /usr/local/bin/gcc*
+echo "==================================== WHICH GCC ==================================== "
 ostype="$(uname -s)"
 case "${ostype}" in
       # NOTE: clang on Github Actions cannot fine Accelerate Framework
@@ -37,11 +41,11 @@ $CMAKE_CXX_COMPILER --version
 echo "==================================== SWIG VERSION"
 swig -version
 echo "==================================== Install Python requirements ==================================== "
-pip3 install -U pip
-pip3 install -U pytest
-pip3 install -U virtualenv
-pip3 install -U numpy
-pip3 install -r requirements.txt
+python -m pip install -U pip
+python -m pip install -U pytest
+python -m pip install -U virtualenv
+python -m pip install -U numpy
+python -m pip install -r requirements.txt
 #  Just build APBS for now
 echo "==================================== PWD FOR TOP DIR ==================================== "
 pwd
@@ -56,6 +60,10 @@ rm -rf $BUILD_DIR                                         || exit 1
 rm -rf $INSTALL_DIR                                       || exit 1
 mkdir -p $BUILD_DIR                                       || exit 1
 mkdir -p $INSTALL_DIR                                     || exit 1
+echo "==================================== SETUP ENV =============================================== "
+export LD_LIBRARY_PATH=$HOME/apbs/lib:${LD_LIBRARY_PATH}
+export PATH=$HOME/apbs/bin:${PATH}
+
 #  Build pybind11
 export BUILD_PYBIND=0
 if [ "${BUILD_PYBIND}" -ne "0" ]; then

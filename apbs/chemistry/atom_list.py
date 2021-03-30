@@ -50,9 +50,7 @@ class AtomList:
             ma = self.max_coord
             mi = self.min_coord
             self._dp["center"] = Coordinate(
-                (ma.x + mi.x) * 0.5,
-                (ma.y + mi.y) * 0.5,
-                (ma.z + mi.z) * 0.5,
+                (ma.x + mi.x) * 0.5, (ma.y + mi.y) * 0.5, (ma.z + mi.z) * 0.5,
             )
         return self._dp["center"]
 

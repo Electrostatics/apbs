@@ -72,9 +72,7 @@ class Grid:
             int(np.ceil(tmp.x)), int(np.ceil(tmp.y)), int(np.ceil(tmp.z))
         )
         lo = Coordinate(
-            int(np.floor(tmp.x)),
-            int(np.floor(tmp.y)),
-            int(np.floor(tmp.z)),
+            int(np.floor(tmp.x)), int(np.floor(tmp.y)), int(np.floor(tmp.z)),
         )
 
         hi.x = (
