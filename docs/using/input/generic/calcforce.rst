@@ -17,7 +17,7 @@ where ``flag`` is a text string that specifies the types of force values to be r
 ``total``
   Calculate and return total electrostatic and apolar forces for the entire molecule.
 ``comps``
-  Calculate and return total electrostatic and apolar forces for the entire molecule as well as force components for each atom.<br />
+  Calculate and return total electrostatic and apolar forces for the entire molecule as well as force components for each atom.
 
 The possible outputs from calcforce are:
 
