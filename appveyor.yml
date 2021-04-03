@@ -47,7 +47,7 @@ install:
   - SET SWIG_EXECUTABLE=C:\ProgramData\chocolatey\lib\swig\tools\install\swig.exe
 
   # Add SWIG, Python, and CMake to PATH
-  - SET PATH=%PYTHON%;%PYTHON%\Scripts;C:\Program Files (x86)\CMake\bin;C:\projects\source\build\bin;C:\ProgramData\chocolatey\lib\swig\tools\install;C:\ProgramData\chocolatey\bin;%PATH%
+  - SET PATH=%PYTHON%;%PYTHON%\Scripts;C:\Program Files (x86)\CMake\bin;C:\Program Files\APBS\bin;C:\projects\source\build\bin;C:\ProgramData\chocolatey\lib\swig\tools\install;C:\ProgramData\chocolatey\bin;%PATH%
   - echo %PATH%
 
   # Check that we have the expected version and architecture for Python
@@ -87,7 +87,7 @@ build_script:
   - echo PYBIND11_BUILD
   - echo "*****************************************************************************"
   - set pybind11_DIR=C:\projects\source\externals\pybind11\install
-  - cd externals/pybind11
+  - cd externals\pybind11
   - mkdir build
   - mkdir install
   - cd build
@@ -102,16 +102,14 @@ build_script:
   - echo "*****************************************************************************"
   # cmake --build . --config Release --parallel 1 --target install -- /m:1 /v:diag /logger:%MSBuildLogger%
   - cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
-
   - set pybind11_DIR=C:\projects\source\externals\pybind11\install\share\cmake\pybind11
-  - cd ..
-  - cd c:\projects\source
-  - mkdir build
-  - cd build
 
   - echo "*****************************************************************************"
   - echo APBS_CONFIG
   - echo "*****************************************************************************"
+  - mkdir c:\projects\source\build
+  - cd c:\projects\source\build
+  # NOTE: This installs APBS in C:\Program Files\APBS
   - cmake --config Release -DPYBIND11_DIR=%pybind11_DIR% -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_FETK=OFF -DENABLE_BEM=ON -DENABLE_GEOFLOW=ON -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=OFF -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 c:\projects\source
 
   - echo "*****************************************************************************"
@@ -127,18 +125,32 @@ build_script:
   - echo "*****************************************************************************"
   - echo APBS_MAKE_INSTALL
   - echo "*****************************************************************************"
+  - cd c:\projects\source\build
   - cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
 
   - echo "*****************************************************************************"
   - echo APBS_TEST
   - echo "*****************************************************************************"
+  - cd c:\projects\source\build
   - ctest -C Release --verbose --output-on-failure
+
+  - echo "*****************************************************************************"
+  - echo APBS_TEST PBAM EXAMPLE
+  - echo "*****************************************************************************"
+  - cd C:\Program Files\APBS\share\apbs\tests
+  - python apbs_tester.py -e "C:\Program Files\APBS\bin\apbs.exe" -c test_cases.cfg -t pbam
 
   - echo "*****************************************************************************"
   - echo APBS_PACKAGE
   - echo "*****************************************************************************"
+  - cd c:\projects\source\build
   - cpack -C Release -G ZIP
   - unzip -l APBS*.zip
+
+  - echo "*****************************************************************************"
+  - echo APBS_CLEANUP
+  - echo "*****************************************************************************"
+  - forfiles /S /P c:\projects\source\build\_CPack_Packages /M *.zip /C "cmd /c if @isdir==FALSE del @file"
 
   - echo "*****************************************************************************"
   - echo APBS_DONE
