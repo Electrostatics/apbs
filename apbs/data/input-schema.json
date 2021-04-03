@@ -1,0 +1,206 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://json.schemastore.org/apbs-input.json",
+  "title": "APBS input",
+  "description": "Input file schema for APBS electrostatics software (https://apbs.readthedocs.io/)",
+  "type": "object",
+  "properties": {
+    "read": {
+      "description": "Specify input files for APBS calculation.",
+      "type": "object",
+      "properties": {
+        "charge": {
+          "description": "Specify input file for fixed (molecular) charge density function mapped to a mesh. The inputs are maps of charge densities; these values have units of e_c Å^{-3}, where e_c is the electron charge.",
+          "type": "object",
+          "properties": {
+            "format": {
+              "description": "Input file format",
+              "type": "object",
+              "oneOf": [
+                { "$ref": "#/definitions/format/dx" },
+                { "$ref": "#/definitions/format/gz" }
+              ]
+            },
+            "path": {
+              "description": "Path to input file",
+              "type": "string"
+            }
+          },
+          "required": [ "format", "path" ]
+        },
+        "dielectric": {
+          "description": "Specify input file for dielectric maps, the dielectric function mapped to 3 meshes shifted by one-half grid spacing in the x, y, and z directions. The inputs are maps of dielectric variables between the solvent and biomolecular dielectric constants; these values are unitless. If you choose this option and have a non-zero ionic strength, you must also include a kappa input map.",
+          "type": "object",
+          "properties": {
+            "format": {
+              "description": "Input file format",
+              "type": "object",
+              "oneOf": [
+                { "$ref": "#/definitions/format/dx" },
+                { "$ref": "#/definitions/format/gz" }
+              ]
+            },
+            "path-x": {
+              "description": "x-shifted dielectric map",
+              "type": "string"
+            },
+            "path-y": {
+              "description": "y-shifted dielectric map",
+              "type": "string"
+            },
+            "path-z": {
+              "description": "z-shifted dielectric map",
+              "type": "string"
+            }
+          },
+          "required": [
+            "format",
+            "path-x",
+            "path-y",
+            "path-z"
+          ]
+        },
+        "ion_accessibility": {
+          "description": "Specify input file for ion-accessibility function mapped to a mesh. The inputs are maps of ion accessibility values which range between 0 and the value of the Debye-Hückel screening parameter; these values have units of Å^{-2}.",
+          "type": "object",
+          "properties": {
+            "format": {
+              "description": "Input file format",
+              "type": "object",
+              "oneOf": [
+                { "$ref": "#/definitions/formats/dx" },
+                { "$ref": "#/definitions/formats/gz" }
+              ]
+            },
+            "path": {
+              "description": "Path to input file",
+              "type": "string"
+            }
+          },
+          "required": [
+            "format",
+            "path"
+          ]
+        },
+        "molecule": {
+          "description": "Specify input file for molecular structure data.",
+          "type": "object",
+          "properties": {
+            "format": {
+              "description": "Input file format",
+              "type": "object",
+              "oneOf": [
+                { "$ref": "#/definitions/formats/pqr" },
+                { "$ref": "#/definitions/formats/pdb" }
+              ]
+            },
+            "path": {
+              "description": "Path to input file",
+              "type": "string"
+            }
+          },
+          "required": [
+            "format",
+            "path"
+          ]
+        },
+        "parameter": {
+          "description": "Specify the charge and radius data to be used with PDB-format molecule files.",
+          "type": "object",
+          "properties": {
+            "format": {
+              "description": "Input file format",
+              "type": "object",
+              "oneOf": [
+                { "$ref": "#/definitions/formats/xml" },
+                { "$ref": "#/definitions/formats/flat" }
+              ]
+            },
+            "path": {
+              "description": "Path to input file",
+              "type": "string"
+            }
+          },
+          "required": ["format", "path"]
+        },
+        "potential": {
+          "description": "Specify the electrostatic potential data (in units of k T/e_c) from previous calculations.",
+          "type": "object",
+          "properties": {
+            "format": {
+              "description": "Input file format",
+              "type": "object",
+              "oneOf": [
+                { "$ref": "#/definitions/formats/dx" },
+                { "$ref": "#/definitions/formats/gz" }
+              ]
+            },
+            "path": {
+              "description": "Path to input file",
+              "type": "string"
+            }
+          },
+          "required": ["format", "path"]
+        }
+      },
+      "required": [
+        "mol"
+      ]
+    },
+    "polar": {
+      "description": "Specify configuration of an electrostatics (polar solvation) calculation",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "A name for your calculation.",
+          "type": "string"
+        },
+        "type": {
+          "description": "The type of calculation to perform",
+          "type": "object",
+          "properties": {
+            "multigrid_auto": {
+              "description": "Automatically configured finite difference Poisson-Boltzmann calculations. This multigrid calculation automatically sets up and performs a string of single-point PBE calculations to “focus” on a region of interest (binding site, etc.) in a system.",
+              "type": "object",
+              "properties": {
+                "boundary_condition": {
+                  "description": "Specifies the type of boundary conditions used to solve the Poisson-Boltzmann equation.",
+                  "type": "object",
+                  "oneOf": [
+                    { "$ref": "#/definitions/boundary_conditions/zero" },
+                    { "$ref": "#/definitions/boundary_conditions/single_sphere" },
+                    { "$ref": "#/definitions/boundary_conditions/multiple_sphere" }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "boundary_conditions": {
+      "zero": {
+        "description": "'Zero' boundary condition. Dirichlet conditions where the potential at the boundary is set to zero. This condition is not commonly used and can result in large errors if used inappropriately."
+      },
+      "single_sphere": {
+        "description": "“Single Debye-Hückel” boundary condition. Dirichlet condition where the potential at the boundary is set to the values prescribed by a Debye-Hückel model for a single sphere with a point charge, dipole, and quadrupole. The sphere radius in this model is set to the radius of the biomolecule and the sphere charge, dipole, and quadrupole are set to the total moments of the protein. This condition works best when the boundary is sufficiently far from the biomolecule."
+      },
+      "multiple_sphere": {
+        "description": "“Multiple Debye-Hückel” boundary condition. Dirichlet condition where the potential at the boundary is set to the values prescribed by a Debye-Hückel model for a multiple, non-interacting spheres with a point charges. The radii of the non-interacting spheres are set to the atomic radii of and the sphere charges are set to the atomic charges. This condition works better than sdh for closer boundaries but can be very slow for large biomolecules."
+      }
+    },
+    "formats": {
+      "dx": { "description": "OpenDX scalar data format" },
+      "flat": { "description": "Flat-format parameter file" },
+      "gz": { "description": "Gzip-compressed OpenDX scalar data format" },
+      "pdb": { "description": "Protein DataBank (PDB) old format" },
+      "pqr": { "description": "PQR (PDB with charge and radius information) format" },
+      "xml": { "description": "XML format parameter file" }
+    }
+  },
+  "required": [
+    "read"
+  ]
+}
