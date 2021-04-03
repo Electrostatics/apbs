@@ -122,6 +122,17 @@ Some of these examples can be performed through the `APBS-PDB2PQR web interface`
    examples/visualization-pymol
    examples/visualization-unitymol
 
+--------------------
+Tests and validation
+--------------------
+
+APBS is distributed with testing tools and validation examples.
+
+.. toctree::
+   :maxdepth: 1
+
+   tests
+
 -------------------
 Tools and utilities
 -------------------

@@ -2,6 +2,7 @@
 
 for external_dep in bem fetk geoflow_c pb_s_am
 do
+  mkdir -p $external_dep || exit 1
   echo cd $external_dep
   cd $external_dep
   echo 'git checkout master && git pull'
