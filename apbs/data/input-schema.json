@@ -13,32 +13,30 @@
           "description": "Specify input file for fixed (molecular) charge density function mapped to a mesh. The inputs are maps of charge densities; these values have units of e_c Å^{-3}, where e_c is the electron charge.",
           "type": "object",
           "properties": {
+            "alias": {
+              "$ref": "#/definitions/read/alias"
+            },
             "format": {
-              "description": "Input file format",
-              "type": "object",
-              "oneOf": [
-                { "$ref": "#/definitions/format/dx" },
-                { "$ref": "#/definitions/format/gz" }
-              ]
+              "$ref": "#/definitions/read/scalar_format"
             },
             "path": {
-              "description": "Path to input file",
-              "type": "string"
+              "$ref": "#/definitions/read/path"
             }
           },
-          "required": [ "format", "path" ]
+          "required": [
+            "format",
+            "path"
+          ]
         },
         "dielectric": {
           "description": "Specify input file for dielectric maps, the dielectric function mapped to 3 meshes shifted by one-half grid spacing in the x, y, and z directions. The inputs are maps of dielectric variables between the solvent and biomolecular dielectric constants; these values are unitless. If you choose this option and have a non-zero ionic strength, you must also include a kappa input map.",
           "type": "object",
           "properties": {
+            "alias": {
+              "$ref": "#/definitions/read/alias"
+            },
             "format": {
-              "description": "Input file format",
-              "type": "object",
-              "oneOf": [
-                { "$ref": "#/definitions/format/dx" },
-                { "$ref": "#/definitions/format/gz" }
-              ]
+              "$ref": "#/definitions/read/scalar_format"
             },
             "path-x": {
               "description": "x-shifted dielectric map",
@@ -64,17 +62,14 @@
           "description": "Specify input file for ion-accessibility function mapped to a mesh. The inputs are maps of ion accessibility values which range between 0 and the value of the Debye-Hückel screening parameter; these values have units of Å^{-2}.",
           "type": "object",
           "properties": {
+            "alias": {
+              "$ref": "#/definitions/read/alias"
+            },
             "format": {
-              "description": "Input file format",
-              "type": "object",
-              "oneOf": [
-                { "$ref": "#/definitions/formats/dx" },
-                { "$ref": "#/definitions/formats/gz" }
-              ]
+              "$ref": "#/definitions/read/scalar_format"
             },
             "path": {
-              "description": "Path to input file",
-              "type": "string"
+              "$ref": "#/definitions/read/path"
             }
           },
           "required": [
@@ -86,12 +81,20 @@
           "description": "Specify input file for molecular structure data.",
           "type": "object",
           "properties": {
+            "alias": {
+              "description": "Alias for object being read. If not provided, filename will be used.",
+              "type": "string"
+            },
             "format": {
               "description": "Input file format",
               "type": "object",
               "oneOf": [
-                { "$ref": "#/definitions/formats/pqr" },
-                { "$ref": "#/definitions/formats/pdb" }
+                {
+                  "$ref": "#/definitions/formats/pqr"
+                },
+                {
+                  "$ref": "#/definitions/formats/pdb"
+                }
               ]
             },
             "path": {
@@ -108,12 +111,20 @@
           "description": "Specify the charge and radius data to be used with PDB-format molecule files.",
           "type": "object",
           "properties": {
+            "alias": {
+              "description": "Alias for object being read. If not provided, filename will be used.",
+              "type": "string"
+            },
             "format": {
               "description": "Input file format",
               "type": "object",
               "oneOf": [
-                { "$ref": "#/definitions/formats/xml" },
-                { "$ref": "#/definitions/formats/flat" }
+                {
+                  "$ref": "#/definitions/formats/xml"
+                },
+                {
+                  "$ref": "#/definitions/formats/flat"
+                }
               ]
             },
             "path": {
@@ -121,26 +132,29 @@
               "type": "string"
             }
           },
-          "required": ["format", "path"]
+          "required": [
+            "format",
+            "path"
+          ]
         },
         "potential": {
           "description": "Specify the electrostatic potential data (in units of k T/e_c) from previous calculations.",
           "type": "object",
           "properties": {
+            "alias": {
+              "$ref": "#/definitions/read/alias"
+            },
             "format": {
-              "description": "Input file format",
-              "type": "object",
-              "oneOf": [
-                { "$ref": "#/definitions/formats/dx" },
-                { "$ref": "#/definitions/formats/gz" }
-              ]
+              "$ref": "#/definitions/read/scalar_format"
             },
             "path": {
-              "description": "Path to input file",
-              "type": "string"
+              "$ref": "#/definitions/read/path"
             }
           },
-          "required": ["format", "path"]
+          "required": [
+            "format",
+            "path"
+          ]
         }
       },
       "required": [
@@ -167,37 +181,395 @@
                   "description": "Specifies the type of boundary conditions used to solve the Poisson-Boltzmann equation.",
                   "type": "object",
                   "oneOf": [
-                    { "$ref": "#/definitions/boundary_conditions/zero" },
-                    { "$ref": "#/definitions/boundary_conditions/single_sphere" },
-                    { "$ref": "#/definitions/boundary_conditions/multiple_sphere" }
+                    {
+                      "$ref": "#/definitions/calculation/boundary_conditions/zero"
+                    },
+                    {
+                      "$ref": "#/definitions/calculation/boundary_conditions/single_sphere"
+                    },
+                    {
+                      "$ref": "#/definitions/calculation/boundary_conditions/multiple_sphere"
+                    },
+                    {
+                      "$ref": "#/definitions/calculation/boundary_conditions/focus"
+                    },
+                    {
+                      "$ref": "#/definitions/calculation/boundary_conditions/map"
+                    }
                   ]
-                }
-              }
+                },
+                "calculate_energy": {
+                  "description": "Controls energy output from calculation.",
+                  "type": "object",
+                  "oneOf": [
+                    {
+                      "none": {
+                        "description": "Do not calculate energy."
+                      }
+                    },
+                    {
+                      "total": {
+                        "description": "Return the total energy for the entire system."
+                      }
+                    },
+                    {
+                      "components": {
+                        "description": "Calculate and return total energy for the entire molecule as well as the energy components for each atom."
+                      }
+                    }
+                  ]
+                },
+                "calculate_force": {
+                  "description": "Controls force output from calculation.",
+                  "type": "object",
+                  "oneOf": [
+                    {
+                      "none": {
+                        "description": "Do not calculate force."
+                      }
+                    },
+                    {
+                      "total": {
+                        "description": "Return the total force for the entire system."
+                      }
+                    },
+                    {
+                      "components": {
+                        "description": "Calculate and return total force for the entire molecule as well as the energy components for each atom."
+                      }
+                    }
+                  ]
+                },
+                "coarse_grid_center": {
+                  "$ref": "#/definitions/calculation/grid_center"
+                },
+                "coarse_grid_length": {
+                  "$ref": "#/definitions/calculation/grid_length"
+                },
+                "charge_discretization": {
+                  "$ref": "#/definitions/calculation/charge_discretization"
+                },
+                "grid_points": {
+                  "$ref": "#/definitions/calculation/grid_points"
+                },
+                "error_tolerance": {
+                  "description": "Convergence tolerance for iterative solver",
+                  "type": "number"
+                },
+                "fine_grid_center": {
+                  "$ref": "#/definitions/calculation/grid_center"
+                },
+                "fine_grid_length": {
+                  "$ref": "#/definitions/calculation/grid_length"
+                },
+                "pb_type": {
+                  "description": "Type of Poisson-Boltzmann equation being solved",
+                  "oneOf": [
+                    {
+                      "$ref": "#/definitions/calculation/pb_types/lpbe"
+                    },
+                    {
+                      "$ref": "#/definitions/calculation/pb_types/npbe"
+                    }
+                  ]
+                },
+                "ions": {
+                  "$ref": "#/definitions/calculation/ions"
+                },
+                "molecule": {
+                  "$ref": "#/definitions/calculation/molecule"
+                },
+                "solute_dielectric": {
+                  "$ref": "#/definitions/calculation/solute_dielectric"
+                },
+                "solvent_dielectric": {
+                  "$ref": "#/definitions/calculation/solvent_dielectric"
+                },
+                "surface_point_density": {
+                  "$ref": "#/definitions/calculation/surface_point_density"
+                },
+                "solvent_radius": {
+                  "$ref": "#/definitions/calculation/solvent_radius"
+                },
+                "molecular_surface": { "$ref": "#/definitions/calculation/molecular_surface" },
+                "temperature": { "$ref": "#/definitions/calculation/temperature" },
+                "use_map": { "$ref": "#/definitions/calculation/usemap" }
+              },
+              "required": [
+                "boundary_condition",
+                "coarse_grid_center",
+                "coarse_grid_length",
+                "charge_discretization",
+                "grid_points",
+                "fine_grid_center",
+                "fine_grid_length",
+                "pb_type",
+                "molecule",
+                "solute_dielectric",
+                "solvent_dielectric",
+                "surface_point_density",
+                "molecular_surface",
+                "temperature"
+              ]
             }
           }
         }
-      }
+      },
+      "required": [
+        "boundary_condition"
+      ]
     }
   },
   "definitions": {
-    "boundary_conditions": {
-      "zero": {
-        "description": "'Zero' boundary condition. Dirichlet conditions where the potential at the boundary is set to zero. This condition is not commonly used and can result in large errors if used inappropriately."
+    "read": {
+      "description": "Definitions for the READ section",
+      "alias": {
+        "description": "Alias for object being read. If not provided, filename will be used.",
+        "type": "string"
       },
-      "single_sphere": {
-        "description": "“Single Debye-Hückel” boundary condition. Dirichlet condition where the potential at the boundary is set to the values prescribed by a Debye-Hückel model for a single sphere with a point charge, dipole, and quadrupole. The sphere radius in this model is set to the radius of the biomolecule and the sphere charge, dipole, and quadrupole are set to the total moments of the protein. This condition works best when the boundary is sufficiently far from the biomolecule."
+      "path": {
+        "description": "Path to input file",
+        "type": "string"
       },
-      "multiple_sphere": {
-        "description": "“Multiple Debye-Hückel” boundary condition. Dirichlet condition where the potential at the boundary is set to the values prescribed by a Debye-Hückel model for a multiple, non-interacting spheres with a point charges. The radii of the non-interacting spheres are set to the atomic radii of and the sphere charges are set to the atomic charges. This condition works better than sdh for closer boundaries but can be very slow for large biomolecules."
+      "scalar_format": {
+        "description": "Input file format",
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/definitions/formats/dx"
+          },
+          {
+            "$ref": "#/definitions/formats/gz"
+          }
+        ]
+      }
+    },
+    "calculation": {
+      "description": "Definitions for POLAR, etc. section",
+      "use_map": {
+        "description": "Specify pre-calculated coefficient maps to be used in the Poisson-Boltzmann calculation. These must have been input via an earlier READ statement.",
+        "type": "array",
+        "items": {
+          "$ref": "#/definition/calculation/map"
+        }
+      },
+      "map" : {
+        "description": "Map as input by read statement. Includes type and the alias or filename for the map.",
+        "oneOf": [
+          {
+            "dielectric": {
+              "description": "Dielectric function map. This causes the code to ignore other parameters related to the dielectric coefficient.",
+              "type": "string"
+            }
+          },
+          {
+            "ion_accessibility": {
+              "description": "Mobile ion-accessibility function map. This causes the code to ignore other parameters related to the ion accessibility coefficient.",
+              "type": "string"
+            }
+          },
+          {
+            "charge_distribution": {
+              "description": "Charge distribution map. This causes the code to ignore other parameters related to charge distribution specification.",
+              "type": "string"
+            }
+          },
+          {
+            "potential": {
+              "description": "Potential map for use in setting boundary conditions.",
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "temperature": {
+        "description": "Temperature for calculation (in K).",
+        "type": "number"
+      },
+      "surface_method": {
+        "description": "Specify the model used to construct the dielectric and ion-accessibility coefficients",
+        "type": "object",
+        "oneOf": [
+          {
+            "molecular": {
+              "description": "The dielectric coefficient is defined based on a molecular surface definition. The problem domain is divided into two spaces. The “free volume” space is defined by the union of solvent-sized spheres which do not overlap with biomolecular atoms. This free volume is assigned bulk solvent dielectric values. The complement of this space is assigned biomolecular dielectric values. With a non-zero solvent radius, this choice of coefficient corresponds to the traditional definition used for PB calculations. When the solvent radius is set to zero, this corresponds to a van der Waals surface definition. The ion-accessibility coefficient is defined by an “inflated” van der Waals model. Specifically, the radius of each biomolecular atom is increased by the radius of the ion species (as specified with the ion keyword). The problem domain is then divided into two spaces. The space inside the union of these inflated atomic spheres is assigned an ion-accessibility value of 0; the complement space is assigned bulk ion accessibility values."
+            }
+          },
+          {
+            "smoothed_molecular": {
+              "description": "The dielectric and ion-accessibility coefficients are defined as for the moleclar surface. However, they are then “smoothed” by a 9-point harmonic averaging to somewhat reduce sensitivity to the grid setup as described by Bruccoleri et al. J Comput Chem 18 268-276, 1997 (doi:10.1007/s00214-007-0397-0)"
+            }
+          },
+          {
+            "cubic_spline": {
+              "description": "The dielectric and ion-accessibility coefficients are defined by a cubic-spline surface as described by Im et al, Comp Phys Commun 111 (1-3) 59-75, 1998 (doi:10.1016/S0010-4655(98)00016-2). The width of the dielectric interface is controlled by the swin parameter. These spline-based surface definitions are very stable with respect to grid parameters and therefore ideal for calculating forces. However, they require substantial reparameterization of the force field; interested users should consult Nina et al, Biophys Chem 78 (1-2) 89-96, 1999 (doi:10.1016/S0301-4622(98)00236-1). Additionally, these surfaces can generate unphysical results with non-zero ionic strengths; this is an on-going area of development. The argument of this property is the the spline window width (in Å).",
+              "type": "number"
+            }
+          },
+          {
+            "quintic_spline": {
+              "description": "The dielectric and ion-accessibility coefficients are defined by a 7th order polynomial. This surface definition has characteristics similar to the cubic spline, but provides higher order continuity necessary for stable force calculations with atomic multipole force fields (up to quadrupole). The argument of this property is the the spline window width (in Å).",
+              "type": "number"
+            }
+          }
+        ]
+      },
+      "ions": {
+        "description": "Specify the bulk concentrations of mobile ion species present in the system. Multiple types of ions can be specified; however, only the largest ionic radius is used to determine the ion-accessibility function. The total bulk system of ions must be electroneutral which means the charge densities/concentrations of positive and negative ions must be equal.",
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/calculation/ion"
+        }
+      },
+      "molecule": {
+        "description": "Molecule for this calculation (alias or file name)",
+        "type": "string"
+      },
+      "solvent_radius": {
+        "description": "This keyword specifies the radius of the solvent molecules; this parameter is used to define various solvent-related surfaces and volumes. This value is usually set to 1.4 Å for a water-like molecular surface and set to 0 Å for a van der Waals surface.",
+        "type": "number"
+      },
+      "surface_point_density": {
+        "description": "This keyword specifies the number of quadrature points per Å^2 to use in calculation surface terms (e.g., molecular surface, solvent accessible surface). Used for non-spline surfaces."
+      },
+      "solvent_dielectric": {
+        "description": "The value of the dielectric coefficient outside the solute; e.g. 80 for water.",
+        "type": "number"
+      },
+      "solute_dielectric": {
+        "description": "The value of the dielectric coefficient in the interior of the solute; usually a value between 2 and 20.",
+        "type": "number"
+      },
+      "pb_types": {
+        "description": "Types of Poisson-Boltzmann equation variants",
+        "lpbe": {
+          "description": "Linearized Poisson-Boltzmann equation"
+        },
+        "npbe": {
+          "description": "Nonlinear Poisson-Boltzmann equation"
+        }
+      },
+      "ion": {
+        "description": "Mobile ion species",
+        "type": "object",
+        "properties": {
+          "charge": {
+            "description": "Mobile ion species charge (units: e_c)",
+            "type": "integer"
+          },
+          "concentration": {
+            "description": "Mobile ion species concentration (units: M)",
+            "type": "number"
+          },
+          "radius": {
+            "description": "Mobile ion species radius (units: Å)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "charge",
+          "concentration",
+          "radius"
+        ]
+      },
+      "charge_discretization": {
+        "description": "Specify the method by which the biomolecular point charges (i.e., Dirac delta functions) by which charges are mapped to the grid. As we are attempting to model delta functions, the support (domain) of these discretized charge distributions is always strongly dependent on the grid spacing.",
+        "type": "object",
+        "oneOf": [
+          {
+            "linear_spline": {
+              "description": "Traditional trilinear interpolation (linear splines). The charge is mapped onto the nearest-neighbor grid points. Resulting potentials are very sensitive to grid spacing, length, and position."
+            }
+          },
+          {
+            "cubic_spline": {
+              "description": "Cubic B-spline discretization. The charge is mapped onto the nearest- and next-nearest-neighbor grid points. Resulting potentials are somewhat less sensitive (than the linear spline) to grid spacing, length, and position."
+            }
+          },
+          {
+            "quintic_spline": {
+              "description": "Quintic B-spline discretization. Similar to the cubic spline, except the charge/multipole is additionally mapped to include next-next-nearest neighbors (125 grid points receive charge density)."
+            }
+          }
+        ]
+      },
+      "grid_center": {
+        "description": "Center of coarse grid",
+        "type": "object",
+        "oneOf": [
+          {
+            "molecule_id": {
+              "description": "Path name or alias for a molecule",
+              "type": "string"
+            }
+          },
+          {
+            "coordinates": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "contains": {
+                "type": "number"
+              }
+            }
+          }
+        ]
+      },
+      "grid_length": {
+        "description": "Length of coarse grid",
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "contains": {
+          "type": "number"
+        }
+      },
+      "grid_points": {
+        "description": "Number of grid points in each direction",
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "contains": {
+          "type": "integer"
+        }
+      },
+      "boundary_conditions": {
+        "zero": {
+          "description": "'Zero' boundary condition. Dirichlet conditions where the potential at the boundary is set to zero. This condition is not commonly used and can result in large errors if used inappropriately."
+        },
+        "single_sphere": {
+          "description": "“Single Debye-Hückel” boundary condition. Dirichlet condition where the potential at the boundary is set to the values prescribed by a Debye-Hückel model for a single sphere with a point charge, dipole, and quadrupole. The sphere radius in this model is set to the radius of the biomolecule and the sphere charge, dipole, and quadrupole are set to the total moments of the protein. This condition works best when the boundary is sufficiently far from the biomolecule."
+        },
+        "multiple_sphere": {
+          "description": "“Multiple Debye-Hückel” boundary condition. Dirichlet condition where the potential at the boundary is set to the values prescribed by a Debye-Hückel model for a multiple, non-interacting spheres with a point charges. The radii of the non-interacting spheres are set to the atomic radii of and the sphere charges are set to the atomic charges. This condition works better than sdh for closer boundaries but can be very slow for large biomolecules."
+        },
+        "focus": {
+          "description": "“Focusing” boundary condition. Dirichlet condition where the potential at the boundary is set to the values computed by the previous (usually lower-resolution) PB calculation. This is only used in sequential focusing performed manually in mg-manual calculations. All of the boundary points should lie within the domain of the previous calculation for best accuracy; if any boundary points lie outside, their values are computed using single Debye-Hückel boundary conditions."
+        },
+        "map": {
+          "description": "Specifying map allows a previously calculated potential map to be used in a new focusing calculation. A typical scenario is using the same coarse grid for multiple focusing calculations. A potential map can be written once from a coarse grid calculation, then used in subsequent runs to bypass the need to recalculate the coarse grid. See the READ keyword potential."
+        }
       }
     },
     "formats": {
-      "dx": { "description": "OpenDX scalar data format" },
-      "flat": { "description": "Flat-format parameter file" },
-      "gz": { "description": "Gzip-compressed OpenDX scalar data format" },
-      "pdb": { "description": "Protein DataBank (PDB) old format" },
-      "pqr": { "description": "PQR (PDB with charge and radius information) format" },
-      "xml": { "description": "XML format parameter file" }
+      "dx": {
+        "description": "OpenDX scalar data format"
+      },
+      "flat": {
+        "description": "Flat-format parameter file"
+      },
+      "gz": {
+        "description": "Gzip-compressed OpenDX scalar data format"
+      },
+      "pdb": {
+        "description": "Protein DataBank (PDB) old format"
+      },
+      "pqr": {
+        "description": "PQR (PDB with charge and radius information) format"
+      },
+      "xml": {
+        "description": "XML format parameter file"
+      }
     }
   },
   "required": [
