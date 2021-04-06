@@ -41,7 +41,7 @@ Model error
 
 When performing solvation calculations using APBS, it is important to keep in mind that you are using an approximate model for solvation.
 Therefore, your answers may contain errors related to approximations in the model.
-Many review articles have covered the nature of these approximations, we will stress the highlights below.</p>
+Many review articles have covered the nature of these approximations, we will stress the highlights below.
 
 """"""""""""""""""""""""""
 Linear dielectric response

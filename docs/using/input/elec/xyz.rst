@@ -15,7 +15,7 @@ The syntax is:
 
 ``filename``
   The name of the file for the xyz coordinates of the molecule center for a given trajectory.
-  The trajectories for a given molecule should be ordered sequentially in the ELEC section. </p>
+  The trajectories for a given molecule should be ordered sequentially in the ELEC section.
 
 .. todo::
    

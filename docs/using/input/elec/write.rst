@@ -12,7 +12,7 @@ The syntax is:
    write {type} {format} {stem}
 
 ``type``
-  A string indicating what type of data to output:</p>
+  A string indicating what type of data to output:
 
   ``charge``
     Write out the biomolecular charge distribution in units of e\ :sub:`c` (electron charge) per Å\ :sup:`3` (multigrid only).

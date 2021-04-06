@@ -24,7 +24,7 @@ where ``flag`` is a text string that identifies the type of conditions to be use
   "Multiple Debye-Hückel" boundary condition.
   Dirichlet condition where the potential at the boundary is set to the values prescribed by a Debye-Hückel model for a multiple, non-interacting spheres with a point charges.
   The radii of the non-interacting spheres are set to the atomic radii of and the sphere charges are set to the atomic charges.
-  This condition works better than sdh for closer boundaries but can be very slow for large biomolecules.<br />
+  This condition works better than sdh for closer boundaries but can be very slow for large biomolecules.
 ``focus``
   "Focusing" boundary condition.
   Dirichlet condition where the potential at the boundary is set to the values computed by the previous (usually lower-resolution) PB calculation.
