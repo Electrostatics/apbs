@@ -11,7 +11,7 @@ setuptools.setup(
     author_email="nathanandrewbaker@gmail.com",
     url="https://www.poissonboltzmann.org",
     packages=setuptools.find_packages(),
-    package_data={"": ["data/input-schema.json"]},
+    # package_data={"": ["data/input-schema.json"]},
     install_requires=["numpy", "jschon"],
     tests_require=["pytest", "requests"],
     keywords="science chemistry biophysics biochemistry",
