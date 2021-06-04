@@ -16,7 +16,7 @@ Specify the filename and location of a 2D cross sectional potential to be writte
   String of either x, y, or z, for which cartesian axis the grid will be computed along
 
 ``axis_value``
-  A floating point number of the position along <code>axis</code> that will be used.
+  A floating point number of the position along ``axis`` that will be used.
 
 .. note::
 
