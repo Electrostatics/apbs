@@ -12,14 +12,42 @@ _LOGGER = logging.getLogger(__name__)
 class InputFile(ABC):
     """Base class for input file classes."""
 
-    def init(self):
-        self._alias = None
+    def __init__(self, dict_=None, yaml=None, json=None):
+        """Initialize object.
+
+        :param dict dict_:  optional dictionary for initializing object with func:`from_dict`
+        :param str yaml:  optional YAML string for initializing object with func:`from_yaml`
+        :param str json:  optional JSON string for initializing object with func:`from_json`
+        """
+        if dict_ is not None:
+            self.from_dict(dict_)
+        if yaml is not None:
+            self.from_yaml(yaml)
+        if json is not None:
+            self.from_json(json)
 
     @abstractmethod
     def from_dict(self, input_):
         """Parse dictionary-format input into this object.
 
         :param dict input_:  input dictionary
+        :raises KeyError:  when input is missing
+        """
+        pass
+
+    @abstractmethod
+    def to_dict(self) -> dict:
+        """Produce dictionary representation of self.
+
+        :returns:  dictionary representation of self
+        """
+        pass
+
+    @abstractmethod
+    def validate(self):
+        """Validate the object.
+
+        :raises ValueError:  if object is not valid
         """
         pass
 
@@ -39,14 +67,6 @@ class InputFile(ABC):
         dict_ = json.loads(input_)
         self.from_dict(dict_)
 
-    @abstractmethod
-    def to_dict(self) -> dict:
-        """Produce dictionary representation of self.
-
-        :returns:  dictionary representation of self
-        """
-        pass
-
     def to_json(self) -> str:
         """Produce JSON representation of self.
 
@@ -62,11 +82,3 @@ class InputFile(ABC):
         """
         dict_ = self.to_dict()
         return yaml.dump(dict_, Dumper)
-
-    @abstractmethod
-    def validate(self):
-        """Validate the object.
-
-        :raises ValueError:  if object is not valid
-        """
-        pass
