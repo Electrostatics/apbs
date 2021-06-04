@@ -5,7 +5,7 @@
    * Add mmCIF support for :class:`Molecule`
 """
 import logging
-from .input_file import InputFile
+from . import InputFile
 
 
 _LOGGER = logging.getLogger(__name__)

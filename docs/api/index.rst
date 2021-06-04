@@ -32,3 +32,13 @@ These input files consist of the following keywords and objects:
 
 .. todo:: finish other required and optional sections
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+Input file class structure
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The input file object parsing and validation follows the basic pattern implemented in :class:`apbs.input_file.InputFile` (see below).
+This class should serve as a template for adding new input file sections.
+
+.. automodule::  apbs.input_file
+   :members:
+   :undoc-members:
