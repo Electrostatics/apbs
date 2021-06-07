@@ -28,7 +28,11 @@ APBS accepts either `JSON <json.org>`_- or `YAML <yaml.org>`_-format input files
 
 These input files consist of the following keywords and objects:
 
-* ``read``:  :ref:`read_input_file`
+.. toctree::
+   :maxdepth: 1
+
+   read
+   process
 
 .. todo:: finish other required and optional sections
 
