@@ -36,3 +36,8 @@ def is_list(value, length) -> bool:
     if is_string(value):
         return False
     return (len(value) == length)
+
+
+def is_bool(value) -> bool:
+    """Is this value a Boolean?"""
+    return isinstance(value, bool)

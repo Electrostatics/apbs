@@ -5,6 +5,8 @@
    * Add mmCIF support for :class:`Molecule`
 """
 import logging
+from typing import Type
+from . import check
 from . import InputFile
 
 
@@ -24,15 +26,15 @@ class DielectricMapGroup(InputFile):
 
     * ``alias``:  see :func:`alias`
     * ``format``:  see :func:`format`
-    * ``x-shifted path``: string with path to x-shifted map
-    * ``y-shifted path``: string with path to y-shifted map
-    * ``x-shifted path``: string with path to z-shifted map
+    * ``x-shifted path``: string with path to x-shifted map (see :func:`paths`)
+    * ``y-shifted path``: string with path to y-shifted map (see :func:`paths`)
+    * ``x-shifted path``: string with path to z-shifted map (see :func:`paths`)
 
     More information about these properties is provided below.
     """
 
     def __init__(self, dict_=None, yaml=None, json=None):
-        self._paths = [None, None, None]
+        self._paths = None
         self._format = None
         self._alias = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
@@ -40,24 +42,38 @@ class DielectricMapGroup(InputFile):
     @property
     def paths(self) -> tuple:
         """3-tuple of strings.
-        
+
         Tuple contains paths to the x-, y-, and z-shifted dielectric maps.
+
+        :raises IndexError:  if length of list is not 3
+        :raises TypeError:  if list does not contain strings
         """
-        return tuple(self.maps)
+        return self._paths
 
     @paths.setter
     def paths(self, value):
-        for i in range(3):
-            self._paths[i] = value[i]
+        value = tuple(value)
+        if len(value) != 3:
+            raise IndexError(f"List has length {len(value)}; should be 3")
+        for i, elem in enumerate(value):
+            if not check.is_string(elem):
+                self._paths[i] = elem
+        self._paths = value
 
     @property
     def alias(self) -> str:
-        """String used to refer to these maps elsewhere in the input file."""
+        """String used to refer to these maps elsewhere in the input file.
+
+        :raises TypeError: if value is not string
+        """
         return self._alias
 
     @alias.setter
     def alias(self, value):
-        self._alias = value
+        if check.is_string(value):
+            self._alias = value
+        else:
+            raise TypeError(f"{value} is not a string")
 
     @property
     def format(self) -> str:
@@ -65,14 +81,18 @@ class DielectricMapGroup(InputFile):
 
         One of:
 
-        * ``dx``: :ref:`opendx` format
-        * ``dx.gz``:  GZip-compressed :ref:`opendx` format
+        * ``dx``: :ref:`opendx`
+        * ``dx.gz``:  GZip-compressed :ref:`opendx`
+
+        :raises ValueError: if assigned incorrect format value
         """
         return self._format
 
     @format.setter
     def format(self, value):
         self._format = value.lower()
+        if self._format not in ("dx", "dx.gz"):
+            raise ValueError(f"{value} is not an allowed format.")
 
     def from_dict(self, dict_):
         """Load object contents from dictionary.
@@ -81,11 +101,9 @@ class DielectricMapGroup(InputFile):
         :raises KeyError:  if dictionary elements missing
         """
         try:
-            self._alias = dict_["alias"]
-            self._format = dict_["format"].lower()
-            self._paths[0] = dict_["x-shifted path"]
-            self._paths[1] = dict_["y-shifted path"]
-            self._paths[2] = dict_["z-shifted path"]
+            self.alias = dict_["alias"]
+            self.format = dict_["format"].lower()
+            self.paths = (dict_["x-shifted path"], dict_["y-shifted path"], dict_["z-shifted path"])
         except KeyError as err:
             err = f"Missing key {err} while parsing {dict_}."
             raise KeyError(err)
@@ -105,10 +123,10 @@ class DielectricMapGroup(InputFile):
         :raises ValueError:  if object invalid
         """
         errors = []
-        if None in self._paths:
-            errors.append(f"One or more paths is null: {self._paths}.")
-        if self._format not in ["dx", "dx.gz"]:
-            errors.append(f"Unknown format: {self._format}.")
+        if self.paths is None:
+            errors.append(f"Paths have not been set.")
+        if self.format is None:
+            errors.append(f"Format has not been set.")
         if errors:
             err = " ".join(errors)
             raise ValueError(err)
@@ -133,12 +151,18 @@ class Map(InputFile):
 
     @property
     def alias(self) -> str:
-        """String used to refer to this map elsewhere in the input file."""
+        """String used to refer to this map elsewhere in the input file.
+
+        :raises TypeError:  if alias is not a string
+        """
         return self._alias
 
     @alias.setter
     def alias(self, value):
-        self._alias = value
+        if check.is_string(value):
+            self._alias = value
+        else:
+            raise TypeError(f"{value} is not a string.")
 
     @property
     def format(self) -> str:
@@ -146,23 +170,35 @@ class Map(InputFile):
 
         One of:
 
-        * ``dx``:  :ref:`opendx` format
-        * ``dx.gz``:  GZip-compressed :ref:`opendx` format
+        * ``dx``:  :ref:`opendx`
+        * ``dx.gz``:  GZip-compressed :ref:`opendx`
+
+        :raises ValueError:  if format is not one of allowed values
         """
         return self._format
 
     @format.setter
     def format(self, value):
-        self._format = value.lower()
+        value = value.lower()
+        if value in ["dx", "dx.gz"]:
+            self._format = value
+        else:
+            raise ValueError(f"{value} is not an allowed format.")
 
     @property
     def path(self) -> str:
-        """Path for scalar input map."""
+        """Path for scalar input map.
+
+        :raises TypeError:  if path is not a string
+        """
         return self._path
 
     @path.setter
     def path(self, value):
-        self._path = value
+        if check.is_string(value):
+            self._path = value
+        else:
+            raise TypeError(value)
 
     def validate(self):
         """Validate the object.
@@ -170,19 +206,19 @@ class Map(InputFile):
         :raises ValueError:  if object is not valid
         """
         errors = []
-        if self._path is None:
-            errors.append("path is not set.")
-        if self._format not in ["dx", "dx.gz"]:
-            errors.append(f"{self._format} is not a valid format.")
+        if self.path is None:
+            errors.append("Path is not set.")
+        if self.format is None:
+            errors.append("Format is not set.")
         if errors:
             err = " ".join(errors)
             raise ValueError(err)
 
     def to_dict(self) -> dict:
         return {
-            "alias": self._alias,
-            "format": self._format,
-            "path": self._path,
+            "alias": self.alias,
+            "format": self.format,
+            "path": self.path,
         }
 
     def from_dict(self, input_):
@@ -192,9 +228,9 @@ class Map(InputFile):
         :raises KeyError:  if input is missing keys
         """
         try:
-            self._alias = input_["alias"]
-            self._format = input_["format"].lower()
-            self._path = input_["path"]
+            self.alias = input_["alias"]
+            self.format = input_["format"].lower()
+            self.path = input_["path"]
         except KeyError as err:
             err = f"Missing key {err} while parsing {input_}"
             raise KeyError(err)
@@ -219,12 +255,18 @@ class Molecule(InputFile):
 
     @property
     def alias(self) -> str:
-        """String used to refer to this map elsewhere in the input file."""
+        """String used to refer to this map elsewhere in the input file.
+
+        :raises TypeError:  if alias is not string
+        """
         return self._alias
 
     @alias.setter
     def alias(self, value):
-        self._alias = value
+        if check.is_string(value):
+            self._alias = value
+        else:
+            raise ValueError(f"{value} is not a string.")
 
     @property
     def format(self) -> str:
@@ -232,23 +274,35 @@ class Molecule(InputFile):
 
         One of:
 
-        * ``pdb``:  :ref:`pdb` format
-        * ``pqr``:  :ref:`pqr` format
+        * ``pdb``:  :ref:`pdb`
+        * ``pqr``:  :ref:`pqr`
+
+        :raises ValueError:  if format is not one of the above
         """
         return self._format
 
     @format.setter
     def format(self, value) -> str:
-        self._format = value.lower()
+        value = value.lower()
+        if value in ["pdb", "pqr"]:
+            self._format = value
+        else:
+            raise ValueError(f"{value} is not a valid format.")
 
     @property
     def path(self) -> str:
-        """Path of molecule input."""
+        """Path of molecule input.
+
+        :raises TypeError: if path is not string
+        """
         return self._path
 
     @path.setter
     def path(self, value):
-        self._path = value
+        if check.is_string(value):
+            self._path = value
+        else:
+            raise TypeError(f"{value} is not a string.")
 
     def validate(self):
         """Validate the object.
@@ -256,19 +310,19 @@ class Molecule(InputFile):
         :raises ValueError:  if object is not valid
         """
         errors = []
-        if self._path is None:
-            errors.append("path is not set.")
-        if self._format not in ["pdb", "pqr"]:
-            errors.append(f"{self._format} is not a valid format.")
+        if self.path is None:
+            errors.append("Path is not set.")
+        if self.format is None:
+            errors.append("Format is not set.")
         if errors:
             err = " ".join(errors)
             raise ValueError(err)
 
     def to_dict(self) -> dict:
         return {
-            "alias": self._alias,
-            "format": self._format,
-            "path": self._path,
+            "alias": self.alias,
+            "format": self.format,
+            "path": self.path,
         }
 
     def from_dict(self, input_):
@@ -278,9 +332,9 @@ class Molecule(InputFile):
         :raises KeyError:  if input is missing keys
         """
         try:
-            self._alias = input_["alias"]
-            self._format = input_["format"].lower()
-            self._path = input_["path"]
+            self.alias = input_["alias"]
+            self.format = input_["format"].lower()
+            self.path = input_["path"]
         except KeyError as err:
             err = f"Missing key {err} while parsing {input_}."
             raise KeyError(err)
@@ -305,12 +359,18 @@ class Parameter(InputFile):
 
     @property
     def alias(self) -> str:
-        """String used to refer to this map elsewhere in the input file."""
+        """String used to refer to this map elsewhere in the input file.
+
+        :raises TypeError:  if not a string
+        """
         return self._alias
 
     @alias.setter
     def alias(self, value):
-        self._alias = value
+        if check.is_string(value):
+            self._alias = value
+        else:
+            raise TypeError(f"{value} is not a string")
 
     @property
     def format(self) -> str:
@@ -318,23 +378,35 @@ class Parameter(InputFile):
 
         One of:
 
-        * ``flat``:  :ref:`apbsflatparm` format
-        * ``xml``:  :ref:`apbsxmlparm` format
+        * ``flat``:  :ref:`apbsflatparm`
+        * ``xml``:  :ref:`apbsxmlparm`
+
+        :raises ValueError:  if given invalid format
         """
         return self._format
 
     @format.setter
     def format(self, value):
-        self._format = value.lower()
+        value = value.lower()
+        if value in ["flat", "xml"]:
+            self._format = value
+        else:
+            raise ValueError(f"{value} is not a valid format.")
 
     @property
     def path(self) -> str:
-        """Path to the parameter file."""
+        """Path to the parameter file.
+
+        :raises TypeError:  if not a string
+        """
         return self._path
 
     @path.setter
     def path(self, value):
-        self._path = value
+        if check.is_string(value):
+            self._path = value
+        else:
+            raise TypeError(f"{value} is not a string.")
 
     def validate(self):
         """Validate this object.
@@ -342,8 +414,8 @@ class Parameter(InputFile):
         :raises ValueError:  if object is invalid
         """
         errors = []
-        if self._format not in ["flat", "xml"]:
-            errors.append(f"{self._format} is not a valid format.")
+        if self._format is None:
+            errors.append("Format cannot be None.")
         if self._path is None:
             errors.append("Path cannot be None.")
         if errors:
@@ -352,9 +424,9 @@ class Parameter(InputFile):
 
     def to_dict(self) -> dict:
         return {
-            "alias": self._alias,
-            "format": self._format,
-            "path": self._path,
+            "alias": self.alias,
+            "format": self.format,
+            "path": self.path,
         }
 
     def from_dict(self, input_):
@@ -364,9 +436,9 @@ class Parameter(InputFile):
         :raises KeyError:  if dictionary elements missing
         """
         try:
-            self._alias = input_["alias"]
-            self._format = input_["format"].lower()
-            self._path = input_["path"]
+            self.alias = input_["alias"]
+            self.format = input_["format"].lower()
+            self.path = input_["path"]
         except KeyError as err:
             err = f"Missing key {err} while parsing {input_}."
             raise KeyError(err)
@@ -380,7 +452,7 @@ class Read(InputFile):
 
     * ``molecules``:  a list of molecule input objects (see :class:`Molecule`)
     * ``potential maps``:  a list of electrostatic potential map input objects
-      (see :class:`read.Map`)
+      (see :class:`Map`)
     * ``charge density maps``:  a list of charge density map input objects (see
       :class:`Map`)
     * ``ion accessibility maps``:  a list of ion accessibility map input
@@ -401,12 +473,18 @@ class Read(InputFile):
 
     @property
     def molecules(self) -> list:
-        """List of :class:`Molecule` objects."""
+        """List of :class:`Molecule` objects.
+
+        :raises TypeError:  if something other than :class:`Molecule` in list
+        """
         return self._molecules
 
     @molecules.setter
-    def molecules(self, value):
-        self._molecules = value
+    def molecules(self, list_):
+        for elem in list_:
+            if not isinstance(elem, Molecule):
+                raise TypeError(f"Found {type(elem)} in list.")
+        self._molecules = list_
 
     @property
     def potential_maps(self) -> list:
@@ -415,13 +493,18 @@ class Read(InputFile):
         These maps can be used to set the electrostatic potential at the
         boundary to values outside of the traditional mappings.
 
-        Units of electrostatic potential are $k_b T e_c^{-1}$.
+        Units of electrostatic potential are :math:`k_b T e_c^{-1}`.
+
+        :raises TypeError: if something other than :class:`Map` in list
         """
         return self._potential_maps
 
     @potential_maps.setter
-    def potential_maps(self, value):
-        self._potential_maps = value
+    def potential_maps(self, list_):
+        for elem in list_:
+            if not isinstance(elem, Map):
+                raise TypeError(f"Found {type(elem)} in list.")
+        self._potential_maps = list_
 
     @property
     def charge_density_maps(self) -> list:
@@ -431,13 +514,18 @@ class Read(InputFile):
         distributions outside of the normal atom-based charge distribution
         obtained from a molecular structure.
 
-        Units of charge density are $e_c Å^{-3}$.
+        Units of charge density are :math:`e_c Å^{-3}`.
+
+        :raises TypeError: if something other than :class:`Map` in list
         """
         return self._charge_density_maps
 
     @charge_density_maps.setter
-    def charge_density_maps(self, value):
-        self._charge_density_maps = value
+    def charge_density_maps(self, list_):
+        for elem in list_:
+            if not isinstance(elem, Map):
+                raise TypeError(f"Found {type(elem)} in list.")
+        self._charge_density_maps = list_
 
     @property
     def ion_accessibility_maps(self) -> list:
@@ -445,13 +533,18 @@ class Read(InputFile):
 
         The maps specify ion accessibility values which range between 0
         (inaccessible) and the value of the Debye-Hückel screening parameter;
-        these values have units of $Å^{-2}$.
+        these values have units of :math:`Å^{-2}`.
+
+        :raises TypeError: if something other than :class:`Map` in list
         """
         return self._ion_accessibility_maps
 
     @ion_accessibility_maps.setter
-    def ion_accessibility_maps(self, value):
-        self._ion_accessibility_maps = value
+    def ion_accessibility_maps(self, list_):
+        for elem in list_:
+            if not isinstance(elem, Map):
+                raise TypeError(f"Found {type(elem)} in list.")
+        self._ion_accessibility_maps = list_
 
     @property
     def dielectric_maps(self) -> list:
@@ -462,13 +555,17 @@ class Read(InputFile):
         inputs are maps of dielectric variables between the solvent and
         biomolecular dielectric constants; these values are unitless.
 
-        :returns: list of 3-tuples of :class:`Map` objects
+        :raises TypeError: if something other than :class:`DielectricMapGroup`
+            in list
         """
         return self._dielectric_maps
 
     @dielectric_maps.setter
-    def dielectric_maps(self, value):
-        self._dielectric_maps = value
+    def dielectric_maps(self, list_):
+        for elem in list_:
+            if not isinstance(elem, DielectricMapGroup):
+                raise TypeError(f"Found {type(elem)} in list.")
+        self._dielectric_maps = list_
 
     def validate(self):
         """Validate this input object.
@@ -476,25 +573,25 @@ class Read(InputFile):
         :raises ValueError:  if invalid
         """
         errors = []
-        if not self._molecules and not self._charge_density_maps:
+        if not self.molecules and not self.charge_density_maps:
             errors.append(
                 "No molecule input provided and no charge density map "
                 "specified."
             )
-        if not self._molecules and not self._dielectric_maps:
+        if not self.molecules and not self.dielectric_maps:
             errors.append(
                 "No molecule input provided and no dielectric maps specified."
             )
         for mol in self._molecules:
-            if mol.format == "pdb" and not self._parameters:
+            if mol.format == "pdb" and not self.parameters:
                 errors.append("Have PDB-format molecule but no parameters.")
         for obj in (
-            self._molecules
-            + self._potential_maps
-            + self._charge_density_maps
-            + self._ion_accessibility_maps
-            + self._dielectric_maps
-            + self._parameters
+            self.molecules
+            + self.potential_maps
+            + self.charge_density_maps
+            + self.ion_accessibility_maps
+            + self.dielectric_maps
+            + self.parameters
         ):
             try:
                 obj.validate()
@@ -506,20 +603,20 @@ class Read(InputFile):
 
     def to_dict(self) -> dict:
         output = dict()
-        output["molecules"] = [mol.to_dict() for mol in self._molecules]
+        output["molecules"] = [mol.to_dict() for mol in self.molecules]
         output["potential maps"] = [
-            map_.to_dict() for map_ in self._potential_maps
+            map_.to_dict() for map_ in self.potential_maps
         ]
         output["charge density maps"] = [
-            map_.to_dict() for map_ in self._charge_density_maps
+            map_.to_dict() for map_ in self.charge_density_maps
         ]
         output["ion accessibility maps"] = [
-            map_.to_dict() for map_ in self._ion_accessibility_maps
+            map_.to_dict() for map_ in self.ion_accessibility_maps
         ]
         output["dielectric maps"] = [
-            map_.to_dict() for map_ in self._dielectric_maps
+            map_.to_dict() for map_ in self.dielectric_maps
         ]
-        output["parameters"] = [param.to_dict() for param in self._parameters]
+        output["parameters"] = [param.to_dict() for param in self.parameters]
         return output
 
     def from_dict(self, input_):
@@ -528,24 +625,24 @@ class Read(InputFile):
         :param dict input_:  input dictionary
         :raises KeyError:  if input is missing keys
         """
-        self._molecules = [
+        self.molecules = [
             Molecule(dict_=dict_) for dict_ in input_.get("molecules", [])
         ]
-        self._potential_maps = [
+        self.potential_maps = [
             Map(dict_=dict_) for dict_ in input_.get("potential maps", [])
         ]
-        self._charge_density_maps = [
+        self.charge_density_maps = [
             Map(dict_=dict_)
             for dict_ in input_.get("charge density maps", [])
         ]
-        self._ion_accessibility_maps = [
+        self.ion_accessibility_maps = [
             Map(dict_=dict_)
             for dict_ in input_.get("ion accessibility maps", [])
         ]
-        self._dielectric_maps = [
+        self.dielectric_maps = [
             DielectricMapGroup(dict_=dict_)
             for dict_ in input_.get("dielectric maps", [])
         ]
-        self._parameters = [
+        self.parameters = [
             Parameter(dict_=dict_) for dict_ in input_.get("parameters", [])
         ]
