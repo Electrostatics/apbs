@@ -9,11 +9,11 @@ This optional section is denoted by the keyword ``process`` and includes lists o
 * ``products``:  a list of weighted product operations
 * ``exps``:  a list of element-wise exponentiation operations
 
-The syntax for these objects is described below.
+The syntax for these objects is described in :class:`apbs.input_file.process.Process`.
 
-----------------------------------------------------------------
+See also:
 
-.. automodule::  apbs.input_file.process
-   :members:
-   :undoc-members:
+.. toctree::
+   :maxdepth: 2
 
+   process_api

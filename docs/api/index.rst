@@ -46,3 +46,4 @@ This class should serve as a template for adding new input file sections.
 .. automodule::  apbs.input_file
    :members:
    :undoc-members:
+   :show-inheritance:
