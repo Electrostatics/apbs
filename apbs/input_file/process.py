@@ -4,6 +4,7 @@ The top-level output summarizes or combines results from multiple calculations.
 """
 import logging
 from . import InputFile
+from .check import is_string, is_number
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -197,13 +198,13 @@ class Element(InputFile):
 
     def validate(self):
         errors = []
-        if isinstance(self._coefficient, (int, float)):
+        if is_number(self._coefficient):
             pass
         else:
             errors.append(
                 f"The coefficient {self._coefficient} is not a number."
             )
-        if not isinstance(self._alias, str):
+        if not is_string(self._alias):
             errors.append(f"The alias {self._alias} is not a string.")
         if errors:
             error = " ".join(errors)
