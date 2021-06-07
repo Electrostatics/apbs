@@ -3,8 +3,9 @@
 The top-level output summarizes or combines results from multiple calculations.
 """
 import logging
+from typing import Type
 from . import InputFile
-from .check import is_string, is_number
+from . import check
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -32,30 +33,51 @@ class Process(InputFile):
 
     @property
     def sums(self) -> list:
-        """List of sum :class:`Operation` objects."""
+        """List of sum :class:`Operation` objects.
+
+        :raises TypeError:  if list contains something other than
+            class:`Operation` objects
+        """
         return self._sums
 
     @sums.setter
-    def sums(self, value):
-        self._sums = value
+    def sums(self, list_):
+        for elem in list_:
+            if not isinstance(elem, Operation):
+                raise TypeError(f"Found {type(elem)} object in list.")
+        self._sums = list_
 
     @property
     def products(self) -> list:
-        """List of product :class:`Operation` objects."""
+        """List of product :class:`Operation` objects.
+
+        :raises TypeError:  if list contains something other than
+            class:`Operation` objects
+        """
         return self._products
 
     @products.setter
-    def products(self, value):
-        self._products = value
+    def products(self, list_):
+        for elem in list_:
+            if not isinstance(elem, Operation):
+                raise TypeError(f"Found {type(elem)} object in list.")
+        self._products = list_
 
     @property
     def exps(self) -> list:
-        """List of exponential :class:`Operation` objects."""
+        """List of exponential :class:`Operation` objects.
+
+        :raises TypeError:  if list contains something other than
+            class:`Operation` objects
+        """
         return self._exps
 
     @exps.setter
-    def exps(self, value):
-        self._exps = value
+    def exps(self, list_):
+        for elem in list_:
+            if not isinstance(elem, Operation):
+                raise TypeError(f"Found {type(elem)} object in list.")
+        self._exps = list_
 
     def validate(self):
         """Validate contents of object.
@@ -63,7 +85,7 @@ class Process(InputFile):
         :raises ValueError:  if invalid object encountered
         """
         errors = []
-        for obj in self._sums + self._products + self._exps:
+        for obj in self.sums + self.products + self.exps:
             try:
                 obj.validate()
             except ValueError as error:
@@ -81,17 +103,17 @@ class Process(InputFile):
         :raises KeyError:  if elements are missing from the input dictionary
         """
         _LOGGER.debug(input_["sums"])
-        self._sums = [Operation(dict_=dict_) for dict_ in input_["sums"]]
-        self._products = [
+        self.sums = [Operation(dict_=dict_) for dict_ in input_["sums"]]
+        self.products = [
             Operation(dict_=dict_) for dict_ in input_["products"]
         ]
-        self._exps = [Operation(dict_=dict_) for dict_ in input_["exps"]]
+        self.exps = [Operation(dict_=dict_) for dict_ in input_["exps"]]
 
     def to_dict(self) -> dict:
         dict_ = {}
-        dict_["sums"] = [elem.to_dict() for elem in self._sums]
-        dict_["products"] = [elem.to_dict() for elem in self._products]
-        dict_["exps"] = [elem.to_dict() for elem in self._exps]
+        dict_["sums"] = [elem.to_dict() for elem in self.sums]
+        dict_["products"] = [elem.to_dict() for elem in self.products]
+        dict_["exps"] = [elem.to_dict() for elem in self.exps]
         return dict_
 
 
@@ -114,21 +136,33 @@ class Operation(InputFile):
 
     @property
     def alias(self) -> str:
-        """String for referring to the output of this operation elsewhere."""
+        """String for referring to the output of this operation elsewhere.
+
+        :raises TypeError:  if alias is not a string
+        """
         return self._alias
 
     @alias.setter
     def alias(self, value):
-        self._alias = value
+        if check.is_string(value):
+            self._alias = value
+        else:
+            raise TypeError(f"{value} is not a string.")
 
     @property
     def elements(self) -> list:
-        """List of :class:`Element` objects for operation."""
+        """List of :class:`Element` objects for operation.
+
+        :raises TypeError:  if list contains objects not :class:`Element`
+        """
         return self._elements
 
     @elements.setter
-    def elements(self, value):
-        self._elements = value
+    def elements(self, list_):
+        for elem in list_:
+            if not isinstance(elem, Element):
+                raise TypeError(f"Found {type(elem)} in list.")
+        self._elements = list_
 
     def from_dict(self, dict_):
         """Load object contents from dictionary.
@@ -136,12 +170,12 @@ class Operation(InputFile):
         :param dict dict_:  dictionary with object contents
         :raises KeyError:  if dictionary elements missing
         """
-        self._alias = dict_["alias"]
-        self._elements = [Element(dict_=edict) for edict in dict_["elements"]]
+        self.alias = dict_["alias"]
+        self.elements = [Element(dict_=edict) for edict in dict_["elements"]]
 
     def to_dict(self) -> dict:
-        dict_ = {"alias": self._alias}
-        dict_["elements"] = [element.to_dict() for element in self._elements]
+        dict_ = {"alias": self.alias}
+        dict_["elements"] = [element.to_dict() for element in self.elements]
         return dict_
 
     def validate(self):
@@ -180,32 +214,40 @@ class Element(InputFile):
 
     @property
     def coefficient(self) -> float:
-        """Return coefficient for this element."""
+        """Return coefficient for this element.
+
+        :raises TypeError:  if not a number
+        """
         return self._coefficient
 
     @coefficient.setter
     def coefficient(self, value):
-        self._coefficient = value
+        if check.is_number(value):
+            self._coefficient = value
+        else:
+            raise TypeError(f"{value} is not a number.")
 
     @property
     def alias(self) -> str:
-        """Return alias for object to which this element refers."""
+        """Return alias for object to which this element refers.
+
+        :raises TypeError:  if alias is not a string.
+        """
         return self._alias
 
     @alias.setter
     def alias(self, value):
-        self._alias = value
+        if check.is_string(value):
+            self._alias = value
+        else:
+            raise TypeError(f"{value} is not a string.")
 
     def validate(self):
         errors = []
-        if is_number(self._coefficient):
-            pass
-        else:
-            errors.append(
-                f"The coefficient {self._coefficient} is not a number."
-            )
-        if not is_string(self._alias):
-            errors.append(f"The alias {self._alias} is not a string.")
+        if self.coefficient is None:
+            errors.append("Coefficient not set.")
+        if self.alias is None:
+            errors.append("Alias not set")
         if errors:
             error = " ".join(errors)
             raise ValueError(error)
@@ -216,8 +258,8 @@ class Element(InputFile):
         :param dict input_:  dictionary with object contents
         :raises KeyError:  if dictionary elements missing
         """
-        self._alias = input_["alias"]
-        self._coefficient = input_["coefficient"]
+        self.alias = input_["alias"]
+        self.coefficient = input_["coefficient"]
 
     def to_dict(self) -> dict:
-        return {"alias": self._alias, "coefficient": self._coefficient}
+        return {"alias": self.alias, "coefficient": self.coefficient}
