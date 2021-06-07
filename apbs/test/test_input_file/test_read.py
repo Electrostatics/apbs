@@ -6,9 +6,9 @@ from apbs.input_file.read import Read
 
 _LOGGER = logging.getLogger(__name__)
 
+
 GOOD_INPUT = [
-    """
-# Typical input with PQR molecules
+    """# Typical input with PQR molecules
 molecules:
   - alias:  molecule 1
     format:  pqr
@@ -20,8 +20,7 @@ molecules:
     format:  pqr
     path:  complex.pqr
 """,
-    """
-# PDB input with parameter file
+    """# PDB input with parameter file
 molecules:
   - alias:  molecule 1
     format:  pdb
@@ -37,8 +36,7 @@ parameters:
     format:  flat
     path:  custom_parms.txt
 """,
-    """
-# PQR input with map for boundary conditions
+    """# PQR input with map for boundary conditions
 molecules:
   - alias:  molecule
     format:  pqr
@@ -48,8 +46,7 @@ potential maps:
     format:  dx
     path:  potential.dx
 """,
-    """
-# All-map input
+    """# All-map input
 charge density maps:
   - alias:  charge density
     format:  dx
@@ -68,8 +65,7 @@ dielectric maps:
 ]
 
 BAD_INPUT = [
-    """
-# Typical input with PQR molecules with BAD format
+    """# Typical input with PQR molecules with BAD format
 molecules:
   - alias:  molecule 1
     format:  BAD
@@ -81,8 +77,7 @@ molecules:
     format:  pqr
     path:  complex.pqr
 """,
-    """
-# PDB input WITHOUT parameter file
+    """# PDB input WITHOUT parameter file
 molecules:
   - alias:  molecule 1
     format:  pdb
@@ -94,8 +89,7 @@ molecules:
     format:  pdb
     path:  mol1.pdb
 """,
-    """
-# PQR input with map for boundary conditions WITHOUT path
+    """# PQR input with map for boundary conditions WITHOUT path
 molecules:
   - alias:  molecule
     format:  pqr
@@ -104,8 +98,7 @@ potential maps:
   - alias:  potential
     format:  dx
 """,
-    """
-# All-map input with MISSING path
+    """# All-map input with MISSING path
 charge density maps:
   - alias:  charge density
     format:  dx
@@ -122,6 +115,7 @@ dielectric maps:
 """,
 ]
 
+
 def id_function(test_string) -> str:
     """Turn test strings into labels."""
     label = test_string.splitlines()[0]
@@ -132,10 +126,14 @@ def id_function(test_string) -> str:
 def test_good_input(input_):
     """Test input file READ sections."""
     read = Read()
-    _LOGGER.debug(input_)
+    _LOGGER.debug(f"YAML input: {input_}")
     read.from_yaml(input_)
-    _LOGGER.debug(read.to_dict())
     read.validate()
+    new_dict = read.to_dict()
+    _LOGGER.debug(f"Object dictionary: {new_dict}")
+    read.from_dict(new_dict)
+    read.validate()
+
 
 @pytest.mark.parametrize("input_", BAD_INPUT, ids=id_function)
 def test_bad_input(input_):
