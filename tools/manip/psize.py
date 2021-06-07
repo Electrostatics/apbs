@@ -320,7 +320,11 @@ class Psize:
                 olen[1],
                 olen[2],
             )
-            msg += "Center = %.3f x %.3f x %.3f A\n" % (cen[0], cen[1], cen[2])
+            msg += "Center = %.3f x %.3f x %.3f A\n" % (
+                cen[0],
+                cen[1],
+                cen[2],
+            )
             msg += "Lower corner = %.3f x %.3f x %.3f A\n" % (
                 float(minlen[0]),
                 float(minlen[1]),
@@ -493,7 +497,9 @@ def main():
         "redfac=",
     ]
     try:
-        opts, args = getopt.getopt(sys.argv[1:], short_opt_list, long_opt_list)
+        opts, args = getopt.getopt(
+            sys.argv[1:], short_opt_list, long_opt_list
+        )
     except getopt.GetoptError as err:
         sys.stderr.write("Option error (%s)!\n" % err)
         usage(2)
