@@ -12,7 +12,7 @@ setuptools.setup(
     url="https://www.poissonboltzmann.org",
     packages=setuptools.find_packages(),
     package_data={"": ["*.yaml"]},
-    install_requires=["numpy", "jschon"],
+    install_requires=["numpy", "pyyaml"],
     tests_require=["pytest", "requests"],
     keywords="science chemistry biophysics biochemistry",
     classifiers=[
