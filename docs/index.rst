@@ -37,7 +37,9 @@ Contents
    help
    reading
    formats/index
+   api/index
    releases
+   todo
 
 ------------------
 Indices and tables

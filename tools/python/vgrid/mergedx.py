@@ -2,7 +2,7 @@
 
 import sys
 import getopt
-from . vgrid import (
+from .vgrid import (
     startVio,
     Vgrid_ctor,
     Vgrid_readDX,
@@ -157,22 +157,21 @@ def createGrid(inputpath, root):
         grid.zmax = grid.zmin + grid.hzed * (grid.nz - 1)
 
         print("\tGrid dimensions: %i %i %i" % (grid.nx, grid.ny, grid.nz))
-        print("\tGrid spacing: %.5f %.5f %.5f" % (grid.hx, grid.hy, grid.hzed))
-        print("\tGrid lower corner: %.2f %.2f %.2f" % (
-            grid.xmin,
-            grid.ymin,
-            grid.zmin,
-        ))
-        print("\tGrid upper corner: %.2f %.2f %.2f" % (
-            grid.xmax,
-            grid.ymax,
-            grid.zmax,
-        ))
-        print("\tGlobal Gridpoint Minima: %i %i %i\n" % (
-            mins[0],
-            mins[1],
-            mins[2],
-        ))
+        print(
+            "\tGrid spacing: %.5f %.5f %.5f" % (grid.hx, grid.hy, grid.hzed)
+        )
+        print(
+            "\tGrid lower corner: %.2f %.2f %.2f"
+            % (grid.xmin, grid.ymin, grid.zmin,)
+        )
+        print(
+            "\tGrid upper corner: %.2f %.2f %.2f"
+            % (grid.xmax, grid.ymax, grid.zmax,)
+        )
+        print(
+            "\tGlobal Gridpoint Minima: %i %i %i\n"
+            % (mins[0], mins[1], mins[2],)
+        )
 
         # If this is the first processor, initialize the merged grid
 
@@ -249,10 +248,14 @@ def createGrid(inputpath, root):
             for k in range(glob[2]):
                 location = IJK(glob[0], glob[1], glob[2], i, j, k)
                 if myaccess[location] == 0:
-                    print(f"Error: Found unaccessed gridpoint at {i} {j} {k}!")
+                    print(
+                        f"Error: Found unaccessed gridpoint at {i} {j} {k}!"
+                    )
                     sys.exit()
                 elif myaccess[location] > 1:  # Pt. on multiple grids: Error!
-                    msg = "Error: Multiple grids attempted to access gridpoint"
+                    msg = (
+                        "Error: Multiple grids attempted to access gridpoint"
+                    )
                     msg += f" {i} {j} {k} in the global grid!"
                     print(msg)
                     sys.exit()
@@ -428,7 +431,9 @@ def main():
     elif nx is None and ny is None and nz is None:
         pass
     else:
-        print("\nYou must enter either none or all values for nx, ny, and nz!")
+        print(
+            "\nYou must enter either none or all values for nx, ny, and nz!"
+        )
         usage()
         sys.exit()
 

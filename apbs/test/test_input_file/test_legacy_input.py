@@ -1,6 +1,6 @@
 import pytest
 from pyparsing import ParseSyntaxException
-from apbs.ainput.apbs_legacy_input import (
+from apbs.input_file.apbs_legacy_input import (
     ApbsLegacyInput,
     get_example_files,
     print_banner,

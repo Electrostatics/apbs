@@ -1,4 +1,0 @@
-click==7.1.2
-mmcif-pdbx==1.1.2
-numpy==1.19.1
-pyparsing==2.4.7
