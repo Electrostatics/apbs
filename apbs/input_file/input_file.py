@@ -1,1 +1,4 @@
-"""Define base class for input file classes."""
+"""Define structure of input file."""
+
+
+raise NotImplementedError("Need to check for valid aliases.")
