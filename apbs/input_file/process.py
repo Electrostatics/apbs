@@ -197,9 +197,7 @@ class Element(InputFile):
 
     def validate(self):
         errors = []
-        if isinstance(self._coefficient, int) or isinstance(
-            self._coefficient, float
-        ):
+        if isinstance(self._coefficient, (int, float)):
             pass
         else:
             errors.append(
