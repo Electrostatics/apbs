@@ -19,8 +19,8 @@ class DielectricMapGroup(InputFile):
     are maps of dielectric variables between the solvent and biomolecular
     dielectric constants; these values are unitless.
 
-    Objects can be initialized with dictionary/JSON/YAML data with the following
-    keys:
+    Objects can be initialized with dictionary/JSON/YAML data with the
+    following keys:
 
     * ``alias``:  see :func:`alias`
     * ``format``:  see :func:`format`
@@ -75,6 +75,11 @@ class DielectricMapGroup(InputFile):
         self._format = value.lower()
 
     def from_dict(self, dict_):
+        """Load object contents from dictionary.
+
+        :param dict dict_:  dictionary with object contents
+        :raises KeyError:  if dictionary elements missing
+        """
         try:
             self._alias = dict_["alias"]
             self._format = dict_["format"].lower()
@@ -95,6 +100,10 @@ class DielectricMapGroup(InputFile):
         }
 
     def validate(self):
+        """Validate object.
+
+        :raises ValueError:  if object invalid
+        """
         errors = []
         if None in self._paths:
             errors.append(f"One or more paths is null: {self._paths}.")
@@ -108,8 +117,8 @@ class DielectricMapGroup(InputFile):
 class Map(InputFile):
     """Input class for scalar grid data input.
 
-    Objects can be initialized with dictionary/JSON/YAML data with the following
-    keys:
+    Objects can be initialized with dictionary/JSON/YAML data with the
+    following keys:
 
     * ``alias``:  see :func:`alias`
     * ``format``:  see :func:`format`
@@ -170,7 +179,6 @@ class Map(InputFile):
             raise ValueError(err)
 
     def to_dict(self) -> dict:
-        """Convert object to dictionary."""
         return {
             "alias": self._alias,
             "format": self._format,
@@ -181,6 +189,7 @@ class Map(InputFile):
         """Load object contents from dictionary.
 
         :param dict input_:  input dictionary
+        :raises KeyError:  if input is missing keys
         """
         try:
             self._alias = input_["alias"]
@@ -194,8 +203,8 @@ class Map(InputFile):
 class Molecule(InputFile):
     """Input class for molecule input.
 
-    Objects can be initialized with dictionary/JSON/YAML data with the following
-    keys:
+    Objects can be initialized with dictionary/JSON/YAML data with the
+    following keys:
 
     * ``alias``:  see :func:`alias`
     * ``format``:  see :func:`format`
@@ -256,7 +265,6 @@ class Molecule(InputFile):
             raise ValueError(err)
 
     def to_dict(self) -> dict:
-        """Convert object to dictionary."""
         return {
             "alias": self._alias,
             "format": self._format,
@@ -267,6 +275,7 @@ class Molecule(InputFile):
         """Load object contents from dictionary.
 
         :param dict input_:  input dictionary
+        :raises KeyError:  if input is missing keys
         """
         try:
             self._alias = input_["alias"]
@@ -280,8 +289,8 @@ class Molecule(InputFile):
 class Parameter(InputFile):
     """Input class for parameter file input.
 
-    Objects can be initialized with dictionary/JSON/YAML data with the following
-    keys:
+    Objects can be initialized with dictionary/JSON/YAML data with the
+    following keys:
 
     * ``alias``:  see :func:`alias`
     * ``format``:  see :func:`format`
@@ -342,7 +351,6 @@ class Parameter(InputFile):
             raise ValueError(err)
 
     def to_dict(self) -> dict:
-        """Convert object to dictionary."""
         return {
             "alias": self._alias,
             "format": self._format,
@@ -353,6 +361,7 @@ class Parameter(InputFile):
         """Load object contents from dictionary.
 
         :param dict input_:  input dictionary
+        :raises KeyError:  if dictionary elements missing
         """
         try:
             self._alias = input_["alias"]
@@ -364,18 +373,23 @@ class Parameter(InputFile):
 
 
 class Read(InputFile):
-    """Input class for parameter file input.
+    """Class for information about data to be loaded into APBS.
 
-    Objects can be initialized with dictionary/JSON/YAML data with the following
-    keys:
+    Objects can be initialized with dictionary/JSON/YAML data with the
+    following keys:
 
     * ``molecules``:  a list of molecule input objects (see :class:`Molecule`)
-    * ``potential maps``:  a list of electrostatic potential map input objects (see :class:`read.Map`)
-    * ``charge density maps``:  a list of charge density map input objects (see :class:`Map`)
-    * ``ion accessibility maps``:  a list of ion accessibility map input objects (see :class:`Map`)
-    * ``dielectric maps``:  a list of dielectric map input objects (see :class:`DielectricMapGroup`)
+    * ``potential maps``:  a list of electrostatic potential map input objects
+      (see :class:`read.Map`)
+    * ``charge density maps``:  a list of charge density map input objects (see
+      :class:`Map`)
+    * ``ion accessibility maps``:  a list of ion accessibility map input
+      objects (see :class:`Map`)
+    * ``dielectric maps``:  a list of dielectric map input objects (see
+      :class:`DielectricMapGroup`)
     * ``parameters``:  a list of parameter files
     """
+
     def __init__(self, dict_=None, yaml=None, json=None):
         self._molecules = []
         self._potential_maps = []
@@ -491,7 +505,6 @@ class Read(InputFile):
             raise ValueError(err)
 
     def to_dict(self) -> dict:
-        """Convert object to dictionary."""
         output = dict()
         output["molecules"] = [mol.to_dict() for mol in self._molecules]
         output["potential maps"] = [
@@ -513,14 +526,13 @@ class Read(InputFile):
         """Load object contents from dictionary.
 
         :param dict input_:  input dictionary
+        :raises KeyError:  if input is missing keys
         """
         self._molecules = [
-            Molecule(dict_=dict_)
-            for dict_ in input_.get("molecules", [])
+            Molecule(dict_=dict_) for dict_ in input_.get("molecules", [])
         ]
         self._potential_maps = [
-            Map(dict_=dict_)
-            for dict_ in input_.get("potential maps", [])
+            Map(dict_=dict_) for dict_ in input_.get("potential maps", [])
         ]
         self._charge_density_maps = [
             Map(dict_=dict_)
@@ -535,6 +547,5 @@ class Read(InputFile):
             for dict_ in input_.get("dielectric maps", [])
         ]
         self._parameters = [
-            Parameter(dict_=dict_)
-            for dict_ in input_.get("parameters", [])
+            Parameter(dict_=dict_) for dict_ in input_.get("parameters", [])
         ]
