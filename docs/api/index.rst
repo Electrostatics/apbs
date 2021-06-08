@@ -29,9 +29,10 @@ APBS accepts either `JSON <json.org>`_- or `YAML <yaml.org>`_-format input files
 These input files consist of the following keywords and objects:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    read
+   calculate/index
    process
 
 .. todo:: finish other required and optional sections
