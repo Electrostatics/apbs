@@ -1,4 +1,4 @@
-"""Parameters for a grid-based nonpolar calculation."""
+"""Parameters for a grid-based nonpolar solvation calculation."""
 import logging
 from .. import check
 from .. import InputFile
@@ -7,7 +7,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class Nonpolar(InputFile):
-    """Parameters for a grid-based nonpolar calculation.
+    """Parameters for a grid-based nonpolar solvation calculation.
 
     Objects can be initialized with dictionary/JSON/YAML data with the
     following keys:
