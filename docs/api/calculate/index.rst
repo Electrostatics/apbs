@@ -22,4 +22,5 @@ Calculation types
 .. toctree::
    :maxdepth: 2
 
+   finite_difference
    nonpolar
