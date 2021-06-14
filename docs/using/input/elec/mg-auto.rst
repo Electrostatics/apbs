@@ -30,7 +30,16 @@ The following keywords are present in mg-auto ELEC blocks; all keywords are requ
    :maxdepth: 2
    :caption: ELEC mg-auto keywords:
 
+   bcfl
+   ../generic/calcenergy
+   ../generic/calcforce
+   cgcent
+   cglen
+   chgm
+   dime
    etol
+   fgcent
+   fglen
    ion
    lpbe
    lrpbe

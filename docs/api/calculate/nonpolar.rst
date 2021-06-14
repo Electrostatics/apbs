@@ -1,12 +1,8 @@
-.. _nonpolar:
-
 ================================
 Nonpolar grid-based calculations
 ================================
 
-.. todo::  Make this more user-friendly.
-
-.. automodule::  apbs.input_file.calculate.nonpolar
+.. automodule::  apbs.input_file.calculate.nonpolar.Nonpolar
    :members:
    :undoc-members:
    :inherited-members:
