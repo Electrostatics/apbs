@@ -3,10 +3,18 @@ import logging
 from math import log2
 from .. import check
 from .. import InputFile
+from .generic import MobileIons
+
 
 _LOGGER = logging.getLogger(__name__)
+
+
 MIN_LEVEL = 4
 """Mininum multigrid level in calculations."""
+
+
+ERROR_TOLERANCE = 1e-6
+"""Relative error tolerance for iterative solver."""
 
 
 class GridDimensions(InputFile):
@@ -699,6 +707,8 @@ class FiniteDifference(InputFile):
     * ``calculation parameters``:  see :func:`calculation_parameters`
     * ``charge discretization``:  method used to map charges onto the grid; see
       :func:`charge_discretization`
+    * ``error tolerance``:  solver error tolerance; see :func:`error_tolerance`
+    * ``ions``:  information about mobile ion species; see :func:`ions`
 
     .. todo:: finish this
     """
@@ -710,7 +720,44 @@ class FiniteDifference(InputFile):
         self._calculation_type = None
         self._calculation_parameters = None
         self._charge_discretization = None
+        self._error_tolerance = None
+        self._ions = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    @property
+    def ions(self) -> MobileIons:
+        """Descriptions of mobile ion species.
+
+        :raises TypeError:  if not set to a :class:`Ions` object
+        """
+        return self._ions
+
+    @ions.setter
+    def ions(self, value):
+        if not isinstance(value, MobileIons):
+            raise TypeError(f"Value {value} (type {type(value)} is not an Ions object.")
+        self._ions = value
+
+    @property
+    def error_tolerance(self) -> float:
+        """Relative error tolerance for iterative solver.
+
+        If not specified, the default value is :const:`ERROR_TOLERANCE`.
+
+        :raises TypeError:  if not set to positive number
+        :raises ValueError:  if not set to number less than 1
+        """
+        if self._error_tolerance is None:
+            self._error_tolerance = ERROR_TOLERANCE
+        return self._error_tolerance
+
+    @error_tolerance.setter
+    def error_tolerance(self, value):
+        if not check.is_positive_definite(value):
+            raise TypeError(f"Value {value} is not a positive number.")
+        if value >= 1.0:
+            raise ValueError(f"Value {value} is not less than 1.0.")
+        self._error_tolerance = value
 
     @property
     def charge_discretization(self) -> str:
