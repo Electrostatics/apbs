@@ -18,11 +18,18 @@ The API (application programming interface) of :mod:`apbs` is documented here fo
 
 .. todo:: Add API documentation for all new Python routines
 
+.. _new_input:
+
 ------------------
 Input file support
 ------------------
 
-.. todo:: Eventually move this into the main documentation
+.. todo::
+
+   Eventually move a version of this into the main documentation, supressing
+   undocumented members and inherited members.
+
+.. todo:: Add crosswalk between old syntax and new syntax
 
 APBS accepts either `JSON <json.org>`_- or `YAML <yaml.org>`_-format input files.
 
