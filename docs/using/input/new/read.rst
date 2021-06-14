@@ -1,4 +1,4 @@
-.. _read_input_file:
+.. _read_new_input:
 
 ==========================================
 Data loading input file section (required)
