@@ -223,9 +223,7 @@ class ApbsLegacyInput:
         """Convenience function that is used by other classes."""
         return Word(printables)  # .setDebug()
 
-    def format_read_section(
-        self, results: ParseResults, groups: list
-    ) -> dict:
+    def format_read_section(self, results: ParseResults, groups: list) -> dict:
         """Format the READ section of the APBS input file.
 
         :param results ParseResults: pyparsing results of the matching grammar

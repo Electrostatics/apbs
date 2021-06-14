@@ -40,7 +40,7 @@ GOOD_INPUT = [
       surface method:  solvent-accessible
       surface tension:  0.0085
       temperature:  298.15
-    """
+    """,
 ]
 
 

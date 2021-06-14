@@ -120,9 +120,6 @@ class Calculate(InputFile):
             self.parameters = Nonpolar(dict_=input_["parameters"])
 
     def to_dict(self) -> dict:
-        dict_ = {
-            "alias":  self.alias,
-            "type":  self.calculation_type
-        }
+        dict_ = {"alias": self.alias, "type": self.calculation_type}
         dict_["parameters"] = self.parameters.to_dict()
         return dict_

@@ -250,9 +250,7 @@ def check_forces(input_file, polar_file, apolar_file, logger):
     compare_force_dicts(test_polar_force_dict, true_polar_force_dict, logger)
 
     logger.both("Checking Apolar Forces")
-    compare_force_dicts(
-        test_apolar_force_dict, true_apolar_force_dict, logger
-    )
+    compare_force_dicts(test_apolar_force_dict, true_apolar_force_dict, logger)
 
 
 def test():

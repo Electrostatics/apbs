@@ -103,7 +103,11 @@ class DielectricMapGroup(InputFile):
         try:
             self.alias = dict_["alias"]
             self.format = dict_["format"].lower()
-            self.paths = (dict_["x-shifted path"], dict_["y-shifted path"], dict_["z-shifted path"])
+            self.paths = (
+                dict_["x-shifted path"],
+                dict_["y-shifted path"],
+                dict_["z-shifted path"],
+            )
         except KeyError as err:
             err = f"Missing key {err} while parsing {dict_}."
             raise KeyError(err)
@@ -632,8 +636,7 @@ class Read(InputFile):
             Map(dict_=dict_) for dict_ in input_.get("potential maps", [])
         ]
         self.charge_density_maps = [
-            Map(dict_=dict_)
-            for dict_ in input_.get("charge density maps", [])
+            Map(dict_=dict_) for dict_ in input_.get("charge density maps", [])
         ]
         self.ion_accessibility_maps = [
             Map(dict_=dict_)
