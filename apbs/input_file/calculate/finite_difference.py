@@ -311,10 +311,28 @@ class GridCenter(InputFile):
 
     """
 
-    def __init__(self, dict_, yaml, json):
+    def __init__(self, dict_=None, yaml=None, json=None):
         self._molecule = None
-        self._position = [None, None, None]
+        self._position = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    def from_dict(self, input_):
+        molecule = input_.get("molecule", None)
+        if molecule is not None:
+            self.molecule = molecule
+        position = input_.get("position", None)
+        if position is not None:
+            self.position = position
+
+    def to_dict(self) -> dict:
+        return {
+            "molecule":  self.molecule,
+            "position":  self.position
+        }
+
+    def validate(self):
+        if self.molecule is None and self.position is None:
+            raise ValueError(f"Need to specify either molecule or position.")
 
     @property
     def molecule(self) -> str:
@@ -348,10 +366,11 @@ class GridCenter(InputFile):
     def position(self, value):
         if len(value) != 3:
             raise IndexError(f"Length of list {value} is not 3.")
-        for i, elem in enumerate(value):
+        self._position = []
+        for elem in value:
             if not check.is_number(elem):
                 raise TypeError(f"{elem} is not a number.")
-            self._position[i] = elem
+            self._position.append(elem)
 
 
 class Manual(InputFile):

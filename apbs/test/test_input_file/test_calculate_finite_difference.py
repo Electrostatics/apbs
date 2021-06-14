@@ -1,4 +1,5 @@
 """Test input file CALCULATE section parsing."""
+from apbs.grid.grid import Grid
 import logging
 import hashlib
 import pytest
@@ -101,6 +102,7 @@ def test_good_grid_dimensions(input_dict):
     grid = GridDimensions(dict_=dict_)
     grid = GridDimensions(yaml=grid.to_yaml())
     grid = GridDimensions(json=grid.to_json())
+    grid.validate()
     assert(grid.counts == input_dict["counts"])
     assert(grid.spacings == input_dict["spacings"])
     assert(grid.lengths == input_dict["lengths"])
@@ -111,6 +113,7 @@ def test_good_grid_dimensions(input_dict):
     grid = GridDimensions(dict_=dict_)
     grid = GridDimensions(yaml=grid.to_yaml())
     grid = GridDimensions(json=grid.to_json())
+    grid.validate()
     assert(grid.counts == input_dict["counts"])
     assert(grid.spacings == input_dict["spacings"])
     assert(grid.lengths == input_dict["lengths"])
@@ -121,6 +124,7 @@ def test_good_grid_dimensions(input_dict):
     grid = GridDimensions(dict_=dict_)
     grid = GridDimensions(yaml=grid.to_yaml())
     grid = GridDimensions(json=grid.to_json())
+    grid.validate()
     assert(grid.counts == input_dict["counts"])
     assert(grid.spacings == input_dict["spacings"])
     assert(grid.lengths == input_dict["lengths"])
@@ -159,8 +163,20 @@ def test_bad_grid_lengths(lengths):
         GridDimensions(dict_=dict_)
 
 
-# @pytest.mark.parametrize("dict_", GOOD_GRID_CENTER, ids=id_function)
-# def test_good_grid_centers(dict_):
-#     """Test the :class:`GridCenter` class."""
-#     center = GridCenter(dict_=dict_)
-#     raise NotImplementedError()
+@pytest.mark.parametrize("dict_", GOOD_GRID_CENTER, ids=id_function)
+def test_good_grid_centers(dict_):
+    """Test the :class:`GridCenter` class."""
+    center = GridCenter(dict_=dict_)
+    center.validate()
+    center = GridCenter(yaml=center.to_yaml())
+    center.validate()
+    center = GridCenter(json=center.to_json())
+    center.validate()
+
+
+@pytest.mark.parametrize("dict_", BAD_GRID_CENTER, ids=id_function)
+def test_bad_grid_centers(dict_):
+    """Test the :class:`GridCenter` class."""
+    with pytest.raises((TypeError, IndexError, ValueError)):
+        center = GridCenter(dict_=dict_)
+        center.validate()
