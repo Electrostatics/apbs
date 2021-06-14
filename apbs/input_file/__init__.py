@@ -73,4 +73,4 @@ class InputFile(ABC):
     def to_yaml(self) -> str:
         """Produce YAML representation of self."""
         dict_ = self.to_dict()
-        return yaml.dump(dict_, Dumper)
+        return yaml.dump(dict_)

@@ -2,7 +2,7 @@
 import logging
 import hashlib
 import pytest
-from apbs.input_file.calculate.finite_difference import GridDimensions
+from apbs.input_file.calculate.finite_difference import GridDimensions, GridCenter
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -34,6 +34,32 @@ GOOD_GRID_DIMENSIONS = [
     }
 ]
 
+
+GOOD_GRID_CENTER = [
+    {
+        "molecule":  "foo",
+        "position":  [1, 2, 3.14]
+    },
+    {
+        "position":  [1, 2, 3.14]
+    },
+    {
+        "molecule":  "foo",
+    }
+]
+
+
+BAD_GRID_CENTER = [
+    {
+        "empty":  True
+    },
+    {
+        "molecule":  42
+    },
+    {
+        "position":  "not a tuple or list"
+    }
+]
 
 BAD_GRID_COUNTS = [
     (97, 161, -1),
@@ -73,18 +99,30 @@ def test_good_grid_dimensions(input_dict):
         "lengths":  input_dict["lengths"]
     }
     grid = GridDimensions(dict_=dict_)
+    grid = GridDimensions(yaml=grid.to_yaml())
+    grid = GridDimensions(json=grid.to_json())
     assert(grid.counts == input_dict["counts"])
+    assert(grid.spacings == input_dict["spacings"])
+    assert(grid.lengths == input_dict["lengths"])
     dict_ = {
         "counts":  input_dict["counts"],
         "lengths":  input_dict["lengths"]
     }
     grid = GridDimensions(dict_=dict_)
+    grid = GridDimensions(yaml=grid.to_yaml())
+    grid = GridDimensions(json=grid.to_json())
+    assert(grid.counts == input_dict["counts"])
     assert(grid.spacings == input_dict["spacings"])
+    assert(grid.lengths == input_dict["lengths"])
     dict_ = {
         "counts":  input_dict["counts"],
         "spacings":  input_dict["spacings"]
     }
     grid = GridDimensions(dict_=dict_)
+    grid = GridDimensions(yaml=grid.to_yaml())
+    grid = GridDimensions(json=grid.to_json())
+    assert(grid.counts == input_dict["counts"])
+    assert(grid.spacings == input_dict["spacings"])
     assert(grid.lengths == input_dict["lengths"])
 
 
@@ -119,3 +157,10 @@ def test_bad_grid_lengths(lengths):
     }
     with pytest.raises(TypeError):
         GridDimensions(dict_=dict_)
+
+
+# @pytest.mark.parametrize("dict_", GOOD_GRID_CENTER, ids=id_function)
+# def test_good_grid_centers(dict_):
+#     """Test the :class:`GridCenter` class."""
+#     center = GridCenter(dict_=dict_)
+#     raise NotImplementedError()

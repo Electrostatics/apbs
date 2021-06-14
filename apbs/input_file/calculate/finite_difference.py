@@ -66,12 +66,15 @@ class GridDimensions(InputFile):
 
     def from_dict(self, input_):
         """Initialize object from dictionary."""
-        if "counts" in input_:
-            self.counts = input_["counts"]
-        if "lengths" in input_:
-            self.lengths = input_["lengths"]
-        if "spacings" in input_:
-            self.spacings = input_["spacings"]
+        counts = input_.get("counts", None)
+        if counts is not None:
+            self.counts = counts
+        lengths = input_.get("lengths", None)
+        if lengths is not None:
+            self.lengths = lengths
+        spacings = input_.get("spacings", None)
+        if spacings is not None:
+            self.spacings = spacings
 
     def to_dict(self):
         return {
@@ -297,7 +300,7 @@ class GridDimensions(InputFile):
 class GridCenter(InputFile):
     """Parameters for specifying the center of a finite difference grid.
 
-    Objects can be initialized with dictionary/JSON/YAML data with the
+    Objects can be initialized with dictionary/JSON/YAML data with one of the
     following keys:
 
     * ``molecule``:  use the center of the specified molecule.  See
