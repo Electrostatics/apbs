@@ -710,7 +710,9 @@ class FiniteDifference(InputFile):
     * ``error tolerance``:  solver error tolerance; see :func:`error_tolerance`
     * ``equation``:  what version of the Poisson-Boltzmann equation to solve; see :func:`equation`
     * ``ions``:  information about mobile ion species; see :func:`ions`
-    * ``molecule``:  alias to molecule; see :func:`molecule`
+    * ``molecule``:  alias to molecule for calculation; see :func:`molecule`
+    * ``solute dielectric``:  see :func:`solute_dielectric`
+    * ``solvent dielectric``:  see :func:`solvent_dielectric`
 
     .. todo:: finish this
     """
@@ -726,7 +728,70 @@ class FiniteDifference(InputFile):
         self._equation = None
         self._ions = None
         self._molecule = None
+        self._solute_dielectric = None
+        self._solvent_dielectric = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    @property
+    def solvent_dielectric(self) -> float:
+        """Solvent dielectric.
+
+        78.5 is a good choice for water at 25 C.
+
+        :returns:  a floating point number greater than or equal to one
+        :raises TypeError:  if not a number
+        :raises ValueError:  if not greater than or equal to 1
+        """
+        return self._solvent_dielectric
+
+    @solvent_dielectric.setter
+    def solvent_dielectric(self, value):
+        if not check.is_positive_definite(value):
+            raise TypeError(f"Value {value} is not a positive number.")
+        if value < 1:
+            raise ValueError(f"Value {value} is not >= 1.")
+        self._solvent_dielectric = value
+
+    @property
+    def solute_dielectric(self) -> float:
+        """Solute dielectric.
+
+        The dielectric value of a solute is often chosen using the following
+        rules of thumb:
+
+        * 1:  only used to compare calculation results with non-polarizable
+          molecular simulation
+
+        * 2-4:  "molecular" dielectric value; used when conformational degrees
+          of freedom are modeled explicitly
+
+        * 4-8:  used to mimic sidechain libration and other small-scale
+          conformational degrees of freedom
+
+        * 8-12:  used to model larger-scale sidechain rearrangement
+
+        * 20-40:  used to model larger-scale macromolecular conformational
+          changes and/or water penetration into interior of molecule
+
+        .. note:: 
+
+           What does the continuum dielectric value of a non-continuum molecule
+           mean?  Hard to say -- this approximation can be very difficult to
+           interpret and can significant affect your results.
+
+        :returns:  a floating point number greater than or equal to one
+        :raises TypeError:  if not a number
+        :raises ValueError:  if not greater than or equal to 1
+        """
+        return self._solute_dielectric
+
+    @solute_dielectric.setter
+    def solute_dielectric(self, value):
+        if not check.is_positive_definite(value):
+            raise TypeError(f"Value {value} is not a positive number.")
+        if value < 1:
+            raise ValueError(f"Value {value} is not >= 1.")
+        self._solute_dielectric = value
 
     @property
     def molecule(self) -> str:
