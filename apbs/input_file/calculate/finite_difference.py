@@ -716,6 +716,7 @@ class FiniteDifference(InputFile):
     * ``solvent radius``:  see :func:`solvent_radius`
     * ``surface method``:  see :func:`surface_method`
     * ``surface spline window``:  see :func:`surface_spline_window`
+    * ``temperature``:  see :func:`temperature`
 
     .. todo:: finish this
     """
@@ -736,11 +737,28 @@ class FiniteDifference(InputFile):
         self._solvent_radius = None
         self._surface_method = None
         self._surface_spline_window = None
+        self._temperature = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
 
     @property
+    def temperature(self) -> float:
+        """Temperature for the calculation in Kelvin.
+
+        :raises ValueError:  if not a positive number (no violations of the
+            3rd Law!)
+        """
+        return self._temperature
+
+    @temperature.setter
+    def temperature(self, value):
+        if check.is_positive_definite(value):
+            self._temperature = value
+        else:
+            raise ValueError(f"{value} is not a positive number.")
+
+    @property
     def surface_spline_window(self) -> float:
-        """Window for spline-based surface definitions.
+        """Window for spline-based surface definitions (not needed otherwise).
 
         This is the distance (in Å) over which the spline transitions from the
         solvent dielectric value to the solute dielectric value.  A typical
