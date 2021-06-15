@@ -710,6 +710,7 @@ class FiniteDifference(InputFile):
     * ``error tolerance``:  solver error tolerance; see :func:`error_tolerance`
     * ``equation``:  what version of the Poisson-Boltzmann equation to solve; see :func:`equation`
     * ``ions``:  information about mobile ion species; see :func:`ions`
+    * ``molecule``:  alias to molecule; see :func:`molecule`
 
     .. todo:: finish this
     """
@@ -724,7 +725,23 @@ class FiniteDifference(InputFile):
         self._error_tolerance = None
         self._equation = None
         self._ions = None
+        self._molecule = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    @property
+    def molecule(self) -> str:
+        """Specify which molecule to use for calculation.
+
+        :returns:  alias for molecule read (see :ref:`read_new_input`)
+        :raises TypeError:  if not set to a string
+        """
+        return self._molecule
+
+    @molecule.setter
+    def molecule(self, value):
+        if not check.is_string(value):
+            raise TypeError(f"Value {value} (type {type(value)}) is not a string.")
+        self._molecule = value
 
     @property
     def equation(self) -> str:

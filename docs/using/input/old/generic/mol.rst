@@ -7,11 +7,13 @@ mol
 
    Some versions of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
 
+   .. currentmodule::  apbs.input_file.calculate
 
-   * Nonpolar calculations:
-      .. currentmodule:: apbs.input_file.calculate.nonpolar
+   * Nonpolar calculations: see :func:`nonpolar.Nonpolar.molecule` for more information.
 
-      See :func:`Nonpolar.molecule` for more information.
+   * Finite difference Poisson-Boltzmann calculations: see :func:`finite_difference.FiniteDifference.molecule` for more information.
+
+.. todo:: port for other calculation types
 
 This term specifies the molecule for which the calculation is to be performed.
 The syntax is:
