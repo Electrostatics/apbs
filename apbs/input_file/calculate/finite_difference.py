@@ -715,6 +715,7 @@ class FiniteDifference(InputFile):
     * ``solvent dielectric``:  see :func:`solvent_dielectric`
     * ``solvent radius``:  see :func:`solvent_radius`
     * ``surface method``:  see :func:`surface_method`
+    * ``surface spline window``:  see :func:`surface_spline_window`
 
     .. todo:: finish this
     """
@@ -734,7 +735,27 @@ class FiniteDifference(InputFile):
         self._solvent_dielectric = None
         self._solvent_radius = None
         self._surface_method = None
+        self._surface_spline_window = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    @property
+    def surface_spline_window(self) -> float:
+        """Window for spline-based surface definitions.
+
+        This is the distance (in Å) over which the spline transitions from the
+        solvent dielectric value to the solute dielectric value.  A typical
+        value is 0.3 Å.
+
+        :returns:  positive number
+        :raises TypeError:  if not a positive number
+        """
+        return self._surface_spline_window
+
+    @surface_spline_window.setter
+    def surface_spline_window(self, value):
+        if not check.is_positive_definite(value):
+            raise TypeError(f"Value {value} is not a positive number.")
+        self._surface_spline_window = value
 
     @property
     def surface_method(self) -> str:
