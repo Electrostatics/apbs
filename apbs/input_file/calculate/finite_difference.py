@@ -707,11 +707,13 @@ class FiniteDifference(InputFile):
     * ``charge discretization``:  method used to map charges onto the grid; see
       :func:`charge_discretization`
     * ``error tolerance``:  solver error tolerance; see :func:`error_tolerance`
-    * ``equation``:  what version of the Poisson-Boltzmann equation to solve; see :func:`equation`
+    * ``equation``:  what version of the Poisson-Boltzmann equation to solve;
+      see :func:`equation`
     * ``ions``:  information about mobile ion species; see :func:`ions`
     * ``molecule``:  alias to molecule for calculation; see :func:`molecule`
     * ``solute dielectric``:  see :func:`solute_dielectric`
     * ``solvent dielectric``:  see :func:`solvent_dielectric`
+    * ``solvent radius``:  see :func:`solvent_radius`
 
     .. todo:: finish this
     """
@@ -729,7 +731,28 @@ class FiniteDifference(InputFile):
         self._molecule = None
         self._solute_dielectric = None
         self._solvent_dielectric = None
+        self._solvent_radius = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    @property
+    def solvent_radius(self) -> float:
+        """Radius of the solvent molecules.
+
+        This parameter is used to define various solvent-related surfaces and
+        volumes (see :func:`surface_method`). This value is usually set to 1.4
+        Å for a water-like molecular surface and set to 0 Å for a van der Waals
+        surface.
+
+        :raises ValueError:  if value is not a non-negative number
+        """
+        return self._solvent_radius
+
+    @solvent_radius.setter
+    def solvent_radius(self, value):
+        if check.is_positive_semidefinite(value):
+            self._solvent_radius = value
+        else:
+            raise ValueError(f"{value} is not a non-negative number.")
 
     @property
     def solvent_dielectric(self) -> float:
