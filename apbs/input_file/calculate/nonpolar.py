@@ -280,7 +280,9 @@ class Nonpolar(InputFile):
         This is a string with a value of:
 
         * ``solvent-accessible``:  solvent-accessible (also called
-          "probe-inflated") surface and volume
+            "probe-inflated") surface and volume.  See Connolly ML, J Appl
+            Crystallography 16 548-558, 1983 (`10.1107/S0021889883010985
+            <https://doi.org/10.1107/S0021889883010985>`_).
 
         :raises ValueError:  if surface method is not a valid value
         :raises TypeError:  if surface method is not a string

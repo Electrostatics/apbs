@@ -714,6 +714,7 @@ class FiniteDifference(InputFile):
     * ``solute dielectric``:  see :func:`solute_dielectric`
     * ``solvent dielectric``:  see :func:`solvent_dielectric`
     * ``solvent radius``:  see :func:`solvent_radius`
+    * ``surface method``:  see :func:`surface_method`
 
     .. todo:: finish this
     """
@@ -732,7 +733,81 @@ class FiniteDifference(InputFile):
         self._solute_dielectric = None
         self._solvent_dielectric = None
         self._solvent_radius = None
+        self._surface_method = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    @property
+    def surface_method(self) -> str:
+        """Method used to defined solute-solvent interface.
+
+        One of the following values:
+
+        * ``molecular surface``:  The dielectric coefficient is defined based on
+          a molecular surface definition. The problem domain is
+          divided into two spaces. The "free volume" space is defined by the
+          union of solvent-sized spheres (see :func:`solvent_radius`) which do
+          not overlap with the solute atoms. This free volume is assigned bulk
+          solvent dielectric values. The complement of this space is assigned
+          solute dielectric values. When the solvent radius is set to zero,
+          this method corresponds to a van der Waals surface definition. The
+          ion-accessibility coefficient is defined by an "inflated" van der
+          Waals model. Specifically, the radius of each biomolecular atom is
+          increased by the radius of the ion species (as specified with the
+          :func:`ion` property). The problem domain is then divided into two
+          spaces. The space inside the union of these inflated atomic spheres
+          is assigned an ion-accessibility value of 0; the complement space is
+          assigned the bulk ion accessibility value. See Connolly ML, J Appl
+          Crystallography 16 548-558, 1983 (`10.1107/S0021889883010985
+          <https://doi.org/10.1107/S0021889883010985>`_).
+
+        * ``smoothed molecular surface``:  The dielectric and ion-accessibility
+          coefficients are defined as for the ``molecular surface`` (see
+          above). However, they are then "smoothed" by a 9-point harmonic
+          averaging to somewhat reduce sensitivity to the grid setup. See
+          Bruccoleri et al. J Comput Chem 18 268-276, 1997
+          (`10.1007/s00214-007-0397-0
+          <http://dx.doi.org/10.1007/s00214-007-0397-0>`_).
+
+        * ``cubic spline``:  The dielectric and ion-accessibility coefficients
+          are defined by a cubic-spline surface as described by Im et al,
+          Comp Phys Commun 111 (1-3) 59-75, 1998
+          (`10.1016/S0010-4655(98)00016-2
+          <https://doi.org/10.1016/S0010-4655(98)00016-2>`_). The width of the
+          dielectric interface is controlled by the :func:`spline_window`
+          property. These spline-based surface definitions are very stable
+          with respect to grid parameters and therefore ideal for calculating
+          forces. However, they require substantial reparameterization of the
+          force field; interested users should consult Nina et al, Biophys
+          Chem 78 (1-2) 89-96, 1999 (`10.1016/S0301-4622(98)00236-1
+          <http://dx.doi.org/10.1016/S0301-4622(98)00236-1>`_). Additionally,
+          these surfaces can generate unphysical results with non-zero ionic
+          strengths.
+
+        * ``septic spline``: The dielectric and ion-accessibility coefficients
+          are defined by a 7th order polynomial. This surface definition has
+          characteristics similar to the cubic spline, but provides higher
+          order continuity necessary for stable force calculations with atomic
+          multipole force fields (up to quadrupole).
+
+        :raises TypeError:  if not set to a string
+        :raises ValueError:  if set to invalid value
+        """
+        return self._surface_method
+
+    @surface_method.setter
+    def surface_method(self, value):
+        if not check.is_string(value):
+            raise TypeError(
+                f"Value {value} (type {type(value)} is not a string."
+            )
+        value = value.lower()
+        if value not in [
+            "molecular surface",
+            "smoothed molecular surface",
+            "cubic spline",
+            "septic spline",
+        ]:
+            raise ValueError(f"Value {value} is an invalid surface method.")
 
     @property
     def solvent_radius(self) -> float:
@@ -838,11 +913,14 @@ class FiniteDifference(InputFile):
         solve:
 
         * Most users should use one of these:
-            * ``linearized pbe``
-            * ``nonlinear pbe``
+
+          * ``linearized pbe``
+          * ``nonlinear pbe``
+
         * These versions are experimental and unstable:
-            * ``linearized regularized pbe``
-            * ``nonlinear regularized pbe``
+
+          * ``linearized regularized pbe``
+          * ``nonlinear regularized pbe``
 
         :raises TypeError:  if not set to a string.
         :raises ValueError:  if set to an invalid value
