@@ -22,6 +22,7 @@ class Ion(InputFile):
     * ``concentration``:  concentration of ion species; see :func:`concentration`
 
     """
+
     def __init__(self, dict_=None, json=None, yaml=None):
         self._charge = None
         self._radius = None
@@ -30,9 +31,9 @@ class Ion(InputFile):
 
     def to_dict(self) -> dict:
         return {
-            "charge":  self.charge,
-            "radius":  self.radius,
-            "concentration":  self.concentration
+            "charge": self.charge,
+            "radius": self.radius,
+            "concentration": self.concentration,
         }
 
     def from_dict(self, dict_):
@@ -109,6 +110,7 @@ class MobileIons(InputFile):
     * ``species``:  list of ion species; see :func:`species`
 
     """
+
     def __init__(self, dict_=None, json=None, yaml=None):
         self._species = []
         super().__init__(dict_=dict_, yaml=yaml, json=json)
@@ -142,15 +144,13 @@ class MobileIons(InputFile):
             self._species.append(Ion(dict_=elem))
 
     def to_dict(self) -> dict:
-        return {
-            "species": [elem.to_dict() for elem in self.species]
-        }
+        return {"species": [elem.to_dict() for elem in self.species]}
 
     def validate(self):
         net_charge = 0.0
         for ion in self.species:
             ion.validate()
-            net_charge += (ion.charge * ion.concentration)
+            net_charge += ion.charge * ion.concentration
         if net_charge != 0.0:
             raise ValueError(
                 f"The net mobile ion charge ({net_charge} e) is not zero."

@@ -86,9 +86,9 @@ class GridDimensions(InputFile):
 
     def to_dict(self):
         return {
-            "counts":  self._counts,
-            "lengths":  self._lengths,
-            "spacings":  self._spacings
+            "counts": self._counts,
+            "lengths": self._lengths,
+            "spacings": self._spacings,
         }
 
     def validate(self):
@@ -130,7 +130,9 @@ class GridDimensions(InputFile):
         """
         if max_level is None:
             max_level = int(log2(target))
-        _LOGGER.debug(f"Finding count for target = {target}, min_level = {min_level}, max_level = {max_level}.")
+        _LOGGER.debug(
+            f"Finding count for target = {target}, min_level = {min_level}, max_level = {max_level}."
+        )
         best_n = 2 ** min_level + 1
         best_c = 1
         best_p = min_level
@@ -333,10 +335,7 @@ class GridCenter(InputFile):
             self.position = position
 
     def to_dict(self) -> dict:
-        return {
-            "molecule":  self.molecule,
-            "position":  self.position
-        }
+        return {"molecule": self.molecule, "position": self.position}
 
     def validate(self):
         if self.molecule is None and self.position is None:
@@ -805,7 +804,9 @@ class FiniteDifference(InputFile):
     @molecule.setter
     def molecule(self, value):
         if not check.is_string(value):
-            raise TypeError(f"Value {value} (type {type(value)}) is not a string.")
+            raise TypeError(
+                f"Value {value} (type {type(value)}) is not a string."
+            )
         self._molecule = value
 
     @property
@@ -832,7 +833,12 @@ class FiniteDifference(InputFile):
                 f"Value {value} (type {type(value)}) is not a string."
             )
         value = value.lower()
-        if value not in [ "linearized pbe", "nonlinear pbe", "linearized regularized pbe", "nonlinear regularized pbe" ]:
+        if value not in [
+            "linearized pbe",
+            "nonlinear pbe",
+            "linearized regularized pbe",
+            "nonlinear regularized pbe",
+        ]:
             raise ValueError(f"Value {value} is invalid.")
         self._equation = value
 
@@ -847,7 +853,9 @@ class FiniteDifference(InputFile):
     @ions.setter
     def ions(self, value):
         if not isinstance(value, MobileIons):
-            raise TypeError(f"Value {value} (type {type(value)} is not an Ions object.")
+            raise TypeError(
+                f"Value {value} (type {type(value)} is not an Ions object."
+            )
         self._ions = value
 
     @property
