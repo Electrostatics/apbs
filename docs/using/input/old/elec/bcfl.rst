@@ -3,6 +3,12 @@
 bcfl
 ====
 
+.. note::  
+
+   Some versions of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
+   
+   * Finite difference boundary conditions; see :func:`apbs.input_file.calculate.finite_difference.FiniteDifference.boundary_condition`.
+
 Specifies the type of boundary conditions used to solve the Poisson-Boltzmann equation.
 The syntax is:
 
@@ -34,6 +40,6 @@ where ``flag`` is a text string that identifies the type of conditions to be use
   Specifying map allows a previously calculated potential map to be used in a new focusing calculation.
   A typical scenario is using the same coarse grid for multiple focusing calculations.
   A potential map can be written once from a coarse grid calculation, then used in subsequent runs to bypass the need to recalculate the coarse grid.
-  See the READ keyword pot (see :ref:`read`) and the attached example files for its use.
+  See the READ keyword pot (see :ref:`read_old_input`) and the attached example files for its use.
 
 

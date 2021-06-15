@@ -345,7 +345,7 @@ class GridCenter(InputFile):
     @property
     def molecule(self) -> str:
         """Alias for molecule used to center the finite difference grid.  See
-        :ref:`read_input_file` for more information on reading molecules into
+        :ref:`read_new_input` for more information on reading molecules into
         APBS.
 
         :returns:  alias for molecule at center
@@ -891,7 +891,7 @@ class FiniteDifference(InputFile):
 
         * ``map`` :c:var:`alias`:  Dirichlet condition where the potential
           values are read from an external map with alias :c:var:`alias` read
-          into APBS as described in :ref:`read_input_file`.
+          into APBS as described in :ref:`read_new_input`.
 
         :raises ValueError:  if set to an invalid boundary type
         :raise IndexError:  if an insufficient number of words are present

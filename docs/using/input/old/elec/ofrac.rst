@@ -3,6 +3,8 @@
 ofrac
 =====
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Specify the amount of overlap to include between the individual processors meshes in a parallel focusing calculation (:ref:`mgpara`).
 The syntax is:
 

@@ -3,6 +3,8 @@
 targetRes
 =========
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Specify the target resolution of the simplices in a finite element mesh (:ref:`femanual`).
 The syntax is:
 

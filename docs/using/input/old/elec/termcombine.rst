@@ -3,6 +3,8 @@
 termcombine
 ===========
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Combine multiple PB-(S)AM Brownian dynamics trajectory termination conditions (see :doc:`term`) via logic operators
 
 .. code-block:: bash

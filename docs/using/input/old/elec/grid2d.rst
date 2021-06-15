@@ -3,6 +3,8 @@
 grid2d
 ======
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Specify the filename and location of a 2D cross sectional potential to be written to.
 
 .. code-block:: bash

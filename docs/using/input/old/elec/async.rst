@@ -3,6 +3,8 @@
 async
 =====
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 An optional keyword to perform an asynchronous parallel focusing Poisson-Boltzmann equation.
 The syntax is
 

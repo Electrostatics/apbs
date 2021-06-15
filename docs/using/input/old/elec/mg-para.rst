@@ -3,6 +3,9 @@
 mg-para
 =======
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
+
 Automatically-configured parallel focusing multigrid Poisson-Boltzmann calculations.
 
 This calculation closely resembles :ref:`mgauto` in syntax.

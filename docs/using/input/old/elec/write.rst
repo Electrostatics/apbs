@@ -3,6 +3,8 @@
 write
 =====
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 This controls the output of scalar data calculated during the Poisson-Boltzmann run.
 This keyword can be repeated several times to provide various types of data output from APBS.
 The syntax is:
@@ -56,7 +58,7 @@ The syntax is:
     Write out the total mobile ion charge density for all ion species in units of e\ :sub:`c` M (multigrid only).
     The output is calculated according to the formula (for nonlinear PB calculations):  :math:`\rho(x) = \sum_i^N {\bar{\rho}_i q_i e^{-q_i\phi(x) - V_i (x)}}`, where *N* is the number of ion species, :math:`\bar{\rho}_i` is the bulk density of ion species *i*, :math:`q_i` is the charge of ion species *i*, :math:`\phi(x)` is the electrostatic potential, and :math:`V_i` is the solute-ion interaction potential for species *i*.
   ``dielx`` or ``diely`` or ``dielz``
-    Write out the dielectric map shifted by 1/2 grid spacing in the {x, y, z}-direction (see :ref:`read` ``diel``).
+    Write out the dielectric map shifted by 1/2 grid spacing in the {x, y, z}-direction (see :ref:`read_old_input` ``diel``).
     The values are unitless (multigrid only).
 
 ``format``

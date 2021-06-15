@@ -3,6 +3,8 @@
 swin
 ====
 
+.. todo::  move this keyword to the *new APBS syntax* (see :ref:`new_input_format`):
+
 Specify the size of the support (i.e., the rate of change) for spline-based surface definitions (see :ref:`elecsrfm`).
 The syntax is:
 

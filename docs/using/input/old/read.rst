@@ -1,7 +1,12 @@
-.. _read:
+.. _read_old_input:
 
 READ input file section
 =======================
+
+.. note::  
+
+   This section has been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+   See :ref:`read_new_input` for more information.
 
 The READ block of an APBS input file has the following general format:
 

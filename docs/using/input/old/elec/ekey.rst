@@ -3,6 +3,8 @@
 ekey
 ====
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Specify the method used to determine the error tolerance in the solve-estimate-refine iterations of the finite element solver (:ref:`femanual`).
 The syntax is:
 

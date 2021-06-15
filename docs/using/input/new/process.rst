@@ -1,3 +1,5 @@
+.. _process_new_input:
+
 =====================================
 Results processing section (optional)
 =====================================

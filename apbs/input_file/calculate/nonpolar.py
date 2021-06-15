@@ -68,7 +68,7 @@ class Nonpolar(InputFile):
     the solute and the solvent integrated over the region of the problem domain
     outside the solute volume *V*. Lennard-Jones parameters are taken from APBS
     parameter files as read in through an APBS input file READ statement (see
-    :ref:`read_input_file`).
+    :ref:`read_new_input`).
 
     .. note::
 

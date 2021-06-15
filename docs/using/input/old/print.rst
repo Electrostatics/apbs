@@ -3,6 +3,11 @@
 PRINT input file section
 ========================
 
+.. note::  
+
+   This section has been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+   See :ref:`process_new_input` for more information.
+
 This is a very simple section that allows linear combinations of calculated properties to be written to standard output.
 The syntax of this section is:
 

@@ -3,6 +3,9 @@
 mg-dummy
 ========
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
+
 Not a Poisson-Boltzmann calculation.
 Many calculations of surface and charge distribution properties which do not require solution of the PBE.
 

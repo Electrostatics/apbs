@@ -3,6 +3,8 @@
 diff
 ====
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Specify the diffusion coefficients for each molecule in the system for a PB-(S)AM Brownian dynamics calculation.
 
 .. code-block:: bash

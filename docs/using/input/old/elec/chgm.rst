@@ -3,6 +3,12 @@
 chgm
 ====
 
+. currentmodule:: apbs.input_file.calculate.finite_difference
+
+.. note::  
+
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`):  see :func:`Focus.charge_discretization` for more information.
+
 Specify the method by which the biomolecular point charges (i.e., Dirac delta functions) by which charges are mapped to the grid for a multigrid (:ref:`mgmanual`, :ref:`mgauto`, :ref:`mgpara`) Poisson-Boltzmann calculation.
 As we are attempting to model delta functions, the support (domain) of these discretized charge distributions is always strongly dependent on the grid spacing.
 The syntax is:

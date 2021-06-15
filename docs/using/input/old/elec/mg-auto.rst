@@ -3,6 +3,8 @@
 mg-auto
 =======
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Automatically configured finite difference Poisson-Boltzmann calculations.
 
 This multigrid calculation automatically sets up and performs a string of single-point PBE calculations to "focus" on a region of interest (binding site, etc.) in a system.

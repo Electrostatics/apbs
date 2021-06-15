@@ -3,6 +3,12 @@
 ion
 ===
 
+.. note::
+
+   .. currentmodule:: apbs.input_file.calculate.generic
+
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see :class:`MobileIons` for more information.
+
 Specify the bulk concentrations of mobile ion species present in the system.
 This command can be repeated as necessary to specify multiple types of ions; however, only the largest ionic radius is used to determine the ion-accessibility function.
 The total bulk system of ions must be electroneutral which means the charge densities/concentrations of positive and negative ions must be equal.

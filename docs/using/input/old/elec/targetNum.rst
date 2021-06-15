@@ -3,6 +3,8 @@
 targetNum
 =========
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Specify the target number of vertices in the initial finite element mesh for :ref:`femanual` calculations.
 The syntax is:
 

@@ -3,6 +3,8 @@
 units
 =====
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Specify the units for energy/force/potential output in PB-(S)AM calculations:
 
 .. code-block:: bash

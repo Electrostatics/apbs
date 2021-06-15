@@ -3,6 +3,8 @@
 pbsam-auto
 ==========
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 PB-SAM is a semi-analytical solution to the linearized Poisson-Boltzmann equation for multiple molecules of arbitrary charge distribution in an ionic solution.
 The solution is an extension of the :ref:`analytical method <pbamauto>`, leveraging fast-multipole methods as well as boundary elements.
 Each molecule is coarse-grained as a system of overlapping spheres, whose surface charges are represented by multipole expansions.

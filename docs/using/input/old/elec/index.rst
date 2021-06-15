@@ -3,6 +3,14 @@
 ELEC input file section
 =======================
 
+.. note::
+
+   Some versions of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
+
+   * :ref:`finite_difference`
+
+.. todo:: port other versions of command
+
 The ELEC block of an APBS input file is used for polar solvation (electrostatics) calculations and has the following syntax:
 
 .. code-block:: bash

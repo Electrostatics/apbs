@@ -3,6 +3,8 @@
 glen
 ====
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Specify the mesh domain lengths for multigrid :ref:`mgmanual` calculations.
 These lengths may be different in each direction.
 The syntax is:

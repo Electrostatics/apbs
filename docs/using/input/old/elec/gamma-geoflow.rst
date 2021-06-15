@@ -1,6 +1,8 @@
 gamma
 =====
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 This keyword specifies the surface tension coefficient for apolar solvation models.
 
 .. code-block:: bash

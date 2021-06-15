@@ -3,6 +3,8 @@
 tree_order
 ==========
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 TABI-PB parameter that specifies the order of the treecode multipole expansion.
 The syntax is:
 

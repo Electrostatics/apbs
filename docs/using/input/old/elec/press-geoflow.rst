@@ -1,6 +1,8 @@
 press
 =====
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 This term specifies the solvent pressure in kJ mol\ :superscript:`-1` Å\ :superscript:`-3`.
 This coefficient multiplies the volume term of the apolar model and can be set to zero to eliminate volume contributions to the apolar solvation calculation.
 The syntax is:

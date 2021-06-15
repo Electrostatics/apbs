@@ -3,6 +3,8 @@
 nrpbe
 =====
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Specifies that the nonlinear form of the regularized Poisson-Boltzmann equation (RPBE) should be solved.
 The regularized PBE equation replaces the point charge distribution with the corresponding Green's function.
 As a result of this replacement, the solution corresponds to the reaction field instead of the total potential; the total potential can be recovered by adding the appropriate Coulombic terms to the solution.

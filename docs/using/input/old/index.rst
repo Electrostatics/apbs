@@ -14,14 +14,18 @@ Specific examples of APBS input are provided in :ref:`examples`.
 
 APBS input files contain three basic sections which can be repeated any number of times:
 
-:ref:`read`
-  section for specifying input
-:ref:`elec`
-  section for specifying polar solvation (electrostatics) calculation parameters
-:ref:`apolar`
-  section for specifying apolar solvation calculation parameters
-:ref:`print`
-  section for specifying summary output
+* :ref:`read_old_input`:
+  Section for specifying data-reading input.
+  For the *new APBS syntax*, see :ref:`read_new_input`.
+* :ref:`elec`:
+  Section for specifying polar solvation (electrostatics) calculation parameters.
+  For the *new APBS syntax*, see :ref:`calculate_new_input`.
+* :ref:`apolar`:
+  Section for specifying apolar solvation calculation parameters.
+  For the *new APBS syntax*, see :ref:`nonpolar_new_input`.
+* :ref:`print`:
+  Section for specifying summary output.
+  For the *new APBS syntax*, see :ref:`process_new_input`.
 
 The APBS input file is constructed from these sections in the following format:
 

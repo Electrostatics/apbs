@@ -3,6 +3,13 @@
 fgcent
 ======
 
+.. currentmodule:: apbs.input_file.calculate.finite_difference
+
+.. note::  
+
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`):  see :func:`Focus.fine_grid_center` for more information.
+
+
 Specify the center of the fine grid (in a focusing calculation) based on a molecule's center or absolute coordinates for :ref:`mgpara` and :ref:`mgauto` multigrid calculations.
 The syntax is:
 
@@ -13,7 +20,7 @@ The syntax is:
 where a user can specify **either**
 
 ``mol {id}``
-  Center the grid on molecule with integer ID id; as assigned in the READ section (see :ref:`read`) of the input file.
+  Center the grid on molecule with integer ID id; as assigned in the READ section (see :ref:`read_old_input`) of the input file.
   Molecule IDs are assigned in the order they are read, starting at 1.
 
 **or** the user can specify

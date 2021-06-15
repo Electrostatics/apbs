@@ -3,6 +3,8 @@
 mesh
 ====
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 TABI-PB parameter that spceifies the meshing software used to generate surface mesh.
 The syntax is:
 

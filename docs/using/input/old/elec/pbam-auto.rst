@@ -3,6 +3,8 @@
 pbam-auto
 =========
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 PB-AM is an analytical solution to the linearized Poisson-Boltzmann equation for multiple spherical objects of arbitrary charge distribution in an ionic solution.
 More details on the method are available in `Lotan, Head-Gordon (2006) <http://pubs.acs.org/doi/full/10.1021/ct050263p>`_.
 The physical calculations are uses to perform various actions on a system of molecules such as calculation of energies, forces, torques, electrostatic potentials, and Brownian dynamics schemes.

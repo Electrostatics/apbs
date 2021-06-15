@@ -3,6 +3,16 @@
 etol
 ====
 
+.. currentmodule:: apbs.input_file.calculate.finite_difference
+
+.. note::  
+
+   Some versions of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
+
+   * For a finite difference calculation, see :func:`Focus.coarse_grid_dimensions` for more information.
+
+.. todo::  add documentation links for other instances.
+
 Specifies the tolerance for iterations of the partial differntial equation solvers:
 The syntax is:
 

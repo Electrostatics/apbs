@@ -3,6 +3,8 @@
 runtype
 =======
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Indicate what type of calculation you would like to run with the PB-(S)AM model.
 
 .. code-block:: bash

@@ -3,6 +3,8 @@
 outdata
 =======
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 TABI-PB parameter that specifies the file type for printing the output data.
 The syntax is:
 

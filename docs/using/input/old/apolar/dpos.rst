@@ -3,6 +3,12 @@
 dpos
 ====
 
+.. currentmodule:: apbs.input_file.calculate.nonpolar
+
+.. note::  
+
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`):  see :func:`Nonpolar.displacement` for more information.
+
 This is the displacement used for finite-difference-based calculations of surface area derivatives.
 I know, this is a terrible way to calculate surface area derivatives -- we're working on replacing it with an analytic version.
 In the meantime, please use this parameter with caution.

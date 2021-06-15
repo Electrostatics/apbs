@@ -3,6 +3,8 @@
 pbc
 ===
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 This keyword is used to indicate if 3D periodic boundary conditions (PBCs) will be used in a PB-(S)AM calculation.
 If used, a box length must also be specified, in Ångstroms.
 

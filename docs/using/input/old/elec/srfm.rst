@@ -3,6 +3,8 @@
 srfm (elec)
 ===========
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Specify the model used to construct the dielectric and ion-accessibility coefficients.
 The syntax for this command is:
 

@@ -3,6 +3,16 @@
 calcenergy
 ==========
 
+.. note::  
+
+   Some versions of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
+
+
+   * Nonpolar calculations:
+      .. currentmodule:: apbs.input_file.calculate.nonpolar
+
+      See :func:`Nonpolar.calculate_energy` for more information.
+
 This optional keyword controls energy output from an apolar solvation calculation.
 The syntax is:
 

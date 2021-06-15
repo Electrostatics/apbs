@@ -3,6 +3,8 @@
 geoflow-auto
 ============
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 To increase the accuracy of our implicit solvent modeling, we have implemented a differential geometry based geometric flow
 solvation model `(Thomas, 2013) <https://www.ncbi.nlm.nih.gov/pubmed/23212974>`_.
 In this model, polar and nonpolar solvation free energies are coupled and the solvent-solute boundary is determined in a self-consistent manner.

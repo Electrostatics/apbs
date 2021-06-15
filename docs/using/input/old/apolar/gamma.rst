@@ -3,6 +3,12 @@
 gamma
 =====
 
+.. currentmodule:: apbs.input_file.calculate.nonpolar
+
+.. note::  
+
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`):  see :func:`Nonpolar.surface_tension` for more information.
+
 This keyword specifies the surface tension coefficient for apolar solvation models.
 
 .. code-block:: bash

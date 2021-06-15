@@ -3,6 +3,8 @@
 tabi
 ==========
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 This mode uses the TABI-PB integral equation software from Geng and Krasny to solve the linearized Poisson-Boltmzann equation. 
 Boundary element methods offer the ability to focus numerical effort on a much smaller region of the problem domain:  the interface between the molecule and the solvent.
 In this method, two coupled integral equations defined on the solute-solvent boundary define a mathematical relationship between the electrostatic surface potential and its normal derivative with a set of integral kernels consisting of Coulomb and screened Coulomb potentials with their normal derivatives.

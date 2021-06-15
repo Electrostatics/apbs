@@ -3,6 +3,8 @@
 pdime
 =====
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Specify the processor array to be used in a parallel focusing (:ref:`mgpara`) calculation.
 The syntax is:
 

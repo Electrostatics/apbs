@@ -3,6 +3,8 @@
 fe-manual
 =========
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Manually-configured adaptive finite element Poisson-Boltzmann calculations.
 
 This is a single-point PBE calculation performed by our adaptive finite element PBE solver.

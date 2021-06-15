@@ -3,6 +3,8 @@
 gcent
 ======
 
+.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+
 Specify the center of the grid based on a molecule's center or absolute coordinates :ref:`mgmanual` multigrid calculations.
 The syntax is:
 
@@ -13,7 +15,7 @@ The syntax is:
 where a user can specify **either**
 
 ``mol {id}``
-  Center the grid on molecule with integer ID id; as assigned in the READ section (see :ref:`read`) of the input file.
+  Center the grid on molecule with integer ID id; as assigned in the READ section (see :ref:`read_old_input`) of the input file.
   Molecule IDs are assigned in the order they are read, starting at 1.
 
 **or** the user can specify
