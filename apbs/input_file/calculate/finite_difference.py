@@ -708,6 +708,7 @@ class FiniteDifference(InputFile):
     * ``charge discretization``:  method used to map charges onto the grid; see
       :func:`charge_discretization`
     * ``error tolerance``:  solver error tolerance; see :func:`error_tolerance`
+    * ``equation``:  what version of the Poisson-Boltzmann equation to solve; see :func:`equation`
     * ``ions``:  information about mobile ion species; see :func:`ions`
 
     .. todo:: finish this
@@ -721,8 +722,37 @@ class FiniteDifference(InputFile):
         self._calculation_parameters = None
         self._charge_discretization = None
         self._error_tolerance = None
+        self._equation = None
         self._ions = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    @property
+    def equation(self) -> str:
+        """Specifies which version of the Poisson-Boltzmann equation (PBE) to
+        solve:
+
+        * Most users should use one of these:
+            * ``linearized pbe``
+            * ``nonlinear pbe``
+        * These versions are experimental and unstable:
+            * ``linearized regularized pbe``
+            * ``nonlinear regularized pbe``
+
+        :raises TypeError:  if not set to a string.
+        :raises ValueError:  if set to an invalid value
+        """
+        return self._equation
+
+    @equation.setter
+    def equation(self, value):
+        if not check.is_string(value):
+            raise TypeError(
+                f"Value {value} (type {type(value)}) is not a string."
+            )
+        value = value.lower()
+        if value not in [ "linearized pbe", "nonlinear pbe", "linearized regularized pbe", "nonlinear regularized pbe" ]:
+            raise ValueError(f"Value {value} is invalid.")
+        self._equation = value
 
     @property
     def ions(self) -> MobileIons:
