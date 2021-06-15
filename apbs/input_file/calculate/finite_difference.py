@@ -692,6 +692,74 @@ class Focus(InputFile):
         self._fine_grid_center = value
 
 
+class UseMap(InputFile):
+    """Use a previously read in map.
+
+    Objects can be initialized with dictionary/JSON/YAML data with the
+    following keys:
+
+    * ``property``:  what property are loading from the map; see
+      :func:`property`
+    * ``alias``:  alias assigned when reading in map; see :func:`alias`
+
+    """
+    def __init__(self, dict_, yaml, json):
+        self._property = None
+        self._alias = None
+        super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    @property
+    def property(self) -> str:
+        """Specify the property being read from the map.
+
+        One of the following values:
+
+        * ``dielectric``: Dielectric function map (as read in
+          :ref:`read_new_input`); this causes the
+          :func:`FiniteDifference.solute_dielectric`,
+          :func:`FiniteDifference.solvent_dielectric`,
+          :func:`FiniteDifference.solvent_radius`,
+          :func:`FiniteDifference.surface_method`, and
+          :func:`FiniteDifference.surface spline window` properties to be
+          ignored, along with the radii of the solute atoms.
+          Note that :func:`FiniteDifference.solute_dielectric` and
+          :func:`FiniteDifference.solvent_dielectric` are still used for some
+          boundary condition calculations (see
+          :func:`FiniteDifference.boundary_condition`)
+
+        * ``ion accessibility``:  Mobile ion-accessibility function map (as read
+          in :ref:`read_new_input`); this causes the
+          :func:`FiniteDifference.surface_method`, and
+          :func:`FiniteDifference.surface spline window` properties to be
+          ignored, along with the radii of the solute atoms.  The
+          :func:`FiniteDifference.ions` property is not ignored and will still
+          be used.
+
+        * ``charge density``:  Charge distribution map (as read in
+          :ref:`read_new_input`); this causes the :func:`charge discretization`
+          parameter and the charges of the biomolecular atoms to be ignored when
+          assembling the fixed charge distribution for the Poisson-Boltzmann
+          equation.
+
+        * ``potential``:  Potential map (as read in :ref:`read_new_input`); this
+          option requires setting :func:`FiniteDifference.boundary_condition` to
+          ``map`` :c:var:`alias`, where :c:var:`alias` is the alias assigned to
+          the map when read in.
+
+        :raises TypeError:  if not string
+        :raises ValueError:  if not valid value
+        """
+        return self._property
+
+    @property.setter
+    def property(self, value):
+        if not check.is_string(value):
+            raise TypeError(f"Value {value} (type {type(value)}) is not a string.")
+        value = value.lower()
+        if value not in ["dielectric", "ion accessibility", "charge density", "potential"]:
+            raise ValueError(f"Value {value} is not valid.")
+        self._property = value
+
 class FiniteDifference(InputFile):
     """Parameters for a finite-difference polar solvation Poisson-Boltzmann
     calculation.
@@ -717,6 +785,7 @@ class FiniteDifference(InputFile):
     * ``surface method``:  see :func:`surface_method`
     * ``surface spline window``:  see :func:`surface_spline_window`
     * ``temperature``:  see :func:`temperature`
+    * ``use map``:  see :func:`use_map`
 
     .. todo:: finish this
     """
@@ -738,7 +807,26 @@ class FiniteDifference(InputFile):
         self._surface_method = None
         self._surface_spline_window = None
         self._temperature = None
+        self._use_map = []
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    @property
+    def use_map(self) -> list:
+        """Information for (optionally) using maps read into APBS.
+
+        :returns:  list of :class:`UseMap` objects
+        :raises TypeError:  if not a list of :class:`UseMap` objects
+        """
+        return self._use_map
+
+    @use_map.setter
+    def use_map(self, value):
+        if not check.is_list(value):
+            raise TypeError(f"Value {value} (type {type(value)}) is not a list.")
+        for elem in value:
+            if not isinstance(elem, UseMap):
+                raise TypeError(f"List contains element {elem} of type {type(elem)}.")
+            self._use_map.append(elem)
 
     @property
     def temperature(self) -> float:

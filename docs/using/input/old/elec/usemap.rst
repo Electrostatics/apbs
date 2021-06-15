@@ -3,7 +3,15 @@
 usemap
 ======
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. note::
+
+   .. currentmodule::  apbs.input_file.calculate.finite_difference
+
+   Some instances of this keyword have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
+
+   * Finite difference calculations:  see :class:`UseMap`
+
+  .. todo::  Port other uses to new syntax.
 
 Specify pre-calculated coefficient maps to be used in the Poisson-Boltzmann calculation.
 These must have been input via an earlier READ statement (see :ref:`read_old_input`).
