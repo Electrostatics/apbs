@@ -515,13 +515,14 @@ class Focus(InputFile):
 
     Focusing is a method for solving the Poisson-Boltzmann equation in a finite
     difference setting. Some of the earliest references to this method are from
-    Gilson and Honig [#Gilson]_. The method starts by solving the equation on a
-    coarse grid (i.e., few grid points) with large dimensions (i.e., grid
-    lengths). The solution on this coarse grid is then used to set the
-    Dirichlet boundary condition values for a smaller problem domain -- and
-    therefore a finer grid -- surrounding the region of interest. The finer
-    grid spacing in the smaller problem domain often provides greater accuracy
-    in the solution.
+    Gilson and Honig
+    (DOI:`10.1038/330084a0 <http://dx.doi.org/10.1038/330084a0>`_). The method
+    starts by solving the equation on a coarse grid (i.e., few grid points) with
+    large dimensions (i.e., grid lengths). The solution on this coarse grid is
+    then used to set the Dirichlet boundary condition values for a smaller
+    problem domain -- and therefore a finer grid -- surrounding the region of
+    interest. The finer grid spacing in the smaller problem domain often
+    provides greater accuracy in the solution.
 
     .. note::
 
@@ -562,10 +563,6 @@ class Focus(InputFile):
       information.
 
     .. todo:: finish this
-
-    .. [#Gilson] Gilson MK and Honig BH, Calculation of electrostatic
-       potentials in an enzyme active site. Nature, 1987. 330(6143): p. 84-6.
-       DOI:`10.1038/330084a0 <http://dx.doi.org/10.1038/330084a0>`_
     """
 
     def __init__(self, dict_, yaml, json):
@@ -636,7 +633,8 @@ class Focus(InputFile):
     def coarse_grid_length(self, value):
         if not isinstance(value, GridDimensions):
             raise TypeError(
-                f"Value {value} is type {type(value)} rather than GridDimensions."
+                f"Value {value} is type {type(value)} rather than "
+                f"GridDimensions."
             )
         self._coarse_grid_dimensions = value
 
@@ -698,11 +696,12 @@ class UseMap(InputFile):
     Objects can be initialized with dictionary/JSON/YAML data with the
     following keys:
 
-    * ``property``:  what property are loading from the map; see
+    * ``property``:  what property being loaded from the map; see
       :func:`property`
     * ``alias``:  alias assigned when reading in map; see :func:`alias`
 
     """
+
     def __init__(self, dict_, yaml, json):
         self._property = None
         self._alias = None
@@ -754,11 +753,122 @@ class UseMap(InputFile):
     @property.setter
     def property(self, value):
         if not check.is_string(value):
-            raise TypeError(f"Value {value} (type {type(value)}) is not a string.")
+            raise TypeError(
+                f"Value {value} (type {type(value)}) is not a string."
+            )
         value = value.lower()
-        if value not in ["dielectric", "ion accessibility", "charge density", "potential"]:
+        if value not in [
+            "dielectric",
+            "ion accessibility",
+            "charge density",
+            "potential",
+        ]:
             raise ValueError(f"Value {value} is not valid.")
         self._property = value
+
+
+class WriteMap(InputFile):
+    """Write the specified property to a map.
+
+    Objects can be initialized with dictionary/JSON/YAML data with the
+    following keys:
+
+    * ``property``:  what property is being written to the map; see
+      :func:`property`
+    * ``format``:  output format; see :func:`format`
+    * ``path``:  a suggested path and file name for the map; see :func:`path`
+
+    """
+
+    def __init__(self, dict_, yaml, json):
+        self._property = None
+        self._alias = None
+        super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    @property
+    def property(self) -> str:
+        """Property to write to map.
+
+        See the documentation for a discussion of units for these properties.
+
+        One of:
+
+        * ``charge density``: Write out the biomolecular charge distribution in
+          units of :math:`e_c` (electron charge) per Å\\ :sup:`3`.
+
+        * ``potential``: Write out the electrostatic potential over the entire
+          problem domain in units of :math:`k_b \\, T \\, e_c^{-1}`.
+
+        * ``atom potential``:  Write out the electrostatic potential at each
+          atom location in units of :math:`k_b \\, T \\, e_c^{-1}`.
+
+        * ``solvent accessibility``:  Write out the solvent accessibility
+          defined by the molecular surface definition (see
+          :func:`FiniteDifference.surface_definition`). Values are unitless and
+          range from 0 (inaccessible) to 1 (accessible).
+
+        * ``ion accessibility``: Write out the inflated van der Waals-based ion
+          accessibility (see :func:`FiniteDifference.surface_definition`).
+          Values are unitless and range from 0 (inaccessible) to 1 (accessible).
+
+        * ``laplacian``: Write out the Laplacian of the potential
+          :math:`\\nabla^2 \\phi` in units of
+          k\\ :sub:`B` T e\\ :sub:`c`\\ :sup:`-1` Å\\ :sup:`-2`.
+
+        * ``energy density``:  Write out the "energy density"
+          :math:`-\\nabla \\cdot \\epsilon \\nabla \\phi` in units of
+          k\\ :sub:`B` T e\\ :sub:`c`\\ :sup:`-1` Å\\ :sup:`-2`.
+
+        * ``ion number density``:  Write out the total mobile ion number density
+          for all ion species in units of M. The output is calculated according
+          to the formula (for nonlinear PB calculations):  :math:`\\rho(x) =
+          \\sum_i^N {\\bar{\\rho}_i e^{-q_i\\phi(x) - V_i (x)}}`, where
+          :math:`N` is the number of ion species, :math:`\\bar{\\rho}_i` is the
+          bulk density of ion species :math:`i`, :math:`q_i` is the charge of
+          ion species :math:`i`, :math:`\\phi(x)` is the electrostatic
+          potential, and :math:`V_i` is the solute-ion interaction potential for
+          species :math:`i`.
+
+        * ``ion charge density``: Write out the total mobile ion charge density
+          for all ion species in units of e\\ :sub:`c` M. The output is
+          calculated according to the formula (for nonlinear PB calculations):
+          :math:`\\rho(x) = \\sum_i^N {\\bar{\\rho}_i q_i e^{-q_i\\phi(x) -
+          V_i(x)}}`, where :math:`N` is the number of ion species,
+          :math:`\\bar{\\rho}_i` is the bulk density of ion species :math:`i`,
+          :math:`q_i` is the charge of ion species :math:`i`, :math:`\\phi(x)`
+          is the electrostatic potential, and :math:`V_i` is the solute-ion
+          interaction potential for species :math:`i`.
+
+        * ``dielectric x`` or ``dielectric y`` or ``dielectric z``: Write out
+          the dielectric map shifted by 1/2 grid spacing in the {``x``, ``y``,
+          ``z``}-direction. The values are unitless.
+
+        :raises TypeError:  if not a string
+        :raises ValueError:  if invalid value
+        """
+        return self._property
+
+    @property.setter
+    def property(self, value):
+        if not check.is_string(value):
+            raise TypeError(
+                f"Value {value} (type {type(value)}) is not a string."
+            )
+        value = value.lower()
+        if value not in [
+            "charge density",
+            "potential",
+            "atom potential",
+            "solvent accessibility",
+            "ion accessibility",
+            "laplacian",
+            "energy density",
+            "ion number density",
+            "ion charge density",
+        ]:
+            raise ValueError(f"Property {value} is invalid.")
+        self._property = value
+
 
 class FiniteDifference(InputFile):
     """Parameters for a finite-difference polar solvation Poisson-Boltzmann
@@ -785,7 +895,10 @@ class FiniteDifference(InputFile):
     * ``surface method``:  see :func:`surface_method`
     * ``surface spline window``:  see :func:`surface_spline_window`
     * ``temperature``:  see :func:`temperature`
-    * ``use map``:  see :func:`use_map`
+    * ``use map``:  use input map for one or more properties of the system; see
+      :func:`use_map`
+    * ``write map``:  write out one or more properties of the system to a map;
+      see :func:`write_map`
 
     .. todo:: finish this
     """
@@ -808,6 +921,8 @@ class FiniteDifference(InputFile):
         self._surface_spline_window = None
         self._temperature = None
         self._use_map = []
+        self._write_map = []
+        raise NotImplementedError("NOT DONE WITH WRITE MAP!")
         super().__init__(dict_=dict_, yaml=yaml, json=json)
 
     @property
@@ -822,10 +937,14 @@ class FiniteDifference(InputFile):
     @use_map.setter
     def use_map(self, value):
         if not check.is_list(value):
-            raise TypeError(f"Value {value} (type {type(value)}) is not a list.")
+            raise TypeError(
+                f"Value {value} (type {type(value)}) is not a list."
+            )
         for elem in value:
             if not isinstance(elem, UseMap):
-                raise TypeError(f"List contains element {elem} of type {type(elem)}.")
+                raise TypeError(
+                    f"List contains element {elem} of type {type(elem)}."
+                )
             self._use_map.append(elem)
 
     @property
@@ -960,7 +1079,7 @@ class FiniteDifference(InputFile):
     def solvent_dielectric(self) -> float:
         """Solvent dielectric.
 
-        78.5 is a good choice for water at 25 C.
+        78.5 is a good choice for water at 298 K.
 
         :returns:  a floating point number greater than or equal to one
         :raises TypeError:  if not a number

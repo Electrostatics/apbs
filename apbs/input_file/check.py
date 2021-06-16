@@ -31,11 +31,14 @@ def is_string(value) -> bool:
     return isinstance(value, str)
 
 
-def is_list(value, length) -> bool:
-    """Is this value a non-string list-like objcet with the specified length?"""
+def is_list(value, length=None) -> bool:
+    """Is this value a non-string list-like object?  If length is not ``None``,
+    does the list have the specified length?"""
     if is_string(value):
         return False
-    return len(value) == length
+    if length is not None:
+        return len(value) == length
+    return True
 
 
 def is_bool(value) -> bool:

@@ -1,4 +1,4 @@
-.. _units:
+.. _units_pbsam:
 
 units
 =====

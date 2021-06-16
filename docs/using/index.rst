@@ -117,3 +117,14 @@ As an example of PDB2PQR and APBS integration with molecular mechanics sofware, 
 This library has enabled the integration of APBS with several molecular dynamics packages, including `NAMD <http://www.ks.uiuc.edu/Research/namd/>`_, `AMBER <http://ambermd.org/>`_, and `CHARMM <https://www.charmm.org/charmm/>`_.
 
 APBS is also used directly by Brownian dynamics software such as `SDA <https://mcm.h-its.org/sda/>`_ and `BrownDye <http://browndye.ucsd.edu/>`_.
+
+--------------
+Notes on units
+--------------
+
+APBS and PDB2PQR use a few different sets of units, explained in the following sections:
+
+.. toctree::
+   :maxdepth: 2
+
+   units

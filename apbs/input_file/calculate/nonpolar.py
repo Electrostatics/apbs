@@ -196,6 +196,8 @@ class Nonpolar(InputFile):
         be set to zero to eliminate volume contributions to the apolar
         solvation calculation.
 
+        See the documentation for a discussion of units for this property.
+
         :raises ValueError:  if not a non-negative number
         """
         return self._pressure
@@ -308,6 +310,8 @@ class Nonpolar(InputFile):
         in units of kJ mol\ :superscript:`-1` Å\ :superscript:`-2`. This term
         can be set to zero to eliminate the :abbr:`SASA (solvent-accessible
         surface area)` contributions to the apolar solvation calculations.
+
+        See the documentation for a discussion of units for this property.
 
         :raises ValueError:  if not a non-negative number
         """
