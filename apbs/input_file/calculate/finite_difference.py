@@ -1,6 +1,7 @@
 """Parameters for a finite-difference polar solvation calculation."""
 import logging
 from math import log2
+from typing import Type
 from .. import check
 from .. import InputFile
 from .generic import MobileIons
@@ -384,14 +385,66 @@ class Manual(InputFile):
     """Parameters specific to a manual finite-difference polar solvation
     Poisson-Boltzmann calculation.
 
+    Manually-configured finite difference multigrid Poisson-Boltzmann
+    calculations.
+
+    This is a standard single-point multigrid PBE calculation without focusing
+    or additional refinement. This :func:`FiniteDifference.calculation_type`
+    offers the most control of parameters to the user. Several of these
+    calculations can be strung together to perform focusing calculations by
+    judicious choice of the :func:`FiniteDifference.boundary_condition`
+    property; however, the setup of the focusing is not automated as it is in
+    the :class:`Focus` :func:`FiniteDifference.calculation_type`. Therefore,
+    this command should primarily be used by more experienced users.
+
     Objects can be initialized with dictionary/JSON/YAML data with the
     following keys:
 
-    .. todo:: finish this
+    * ``grid center``:  center of the grid, see :func:`grid_center`
+
+    * ``grid dimensions``:  dimensions of the grid, see :func:`grid_dimensions`
+
     """
 
     def __init__(self, dict_, yaml, json):
+        self._grid_center = None
+        self._grid_dimensions = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    @property
+    def grid_dimensions(self) -> GridDimensions:
+        """Dimensions of the grid in a focusing finite-difference
+        Poisson-Boltzmann calculation.
+
+        :raises TypeError:  if the value is not :class:`GridDimensions`.
+        """
+        return self._grid_dimensions
+
+    @grid_dimensions.setter
+    def grid_dimensions(self, value):
+        if not isinstance(value, GridDimensions):
+            raise TypeError(
+                f"Value {value} is type {type(value)} rather than "
+                f"GridDimensions."
+            )
+        self._grid_dimensions = value
+
+    @property
+    def grid_center(self) -> GridCenter:
+        """The center of the grid in a finite difference Poisson-Boltzmann
+        calculation.
+
+        :raises TypeError:  if not :class:`GridCenter` object
+        """
+        return self._grid_center
+
+    @grid_center.setter
+    def grid_center(self, value):
+        if not isinstance(value, GridCenter):
+            raise TypeError(
+                f"{value} (type {type(value)}) is not GridCenter type."
+            )
+        self._grid_center = value
 
 
 class ParallelFocus(InputFile):
@@ -562,7 +615,6 @@ class Focus(InputFile):
       :func:`parallel_parameters` and :class:`ParallelFocus` for more 
       information.
 
-    .. todo:: finish this
     """
 
     def __init__(self, dict_, yaml, json):
@@ -630,7 +682,7 @@ class Focus(InputFile):
         return self._coarse_grid_dimensions
 
     @coarse_grid_dimensions.setter
-    def coarse_grid_length(self, value):
+    def coarse_grid_dimensions(self, value):
         if not isinstance(value, GridDimensions):
             raise TypeError(
                 f"Value {value} is type {type(value)} rather than "
@@ -779,11 +831,61 @@ class WriteMap(InputFile):
     * ``path``:  a suggested path and file name for the map; see :func:`path`
 
     """
-
     def __init__(self, dict_, yaml, json):
         self._property = None
-        self._alias = None
+        self._format = None
+        self._path = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    @property
+    def path(self) -> str:
+        """Suggested path for writing results.
+
+        This path is only a suggestion; if parallel calculations are performed,
+        then the filename will be modified to include the processor number for
+        the output.
+
+        :raises TypeError:  if not set to string.
+        """
+        return self._path
+
+    @path.setter
+    def path(self, value):
+        if not check.is_string(value):
+            raise TypeError(
+                f"Value {value} (type {type(value)}) is not a string."
+            )
+        self._path = value
+
+    @property
+    def format(self) -> str:
+        """Format for writing output.
+
+        Allowed formats (see documentation for details) include:
+
+        * ``dx``:  OpenDX-format data. This is the preferred format for APBS
+          input/output.
+
+        * ``dx.gz``: GZipped OpenDX-format data.
+
+        * ``flat``: Write out data as a plain text file.
+
+        * ``uhbd``:  UHBD-format data.
+
+        :raises TypeError:  if not set to a strinng
+        :raises ValueError:  if invalid format specified
+        """
+        return self._format
+
+    @format.setter
+    def format(self, value):
+        if not check.is_string(value):
+            raise TypeError(
+                f"Value {value} (type {type(value)}) is not a string."
+            )
+        value = value.lower()
+        if value not in ["dx", "dx.gz", "flat", "uhbd"]:
+            raise ValueError(f"Value {value} is not an allowed format.")
 
     @property
     def property(self) -> str:
@@ -798,9 +900,6 @@ class WriteMap(InputFile):
 
         * ``potential``: Write out the electrostatic potential over the entire
           problem domain in units of :math:`k_b \\, T \\, e_c^{-1}`.
-
-        * ``atom potential``:  Write out the electrostatic potential at each
-          atom location in units of :math:`k_b \\, T \\, e_c^{-1}`.
 
         * ``solvent accessibility``:  Write out the solvent accessibility
           defined by the molecular surface definition (see
@@ -880,7 +979,8 @@ class FiniteDifference(InputFile):
     * ``boundary condition``:  :func:`boundary_condition`
     * ``calculate energy``:  see :func:`calculate_energy`
     * ``calculate forces``:  see :func:`calculate_forces`
-    * ``calculation type``:  see :func:`calculation_type`
+    * ``calculation type``:  see :func:`calculation_type` as well as
+      :class:`Focus` and :class:`Manual`
     * ``calculation parameters``:  see :func:`calculation_parameters`
     * ``charge discretization``:  method used to map charges onto the grid; see
       :func:`charge_discretization`
@@ -889,6 +989,7 @@ class FiniteDifference(InputFile):
       see :func:`equation`
     * ``ions``:  information about mobile ion species; see :func:`ions`
     * ``molecule``:  alias to molecule for calculation; see :func:`molecule`
+    * ``no-op``:  determine whether the solver should be run; see :func:`noop`
     * ``solute dielectric``:  see :func:`solute_dielectric`
     * ``solvent dielectric``:  see :func:`solvent_dielectric`
     * ``solvent radius``:  see :func:`solvent_radius`
@@ -897,6 +998,8 @@ class FiniteDifference(InputFile):
     * ``temperature``:  see :func:`temperature`
     * ``use map``:  use input map for one or more properties of the system; see
       :func:`use_map`
+    * ``write atom potentials``:  write out atom potentials; see
+      :func:`write_atom_potentials`
     * ``write map``:  write out one or more properties of the system to a map;
       see :func:`write_map`
 
@@ -914,6 +1017,7 @@ class FiniteDifference(InputFile):
         self._equation = None
         self._ions = None
         self._molecule = None
+        self._noop = False
         self._solute_dielectric = None
         self._solvent_dielectric = None
         self._solvent_radius = None
@@ -921,9 +1025,80 @@ class FiniteDifference(InputFile):
         self._surface_spline_window = None
         self._temperature = None
         self._use_map = []
-        self._write_map = []
-        raise NotImplementedError("NOT DONE WITH WRITE MAP!")
+        self._write_atom_potentials = None
+        self._write_map = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    @property
+    def noop(self) -> bool:
+        """Determine whether solver is run.
+
+        If set to ``True``, then skip running the solver but still calculate
+        coefficient maps, etc.
+
+        The default value of this property is ``False``.
+
+        :raises TypeError:  if not set to :class:`bool`
+        """
+        return self._noop
+
+    @noop.setter
+    def noop(self, value):
+        if not isinstance(value, bool):
+            raise TypeError(
+                f"Value {value} (type {type(value)}) is not a Boolean."
+            )
+
+    @property
+    def write_map(self) -> WriteMap:
+        """Write out maps related to computed properties.
+
+        See :class:`WriteMap` for more information.
+
+        :raises TypeError:  if set to wrong type
+        """
+        return self._write_map
+
+    @write_map.setter
+    def write_map(self, value):
+        if not isinstance(value, WriteMap):
+            raise TypeError(f"Value {value} is type {type(value)}.")
+        self._write_map = value
+
+    @property
+    def write_atom_potentials(self) -> str:
+        """Write out the electrostatic potential at each atom location.
+
+        Write out text file with potential at center of atom in units of
+        :math:`k_b \\, T \\, e_c^{-1}`.
+
+        .. note::
+
+           These numbers are meaningless by themselves due to the presence of
+           "self-energy" terms that are sensitive to grid spacing and position.
+           These numbers should be evaluated with respect to a reference
+           calculation:  the potentials from that reference calculation should
+           be subtracted from the target system.  For example, one calculation
+           might include a molecule with a heterogeneous dielectric coefficient
+           and the reference system might be exactly the same system setup but
+           with a homeogeneous dielectric coefficient.  If the results from the
+           reference calculation are substracted from the first calculation,
+           then the result will be a physically meaningful reaction field
+           potential. However, the results from the first and reference
+           calculations are meaningless by themselves.
+
+        :returns:  path to text file for writing atom potential values.
+        :raises TypeError:  if not set to string
+        """
+        return self._write_atom_potentials
+
+    @write_atom_potentials.setter
+    def write_atom_potentials(self, value):
+        if not check.is_string(value):
+            raise TypeError(
+                f"Value {value} (type {type(value)}) is not a string."
+            )
+        self._write_atom_potentials = value
 
     @property
     def use_map(self) -> list:

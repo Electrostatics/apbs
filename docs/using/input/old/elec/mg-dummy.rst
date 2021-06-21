@@ -3,7 +3,11 @@
 mg-dummy
 ========
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. currentmodule::  apbs.input_file.calculate.finite_difference
+
+.. note::
+   
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see :func:`FiniteDifference.noop` for more information.
 
 
 Not a Poisson-Boltzmann calculation.

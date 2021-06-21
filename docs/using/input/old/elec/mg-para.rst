@@ -3,7 +3,11 @@
 mg-para
 =======
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. currentmodule:: apbs.input_file.calculate.finite_difference
+
+.. note::
+
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see :func:`Focus.parallel` and :func:`FiniteDifference.calculation_type`.
 
 
 Automatically-configured parallel focusing multigrid Poisson-Boltzmann calculations.

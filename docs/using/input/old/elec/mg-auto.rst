@@ -3,7 +3,12 @@
 mg-auto
 =======
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. currentmodule:: apbs.input_file.calculate.finite_difference
+
+.. note::
+
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+   See :class:`FiniteDifference` and :class:`Focus` for more information.
 
 Automatically configured finite difference Poisson-Boltzmann calculations.
 
