@@ -178,3 +178,5 @@ def test_bad_grid_centers(dict_):
     with pytest.raises((TypeError, IndexError, ValueError)):
         center = GridCenter(dict_=dict_)
         center.validate()
+
+
