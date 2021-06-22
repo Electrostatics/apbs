@@ -925,11 +925,26 @@ class WriteMap(InputFile):
     * ``path``:  a suggested path and file name for the map; see :func:`path`
 
     """
-    def __init__(self, dict_, yaml, json):
+    def __init__(self, dict_=None, yaml=None, json=None):
         self._property = None
         self._format = None
         self._path = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    def from_dict(self, input_):
+        self.property = input_["property"]
+        self.format = input_["format"]
+        self.path = input_["path"]
+
+    def to_dict(self) -> dict:
+        return {
+            "property":  self.property,
+            "format":  self.format,
+            "path":  self.path
+        }
+
+    def validate(self):
+        pass
 
     @property
     def path(self) -> str:
@@ -980,6 +995,7 @@ class WriteMap(InputFile):
         value = value.lower()
         if value not in ["dx", "dx.gz", "flat", "uhbd"]:
             raise ValueError(f"Value {value} is not an allowed format.")
+        self._format = value
 
     @property
     def property(self) -> str:
@@ -1058,6 +1074,9 @@ class WriteMap(InputFile):
             "energy density",
             "ion number density",
             "ion charge density",
+            "dielectric x",
+            "dielectric y",
+            "dielectric z"
         ]:
             raise ValueError(f"Property {value} is invalid.")
         self._property = value
