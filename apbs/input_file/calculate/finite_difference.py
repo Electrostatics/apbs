@@ -887,9 +887,7 @@ class UseMap(InputFile):
           equation.
 
         * ``potential``:  Potential map (as read in :ref:`read_new_input`); this
-          option requires setting :func:`FiniteDifference.boundary_condition` to
-          ``map`` :c:var:`alias`, where :c:var:`alias` is the alias assigned to
-          the map when read in.
+          is used to set the boundary condition and causes the :func:`boundary_condition` property to be ignored.
 
         :raises TypeError:  if not string
         :raises ValueError:  if not valid value
@@ -1116,7 +1114,6 @@ class FiniteDifference(InputFile):
     * ``write map``:  write out one or more properties of the system to a map;
       see :func:`write_map`
 
-    .. todo:: finish this
     """
 
     def __init__(self, dict_, yaml, json):
@@ -1644,10 +1641,6 @@ class FiniteDifference(InputFile):
           their values are computed using the ``single sphere`` Debye-Hückel
           boundary condition (see above).
 
-        * ``map`` :c:var:`alias`:  Dirichlet condition where the potential
-          values are read from an external map with alias :c:var:`alias` read
-          into APBS as described in :ref:`read_new_input`.
-
         :raises ValueError:  if set to an invalid boundary type
         :raise IndexError:  if an insufficient number of words are present
         """
@@ -1663,8 +1656,6 @@ class FiniteDifference(InputFile):
         elif words[0] == "multiple" and words[1] == "sphere":
             self._boundary_condition = "multiple sphere"
         elif words[1] == "focus":
-            self._boundary_condition = " ".join(words)
-        elif words[1] == "map":
             self._boundary_condition = " ".join(words)
         else:
             raise ValueError(f"Unknown boundary condition: {value}.")
