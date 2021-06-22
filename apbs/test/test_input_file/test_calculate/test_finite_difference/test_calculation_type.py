@@ -9,13 +9,11 @@ _LOGGER = logging.getLogger(__name__)
 
 GOOD_MANUAL_INPUTS = [
     {
-        "grid center":  {
-            "position":  [0, 0, 0]
+        "grid center": {"position": [0, 0, 0]},
+        "grid dimensions": {
+            "counts": [97, 97, 97],
+            "spacings": [0.2, 0.2, 0.2],
         },
-        "grid dimensions":  {
-            "counts":  [97, 97, 97],
-            "spacings":  [0.2, 0.2, 0.2]
-        }
     }
 ]
 
@@ -31,24 +29,14 @@ def test_good_manual(input_dict):
 
 BAD_MANUAL_INPUTS = [
     {
-        "grid center":  None,
-        "grid dimensions":  {
-            "counts":  [97, 97, 97],
-            "spacings":  [0.2, 0.2, 0.2]
-        }
-    },
-    {
-        "grid center":  {
-            "position":  [0, 0, 0]
+        "grid center": None,
+        "grid dimensions": {
+            "counts": [97, 97, 97],
+            "spacings": [0.2, 0.2, 0.2],
         },
-        "grid dimensions":  4
     },
-    {
-        "grid dimensions":  {
-            "counts":  [97, 97, 97],
-            "spacings":  [0.2, 0.2, 0.2]
-        }
-    },
+    {"grid center": {"position": [0, 0, 0]}, "grid dimensions": 4},
+    {"grid dimensions": {"counts": [97, 97, 97], "spacings": [0.2, 0.2, 0.2]}},
 ]
 
 
@@ -63,43 +51,35 @@ def test_bad_manual(input_dict):
 
 GOOD_FOCUS_INPUTS = [
     {
-        "coarse grid center":  {
-            "position":  [0, 0, 0]
+        "coarse grid center": {"position": [0, 0, 0]},
+        "coarse grid dimensions": {
+            "counts": [97, 97, 97],
+            "spacings": [0.2, 0.2, 0.2],
         },
-        "coarse grid dimensions":  {
-            "counts":  [97, 97, 97],
-            "spacings":  [0.2, 0.2, 0.2]
+        "fine grid center": {"position": [0.2, -0.1, 0.13]},
+        "fine grid dimensions": {
+            "counts": [97, 97, 97],
+            "spacings": [0.05, 0.05, 0.05],
         },
-        "fine grid center":  {
-            "position":  [0.2, -0.1, 0.13]
-        },
-        "fine grid dimensions":  {
-            "counts":  [97, 97, 97],
-            "spacings":  [0.05, 0.05, 0.05]
-        },
-        "parallel":  False
+        "parallel": False,
     },
     {
-        "coarse grid center":  {
-            "position":  [0, 0, 0]
+        "coarse grid center": {"position": [0, 0, 0]},
+        "coarse grid dimensions": {
+            "counts": [97, 97, 97],
+            "spacings": [0.2, 0.2, 0.2],
         },
-        "coarse grid dimensions":  {
-            "counts":  [97, 97, 97],
-            "spacings":  [0.2, 0.2, 0.2]
+        "fine grid center": {"position": [0.2, -0.1, 0.13]},
+        "fine grid dimensions": {
+            "counts": [97, 97, 97],
+            "spacings": [0.05, 0.05, 0.05],
         },
-        "fine grid center":  {
-            "position":  [0.2, -0.1, 0.13]
-        },
-        "fine grid dimensions":  {
-            "counts":  [97, 97, 97],
-            "spacings":  [0.05, 0.05, 0.05]
-        },
-        "parallel":  True,
+        "parallel": True,
         "parallel parameters": {
-            "overlap fraction":  0.1,
-            "processor array":  [8, 8, 8],
-            "asynchronous rank": 4
-        }
+            "overlap fraction": 0.1,
+            "processor array": [8, 8, 8],
+            "asynchronous rank": 4,
+        },
     },
 ]
 
@@ -115,60 +95,48 @@ def test_good_focus(input_dict):
 
 BAD_FOCUS_INPUTS = [
     {
-        "coarse grid center":  {
-            "position":  [0, 0, 0]
+        "coarse grid center": {"position": [0, 0, 0]},
+        "coarse grid dimensions": {
+            "counts": [97, 97, 97],
+            "spacings": [0.2, 0.2, 0.2],
         },
-        "coarse grid dimensions":  {
-            "counts":  [97, 97, 97],
-            "spacings":  [0.2, 0.2, 0.2]
+        "fine grid center": {"position": [0.2, -0.1, 0.13]},
+        "fine grid dimensions": {
+            "counts": [97, 97, 97],
+            "spacings": [0.3, 0.3, 0.3],
         },
-        "fine grid center":  {
-            "position":  [0.2, -0.1, 0.13]
-        },
-        "fine grid dimensions":  {
-            "counts":  [97, 97, 97],
-            "spacings":  [0.3, 0.3, 0.3]
-        },
-        "parallel":  False
+        "parallel": False,
     },
     {
-        "coarse grid center":  {
-            "position":  [0, 0, 0]
+        "coarse grid center": {"position": [0, 0, 0]},
+        "coarse grid dimensions": {
+            "counts": [97, 97, 97],
+            "spacings": [0.2, 0.2, 0.2],
         },
-        "coarse grid dimensions":  {
-            "counts":  [97, 97, 97],
-            "spacings":  [0.2, 0.2, 0.2]
+        "fine grid center": {"position": [0.2, -0.1, 0.13]},
+        "fine grid dimensions": {
+            "counts": [97, 97, 97],
+            "spacings": [0.05, 0.05, 0.05],
         },
-        "fine grid center":  {
-            "position":  [0.2, -0.1, 0.13]
-        },
-        "fine grid dimensions":  {
-            "counts":  [97, 97, 97],
-            "spacings":  [0.05, 0.05, 0.05]
-        },
-        "parallel":  True
+        "parallel": True,
     },
     {
-        "coarse grid center":  {
-            "position":  [0, 0, 0]
+        "coarse grid center": {"position": [0, 0, 0]},
+        "coarse grid dimensions": {
+            "counts": [97, 97, 97],
+            "spacings": [0.2, 0.2, 0.2],
         },
-        "coarse grid dimensions":  {
-            "counts":  [97, 97, 97],
-            "spacings":  [0.2, 0.2, 0.2]
+        "fine grid center": {"position": [0.2, -0.1, 0.13]},
+        "fine grid dimensions": {
+            "counts": [97, 97, 97],
+            "spacings": [0.05, 0.05, 0.05],
         },
-        "fine grid center":  {
-            "position":  [0.2, -0.1, 0.13]
-        },
-        "fine grid dimensions":  {
-            "counts":  [97, 97, 97],
-            "spacings":  [0.05, 0.05, 0.05]
-        },
-        "parallel":  True,
+        "parallel": True,
         "parallel parameters": {
-            "overlap fraction":  0.1,
-            "processor array":  [2, 2, 2],
-            "asynchronous rank": 10
-        }
+            "overlap fraction": 0.1,
+            "processor array": [2, 2, 2],
+            "asynchronous rank": 10,
+        },
     },
 ]
 

@@ -831,10 +831,27 @@ class UseMap(InputFile):
 
     """
 
-    def __init__(self, dict_, yaml, json):
+    def __init__(self, dict_=None, yaml=None, json=None):
         self._property = None
         self._alias = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    def from_dict(self, input_):
+        """Load object from dictionary.
+
+        :raises KeyError:  if missing items
+        """
+        self.property = input_["property"]
+        self.alias = input_["alias"]
+
+    def to_dict(self) -> dict:
+        return {
+            "property":  self.property,
+            "alias":  self.alias
+        }
+
+    def validate(self):
+        pass
 
     @property
     def property(self) -> str:

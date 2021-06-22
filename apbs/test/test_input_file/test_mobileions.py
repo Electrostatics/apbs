@@ -9,60 +9,25 @@ _LOGGER = logging.getLogger(__name__)
 
 
 GOOD_IONS = [
-    {
-        "charge":  -1,
-        "radius":  2.1,
-        "concentration":  0.100
-    },
-    {
-        "charge":  +1,
-        "radius":  2,
-        "concentration":  0.000
-    }
+    {"charge": -1, "radius": 2.1, "concentration": 0.100},
+    {"charge": +1, "radius": 2, "concentration": 0.000},
 ]
 
 
 BAD_IONS = [
-    {
-        "charge":  2,
-        "radius":  2
-    },
-    {
-        "charge": 1,
-        "radius": 0,
-        "concentration":  0.1
-    },
-    {
-        "charge":  "negative one",
-        "radius":  2,
-        "concentration":  0.1
-    },
-    {
-        "charge":  -1,
-        "radius":  2.1,
-        "concentration":  -0.100
-    }
+    {"charge": 2, "radius": 2},
+    {"charge": 1, "radius": 0, "concentration": 0.1},
+    {"charge": "negative one", "radius": 2, "concentration": 0.1},
+    {"charge": -1, "radius": 2.1, "concentration": -0.100},
 ]
 
 
 GOOD_SOLUTIONS = [
     {
-        "species":  [
-            {
-                "charge":  +2,
-                "radius":  2.0,
-                "concentration":  0.050
-            },
-            {
-                "charge":  1,
-                "radius":  1.2,
-                "concentration":  0.100
-            },
-            {
-                "charge":  -1,
-                "radius":  2.0,
-                "concentration":  0.200
-            }
+        "species": [
+            {"charge": +2, "radius": 2.0, "concentration": 0.050},
+            {"charge": 1, "radius": 1.2, "concentration": 0.100},
+            {"charge": -1, "radius": 2.0, "concentration": 0.200},
         ]
     }
 ]
