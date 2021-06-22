@@ -406,10 +406,29 @@ class Manual(InputFile):
 
     """
 
-    def __init__(self, dict_, yaml, json):
+    def __init__(self, dict_=None, yaml=None, json=None):
         self._grid_center = None
         self._grid_dimensions = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    def from_dict(self, input_):
+        """Load object from dictionary.
+
+        :raises KeyError:  if missing entries
+        """
+        self.grid_center = GridCenter(dict_=input_["grid center"])
+        self.grid_dimensions = GridDimensions(dict_=input_["grid dimensions"])
+        return super().from_dict(input_)
+
+    def to_dict(self) -> dict:
+        return {
+            "grid center":  self.grid_center.to_dict(),
+            "grid dimensions":  self.grid_dimensions.to_dict()
+        }
+
+    def validate(self):
+        self.grid_dimensions.validate()
+        self.grid_center.validate()
 
     @property
     def grid_dimensions(self) -> GridDimensions:
@@ -465,11 +484,35 @@ class ParallelFocus(InputFile):
     .. todo:: finish this
     """
 
-    def __init__(self, dict_, yaml, json):
+    def __init__(self, dict_=None, yaml=None, json=None):
         self._overlap_fraction = None
-        self._processor_array = [None, None, None]
+        self._processor_array = None
         self._asynchronous_rank = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    def from_dict(self, input_):
+        """Load object from dictionary.
+
+        :raises KeyError: for missing items
+        """
+        self.overlap_fraction = input_["overlap fraction"]
+        self.processor_array = input_["processor array"]
+        self.asynchronous_rank = input_.get("asynchronous rank", None)
+
+    def to_dict(self) -> dict:
+        return {
+            "overlap fraction":  self.overlap_fraction,
+            "processor array":  self.processor_array,
+            "asynchronous rank":  self.asynchronous_rank
+        }
+
+    def validate(self):
+        if self.asynchronous_rank is not None:
+            num_proc = 1
+            for i in range(3):
+                num_proc *= self.processor_array[i]
+            if self.asynchronous_rank > num_proc:
+                raise ValueError(f"Processor rank {self.asynchronous_rank} is greater than the number of processors {num_proc}.")
 
     @property
     def processor_array(self) -> list:
@@ -520,7 +563,8 @@ class ParallelFocus(InputFile):
             raise IndexError(
                 f"Processor array has length {len(value)} instead of length 3."
             )
-        for i, elem in enumerate(value):
+        self._processor_array = []
+        for elem in value:
             if not check.is_positive_definite(elem):
                 raise TypeError(
                     f"Processor array {value} does not contain positive numbers."
@@ -529,7 +573,7 @@ class ParallelFocus(InputFile):
                 raise TypeError(
                     f"Processor array {value} does not contain integers."
                 )
-            self._processor_array[i] = elem
+            self._processor_array.append(elem)
 
     @property
     def overlap_fraction(self) -> float:
@@ -617,7 +661,7 @@ class Focus(InputFile):
 
     """
 
-    def __init__(self, dict_, yaml, json):
+    def __init__(self, dict_=None, yaml=None, json=None):
         self._fine_grid_center = None
         self._fine_grid_dimensions = None
         self._coarse_grid_center = None
@@ -625,6 +669,44 @@ class Focus(InputFile):
         self._parallel = None
         self._parallel_parameters = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    def from_dict(self, input_):
+        """Load object from dictionary.
+
+        :raises KeyError:  if missing items.
+        """
+        self.fine_grid_center = GridCenter(dict_=input_["fine grid center"])
+        self.fine_grid_dimensions = GridDimensions(dict_=input_["fine grid dimensions"])
+        self.coarse_grid_center = GridCenter(dict_=input_["coarse grid center"])
+        self.coarse_grid_dimensions = GridDimensions(dict_=input_["coarse grid dimensions"])
+        self.parallel = input_["parallel"]
+        if self.parallel:
+            self.parallel_parameters = ParallelFocus(dict_=input_["parallel parameters"])
+
+    def to_dict(self) -> dict:
+        dict_ = {
+            "fine grid center": self.fine_grid_center.to_dict(),
+            "fine grid dimensions": self.fine_grid_dimensions.to_dict(),
+            "coarse grid center":  self.coarse_grid_center.to_dict(),
+            "coarse grid dimensions":  self.coarse_grid_dimensions.to_dict(),
+            "parallel":  self.parallel
+        }
+        if dict_["parallel"]:
+            dict_["parallel parameters"] = self.parallel_parameters.to_dict()
+        return dict_
+
+    def validate(self):
+        self.fine_grid_center.validate()
+        self.fine_grid_dimensions.validate()
+        self.coarse_grid_center.validate()
+        self.coarse_grid_dimensions.validate()
+        if self.parallel:
+            if self.parallel_parameters is None:
+                raise ValueError(f"Missing parallel parameters.")
+            self.parallel_parameters.validate()
+        for i in range(3):
+            if self.coarse_grid_dimensions.lengths[i] < self.fine_grid_dimensions.lengths[i]:
+                raise ValueError(f"Coarse grid length {self.coarse_grid_dimensions.lengths[i]} is less than fine grid length {self.fine_grid_dimensions.lengths[i]}")
 
     @property
     def parallel(self) -> bool:
@@ -635,8 +717,6 @@ class Focus(InputFile):
         to True (sorry).
 
         :raises TypeError:  if set to something other than :class:`bool`.
-        :raises ValueError:  if set to True and :func:`parallel_parameters`
-          hasn't been set (sorry).
         """
         return self._parallel
 
@@ -644,10 +724,6 @@ class Focus(InputFile):
     def parallel(self, value):
         if not check.is_bool(value):
             raise TypeError(f"Value {value} is not a Boolean.")
-        if value and self._parallel_parameters is None:
-            raise ValueError(
-                "The 'parallel parameters' object has not been provided."
-            )
         self._parallel = value
 
     @property
@@ -724,6 +800,7 @@ class Focus(InputFile):
                 f"Value {value} is type {type(value)} "
                 f"rather than GridDimensions."
             )
+        self._fine_grid_dimensions = value
 
     @property
     def fine_grid_center(self) -> GridCenter:

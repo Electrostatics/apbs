@@ -1,4 +1,4 @@
-"""Test input file calculate.FiniteDifference section parsing."""
+"""Test input file calculate.FiniteDifference grid-related parsing."""
 import logging
 import pytest
 from apbs.input_file.calculate.finite_difference import GridDimensions, GridCenter
