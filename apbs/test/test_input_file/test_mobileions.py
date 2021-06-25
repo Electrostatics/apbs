@@ -48,9 +48,7 @@ GOOD_SOLUTIONS = [
             {"charge": -1, "radius": 2.0, "concentration": 0.200},
         ]
     },
-    {
-        "species": GOOD_IONS
-    }
+    {"species": GOOD_IONS},
 ]
 
 
@@ -71,9 +69,7 @@ BAD_SOLUTIONS = [
             {"charge": -1, "radius": 2.0, "concentration": 0.200},
         ]
     },
-    {
-        "species": BAD_IONS
-    }
+    {"species": BAD_IONS},
 ]
 
 

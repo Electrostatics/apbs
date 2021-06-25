@@ -93,10 +93,17 @@ class GridDimensions(InputFile):
         }
 
     def validate(self):
-        _ = self.counts
-        _ = self.lengths
-        _ = self.spacings
-        _ = self.levels
+        errors = []
+        if self.counts is None:
+            errors.append("counts not set")
+        if self.spacings is None:
+            errors.append("spacings not set")
+        if self.lengths is None:
+            errors.append("errors not set")
+        if self.levels is None:
+            errors.append("levels not set")
+        if errors:
+            raise ValueError(" ".join(errors))
 
     @property
     def levels(self) -> int:
@@ -132,7 +139,8 @@ class GridDimensions(InputFile):
         if max_level is None:
             max_level = int(log2(target))
         _LOGGER.debug(
-            f"Finding count for target = {target}, min_level = {min_level}, max_level = {max_level}."
+            f"Finding count for target = {target}, min_level = {min_level}, "
+            "max_level = {max_level}."
         )
         best_n = 2 ** min_level + 1
         best_c = 1
@@ -422,13 +430,22 @@ class Manual(InputFile):
 
     def to_dict(self) -> dict:
         return {
-            "grid center":  self.grid_center.to_dict(),
-            "grid dimensions":  self.grid_dimensions.to_dict()
+            "grid center": self.grid_center.to_dict(),
+            "grid dimensions": self.grid_dimensions.to_dict(),
         }
 
     def validate(self):
-        self.grid_dimensions.validate()
-        self.grid_center.validate()
+        errors = []
+        if self.grid_dimensions is None:
+            errors.append("grid dimensions not set.")
+        else:
+            self.grid_dimensions.validate()
+        if self.grid_center is None:
+            errors.append("grid center not set")
+        else:
+            self.grid_center.validate()
+        if errors:
+            raise ValueError(" ".join(errors))
 
     @property
     def grid_dimensions(self) -> GridDimensions:
@@ -501,9 +518,9 @@ class ParallelFocus(InputFile):
 
     def to_dict(self) -> dict:
         return {
-            "overlap fraction":  self.overlap_fraction,
-            "processor array":  self.processor_array,
-            "asynchronous rank":  self.asynchronous_rank
+            "overlap fraction": self.overlap_fraction,
+            "processor array": self.processor_array,
+            "asynchronous rank": self.asynchronous_rank,
         }
 
     def validate(self):
@@ -512,7 +529,10 @@ class ParallelFocus(InputFile):
             for i in range(3):
                 num_proc *= self.processor_array[i]
             if self.asynchronous_rank > num_proc:
-                raise ValueError(f"Processor rank {self.asynchronous_rank} is greater than the number of processors {num_proc}.")
+                raise ValueError(
+                    f"Processor rank {self.asynchronous_rank} is greater than "
+                    "the number of processors {num_proc}."
+                )
 
     @property
     def processor_array(self) -> list:
@@ -567,7 +587,8 @@ class ParallelFocus(InputFile):
         for elem in value:
             if not check.is_positive_definite(elem):
                 raise TypeError(
-                    f"Processor array {value} does not contain positive numbers."
+                    f"Processor array {value} does not contain positive "
+                    f"numbers."
                 )
             if not isinstance(elem, int):
                 raise TypeError(
@@ -590,7 +611,8 @@ class ParallelFocus(InputFile):
     def overlap_fraction(self, value):
         if not check.is_positive_definite(value):
             raise TypeError(
-                f"Overlap fraction (type {type(value)}) is not a positive number."
+                f"Overlap fraction (type {type(value)}) is not a positive "
+                f"number."
             )
         if value > 1.0:
             raise ValueError(f"Overlap fraction {value} is greater than 1.")
@@ -665,7 +687,7 @@ class Focus(InputFile):
         self._fine_grid_center = None
         self._fine_grid_dimensions = None
         self._coarse_grid_center = None
-        self._coarse_grid_dimesons = None
+        self._coarse_grid_dimensions = None
         self._parallel = None
         self._parallel_parameters = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
@@ -676,37 +698,67 @@ class Focus(InputFile):
         :raises KeyError:  if missing items.
         """
         self.fine_grid_center = GridCenter(dict_=input_["fine grid center"])
-        self.fine_grid_dimensions = GridDimensions(dict_=input_["fine grid dimensions"])
-        self.coarse_grid_center = GridCenter(dict_=input_["coarse grid center"])
-        self.coarse_grid_dimensions = GridDimensions(dict_=input_["coarse grid dimensions"])
+        self.fine_grid_dimensions = GridDimensions(
+            dict_=input_["fine grid dimensions"]
+        )
+        self.coarse_grid_center = GridCenter(
+            dict_=input_["coarse grid center"]
+        )
+        self.coarse_grid_dimensions = GridDimensions(
+            dict_=input_["coarse grid dimensions"]
+        )
         self.parallel = input_["parallel"]
         if self.parallel:
-            self.parallel_parameters = ParallelFocus(dict_=input_["parallel parameters"])
+            self.parallel_parameters = ParallelFocus(
+                dict_=input_["parallel parameters"]
+            )
 
     def to_dict(self) -> dict:
         dict_ = {
             "fine grid center": self.fine_grid_center.to_dict(),
             "fine grid dimensions": self.fine_grid_dimensions.to_dict(),
-            "coarse grid center":  self.coarse_grid_center.to_dict(),
-            "coarse grid dimensions":  self.coarse_grid_dimensions.to_dict(),
-            "parallel":  self.parallel
+            "coarse grid center": self.coarse_grid_center.to_dict(),
+            "coarse grid dimensions": self.coarse_grid_dimensions.to_dict(),
+            "parallel": self.parallel,
         }
         if dict_["parallel"]:
             dict_["parallel parameters"] = self.parallel_parameters.to_dict()
         return dict_
 
     def validate(self):
-        self.fine_grid_center.validate()
-        self.fine_grid_dimensions.validate()
-        self.coarse_grid_center.validate()
-        self.coarse_grid_dimensions.validate()
+        errors = []
+        if self.fine_grid_center is None:
+            errors.append("fine grid center not set.")
+        else:
+            self.fine_grid_center.validate()
+        if self.coarse_grid_center is None:
+            errors.append("coarse grid center not set.")
+        else:
+            self.coarse_grid_center.validate()
+        if (self.fine_grid_dimensions is None) or (
+            self.coarse_grid_dimensions is None
+        ):
+            errors.append("Either fine or coarse grid dimensions not set.")
+        else:
+            self.fine_grid_dimensions.validate()
+            self.coarse_grid_dimensions.validate()
+            for i in range(3):
+                if (
+                    self.coarse_grid_dimensions.lengths[i]
+                    < self.fine_grid_dimensions.lengths[i]
+                ):
+                    raise ValueError(
+                        f"Coarse grid length "
+                        f"{self.coarse_grid_dimensions.lengths[i]} is less "
+                        f"than fine grid length "
+                        f"{self.fine_grid_dimensions.lengths[i]}"
+                    )
         if self.parallel:
             if self.parallel_parameters is None:
                 raise ValueError(f"Missing parallel parameters.")
             self.parallel_parameters.validate()
-        for i in range(3):
-            if self.coarse_grid_dimensions.lengths[i] < self.fine_grid_dimensions.lengths[i]:
-                raise ValueError(f"Coarse grid length {self.coarse_grid_dimensions.lengths[i]} is less than fine grid length {self.fine_grid_dimensions.lengths[i]}")
+        if errors:
+            raise ValueError(" ".join(errors))
 
     @property
     def parallel(self) -> bool:
@@ -845,13 +897,16 @@ class UseMap(InputFile):
         self.alias = input_["alias"]
 
     def to_dict(self) -> dict:
-        return {
-            "property":  self.property,
-            "alias":  self.alias
-        }
+        return {"property": self.property, "alias": self.alias}
 
     def validate(self):
-        pass
+        errors = []
+        if self.property is None:
+            errors.append("property not set.")
+        if self.alias is None:
+            errors.append("alias not set.")
+        if errors:
+            raise ValueError(" ".join(errors))
 
     @property
     def property(self) -> str:
@@ -887,7 +942,8 @@ class UseMap(InputFile):
           equation.
 
         * ``potential``:  Potential map (as read in :ref:`read_new_input`); this
-          is used to set the boundary condition and causes the :func:`boundary_condition` property to be ignored.
+          is used to set the boundary condition and causes the
+          :func:`boundary_condition` property to be ignored.
 
         :raises TypeError:  if not string
         :raises ValueError:  if not valid value
@@ -923,6 +979,7 @@ class WriteMap(InputFile):
     * ``path``:  a suggested path and file name for the map; see :func:`path`
 
     """
+
     def __init__(self, dict_=None, yaml=None, json=None):
         self._property = None
         self._format = None
@@ -936,13 +993,21 @@ class WriteMap(InputFile):
 
     def to_dict(self) -> dict:
         return {
-            "property":  self.property,
-            "format":  self.format,
-            "path":  self.path
+            "property": self.property,
+            "format": self.format,
+            "path": self.path,
         }
 
     def validate(self):
-        pass
+        errors = []
+        if self.property is None:
+            errors.append("property not set.")
+        if self.format is None:
+            errors.append("format not set.")
+        if self.path is None:
+            errors.append("path not set.")
+        if errors:
+            raise ValueError(" ".join(errors))
 
     @property
     def path(self) -> str:
@@ -1074,7 +1139,7 @@ class WriteMap(InputFile):
             "ion charge density",
             "dielectric x",
             "dielectric y",
-            "dielectric z"
+            "dielectric z",
         ]:
             raise ValueError(f"Property {value} is invalid.")
         self._property = value
@@ -1107,16 +1172,16 @@ class FiniteDifference(InputFile):
     * ``surface method``:  see :func:`surface_method`
     * ``surface spline window``:  see :func:`surface_spline_window`
     * ``temperature``:  see :func:`temperature`
-    * ``use map``:  use input map for one or more properties of the system; see
-      :func:`use_map`
+    * ``use maps``:  use input map for one or more properties of the system; see
+      :func:`use_maps`
     * ``write atom potentials``:  write out atom potentials; see
       :func:`write_atom_potentials`
-    * ``write map``:  write out one or more properties of the system to a map;
-      see :func:`write_map`
+    * ``write maps``:  write out one or more properties of the system to a map;
+      see :func:`write_maps`
 
     """
 
-    def __init__(self, dict_, yaml, json):
+    def __init__(self, dict_=None, yaml=None, json=None):
         self._boundary_condition = None
         self._calculate_energy = None
         self._calculate_forces = None
@@ -1134,10 +1199,143 @@ class FiniteDifference(InputFile):
         self._surface_method = None
         self._surface_spline_window = None
         self._temperature = None
-        self._use_map = []
+        self._use_maps = []
         self._write_atom_potentials = None
-        self._write_map = None
+        self._write_maps = []
         super().__init__(dict_=dict_, yaml=yaml, json=json)
+
+    def from_dict(self, input_):
+        """Load object from dictionary.
+
+        :raises KeyError:  if some entries not found.
+        :raises ValueError:  for invalid entries.
+        """
+        self.boundary_condition = input_["boundary condition"]
+        self.calculate_energy = input_["calculate energy"]
+        self.calculate_forces = input_["calculate forces"]
+        self.calculation_type = input_["calculation type"]
+        if self.calculation_type == "focus":
+            self.calculation_parameters = Focus(
+                dict_=input_["calculation parameters"]
+            )
+        elif self.calculation_type == "manual":
+            self.calculation_parameters = Manual(
+                dict_=input_["calculation parameters"]
+            )
+        else:
+            raise ValueError(
+                f"Invalid calculation type {input_['calculation type']}."
+            )
+        self.charge_discretization = input_["charge discretization"]
+        self.error_tolerance = input_["error tolerance"]
+        self.equation = input_["equation"]
+        self.ions = MobileIons(dict_=input_["ions"])
+        self.molecule = input_["molecule"]
+        self.noop = input_["no-op"]
+        self.solute_dielectric = input_["solute dielectric"]
+        self.solvent_dielectric = input_["solvent dielectric"]
+        self.solvent_radius = input_["solvent radius"]
+        self.surface_method = input_["surface method"]
+        self.surface_spline_window = input_["surface spline window"]
+        self.temperature = input_["temperature"]
+        for map_dict in input_["use maps"]:
+            self.use_maps.append(UseMap(dict_=map_dict))
+        self.write_atom_potentials = input_["write atom potentials"]
+        for map_dict in input_["write maps"]:
+            self.write_maps.append(WriteMap(dict_=map_dict))
+
+    def to_dict(self) -> dict:
+        return {
+            "boundary condition": self.boundary_condition,
+            "calculate energy": self.calculate_energy,
+            "calculate forces": self.calculate_forces,
+            "calculation type": self.calculation_type,
+            "calculation parameters": self.calculation_parameters.to_dict(),
+            "charge discretization": self.charge_discretization,
+            "error tolerance": self.error_tolerance,
+            "equation": self.equation,
+            "ions": self.ions.to_dict(),
+            "molecule": self.molecule,
+            "no-op": self.noop,
+            "solute dielectric": self.solute_dielectric,
+            "solvent dielectric": self.solvent_dielectric,
+            "solvent radius": self.solvent_radius,
+            "surface method": self.surface_method,
+            "surface spline window": self.surface_spline_window,
+            "temperature": self.temperature,
+            "use maps": [map_.to_dict() for map_ in self.use_maps],
+            "write atom potentials": self.write_atom_potentials,
+            "write maps": [map_.to_dict() for map_ in self.write_maps],
+        }
+
+    def validate(self):
+        errors = []
+        if self.boundary_condition is None:
+            errors.append("boundary condition not set.")
+        if self.calculate_energy is None:
+            errors.append("calculate energy not set.")
+        if self.calculate_forces is None:
+            errors.append("calculate forces not set.")
+        if self.calculation_type is None:
+            errors.append("calculation type not set.")
+        if self.calculation_parameters is None:
+            errors.append("calculation parameters not set.")
+        else:
+            try:
+                self.calculation_parameters.validate()
+            except ValueError as error:
+                errors.append(str(error))
+        if self.charge_discretization is None:
+            errors.append("charge discretization not set.")
+        if self.error_tolerance is None:
+            errors.append("error tolerance not set.")
+        if self.equation is None:
+            errors.append("equation not set.")
+        if self.ions is None:
+            _LOGGER.debug(
+                "The ions feel bad that you left them out but it's OK, they'll "
+                "get over it."
+            )
+        else:
+            try:
+                self.ions.validate()
+            except ValueError as error:
+                errors.append(str(error))
+        if self.molecule is None:
+            errors.append("molecule not set.")
+        if self.noop is None:
+            errors.append("no-op not set.")
+        if self.solute_dielectric is None:
+            errors.append("solute dielectric not set.")
+        if self.solvent_dielectric is None:
+            errors.append("solvent dielectric not set.")
+        if self.solvent_radius is None:
+            errors.append("solvent radius not set.")
+        if self.surface_method is None:
+            errors.append("surface_method not set.")
+        elif (
+            "spline" in self.surface_method
+            and self.surface_spline_window is None
+        ):
+            errors.append("surface spline window not set.")
+        if self.temperature is None:
+            errors.append("temperature not set.")
+        for map_ in self._use_maps:
+            try:
+                map_.validate()
+            except ValueError as error:
+                errors.append(str(error))
+        if self.write_atom_potentials:
+            _LOGGER.debug(
+                "It's OK if you don't want to write out atom potentials."
+            )
+        for map_ in self.write_maps:
+            try:
+                map_.validate()
+            except ValueError as error:
+                errors.append(str(error))
+        if errors:
+            raise ValueError(" ".join(errors))
 
     @property
     def noop(self) -> bool:
@@ -1160,20 +1358,28 @@ class FiniteDifference(InputFile):
             )
 
     @property
-    def write_map(self) -> WriteMap:
+    def write_maps(self) -> list:
         """Write out maps related to computed properties.
 
         See :class:`WriteMap` for more information.
 
         :raises TypeError:  if set to wrong type
         """
-        return self._write_map
+        return self._write_maps
 
-    @write_map.setter
-    def write_map(self, value):
-        if not isinstance(value, WriteMap):
-            raise TypeError(f"Value {value} is type {type(value)}.")
-        self._write_map = value
+    @write_maps.setter
+    def write_maps(self, value):
+        if not check.is_list(value):
+            raise TypeError(
+                f"Value {value} (type {type(value)}) is not a list."
+            )
+        for elem in value:
+            if not isinstance(elem, WriteMap):
+                raise TypeError(
+                    f"Value {elem} (type {type(elem)}) is not a WriteMap "
+                    f"object."
+                )
+        self._write_maps = value
 
     @property
     def write_atom_potentials(self) -> str:
@@ -1211,16 +1417,16 @@ class FiniteDifference(InputFile):
         self._write_atom_potentials = value
 
     @property
-    def use_map(self) -> list:
+    def use_maps(self) -> list:
         """Information for (optionally) using maps read into APBS.
 
         :returns:  list of :class:`UseMap` objects
         :raises TypeError:  if not a list of :class:`UseMap` objects
         """
-        return self._use_map
+        return self._use_maps
 
-    @use_map.setter
-    def use_map(self, value):
+    @use_maps.setter
+    def use_maps(self, value):
         if not check.is_list(value):
             raise TypeError(
                 f"Value {value} (type {type(value)}) is not a list."
@@ -1230,7 +1436,7 @@ class FiniteDifference(InputFile):
                 raise TypeError(
                     f"List contains element {elem} of type {type(elem)}."
                 )
-            self._use_map.append(elem)
+            self._use_maps.append(elem)
 
     @property
     def temperature(self) -> float:
@@ -1339,6 +1545,7 @@ class FiniteDifference(InputFile):
             "septic spline",
         ]:
             raise ValueError(f"Value {value} is an invalid surface method.")
+        self._surface_method = value
 
     @property
     def solvent_radius(self) -> float:
@@ -1603,7 +1810,8 @@ class FiniteDifference(InputFile):
             or (self._calculation_type is None)
         ):
             raise ValueError(
-                f"Calculation type is {type(self._calculation_type)} but value type is {type(value)}."
+                f"Calculation type is {type(self._calculation_type)} but value "
+                f"type is {type(value)}."
             )
         self._calculation_parameters = value
 
@@ -1655,7 +1863,7 @@ class FiniteDifference(InputFile):
             self._boundary_condition = "single sphere"
         elif words[0] == "multiple" and words[1] == "sphere":
             self._boundary_condition = "multiple sphere"
-        elif words[1] == "focus":
+        elif words[0] == "focus":
             self._boundary_condition = " ".join(words)
         else:
             raise ValueError(f"Unknown boundary condition: {value}.")
