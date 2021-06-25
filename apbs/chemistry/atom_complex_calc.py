@@ -112,9 +112,7 @@ class AtomComplexCalc:
             pos.z = rad(ref.zs[idx]) + apos.z
 
             # need to implement
-            if self.accessible_outside_inflated_vdw_radius(
-                pos, prad, atom_id
-            ):
+            if self.accessible_outside_inflated_vdw_radius(pos, prad, atom_id):
                 npoints += 1
                 ref.is_on_surf[idx] = True
             else:

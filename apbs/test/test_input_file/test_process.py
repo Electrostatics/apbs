@@ -144,7 +144,7 @@ def test_good_input(input_):
 @pytest.mark.parametrize("input_", BAD_INPUT, ids=id_function)
 def test_bad_input(input_):
     """Test input file PROCESS sections."""
-    with pytest.raises((KeyError, ValueError)):
+    with pytest.raises((KeyError, ValueError, TypeError)):
         process = Process()
         _LOGGER.debug(input_)
         process.from_yaml(input_)

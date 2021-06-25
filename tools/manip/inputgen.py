@@ -420,9 +420,7 @@ def main():
     ]
 
     try:
-        opts, args = getopt.getopt(
-            sys.argv[1:], short_opt_list, long_opt_list
-        )
+        opts, args = getopt.getopt(sys.argv[1:], short_opt_list, long_opt_list)
     except getopt.GetoptError as err:
         sys.stderr.write("Option error (%s)!\n" % err)
         usage()

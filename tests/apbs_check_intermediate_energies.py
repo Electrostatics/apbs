@@ -95,9 +95,7 @@ def check_energies(input_file):
     energy_list += extract_energy(
         ElecEnergy, input_lines, "Fixed charge energy"
     )
-    energy_list += extract_energy(
-        ElecEnergy, input_lines, "Dielectric energy"
-    )
+    energy_list += extract_energy(ElecEnergy, input_lines, "Dielectric energy")
 
     return energy_list
 
@@ -113,7 +111,5 @@ def test():
 
 
 if __name__ == "__main__":
-    print(
-        f"The python source file {sys.argv[0]} is a module and not runnable"
-    )
+    print(f"The python source file {sys.argv[0]} is a module and not runnable")
     sys.exit(1)

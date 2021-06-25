@@ -394,9 +394,7 @@ def main():
     else:
         test_sections = options.target_test
 
-    print(
-        "The following sections will be tested: " + ", ".join(test_sections)
-    )
+    print("The following sections will be tested: " + ", ".join(test_sections))
     print("=" * 80)
 
     # Run each test that has been requested
