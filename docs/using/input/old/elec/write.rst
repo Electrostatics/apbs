@@ -1,4 +1,4 @@
-.. _write:
+.. _old_write:
 
 write
 =====

@@ -15,5 +15,5 @@ where ``filename`` is a string for the name of the file where a 3D grid will be 
 
 .. todo::
    
-   The PB-(S)AM ``3dmap`` keyword should not exist; please replace it ASAP with the :ref:`write` command.
+   The PB-(S)AM ``3dmap`` keyword should not exist; please replace it ASAP with the :ref:`old_write` command.
    Documented this todo as https://github.com/Electrostatics/apbs/issues/482

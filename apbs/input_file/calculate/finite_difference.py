@@ -1,7 +1,6 @@
 """Parameters for a finite-difference polar solvation calculation."""
 import logging
 from math import log2
-from typing import Type
 from .. import check
 from .. import InputFile
 from .generic import MobileIons

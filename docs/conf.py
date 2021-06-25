@@ -56,6 +56,7 @@ extensions = [
     "sphinx_rtd_theme",
     "sphinx.ext.mathjax",
     "sphinx_sitemap",
+    'autodocsumm',
 ]
 
 todo_include_todos = True
@@ -68,6 +69,10 @@ site_url = "https://apbs.readthedocs.io"
 autosummary_generate = True
 autosummary_imported_members = False
 autosummary_generate_overwrite = True
+
+autodoc_default_options = {
+    'autosummary': True,
+}
 
 master_doc = "index"
 

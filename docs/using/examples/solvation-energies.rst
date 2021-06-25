@@ -2,6 +2,8 @@
 Solvation energies
 ==================
 
+.. todo::  Update this documentation with the *new APBS syntax* (see :ref:`new_input_format`).
+
 Solvation energies are usually decomposed into a free energy cycle as shown in the free energy cycle below.
 Note that such solvation energies often performed on fixed conformations; as such, they are more correctly called "potentials of mean force".
 More details on using APBS for the polar and nonpolar portions of such a cycle are given in the following sections.
