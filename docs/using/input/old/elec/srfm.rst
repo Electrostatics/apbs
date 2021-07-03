@@ -3,16 +3,14 @@
 srfm (elec)
 ===========
 
+.. currentmodule::  apbs.input_file.calculate
+
 .. note::
 
-   .. currentmodule::  apbs.input_file.calculate
-
-   Some uses of this command have been ported to the *new APBS syntax*
-   (see :ref:`new_input_format`):
+   Some uses of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
    
-   * Finite differences; see :func:`finite_difference.FiniteDifference` for more information
-
-   .. todo:: port other versions of ``srfm`` to new syntax.
+   * Finite differences; see :func:`finite_difference.FiniteDifference.surface_method` for more information
+   * Finite elements; see :func:`finite_element.FiniteElement.surface_method` for more information
 
 Specify the model used to construct the dielectric and ion-accessibility coefficients.
 The syntax for this command is:

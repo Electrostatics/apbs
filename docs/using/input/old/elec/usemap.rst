@@ -5,11 +5,9 @@ usemap
 
 .. note::
 
-   .. currentmodule::  apbs.input_file.calculate.finite_difference
+   .. currentmodule::  apbs.input_file.calculate.generic
 
-   Some instances of this keyword have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
-
-   * Finite difference calculations:  see :class:`UseMap`
+   Some instances of this keyword have been ported to the *new APBS syntax* (see :ref:`new_input_format`); see :class:`UseMap`
 
   .. todo::  Port other uses to new syntax.
 

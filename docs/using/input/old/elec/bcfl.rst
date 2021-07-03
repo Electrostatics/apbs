@@ -3,11 +3,14 @@
 bcfl
 ====
 
+.. currentmodule::  apbs.input_file.calculate
+
 .. note::  
 
    Some versions of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
    
-   * Finite difference boundary conditions; see :func:`apbs.input_file.calculate.finite_difference.FiniteDifference.boundary_condition`.
+   * Finite difference boundary conditions; see :func:`finite_difference.FiniteDifference.boundary_condition`.
+   * Finite element boundary conditions; see :func:`finite_element.FiniteElement.boundary_condition`.
 
 Specifies the type of boundary conditions used to solve the Poisson-Boltzmann equation.
 The syntax is:

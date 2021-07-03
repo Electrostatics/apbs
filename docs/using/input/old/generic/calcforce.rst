@@ -3,15 +3,18 @@
 calcforce
 =========
 
+.. currentmodule:: apbs.input_file.calculate
+
 .. note::  
 
    Some versions of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
 
 
-   * Nonpolar calculations:
-      .. currentmodule:: apbs.input_file.calculate.nonpolar
+   * Nonpolar calculations:  see :func:`nonpolar.Nonpolar.calculate_forces` for more information.
+   * Polar calculations:
 
-      See :func:`Nonpolar.calculate_forces` for more information.
+     * Finite difference:  see :func:`finite_difference.FiniteDifference.calculate_forces`
+     * Finite element:  see :func:`finite_element.FiniteElement.calculate_forces`
 
 This optional keyword controls energy output from an apolar solvation calculation.
 The syntax is:

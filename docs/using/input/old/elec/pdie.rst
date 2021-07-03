@@ -3,13 +3,14 @@
 pdie
 ====
 
+.. currentmodule::  apbs.input_file.calculate
+
 .. note:: 
 
    Some versions of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
 
-   .. currentmodule::  apbs.input_file.calculate.finite_difference
-
-   * Finite difference Poisson-Boltzmann calculations: see :func:`FiniteDifference.solute_dielectric` for more information.
+   * Finite difference Poisson-Boltzmann calculations: see :func:`finite_difference.FiniteDifference.solute_dielectric` for more information.
+   * Finite element Poisson-Boltzmann calculations: see :func:`finite_element.FiniteElement.solute_dielectric` for more information.
 
 .. todo:: port for other calculation types
 

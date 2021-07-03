@@ -3,15 +3,18 @@
 calcenergy
 ==========
 
+.. currentmodule:: apbs.input_file.calculate
+
 .. note::  
 
    Some versions of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
 
 
-   * Nonpolar calculations:
-      .. currentmodule:: apbs.input_file.calculate.nonpolar
+   * Nonpolar calculations:  see :func:`nonpolar.Nonpolar.calculate_energy` for more information.
+   * Polar calculations:
 
-      See :func:`Nonpolar.calculate_energy` for more information.
+     * Finite difference:  see :func:`finite_difference.FiniteDifference.calculate_energy`
+     * Finite element:  see :func:`finite_element.FiniteElement.calculate_energy`
 
 This optional keyword controls energy output from an apolar solvation calculation.
 The syntax is:
