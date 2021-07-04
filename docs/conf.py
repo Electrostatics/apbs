@@ -56,7 +56,7 @@ extensions = [
     "sphinx_rtd_theme",
     "sphinx.ext.mathjax",
     "sphinx_sitemap",
-    'autodocsumm',
+    "autodocsumm",
 ]
 
 todo_include_todos = True
@@ -71,7 +71,7 @@ autosummary_imported_members = False
 autosummary_generate_overwrite = True
 
 autodoc_default_options = {
-    'autosummary': True,
+    "autosummary": True,
 }
 
 master_doc = "index"
