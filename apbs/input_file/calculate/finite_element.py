@@ -6,6 +6,9 @@ from .. import InputFile
 from .generic import MobileIons, UseMap, WriteMap
 
 
+_LOGGER = logging.getLogger(__name__)
+
+
 class FiniteElement(InputFile):
     """Parameters for a finite-difference polar solvation Poisson-Boltzmann
     calculation.
@@ -91,12 +94,12 @@ class FiniteElement(InputFile):
         self.boundary_condition = input_["boundary condition"]
         self.calculate_energy = input_["calculate energy"]
         self.calculate_forces = input_["calculate forces"]
-        self.charge_discretization = input_["charge_discretization"]
+        self.charge_discretization = input_["charge discretization"]
         self.domain_length = input_["domain length"]
         self.error_based_refinement = input_["error based refinement"]
         self.error_tolerance = input_["error tolerance"]
         self.equation = input_["equation"]
-        self.ions = MobileIons(input_["ions"])
+        self.ions = MobileIons(dict_=input_["ions"])
         self.initial_mesh_resolution = input_["initial mesh resolution"]
         self.initial_mesh_vertices = input_["initial mesh vertices"]
         self.maximum_refinement_iterations = input_[
@@ -110,9 +113,11 @@ class FiniteElement(InputFile):
         self.surface_method = input_["surface method"]
         self.surface_spline_window = input_["surface spline window"]
         self.temperature = input_["temperature"]
-        self.use_maps = [UseMap(dict_) for dict_ in input_["use maps"]]
+        self.use_maps = [UseMap(dict_=dict_) for dict_ in input_["use maps"]]
         self.write_atom_potentials = input_["write atom potentials"]
-        self.write_maps = [WriteMap(dict_) for dict_ in input_["write maps"]]
+        self.write_maps = [
+            WriteMap(dict_=dict_) for dict_ in input_["write maps"]
+        ]
 
     def to_dict(self) -> dict:
         """Dump dictionary from object."""
@@ -121,7 +126,7 @@ class FiniteElement(InputFile):
         dict_["boundary condition"] = self.boundary_condition
         dict_["calculate energy"] = self.calculate_energy
         dict_["calculate forces"] = self.calculate_forces
-        dict_["charge_discretization"] = self.charge_discretization
+        dict_["charge discretization"] = self.charge_discretization
         dict_["domain length"] = self.domain_length
         dict_["error based refinement"] = self.error_based_refinement
         dict_["error tolerance"] = self.error_tolerance
@@ -143,6 +148,7 @@ class FiniteElement(InputFile):
         dict_["use maps"] = [map_.to_dict() for map_ in self.use_maps]
         dict_["write atom potentials"] = self.write_atom_potentials
         dict_["write maps"] = [map_.to_dict() for map_ in self.write_maps]
+        return dict_
 
     def validate(self):
         """Validate this object.
@@ -183,7 +189,7 @@ class FiniteElement(InputFile):
                     f"Value {elem} (type {type(elem)}) is not a WriteMap "
                     f"object."
                 )
-        self._write_maps = value
+            self._write_maps.append(elem)
 
     @property
     def write_atom_potentials(self) -> str:
@@ -535,6 +541,9 @@ class FiniteElement(InputFile):
 
         :raises TypeError:  if not set to a :class:`Ions` object
         """
+        _LOGGER.debug(f"self.ions = {self._ions}.")
+        if self._ions is None:
+            raise TypeError("Ions are set to None.")
         return self._ions
 
     @ions.setter
@@ -590,6 +599,7 @@ class FiniteElement(InputFile):
         value = value.lower()
         if value not in ["geometric", "uniform"]:
             raise ValueError(f"{value} is not a recognized value.")
+        self._a_priori_refinement = value
 
     @property
     def boundary_condition(self) -> str:
