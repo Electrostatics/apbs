@@ -81,6 +81,86 @@ class FiniteElement(InputFile):
         self._write_maps = []
         super().__init__(dict_=dict_, yaml=yaml, json=json)
 
+    def from_dict(self, input_):
+        """Populate object from dictionary.
+        
+        :param dict input_:  dictionary with input data.
+        :raises KeyError:  if dictionary missing keys.
+        """
+        self.a_priori_refinement = input_["a priori refinement"]
+        self.boundary_condition = input_["boundary condition"]
+        self.calculate_energy = input_["calculate energy"]
+        self.calculate_forces = input_["calculate forces"]
+        self.charge_discretization = input_["charge_discretization"]
+        self.domain_length = input_["domain length"]
+        self.error_based_refinement = input_["error based refinement"]
+        self.error_tolerance = input_["error tolerance"]
+        self.equation = input_["equation"]
+        self.ions = MobileIons(input_["ions"])
+        self.initial_mesh_resolution = input_["initial mesh resolution"]
+        self.initial_mesh_vertices = input_["initial mesh vertices"]
+        self.maximum_refinement_iterations = input_[
+            "maximum refinement iterations"
+        ]
+        self.maximum_vertices = input_["maximum vertices"]
+        self.molecule = input_["molecule"]
+        self.solute_dielectric = input_["solute dielectric"]
+        self.solvent_dielectric = input_["solvent dielectric"]
+        self.solvent_radius = input_["solvent radius"]
+        self.surface_method = input_["surface method"]
+        self.surface_spline_window = input_["surface spline window"]
+        self.temperature = input_["temperature"]
+        self.use_maps = [UseMap(dict_) for dict_ in input_["use maps"]]
+        self.write_atom_potentials = input_["write atom potentials"]
+        self.write_maps = [WriteMap(dict_) for dict_ in input_["write maps"]]
+
+    def to_dict(self) -> dict:
+        """Dump dictionary from object."""
+        dict_ = {}
+        dict_["a priori refinement"] = self.a_priori_refinement
+        dict_["boundary condition"] = self.boundary_condition
+        dict_["calculate energy"] = self.calculate_energy
+        dict_["calculate forces"] = self.calculate_forces
+        dict_["charge_discretization"] = self.charge_discretization
+        dict_["domain length"] = self.domain_length
+        dict_["error based refinement"] = self.error_based_refinement
+        dict_["error tolerance"] = self.error_tolerance
+        dict_["equation"] = self.equation
+        dict_["ions"] = self.ions.to_dict()
+        dict_["initial mesh resolution"] = self.initial_mesh_resolution
+        dict_["initial mesh vertices"] = self.initial_mesh_vertices
+        dict_[
+            "maximum refinement iterations"
+        ] = self.maximum_refinement_iterations
+        dict_["maximum vertices"] = self.maximum_vertices
+        dict_["molecule"] = self.molecule
+        dict_["solute dielectric"] = self.solute_dielectric
+        dict_["solvent dielectric"] = self.solvent_dielectric
+        dict_["solvent radius"] = self.solvent_radius
+        dict_["surface method"] = self.surface_method
+        dict_["surface spline window"] = self.surface_spline_window
+        dict_["temperature"] = self.temperature
+        dict_["use maps"] = [map_.to_dict() for map_ in self.use_maps]
+        dict_["write atom potentials"] = self.write_atom_potentials
+        dict_["write maps"] = [map_.to_dict() for map_ in self.write_maps]
+
+    def validate(self):
+        """Validate this object.
+        
+        Assumes that all attributes have been set via setters.
+
+        :raises ValueError:  if object is invalid.
+        """
+        for map_ in self.use_maps + self.write_maps:
+            map_.validate()
+        self.ions.validate()
+        if self.initial_mesh_vertices > self.maximum_vertices:
+            raise ValueError(
+                f"Initial mesh vertices {self.initial_mesh_vertices} setting "
+                f"is greater than maximum mesh vertices setting "
+                f"{self.maximum_vertices}."
+            )
+
     @property
     def write_maps(self) -> list:
         """Write out maps related to computed properties.
@@ -465,7 +545,6 @@ class FiniteElement(InputFile):
             )
         self._ions = value
 
-
     @property
     def domain_length(self) -> list:
         """Length of rectangular prism domain.
@@ -716,4 +795,3 @@ class FiniteElement(InputFile):
         ]:
             raise ValueError(f"Value {value} is invalid.")
         self._equation = value
-
