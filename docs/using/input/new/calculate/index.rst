@@ -16,6 +16,7 @@ Calculation types
    :maxdepth: 2
 
    finite_difference
+   finite_element
    nonpolar
 
 -------------

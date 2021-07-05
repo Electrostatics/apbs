@@ -3,7 +3,7 @@
 akeySOLVE
 =========
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. note::  This command has been eliminated in the *new APBS syntax* (see :ref:`new_input_format`) and will not be ported.
 
 Specifies how the the finite element mesh should be adaptively subdivided during the solve-estimate-refine iterations of a :ref:`femanual` finite element calculation.
 The syntax is:

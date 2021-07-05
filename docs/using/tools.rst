@@ -2,6 +2,8 @@
 Conversion utilities
 --------------------
 
+.. todo::  Update this documentation with the *new APBS syntax* (see :ref:`new_input_format`).
+
 ^^^^^^^^^^^^^^^
 amber2charmm.sh
 ^^^^^^^^^^^^^^^
@@ -133,7 +135,7 @@ Found in :file:`tools/mesh`
 mgmesh
 ^^^^^^
 
-Prints out acceptable combinations of :doc:`input/elec/nlev` and :doc:`input/elec/dime` for multigrd calculations.
+Prints out acceptable combinations of :doc:`input/old/elec/nlev` and :doc:`input/old/elec/dime` for multigrd calculations.
 Found in :file:`tools/mesh`
 
 ^^^^^^^^^^

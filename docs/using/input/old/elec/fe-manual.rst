@@ -3,7 +3,9 @@
 fe-manual
 =========
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. currentmodule:: apbs.input_file.calculate.finite_element
+
+.. note::  This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see :class:`FiniteElement` for more information.
 
 Manually-configured adaptive finite element Poisson-Boltzmann calculations.
 

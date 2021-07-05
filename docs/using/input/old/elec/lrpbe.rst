@@ -3,17 +3,18 @@
 lrpbe
 =====
 
+.. currentmodule:: apbs.input_file.calculate
+
 .. note::  
 
    Some aspects of this command have been moved to the *new APBS syntax* (see :ref:`new_input_format`): 
 
-   * Finite difference:
+   * Finite difference:  see :func:`finite_difference.FiniteDifference.equation` for more information.
 
-      .. currentmodule:: apbs.input_file.calculate.finite_difference
-
-      See :func:`FiniteDifference.equation` for more information.
+   * Finite element:  see :func:`finite_element.FiniteElement.equation` for more information.
 
 .. todo::  port for other types of calculations.
+
 
 Specifies that the linear form of the regularized Poisson-Boltzmann equation (RPBE) should be solved.
 The regularized PBE equation replaces the point charge distribution with the corresponding Green's function.

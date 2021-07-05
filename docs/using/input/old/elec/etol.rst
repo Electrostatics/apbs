@@ -3,13 +3,14 @@
 etol
 ====
 
-.. currentmodule:: apbs.input_file.calculate.finite_difference
+.. currentmodule:: apbs.input_file.calculate
 
 .. note::  
 
    Some versions of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
 
-   * For a finite difference calculation, see :func:`Focus.coarse_grid_dimensions` for more information.
+   * For a finite difference calculation, see :func:`finite_difference.FiniteDifference.error_tolerance`.
+   * For a finite element calculation, see :func:`finite_element.FiniteElement.error_tolerance`.
 
 .. todo::  add documentation links for other instances.
 

@@ -3,7 +3,11 @@
 targetRes
 =========
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. currentmodule::  apbs.input_file.calculate.finite_element
+
+.. note::
+   
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see :func:`FiniteElement.initial_mesh_resolution`.
 
 Specify the target resolution of the simplices in a finite element mesh (:ref:`femanual`).
 The syntax is:

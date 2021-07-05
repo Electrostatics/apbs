@@ -1,9 +1,16 @@
-.. _write:
+.. _old_write:
 
 write
 =====
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. currentmodule::  apbs.input_file.calculate
+
+.. note::
+   
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see :class:`generic.WriteMap` and specific functions for different calculations:
+
+   * Finite differences; see :func:`finite_difference.write_atom_potentials`.
+   * Finite elements; see :func:`finite_elements.write_atom_potentials`.
 
 This controls the output of scalar data calculated during the Poisson-Boltzmann run.
 This keyword can be repeated several times to provide various types of data output from APBS.

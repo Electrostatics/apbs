@@ -3,7 +3,9 @@
 akeyPRE
 =======
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. currentmodule:: apbs.input_file.calculate.finite_element
+
+.. note::  This command has been ported to :func:`FiniteElement.a_priori_refinement`.
 
 Specifies how the initial finite element mesh should be constructed (from refinement of a very coarse 8-tetrahedron mesh prior to the solve-estimate-refine iteration in :ref:`femanual` finite element calculations.
 The syntax is:

@@ -9,8 +9,9 @@ temp
 
    .. currentmodule:: apbs.input_file.calculate
 
-   * Finite difference calculations: See :func:`finite_difference.FiniteDifference.temperature`.
    * Nonpolar calculations: See :func:`nonpolar.Nonpolar.temperature`.
+   * Finite-difference Poisson-Boltzmann calculations: See :func:`finite_difference.FiniteDifference.temperature`.
+   * Finite-element Poisson-Boltzmann calculations: See :func:`finite_element.FiniteElement.temperature`.
 
    .. todo:: add other uses to new syntax
 

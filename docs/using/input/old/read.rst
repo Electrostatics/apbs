@@ -29,7 +29,7 @@ charge
 
 This command allows APBS to read the fixed (molecular) charge density function mapped to a mesh.
 The inputs are maps of charge densities; these values have units of e\ :sub:`c` Å\ :sup:`-3`, where e\ :sub:`c` is the electron charge.
-In general, this command will read charge-maps written by :ref:`elec` :ref:`write` commands.
+In general, this command will read charge-maps written by :ref:`elec` :ref:`old_write` commands.
 The syntax of this command is:
 
 .. code-block:: bash
@@ -57,7 +57,7 @@ diel
 
 This command allows APBS to read the dielectric function mapped to 3 meshes shifted by one-half grid spacing in the x, y, and z directions.
 The inputs are maps of dielectric variables between the solvent and biomolecular dielectric constants; these values are unitless.
-In general, this command will read dielectric maps written by by :ref:`elec` :ref:`write` commands.
+In general, this command will read dielectric maps written by by :ref:`elec` :ref:`old_write` commands.
 The syntax of this command is:
 
 .. code-block:: bash
@@ -92,7 +92,7 @@ kappa
 
 This command allows APBS to read the ion-accessibility function mapped to a mesh.
 The inputs are maps of ion accessibility values which range between 0 and the build Debye-Hückel screening parameter; these values have units of Å\ :sup:`-2`.
-In general, this command will read kappa-maps written by by :ref:`elec` :ref:`write` commands.
+In general, this command will read kappa-maps written by by :ref:`elec` :ref:`old_write` commands.
 The syntax of this command is:
 
 .. code-block:: bash
@@ -176,7 +176,7 @@ pot
 
 This command allows APBS to read the electrostatic potential mapped to a mesh.
 The inputs are maps of the electrostatic potential from a previous calculation.
-In general, this command will read potential-maps written by by :ref:`elec` :ref:`write` commands.
+In general, this command will read potential-maps written by by :ref:`elec` :ref:`old_write` commands.
 The syntax of this command is:
 
 .. code-block:: bash

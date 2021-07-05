@@ -7,11 +7,8 @@ dime
 
 .. note::  
 
-   Some versions of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see :class:`GridDimensions` for more information.
 
-   * For a focused finite difference calculation, see :func:`Focus.coarse_grid_dimensions` for more information.
-
-.. todo::  add manual finite difference documentation.
 
 Specifies the number of grid points per processor for grid-based discretization.
 The syntax is:

@@ -3,7 +3,9 @@
 domainLength
 ============
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. currentmodule:: apbs.input_file.calculate.finite_element
+
+.. note::  This command has been ported to the *new APBS syntax* (see :func:`FiniteElement.domain_length`).
 
 Specify the rectangular finite element mesh domain lengths for :ref:`femanual` finite element calculations.
 This length may be different in each direction.

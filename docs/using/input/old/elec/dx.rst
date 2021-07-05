@@ -16,5 +16,5 @@ where ``filename`` is a string for the name of the file where an OpenDX file wil
 
 .. todo::
    
-   The PB-(S)AM ``dx`` keyword should not exist; please replace it ASAP with the :doc:`write` command.
+   The PB-(S)AM ``dx`` keyword should not exist; please replace it ASAP with the :ref:`old_write` command.
    Documented in https://github.com/Electrostatics/apbs/issues/488

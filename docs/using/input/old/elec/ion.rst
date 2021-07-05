@@ -5,9 +5,13 @@ ion
 
 .. note::
 
-   .. currentmodule:: apbs.input_file.calculate.generic
+   .. currentmodule:: apbs.input_file.calculate
 
-   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see :class:`MobileIons` for more information.
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see:
+   
+   * General information about this object:  :class:`generic.MobileIons` for more information.
+   * Finite difference implementation:  :func:`finite_difference.FiniteDifference.ions`.
+   * Finite element implementation:  :func:`finite_element.FiniteElement.ions`.
 
 Specify the bulk concentrations of mobile ion species present in the system.
 This command can be repeated as necessary to specify multiple types of ions; however, only the largest ionic radius is used to determine the ion-accessibility function.
