@@ -43,7 +43,6 @@ GOOD_BOUNDARY_CONDITIONS = [
     "multiple sphere",
     "focus foo",
 ]
-GOOD_BEER = ["White Bluffs FID"]
 GOOD_CHARGE_DISCRETIZATIONS = ["linear", "cubic", "quintic"]
 GOOD_ERROR_BASED_REFINEMENT = ["global", "simplex", "fraction"]
 GOOD_EQUATIONS = [
