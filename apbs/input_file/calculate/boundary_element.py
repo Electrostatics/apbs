@@ -31,6 +31,79 @@ class Mesh(InputFile):
         super().__init__(dict_=dict_, yaml=yaml, json=json)
 
     @property
+    def software(self) -> str:
+        """Software for generating mesh.
+
+        One of the following values:
+
+        * ``nanoshaper``:  `NanoShaper software
+          <https://www.electrostaticszone.eu/downloads>`
+
+        .. note::  The user is responsible for downloading the software and
+           ensuring that it is available in their path.
+
+        :raises TypeError:  if not set to a string
+        :raises ValueError:  if set to an invalid value
+        """
+        return self._software
+
+    @software.setter
+    def software(self, value):
+        if not check.is_string(value):
+            raise TypeError(
+                f"Value {value} (type {type(value)}) is not a string."
+            )
+        value = value.lower()
+        if value not in ["nanoshaper"]:
+            raise ValueError(f"{value} is not a valid value.")
+        self._software = value
+
+    @property
+    def solvent_radius(self) -> float:
+        """Radius of the solvent molecules.
+
+        This parameter is used to define various solvent-related surfaces and
+        volumes (see :func:`surface_method`). This value is usually set to 1.4
+        Å for a water-like molecular surface and set to 0 Å for a van der Waals
+        surface.
+
+        :raises ValueError:  if value is not a non-negative number
+        """
+        return self._solvent_radius
+
+    @solvent_radius.setter
+    def solvent_radius(self, value):
+        if check.is_positive_semidefinite(value):
+            self._solvent_radius = value
+        else:
+            raise ValueError(f"{value} is not a non-negative number.")
+
+    @property
+    def surface_density(self) -> float:
+        """Number of points per area on surface.
+
+        Units are number per Å\ :superscript:`2` and are used in calculation of
+        surface terms (e.g., molecular surface, solvent accessible surface).
+        This keyword is ignored when :func:`surface_radius` is 0.0 (e.g., for
+        van der Waals surfaces) or if :func:`surface method` refers to
+        splines.
+
+        A typical value is 10.0.
+
+        .. todo:: I am not sure how TABI uses this value with NanoShaper
+
+        :raises ValueError:  if value is not a positive number
+        """
+        return self._surface_density
+
+    @surface_density.setter
+    def surface_density(self, value):
+        if check.is_positive_definite(value):
+            self._surface_density = value
+        else:
+            raise ValueError(f"{value} is not a positive number.")
+
+    @property
     def surface_method(self) -> str:
         """Method to compute molecular surface (boundary).
 
@@ -382,7 +455,19 @@ class BoundaryElement(InputFile):
 
     @property
     def mesh(self) -> Mesh:
-        raise NotImplementedError()
+        """Parameters for the boundary mesh.
+
+        :raises TypeError:  if not set to :class:`Mesh` object.
+        """
+        return self._mesh
+
+    @mesh.setter
+    def mesh(self, value):
+        if not isinstance(value, Mesh):
+            raise TypeError(
+                f"Value {value} (type {type(value)} is not class Mesh."
+            )
+        self._mesh = value
 
     @property
     def ions(self) -> MobileIons:

@@ -3,4 +3,4 @@
 
 def test_input():
     """Test input files."""
-    raise NotImplementedError()
+    raise NotImplementedError("FINISH OVERALL INPUT FILE TEST")
