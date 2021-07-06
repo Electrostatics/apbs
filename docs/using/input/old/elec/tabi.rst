@@ -3,7 +3,11 @@
 tabi
 ==========
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. currentmodule::  apbs.input_file.calculate.boundary_element
+
+.. note::
+   
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see :class:`BoundaryElement` and :class:`TABIParameters`.
 
 This mode uses the TABI-PB integral equation software from Geng and Krasny to solve the linearized Poisson-Boltmzann equation. 
 Boundary element methods offer the ability to focus numerical effort on a much smaller region of the problem domain:  the interface between the molecule and the solvent.

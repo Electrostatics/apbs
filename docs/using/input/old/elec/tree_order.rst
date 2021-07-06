@@ -3,7 +3,11 @@
 tree_order
 ==========
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. currentmodule::  apbs.input_file.calculate.boundary_element
+
+.. note::
+
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see :func:`TABIParameters.tree_order`.
 
 TABI-PB parameter that specifies the order of the treecode multipole expansion.
 The syntax is:

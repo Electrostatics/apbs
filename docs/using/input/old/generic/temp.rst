@@ -9,9 +9,10 @@ temp
 
    .. currentmodule:: apbs.input_file.calculate
 
+   * Boundary-element Poisson-Boltzmann polar calculations: See :func:`boundary_element.BoundaryElement.temperature`.
    * Nonpolar calculations: See :func:`nonpolar.Nonpolar.temperature`.
-   * Finite-difference Poisson-Boltzmann calculations: See :func:`finite_difference.FiniteDifference.temperature`.
-   * Finite-element Poisson-Boltzmann calculations: See :func:`finite_element.FiniteElement.temperature`.
+   * Finite-difference Poisson-Boltzmann polar calculations: See :func:`finite_difference.FiniteDifference.temperature`.
+   * Finite-element Poisson-Boltzmann polar calculations: See :func:`finite_element.FiniteElement.temperature`.
 
    .. todo:: add other uses to new syntax
 

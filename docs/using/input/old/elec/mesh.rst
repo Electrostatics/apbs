@@ -3,9 +3,14 @@
 mesh
 ====
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. currentmodule::  apbs.input_file.calculate.boundary_element
 
-TABI-PB parameter that spceifies the meshing software used to generate surface mesh.
+.. note::
+
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see :func:`Mesh.surface_method`.
+
+
+TABI-PB parameter that specifies the meshing software used to generate surface mesh.
 The syntax is:
 
 .. code-block:: bash
