@@ -3,7 +3,8 @@ import logging
 import json
 from abc import ABC, abstractmethod
 import yaml
-from yaml import Dumper
+
+# from yaml import Dumper
 from .apbs_legacy_input import ApbsLegacyInput  # noqa F401
 
 
@@ -16,9 +17,12 @@ class InputFile(ABC):
     def __init__(self, dict_=None, yaml=None, json=None):
         """Initialize object.
 
-        :param dict dict_:  optional dictionary for initializing object with func:`from_dict`
-        :param str yaml:  optional YAML string for initializing object with func:`from_yaml`
-        :param str json:  optional JSON string for initializing object with func:`from_json`
+        :param dict dict_:  optional dictionary for initializing object with
+            func:`from_dict`
+        :param str yaml:  optional YAML string for initializing object with
+            func:`from_yaml`
+        :param str json:  optional JSON string for initializing object with
+            func:`from_json`
         """
         if dict_ is not None:
             self.from_dict(dict_)

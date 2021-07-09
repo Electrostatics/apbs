@@ -5,7 +5,8 @@
    * Add mmCIF support for :class:`Molecule`
 """
 import logging
-from typing import Type
+
+# from typing import Type
 from . import check
 from . import InputFile
 
@@ -128,9 +129,9 @@ class DielectricMapGroup(InputFile):
         """
         errors = []
         if self.paths is None:
-            errors.append(f"Paths have not been set.")
+            errors.append("Paths have not been set.")
         if self.format is None:
-            errors.append(f"Format has not been set.")
+            errors.append("Format has not been set.")
         if errors:
             err = " ".join(errors)
             raise ValueError(err)

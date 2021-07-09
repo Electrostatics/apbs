@@ -21,8 +21,8 @@ class Atom:
         Arguments:
 
         :param int id: A unique identifier for this Atom
-        :param str field_name: Specifies the type of PQR entry and should either
-                           be ATOM or HETATM in order to be parsed by APBS.
+        :param str field_name: Specifies the type of PQR entry and should be
+                         either ATOM or HETATM in order to be parsed by APBS.
         :param int atom_number: The atom index.
         :param str atom_name: The atom name.
         :param str residue_name: The residue name.
@@ -30,7 +30,8 @@ class Atom:
                          the atom. NOTE: that chain ID support is a new
                          feature of APBS 0.5.0 and later versions.
         :param int residue_number: The residue index.
-        :param str ins_code: An optional value which provides the PDB insertion code.
+        :param str ins_code: An optional value which provides the PDB insertion
+                         code.
         :param float x: The X atomic coordinate in angstroms
         :param float y: The Y atomic coordinate in angstroms
         :param float z: The Z atomic coordinate in angstroms
@@ -85,10 +86,16 @@ class Atom:
             )
 
     def __str__(self):
-        return f"Atom< name< {self.field_name} >, {self.position}, radius< {self.radius} >, charge< {self.charge} > >"
+        return (
+            f"Atom< name< {self.field_name} >, {self.position}, "
+            f"radius< {self.radius} >, charge< {self.charge} > >"
+        )
 
     def __repr__(self):
-        return f"Atom< name< {self.field_name} >, {self.position}, radius< {self.radius} >, charge< {self.charge} > >"
+        return (
+            f"Atom< name< {self.field_name} >, {self.position}, "
+            f"radius< {self.radius} >, charge< {self.charge} > >"
+        )
 
     def euclidian_dist2(
         self, other: Union["Atom", Coordinate, np.ndarray]
