@@ -19,7 +19,8 @@ class Ion(InputFile):
 
     * ``charge``:  charge of ion; see :func:`charge`
     * ``radius``:  radius of ion; see :func:`radius`
-    * ``concentration``:  concentration of ion species; see :func:`concentration`
+    * ``concentration``:  concentration of ion species;
+      see :func:`concentration`
 
     """
 
@@ -271,7 +272,8 @@ class WriteMap(InputFile):
 
         * ``ion accessibility``: Write out the inflated van der Waals-based ion
           accessibility (see :func:`FiniteDifference.surface_definition`).
-          Values are unitless and range from 0 (inaccessible) to 1 (accessible).
+          Values are unitless and range from 0 (inaccessible) to 1
+          (accessible).
 
         * ``laplacian``: Write out the Laplacian of the potential
           :math:`\\nabla^2 \\phi` in units of
@@ -281,15 +283,16 @@ class WriteMap(InputFile):
           :math:`-\\nabla \\cdot \\epsilon \\nabla \\phi` in units of
           k\\ :sub:`B` T e\\ :sub:`c`\\ :sup:`-1` Å\\ :sup:`-2`.
 
-        * ``ion number density``:  Write out the total mobile ion number density
-          for all ion species in units of M. The output is calculated according
-          to the formula (for nonlinear PB calculations):  :math:`\\rho(x) =
+        * ``ion number density``:  Write out the total mobile ion number
+          density for all ion species in units of M. The output is calculated
+          according to the formula (for nonlinear PB calculations):
+          :math:`\\rho(x) =
           \\sum_i^N {\\bar{\\rho}_i e^{-q_i\\phi(x) - V_i (x)}}`, where
           :math:`N` is the number of ion species, :math:`\\bar{\\rho}_i` is the
           bulk density of ion species :math:`i`, :math:`q_i` is the charge of
           ion species :math:`i`, :math:`\\phi(x)` is the electrostatic
-          potential, and :math:`V_i` is the solute-ion interaction potential for
-          species :math:`i`.
+          potential, and :math:`V_i` is the solute-ion interaction potential
+          for species :math:`i`.
 
         * ``ion charge density``: Write out the total mobile ion charge density
           for all ion species in units of e\\ :sub:`c` M. The output is
@@ -391,8 +394,8 @@ class UseMap(InputFile):
           boundary condition calculations (see
           :func:`FiniteDifference.boundary_condition`)
 
-        * ``ion accessibility``:  Mobile ion-accessibility function map (as read
-          in :ref:`read_new_input`); this causes the
+        * ``ion accessibility``:  Mobile ion-accessibility function map (as
+          read in :ref:`read_new_input`); this causes the
           :func:`FiniteDifference.surface_method`, and
           :func:`FiniteDifference.surface spline window` properties to be
           ignored, along with the radii of the solute atoms.  The
@@ -401,12 +404,12 @@ class UseMap(InputFile):
 
         * ``charge density``:  Charge distribution map (as read in
           :ref:`read_new_input`); this causes the :func:`charge discretization`
-          parameter and the charges of the biomolecular atoms to be ignored when
-          assembling the fixed charge distribution for the Poisson-Boltzmann
-          equation.
+          parameter and the charges of the biomolecular atoms to be ignored
+          when assembling the fixed charge distribution for the
+          Poisson-Boltzmann equation.
 
-        * ``potential``:  Potential map (as read in :ref:`read_new_input`); this
-          is used to set the boundary condition and causes the
+        * ``potential``:  Potential map (as read in :ref:`read_new_input`);
+          this is used to set the boundary condition and causes the
           :func:`boundary_condition` property to be ignored.
 
         :raises TypeError:  if not string

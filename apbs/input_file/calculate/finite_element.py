@@ -1,6 +1,7 @@
 """Parameters for a finite-element polar solvation calculation."""
 import logging
-from typing import Type
+
+# from typing import Type
 from .. import check
 from .. import InputFile
 from .generic import MobileIons, UseMap, WriteMap
@@ -26,7 +27,7 @@ class FiniteElement(InputFile):
     * ``domain length``:  see :func:`domain_length`
     * ``error estimation``:  how error is calculated for driving refinement;
       see :func:`error_estimation`
-    * ``error-based refinement``:  method for choosing which simplices to 
+    * ``error-based refinement``:  method for choosing which simplices to
       refine based on error; see :func:`error_based_refinement`
     * ``equation``:  what version of the Poisson-Boltzmann equation to solve;
       see :func:`equation`
@@ -35,7 +36,7 @@ class FiniteElement(InputFile):
       :func:`initial_mesh_resolution`
     * ``initial mesh vertices``:  target number of vertices in the initial
       finite element mesh; see :func:`initial_mesh_vertices`
-    * ``maximum refinement iterations``:  number of times to perform the 
+    * ``maximum refinement iterations``:  number of times to perform the
       solve-estimate-refine iteration of the finite element solver; see
       :func:`maximum_refinement_iterations`
     * ``maximum vertices``:  target for maximum number of vertices in mesh; see
@@ -48,8 +49,8 @@ class FiniteElement(InputFile):
     * ``surface method``:  see :func:`surface_method`
     * ``surface spline window``:  see :func:`surface_spline_window`
     * ``temperature``:  see :func:`temperature`
-    * ``use maps``:  use input map for one or more properties of the system; see
-      :func:`use_maps`
+    * ``use maps``:  use input map for one or more properties of the system;
+      see :func:`use_maps`
     * ``write atom potentials``:  write out atom potentials; see
       :func:`write_atom_potentials`
     * ``write maps``:  write out one or more properties of the system to a map;
@@ -86,7 +87,7 @@ class FiniteElement(InputFile):
 
     def from_dict(self, input_):
         """Populate object from dictionary.
-        
+
         :param dict input_:  dictionary with input data.
         :raises KeyError:  if dictionary missing keys.
         """
@@ -152,7 +153,7 @@ class FiniteElement(InputFile):
 
     def validate(self):
         """Validate this object.
-        
+
         Assumes that all attributes have been set via setters.
 
         :raises ValueError:  if object is invalid.
@@ -289,8 +290,8 @@ class FiniteElement(InputFile):
 
         One of the following values:
 
-        * ``molecular surface``:  The dielectric coefficient is defined based on
-          a molecular surface definition. The problem domain is
+        * ``molecular surface``:  The dielectric coefficient is defined based
+          on a molecular surface definition. The problem domain is
           divided into two spaces. The "free volume" space is defined by the
           union of solvent-sized spheres (see :func:`solvent_radius`) which do
           not overlap with the solute atoms. This free volume is assigned bulk
@@ -418,7 +419,7 @@ class FiniteElement(InputFile):
         * 20-40:  used to model larger-scale macromolecular conformational
           changes and/or water penetration into interior of molecule
 
-        .. note:: 
+        .. note::
 
            What does the continuum dielectric value of a non-continuum molecule
            mean?  Hard to say -- this approximation can be very difficult to
@@ -459,7 +460,7 @@ class FiniteElement(InputFile):
     def maximum_vertices(self) -> int:
         """Maximum number of vertices produced in solve-estimate-refine
         iterations.
-        
+
         The solve-estimate-refine loop will continue until the mesh has more
         than this number of vertices or :func:`maximum_refinement_iterations`
         has been reached.
@@ -557,7 +558,7 @@ class FiniteElement(InputFile):
     @property
     def domain_length(self) -> list:
         """Length of rectangular prism domain.
-        
+
         :returns:  list of non-zero lengths for x, y, and z directions.
         :raises  TypeError: if not list of positive definite numbers.
         :raises IndexError:  if list not length 3
@@ -612,12 +613,12 @@ class FiniteElement(InputFile):
           large errors if used inappropriately.
 
         * ``single sphere``:  Dirichlet condition where the potential at the
-          boundary is set to the values prescribed by a Debye-Hückel model for a
-          single sphere with a point charge, dipole, and quadrupole. The sphere
-          radius in this model is set to the radius of the biomolecule and the
-          sphere charge, dipole, and quadrupole are set to the total moments of
-          the protein. This condition works best when the boundary is
-          sufficiently far (multiple Debye lengths) from the biomolecule.
+          boundary is set to the values prescribed by a Debye-Hückel model for
+          a single sphere with a point charge, dipole, and quadrupole. The
+          sphere radius in this model is set to the radius of the biomolecule
+          and the sphere charge, dipole, and quadrupole are set to the total
+          moments of the protein. This condition works best when the boundary
+          is sufficiently far (multiple Debye lengths) from the biomolecule.
 
         * ``multiple sphere``:  Dirichlet condition where the potential at the
           boundary is set to the values prescribed by a Debye-Hückel model for
@@ -629,8 +630,8 @@ class FiniteElement(InputFile):
 
         * ``focus`` :c:var:`alias`:  Dirichlet condition where the potential at
           the boundary is set to the values computed by a previous (usually
-          lower-resolution) PB calculation with alias :c:var:`alias`. All of the
-          boundary points should lie within the domain of the previous
+          lower-resolution) PB calculation with alias :c:var:`alias`. All of
+          the boundary points should lie within the domain of the previous
           calculation for best accuracy; if any boundary points lie outside,
           their values are computed using the ``single sphere`` Debye-Hückel
           boundary condition (see above).
@@ -736,7 +737,7 @@ class FiniteElement(InputFile):
         * ``fraction``:  this refines the specified fraction of simplices
           with the largest per-simplex error.  The fraction is specified by
           :func:`error_tolerance`.
-        
+
         :raises TypeError:  if not set to string
         :raises ValueError:  if not set to allowed value
         """

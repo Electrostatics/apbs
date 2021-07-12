@@ -33,7 +33,7 @@ class AtomComplexCalc:
         self.surface_density = surface_density
         max_radius = alist.max_radius + clist.max_radius
         max_area = 4.0 * (max_radius ** 2) * np.pi
-        nsphere = np.ceil(max_area * surface_density)
+        nsphere = np.ceil(max_area * surface_density)  # noqa: F841
 
         # TODO: calculate reference shpere (see VaccSurf_refSphere)
 
@@ -56,7 +56,8 @@ class AtomComplexCalc:
         """
         if radius > self.clist.max_radius:
             raise RuntimeError(
-                f"Got radius {radius} greater than max radius {self.clist.max_radius} from cell list."
+                f"Got radius {radius} greater than max radius "
+                f"{self.clist.max_radius} from cell list."
             )
 
         c = (center - self.lower_corner) / self.stride

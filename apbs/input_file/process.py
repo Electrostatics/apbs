@@ -3,7 +3,8 @@
 The top-level output summarizes or combines results from multiple calculations.
 """
 import logging
-from typing import Type
+
+# from typing import Type
 from . import InputFile
 from . import check
 
