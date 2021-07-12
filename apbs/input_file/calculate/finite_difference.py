@@ -21,16 +21,16 @@ class GridDimensions(InputFile):
     """Parameters for controlling the number of grid points and the grid
     spacing.
 
-    For a given direction :math:`i \\in [x, y, z]`, the grid spacing :math:`h_i`
-    is related to the number of grid points :math:`n_i` and the grid length
-    :math:`l_i` by
+    For a given direction :math:`i \\in [x, y, z]`, the grid spacing
+    :math:`h_i` is related to the number of grid points :math:`n_i` and the
+    grid length :math:`l_i` by
 
     .. math::
 
        l_i = h_i (n_i - 1)
 
     Therefore, only two of the following three properties are needed.  When all
-    three are provided, the :func:`spacings` will be inferred from the 
+    three are provided, the :func:`spacings` will be inferred from the
     :func:`counts` and :func:`lengths`.
 
     * ``counts``:  the number of grid points in each direction; see
@@ -127,7 +127,7 @@ class GridDimensions(InputFile):
         :math:`p` is the number of levels, greater than or equal to
         :const:`MIN_LEVEL`.
 
-        .. note::  assumes ``target`` is greater than or equal to 
+        .. note::  assumes ``target`` is greater than or equal to
             2 ** :const:`MIN_LEVEL`
 
         :param int target:  target number of grid points
@@ -213,8 +213,9 @@ class GridDimensions(InputFile):
                 self.counts = counts
             else:
                 raise ValueError(
-                    f"Can't return counts because either lengths "
-                    f"({self._lengths}) or spacings ({self._spacings}) is None."
+                    "Can't return counts because either lengths "
+                    f"({self._lengths}) or spacings ({self._spacings}) is "
+                    "None."
                 )
         return self._counts
 
@@ -246,8 +247,8 @@ class GridDimensions(InputFile):
           direction.
         :raises IndexError:  if the length of the value is not 3.
         :raises TypeError:  if the spacings are not positive numbers.
-        :raises ValueError:  if not enough information is available to calculate
-            spacings
+        :raises ValueError:  if not enough information is available to
+            calculate spacings
         """
         if self._spacings is None:
             if (self._lengths is not None) and (self._counts is not None):
@@ -285,8 +286,8 @@ class GridDimensions(InputFile):
           direction.
         :raises IndexError:  if the length of the value is not 3.
         :raises TypeError:  if the lengths are not positive numbers.
-        :raises ValueError:  if not enough information is available to calculate
-            lengths
+        :raises ValueError:  if not enough information is available to
+            calculate lengths
         """
         if self._lengths is None:
             if (self._spacings is not None) and (self._counts is not None):
@@ -323,7 +324,7 @@ class GridCenter(InputFile):
 
     * ``molecule``:  use the center of the specified molecule.  See
       :func:`molecule`.
-    
+
     * ``position``:  use a specific position (coordinates).  See
       :func:`position`.
 
@@ -347,7 +348,7 @@ class GridCenter(InputFile):
 
     def validate(self):
         if self.molecule is None and self.position is None:
-            raise ValueError(f"Need to specify either molecule or position.")
+            raise ValueError("Need to specify either molecule or position.")
 
     @property
     def molecule(self) -> str:
@@ -635,12 +636,12 @@ class Focus(InputFile):
     difference setting. Some of the earliest references to this method are from
     Gilson and Honig
     (DOI:`10.1038/330084a0 <http://dx.doi.org/10.1038/330084a0>`_). The method
-    starts by solving the equation on a coarse grid (i.e., few grid points) with
-    large dimensions (i.e., grid lengths). The solution on this coarse grid is
-    then used to set the Dirichlet boundary condition values for a smaller
-    problem domain -- and therefore a finer grid -- surrounding the region of
-    interest. The finer grid spacing in the smaller problem domain often
-    provides greater accuracy in the solution.
+    starts by solving the equation on a coarse grid (i.e., few grid points)
+    with large dimensions (i.e., grid lengths). The solution on this coarse
+    grid is then used to set the Dirichlet boundary condition values for a
+    smaller problem domain -- and therefore a finer grid -- surrounding the
+    region of interest. The finer grid spacing in the smaller problem domain
+    often provides greater accuracy in the solution.
 
     .. note::
 
@@ -670,14 +671,14 @@ class Focus(InputFile):
     * ``fine grid dimensions``:  dimensions of the fine grid, see
       :func:`fine_grid_dimensions`
 
-    * ``parallel``:  a Boolean, indicating whether a parallel calculation 
+    * ``parallel``:  a Boolean, indicating whether a parallel calculation
       should be performed; see :func:`parallel`.  If this value is true, the
       ``parallel parameters`` object should be included in the input file; see
       :func:`parallel_parameters`.
 
     * ``parallel parameters``:  *optional* information for configuring a
       parallel focusing run; *required* if :func:`parallel` is True. See
-      :func:`parallel_parameters` and :class:`ParallelFocus` for more 
+      :func:`parallel_parameters` and :class:`ParallelFocus` for more
       information.
 
     """
@@ -754,7 +755,7 @@ class Focus(InputFile):
                     )
         if self.parallel:
             if self.parallel_parameters is None:
-                raise ValueError(f"Missing parallel parameters.")
+                raise ValueError("Missing parallel parameters.")
             self.parallel_parameters.validate()
         if errors:
             raise ValueError(" ".join(errors))
@@ -897,8 +898,8 @@ class FiniteDifference(InputFile):
     * ``surface method``:  see :func:`surface_method`
     * ``surface spline window``:  see :func:`surface_spline_window`
     * ``temperature``:  see :func:`temperature`
-    * ``use maps``:  use input map for one or more properties of the system; see
-      :func:`use_maps`
+    * ``use maps``:  use input map for one or more properties of the system;
+      see :func:`use_maps`
     * ``write atom potentials``:  write out atom potentials; see
       :func:`write_atom_potentials`
     * ``write maps``:  write out one or more properties of the system to a map;
@@ -1018,8 +1019,8 @@ class FiniteDifference(InputFile):
             errors.append("equation not set.")
         if self.ions is None:
             _LOGGER.debug(
-                "The ions feel bad that you left them out but it's OK, they'll "
-                "get over it."
+                "The ions feel bad that you left them out but it's OK, "
+                "they'll get over it."
             )
         else:
             try:
@@ -1204,8 +1205,8 @@ class FiniteDifference(InputFile):
 
         One of the following values:
 
-        * ``molecular surface``:  The dielectric coefficient is defined based on
-          a molecular surface definition. The problem domain is
+        * ``molecular surface``:  The dielectric coefficient is defined based
+          on a molecular surface definition. The problem domain is
           divided into two spaces. The "free volume" space is defined by the
           union of solvent-sized spheres (see :func:`solvent_radius`) which do
           not overlap with the solute atoms. This free volume is assigned bulk
@@ -1333,7 +1334,7 @@ class FiniteDifference(InputFile):
         * 20-40:  used to model larger-scale macromolecular conformational
           changes and/or water penetration into interior of molecule
 
-        .. note:: 
+        .. note::
 
            What does the continuum dielectric value of a non-continuum molecule
            mean?  Hard to say -- this approximation can be very difficult to
@@ -1517,7 +1518,7 @@ class FiniteDifference(InputFile):
            setting this property (sorry...)
 
         :raises ValueError:  if calculation parameter class doesn't match
-          calculation type or if 
+          calculation type or if
         """
         return self._calculation_parameters
 
@@ -1535,8 +1536,8 @@ class FiniteDifference(InputFile):
             or (self._calculation_type is None)
         ):
             raise ValueError(
-                f"Calculation type is {type(self._calculation_type)} but value "
-                f"type is {type(value)}."
+                f"Calculation type is {type(self._calculation_type)} but "
+                f"value type is {type(value)}."
             )
         self._calculation_parameters = value
 
@@ -1551,12 +1552,12 @@ class FiniteDifference(InputFile):
           large errors if used inappropriately.
 
         * ``single sphere``:  Dirichlet condition where the potential at the
-          boundary is set to the values prescribed by a Debye-Hückel model for a
-          single sphere with a point charge, dipole, and quadrupole. The sphere
-          radius in this model is set to the radius of the biomolecule and the
-          sphere charge, dipole, and quadrupole are set to the total moments of
-          the protein. This condition works best when the boundary is
-          sufficiently far (multiple Debye lengths) from the biomolecule.
+          boundary is set to the values prescribed by a Debye-Hückel model for
+          a single sphere with a point charge, dipole, and quadrupole. The
+          sphere radius in this model is set to the radius of the biomolecule
+          and the sphere charge, dipole, and quadrupole are set to the total
+          moments of the protein. This condition works best when the boundary
+          is sufficiently far (multiple Debye lengths) from the biomolecule.
 
         * ``multiple sphere``:  Dirichlet condition where the potential at the
           boundary is set to the values prescribed by a Debye-Hückel model for
@@ -1568,8 +1569,8 @@ class FiniteDifference(InputFile):
 
         * ``focus`` :c:var:`alias`:  Dirichlet condition where the potential at
           the boundary is set to the values computed by a previous (usually
-          lower-resolution) PB calculation with alias :c:var:`alias`. All of the
-          boundary points should lie within the domain of the previous
+          lower-resolution) PB calculation with alias :c:var:`alias`. All of
+          the boundary points should lie within the domain of the previous
           calculation for best accuracy; if any boundary points lie outside,
           their values are computed using the ``single sphere`` Debye-Hückel
           boundary condition (see above).

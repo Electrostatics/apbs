@@ -7,7 +7,7 @@ from apbs.pqr import PQRReader
 
 def search_dir(opt_path):
     return (
-        pathlib.Path(__file__).parent.parent.parent.parent.absolute()
+        pathlib.Path(__file__).parent.parent.parent.absolute()
         / "examples"
         / opt_path
     )

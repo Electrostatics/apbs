@@ -72,7 +72,9 @@ class Grid:
             int(np.ceil(tmp.x)), int(np.ceil(tmp.y)), int(np.ceil(tmp.z))
         )
         lo = Coordinate(
-            int(np.floor(tmp.x)), int(np.floor(tmp.y)), int(np.floor(tmp.z)),
+            int(np.floor(tmp.x)),
+            int(np.floor(tmp.y)),
+            int(np.floor(tmp.z)),
         )
 
         hi.x = (
@@ -173,7 +175,7 @@ class Grid:
     def seminormH1(self) -> float:
         r"""Get the \f$H_1\f$ semi-norm of the data.
         This returns the integral:
-          \f[ | u |_{H_1} = \left( \int_\Omega |\nabla u(x)|^2 dx \right)^{1/2} \f]
+          \f[ | u |_{H_1} = \left( \int_\Omega |\nabla u(x)|^2 dx \right)^{1/2} \f]  # noqa: E501
         """
         ...
 
