@@ -1,7 +1,7 @@
 #######################
 
 read
-    mol pqr /home/ubuntu/git/apbs/examples/pygbe/lys/lys1_charges.pqr
+    mol pqr lys/lys1_charges.pqr
 end
 
 elec name mol1
