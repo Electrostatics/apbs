@@ -50,9 +50,9 @@ python -m pip install -r requirements.txt
 echo "==================================== PWD FOR TOP DIR ==================================== "
 pwd
 echo "==================================== Get External SubModules ==================================== "
-#git submodule init
-#git submodule update
-#git submodule sync
+git submodule init
+git submodule update
+git submodule sync
 git ls-tree HEAD externals
 
 echo "==================================== CLEAN =============================================== "
@@ -89,15 +89,16 @@ cd $BUILD_DIR                                             || exit 1
 #cmake -S .. -B $BUILD_DIR --trace-source=../CMakeLists.txt --trace-expand \
 cmake                                                     \
       -DBUILD_DOC=ON                                      \
-      -DBUILD_SHARED_LIBS=OFF                             \
+      -DBUILD_SHARED_LIBS=ON                              \
       -DBUILD_TOOLS=ON                                    \
       -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} ${COVERAGE}"      \
       -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${COVERAGE}"  \
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE                    \
       -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR                 \
+      -DENABLE_PYGBE=ON                                   \
       -DENABLE_BEM=ON                                     \
       -DENABLE_GEOFLOW=ON                                 \
-      -DENABLE_FETK=ON                                    \
+      -DENABLE_FETK=OFF                                   \
       -DENABLE_OPENMP=ON                                  \
       -DENABLE_PBAM=ON                                    \
       -DENABLE_PBSAM=ON                                   \
