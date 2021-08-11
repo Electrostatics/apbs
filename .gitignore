@@ -69,6 +69,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
+!docs
 docs/_build/
 
 # PyBuilder
@@ -171,4 +172,3 @@ junk.sh
 # PYBIND11
 pybind11
 coverage.txt
-.gitignore
