@@ -112,7 +112,8 @@ VERBOSE=1 make -j 1                                       || exit 1
 VERBOSE=1 make -j 1 install                               #|| exit 1
 export PATH="$INSTALL_DIR/bin:$PATH"
 # Run a single test if it fails using the following:
-# ctest -VV -R pbam_test
+echo "==================================== VERBOSE TEST ======================================= "
+ctest -C Release -VV -R protein-rna
 echo "==================================== TEST =============================================== "
 ctest -C Release --output-on-failure                      #|| exit 1
 
