@@ -85,10 +85,11 @@ build_script:
   # - cd c:\
   # - curl -o OpenBLAS.zip https://github.com/xianyi/OpenBLAS/releases/download/v0.3.17/OpenBLAS-0.3.17-x64.zip
   # - curl -o OpenBLAS.zip https://sourceforge.net/projects/openblas/files/v0.3.17/OpenBLAS%200.3.17%20version.zip/download
-  - SET $source="https://sourceforge.net/projects/openblas/files/v0.3.17/OpenBLAS%200.3.17%20version.zip/download
-  - SET $destination="c:\OpenBLAS.zip"
-  - Invoke-WebRequest $source -OutFile $destination
-  - unzip OpenBLAS.zip
+  # - SET $source="https://sourceforge.net/projects/openblas/files/v0.3.17/OpenBLAS%200.3.17%20version.zip/download
+  # - SET $destination="c:\OpenBLAS.zip"
+  # - Invoke-WebRequest $source -OutFile $destination
+  # - unzip OpenBLAS.zip
+  - conda install -c anaconda openblas
 
   #  Get the external projects configured
   - cd c:\projects\source
