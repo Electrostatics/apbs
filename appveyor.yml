@@ -79,6 +79,12 @@ build_script:
   #  ECHO "VS VARS FILE = %vsdevcmd%"
   #  call %vsdevcmd%
 
+  #  Install BLAS
+  #  https://sourceforge.net/projects/openblas/files/v0.3.17/OpenBLAS%200.3.17%20version.zip/download
+  - cd c:\
+  - curl -fsS -o OpenBLAS.zip https://github.com/xianyi/OpenBLAS/releases/download/v0.3.17/OpenBLAS-0.3.17-x64.zip
+  - unzip -l OpenBLAS.zip
+
   #  Get the external projects configured
   - cd c:\projects\source
   - git submodule update --init --recursive
