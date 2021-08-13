@@ -47,7 +47,7 @@ install:
   - SET SWIG_EXECUTABLE=C:\ProgramData\chocolatey\lib\swig\tools\install\swig.exe
 
   # Add SWIG, Python, and CMake to PATH
-  - SET PATH=%PYTHON%;%PYTHON%\Scripts;C:\Program Files (x86)\CMake\bin;C:\Program Files\APBS\bin;C:\projects\source\build\bin;C:\ProgramData\chocolatey\lib\swig\tools\install;C:\ProgramData\chocolatey\bin;%PATH%
+  - SET PATH=%PYTHON%;%PYTHON%\Scripts;C:\Users\appveyor\AppData\Roaming\Python\Python37\Scripts;C:\Program Files (x86)\CMake\bin;C:\Program Files\APBS\bin;C:\projects\source\build\bin;C:\ProgramData\chocolatey\lib\swig\tools\install;C:\ProgramData\chocolatey\bin;%PATH%
   - echo %PATH%
 
   # Check that we have the expected version and architecture for Python
@@ -82,7 +82,8 @@ build_script:
   #  Install BLAS
   #  https://sourceforge.net/projects/openblas/files/v0.3.17/OpenBLAS%200.3.17%20version.zip/download
   - cd c:\
-  - curl -o OpenBLAS.zip https://github.com/xianyi/OpenBLAS/releases/download/v0.3.17/OpenBLAS-0.3.17-x64.zip
+  # - curl -o OpenBLAS.zip https://github.com/xianyi/OpenBLAS/releases/download/v0.3.17/OpenBLAS-0.3.17-x64.zip
+  - curl -o OpenBLAS.zip https://sourceforge.net/projects/openblas/files/v0.3.17/OpenBLAS%200.3.17%20version.zip/download
   - unzip OpenBLAS.zip
 
   #  Get the external projects configured
