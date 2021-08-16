@@ -86,8 +86,8 @@ fi
 
 echo "==================================== CONFIG =============================================== "
 cd $BUILD_DIR                                             || exit 1
-#cmake -S .. -B $BUILD_DIR --trace-source=../CMakeLists.txt --trace-expand \
-cmake                                                     \
+#cmake                                                     \
+cmake -S .. -B $BUILD_DIR --trace-source=../CMakeLists.txt --trace-expand \
       -DCMAKE_INSTALL_INCLUDEDIR="include"                \
       -DBUILD_DOC=ON                                      \
       -DBUILD_SHARED_LIBS=ON                              \
