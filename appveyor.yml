@@ -42,7 +42,7 @@ install:
   # Install non-python dependencies using chocolatey package manager
   - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install --ignorechecksum -f -r -y swig --version=4.0.0
   #  - type C:\ProgramData\chocolatey\logs\chocolatey.log
-  - where /r C:\ProgramData\chocolatey swig.swg
+  #  - where /r C:\ProgramData\chocolatey swig.swg
   - SET SWIG_DIR=C:\ProgramData\chocolatey\lib\swig\tools\install
   - SET SWIG_EXECUTABLE=C:\ProgramData\chocolatey\lib\swig\tools\install\swig.exe
 
@@ -70,7 +70,6 @@ build_script:
   - set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\vsdevcmd\core\vsdevcmd_start.bat"
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
-  - set MYCPACK="C:\Program Files(x86)%\CMake\bin\cpack"
 
   # set
   #  REM set VSDIR="C:\Program Files (x86)\Microsoft Visual Studio"
@@ -143,11 +142,11 @@ build_script:
 #  - cd c:\projects\source\build
 #  - ctest -C Release -VV -R protein-rna
 
-#  - echo "*****************************************************************************"
-#  - echo APBS_TEST
-#  - echo "*****************************************************************************"
-#  - cd c:\projects\source\build
-#  - ctest -C Release --verbose --output-on-failure
+  - echo "*****************************************************************************"
+  - echo APBS_TEST
+  - echo "*****************************************************************************"
+  - cd c:\projects\source\build
+  - ctest -C Release --verbose --output-on-failure
 
 #  - echo "*****************************************************************************"
 #  - echo APBS_TEST PBAM EXAMPLE
