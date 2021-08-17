@@ -67,6 +67,7 @@ build_script:
   - set MSBuildLogger="C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\vsdevcmd\core\vsdevcmd_start.bat"
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+  - set MYCPACK="C:\Program Files(x86)%\CMake\bin\cpack"
 
   # set
   #  REM set VSDIR="C:\Program Files (x86)\Microsoft Visual Studio"
@@ -165,7 +166,7 @@ build_script:
   - echo "*****************************************************************************"
   - cd c:\projects\source\build
 #  NOTE: Full path needed to avoid problems with chocolatey version of cpack (will give nuspec error)
-  - %ProgramFiles(x86)%\CMake\bin\cpack" -C Release -G ZIP
+  - %MYCPACK% -C Release -G ZIP
   - unzip -l APBS*.zip
 
   - echo "*****************************************************************************"
