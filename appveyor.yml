@@ -50,7 +50,8 @@ install:
   - SET PATH=%PYTHON%;%PYTHON%\Scripts;C:\Users\appveyor\AppData\Roaming\Python\Python37\Scripts;C:\Program Files\CMake\bin;C:\Program Files\APBS\bin;C:\projects\source\build\bin;C:\ProgramData\chocolatey\lib\swig\tools\install;C:\ProgramData\chocolatey\bin;%PATH%
   - echo %PATH%
 
-  - where /r C:\ cpack.exe
+  - cmake --version
+  - cpack --version
   - cpack.exe
 
   # Check that we have the expected version and architecture for Python
