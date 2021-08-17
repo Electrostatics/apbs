@@ -50,6 +50,9 @@ install:
   - SET PATH=%PYTHON%;%PYTHON%\Scripts;C:\Users\appveyor\AppData\Roaming\Python\Python37\Scripts;C:\Program Files (x86)\CMake\bin;C:\Program Files\APBS\bin;C:\projects\source\build\bin;C:\ProgramData\chocolatey\lib\swig\tools\install;C:\ProgramData\chocolatey\bin;%PATH%
   - echo %PATH%
 
+  - where /r C:\ cpack.exe
+  - cpack.exe
+
   # Check that we have the expected version and architecture for Python
   - where /r C:\Python37-x64 python.exe
   - python --version
@@ -82,15 +85,6 @@ build_script:
   #  call %vsdevcmd%
 
   #  Install BLAS
-  #  https://sourceforge.net/projects/openblas/files/v0.3.17/OpenBLAS%200.3.17%20version.zip/download
-  # - cd c:\
-  # - curl -o OpenBLAS.zip https://github.com/xianyi/OpenBLAS/releases/download/v0.3.17/OpenBLAS-0.3.17-x64.zip
-  # - curl -o OpenBLAS.zip https://sourceforge.net/projects/openblas/files/v0.3.17/OpenBLAS%200.3.17%20version.zip/download
-  # - SET $source="https://sourceforge.net/projects/openblas/files/v0.3.17/OpenBLAS%200.3.17%20version.zip/download
-  # - SET $destination="c:\OpenBLAS.zip"
-  # - Invoke-WebRequest $source -OutFile $destination
-  # - unzip OpenBLAS.zip
-  # - conda install -c anaconda openblas
   - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-python2-pip mingw-w64-x86_64-openblas mingw-w64-x86_64-lapack"
 
 
