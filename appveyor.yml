@@ -143,17 +143,17 @@ build_script:
   - cd c:\projects\source\build
   - cmake --build . --config Release --parallel 1 --target install -- /m:1 /logger:%MSBuildLogger%
 
-  - echo "*****************************************************************************"
-  - echo APBS_TEST VERBOSE
-  - echo "*****************************************************************************"
-  - cd c:\projects\source\build
-  - ctest -C Release -VV -R protein-rna
+#  - echo "*****************************************************************************"
+#  - echo APBS_TEST VERBOSE
+#  - echo "*****************************************************************************"
+#  - cd c:\projects\source\build
+#  - ctest -C Release -VV -R protein-rna
 
-  - echo "*****************************************************************************"
-  - echo APBS_TEST
-  - echo "*****************************************************************************"
-  - cd c:\projects\source\build
-  - ctest -C Release --verbose --output-on-failure
+#  - echo "*****************************************************************************"
+#  - echo APBS_TEST
+#  - echo "*****************************************************************************"
+#  - cd c:\projects\source\build
+#  - ctest -C Release --verbose --output-on-failure
 
 #  - echo "*****************************************************************************"
 #  - echo APBS_TEST PBAM EXAMPLE
@@ -166,7 +166,7 @@ build_script:
   - echo "*****************************************************************************"
   - cd c:\projects\source\build
 #  NOTE: Full path needed to avoid problems with chocolatey version of cpack (will give nuspec error)
-  - C:\\Program\ Files(x86)\\CMake\\bin\\cpack.exe -C Release -G ZIP
+  - C:\\Program\\ Files(x86)\\CMake\\bin\\cpack.exe -C Release -G ZIP
   - unzip -l APBS*.zip
 
   - echo "*****************************************************************************"
