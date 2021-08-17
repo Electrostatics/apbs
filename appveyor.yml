@@ -165,7 +165,7 @@ build_script:
   - echo "*****************************************************************************"
   - cd c:\projects\source\build
 #  NOTE: Full path needed to avoid problems with chocolatey version of cpack (will give nuspec error)
-  - C:\Program Files (x86)\CMake\bin\cpack -C Release -G ZIP
+  - %ProgramFiles(x86)%\CMake\bin\cpack" -C Release -G ZIP
   - unzip -l APBS*.zip
 
   - echo "*****************************************************************************"
