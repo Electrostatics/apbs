@@ -52,7 +52,6 @@ install:
 
   - cmake --version
   - cpack --version
-  - cpack.exe
 
   # Check that we have the expected version and architecture for Python
   - where /r C:\Python37-x64 python.exe
