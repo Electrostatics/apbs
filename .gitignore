@@ -146,6 +146,7 @@ cython_debug/
 *.swo
 
 # Data files for reference
+examples/**/OUTPUT.txt
 examples/**/*.dx
 examples/**/*.vtk
 examples/**/*PE[0-9].in

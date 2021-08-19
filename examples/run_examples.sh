@@ -16,7 +16,8 @@ do
   do
     echo -n "$APBS_EXE $dir/$infile "
     SECONDS=0
-    $APBS_EXE $infile > /dev/null 2>&1
+    #/dev/null 2>&1
+    $APBS_EXE $infile > OUTPUT.txt 2>&1
     status=$?
     duration=$SECONDS
     echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."

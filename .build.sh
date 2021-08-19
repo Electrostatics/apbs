@@ -64,6 +64,9 @@ echo "==================================== SETUP ENV ===========================
 export LD_LIBRARY_PATH=$HOME/apbs/lib:${LD_LIBRARY_PATH}
 export PATH=$HOME/apbs/bin:${PATH}
 
+export TEST_APBS=1
+export PACKAGE_APBS=1
+
 #  Build pybind11
 export BUILD_PYBIND=0
 if [ "${BUILD_PYBIND}" -ne "0" ]; then
@@ -112,14 +115,19 @@ echo "==================================== BUILD ===============================
 VERBOSE=1 make -j 1                                       || exit 1
 VERBOSE=1 make -j 1 install                               #|| exit 1
 export PATH="$INSTALL_DIR/bin:$PATH"
-# Run a single test if it fails using the following:
-echo "==================================== VERBOSE TEST ======================================= "
-ctest -C Release -VV -R protein-rna
-echo "==================================== TEST =============================================== "
-ctest -C Release --output-on-failure                      #|| exit 1
 
-echo "==================================== PACKAGE ============================================ "
-cpack -C Release -G ZIP                                   || exit 1
-unzip -l APBS*.zip
-mkdir -p $HOME/artifacts
-mv APBS*.zip $HOME/artifacts
+if [ "${TEST_APBS}" -ne "0" ]; then
+    # Run a single test if it fails using the following:
+    # echo "==================================== VERBOSE TEST ======================================= "
+    # ctest -C Release -VV -R protein-rna
+    echo "==================================== TEST =============================================== "
+    ctest -C Release --output-on-failure                      #|| exit 1
+fi
+
+if [ "${PACKAGE_APBS}" -ne "0" ]; then
+    echo "==================================== PACKAGE ============================================ "
+    cpack -C Release -G ZIP                                   || exit 1
+    unzip -l APBS*.zip
+    mkdir -p $HOME/artifacts
+    mv APBS*.zip $HOME/artifacts
+fi
