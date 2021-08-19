@@ -410,6 +410,8 @@ VPUBLIC NOsh_calc* NOsh_calc_ctor(
             thee->pbamparm = PBAMparm_ctor(PBAMCT_AUTO);
             thee->pbsamparm = PBSAMparm_ctor(PBSAMCT_AUTO);
             break;
+        case NCT_PYGBE:
+            break;
         default:
             Vnm_print(2, "NOsh_calc_ctor:  unknown calculation type (%d)!\n",
                       calctype);
@@ -451,6 +453,8 @@ VPUBLIC void NOsh_calc_dtor(
         case NCT_PBSAM:
             PBAMparm_dtor(&(calc->pbamparm));
             PBSAMparm_dtor(&(calc->pbsamparm));
+            break;
+        case NCT_PYGBE:
             break;
         default:
             Vnm_print(2, "NOsh_calc_ctor:  unknown calculation type (%d)!\n",
@@ -1256,6 +1260,13 @@ ELEC section!\n");
             (thee->nelec)++;
             calc->femparm->type = FCT_MANUAL;
             return NOsh_parseFEM(thee, sock, calc);
+        } else if (Vstring_strcasecmp(tok, "pygbe") == 0) {
+            thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_PYGBE);
+            Vnm_print(0, "NOsh_parseELEC: PYGBE FOUND!\n");
+            calc = thee->elec[thee->nelec];
+            (thee->nelec)++;
+            thee->ncalc++;
+            return 1;
         } else if (Vstring_strcasecmp(tok, "tabi") == 0) {
             thee->elec[thee->nelec] = NOsh_calc_ctor(NCT_BEM);
             calc = thee->elec[thee->nelec];
@@ -1299,7 +1310,7 @@ ELEC section!\n");
             calc->pbsamparm->type = PBSAMCT_AUTO;
             return NOsh_parsePBSAM(thee, sock, calc);
         } else {
-            Vnm_print(2, "NOsh_parseELEC: The method (\"mg\",\"fem\", \"bem\", \"geoflow\" \"pbam\", \"pbsam\") or \
+            Vnm_print(2, "NOsh_parseELEC: The method (\"mg\",\"fem\", \"pygbe\", \"bem\", \"geoflow\" \"pbam\", \"pbsam\") or \
 \"name\" must be the first keyword in the ELEC section\n");
             return 0;
         }
@@ -1447,6 +1458,8 @@ map is used!\n");
                 break;
             case NCT_GEOFLOW:
                 NOsh_setupCalcGEOFLOW(thee, elec);
+                break;
+            case NCT_PYGBE:
                 break;
             default:
                 Vnm_print(2, "NOsh_setupCalc:  Invalid calculation type (%d)!\n",

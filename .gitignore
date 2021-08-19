@@ -69,6 +69,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
+!docs
 docs/_build/
 
 # PyBuilder
@@ -145,13 +146,25 @@ cython_debug/
 *.swo
 
 # Data files for reference
-examples
+examples/**/OUTPUT.txt
+examples/**/*.dx
+examples/**/*.vtk
+examples/**/*PE[0-9].in
+examples/protein-rna
+examples/pygbe/lys/output
 
 # FETK io files
 *.mc
 
 # Output files
 *.out
+
+# External Submodules
+externals/bem
+externals/FETK
+externals/geoflow_c
+externals/pb_s_am
+externals/pybind11
 
 # Personal notes
 NOTES.txt

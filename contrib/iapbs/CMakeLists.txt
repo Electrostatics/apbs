@@ -1,7 +1,7 @@
 ################################################################################
 # Set up basic project stuff                                                   #
 ################################################################################
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.6)
 
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
@@ -9,7 +9,7 @@ include(CheckSymbolExists)
 include(CheckTypeSize)
 include(ExternalProject)
 
-set(iAPBS_VERSION "3.0.0")
+set(iAPBS_VERSION "3.2.0")
 
 PROJECT(iAPBS)
 ################################################################################
