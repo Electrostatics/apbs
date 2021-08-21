@@ -278,8 +278,6 @@ class BoundaryElement(InputFile):
     * ``mesh``:  specify how the mesh is obtained; see :func:`mesh`
     * ``write atom potentials``:  write out atom potentials; see
         :func:`write_atom_potentials`
-    * ``write maps``:  write out one or more properties of the system mapped to
-        the input mesh; see :func:`write_maps`
 
     """
 
@@ -296,7 +294,6 @@ class BoundaryElement(InputFile):
         self._solver_parameters = None
         self._temperature = None
         self._write_atom_potentials = None
-        self._write_maps = None
         super().__init__(dict_=dict_, yaml=yaml, json=json)
 
     def validate(self):
@@ -307,6 +304,41 @@ class BoundaryElement(InputFile):
                     f" are not from the TABIParameters class."
                 )
         raise NotImplementedError()
+
+    @property
+    def write_atom_potentials(self) -> str:
+        """Write out the electrostatic potential at each atom location.
+
+        Write out text file with potential at center of atom in units of
+        :math:`k_b \\, T \\, e_c^{-1}`.
+
+        .. note::
+
+           These numbers are meaningless by themselves due to the presence of
+           "self-energy" terms that are sensitive to grid spacing and position.
+           These numbers should be evaluated with respect to a reference
+           calculation:  the potentials from that reference calculation should
+           be subtracted from the target system.  For example, one calculation
+           might include a molecule with a heterogeneous dielectric coefficient
+           and the reference system might be exactly the same system setup but
+           with a homeogeneous dielectric coefficient.  If the results from the
+           reference calculation are substracted from the first calculation,
+           then the result will be a physically meaningful reaction field
+           potential. However, the results from the first and reference
+           calculations are meaningless by themselves.
+
+        :returns:  path to text file for writing atom potential values.
+        :raises TypeError:  if not set to string
+        """
+        return self._write_atom_potentials
+
+    @write_atom_potentials.setter
+    def write_atom_potentials(self, value):
+        if not check.is_string(value):
+            raise TypeError(
+                f"Value {value} (type {type(value)}) is not a string."
+            )
+        self._write_atom_potentials = value
 
     @property
     def temperature(self) -> float:
