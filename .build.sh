@@ -50,9 +50,9 @@ python -m pip install -r requirements.txt
 echo "==================================== PWD FOR TOP DIR ==================================== "
 pwd
 echo "==================================== Get External SubModules ==================================== "
-#git submodule init
-#git submodule update
-#git submodule sync
+git submodule init
+git submodule update
+git submodule sync
 git ls-tree HEAD externals
 
 echo "==================================== CLEAN =============================================== "
@@ -63,6 +63,9 @@ mkdir -p $INSTALL_DIR                                     || exit 1
 echo "==================================== SETUP ENV =============================================== "
 export LD_LIBRARY_PATH=$HOME/apbs/lib:${LD_LIBRARY_PATH}
 export PATH=$HOME/apbs/bin:${PATH}
+
+export TEST_APBS=1
+export PACKAGE_APBS=1
 
 #  Build pybind11
 export BUILD_PYBIND=0
@@ -86,18 +89,20 @@ fi
 
 echo "==================================== CONFIG =============================================== "
 cd $BUILD_DIR                                             || exit 1
-#cmake -S .. -B $BUILD_DIR --trace-source=../CMakeLists.txt --trace-expand \
-cmake                                                     \
+#cmake                                                     \
+cmake -S .. -B $BUILD_DIR --trace-source=../CMakeLists.txt --trace-expand \
+      -DCMAKE_INSTALL_INCLUDEDIR="include"                \
       -DBUILD_DOC=ON                                      \
-      -DBUILD_SHARED_LIBS=OFF                             \
+      -DBUILD_SHARED_LIBS=ON                              \
       -DBUILD_TOOLS=ON                                    \
       -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} ${COVERAGE}"      \
       -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${COVERAGE}"  \
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE                    \
       -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR                 \
+      -DENABLE_PYGBE=ON                                   \
       -DENABLE_BEM=ON                                     \
       -DENABLE_GEOFLOW=ON                                 \
-      -DENABLE_FETK=ON                                    \
+      -DENABLE_FETK=OFF                                   \
       -DENABLE_OPENMP=ON                                  \
       -DENABLE_PBAM=ON                                    \
       -DENABLE_PBSAM=ON                                   \
@@ -110,13 +115,19 @@ echo "==================================== BUILD ===============================
 VERBOSE=1 make -j 1                                       || exit 1
 VERBOSE=1 make -j 1 install                               #|| exit 1
 export PATH="$INSTALL_DIR/bin:$PATH"
-# Run a single test if it fails using the following:
-# ctest -VV -R pbam_test
-echo "==================================== TEST =============================================== "
-ctest -C Release --output-on-failure                      #|| exit 1
 
-echo "==================================== PACKAGE ============================================ "
-cpack -C Release -G ZIP                                   || exit 1
-unzip -l APBS*.zip
-mkdir -p $HOME/artifacts
-mv APBS*.zip $HOME/artifacts
+if [ "${TEST_APBS}" -ne "0" ]; then
+    # Run a single test if it fails using the following:
+    # echo "==================================== VERBOSE TEST ======================================= "
+    # ctest -C Release -VV -R protein-rna
+    echo "==================================== TEST =============================================== "
+    ctest -C Release --output-on-failure                      #|| exit 1
+fi
+
+if [ "${PACKAGE_APBS}" -ne "0" ]; then
+    echo "==================================== PACKAGE ============================================ "
+    cpack -C Release -G ZIP                                   || exit 1
+    unzip -l APBS*.zip
+    mkdir -p $HOME/artifacts
+    mv APBS*.zip $HOME/artifacts
+fi

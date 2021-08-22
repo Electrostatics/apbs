@@ -49,8 +49,8 @@ ATAM     39 O3PB ADP     1  D   -16.362  -6.763  26.980 -0.900 1.700
     def test_load(self):
         """Test to load all the data from an example file"""
         sut = PQRReader()
-        pqr_imput = search_dir("actin-dimer/mol1.pqr")
-        atomlist: AtomList = sut.load(pqr_imput)
+        pqr_input = search_dir("actin-dimer/mol1.pqr")
+        atomlist: AtomList = sut.load(pqr_input)
         assert len(atomlist) == 5877
 
     @pytest.mark.slow

@@ -68,6 +68,7 @@ FILENAME = "STRING"
 #       MgDummyParser:
 #       PbamAutoParser:
 #       PbsamAutoParser:
+#       PygbeParser:
 #
 #   Each SECTION has a parser and formatter. The parser specifies the
 #   grammar used to match the section of the input file and generates
@@ -563,6 +564,7 @@ class ApbsLegacyInput:
             | MgDummyParser.grammar
             | PbamAutoParser.grammar
             | PbsamAutoParser.grammar
+            | PygbeParser.grammar
         )
 
         def format_elec(results: ParseResults):
@@ -1125,6 +1127,14 @@ class MgDummyParser:
         & ZeroOrMore(GenericToken.temp)
         & ZeroOrMore(ElecToken.write)
     )
+
+
+class PygbeParser:
+    """ELEC pygbe specific tokens/grammars."""
+
+    # https://apbs.readthedocs.io/en/latest/using/input/elec/pygbe.html
+
+    grammar = CLiteral("pygbe") & ZeroOrMore(ElecToken.name)
 
 
 class PbToken:
