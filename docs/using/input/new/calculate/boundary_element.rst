@@ -4,6 +4,10 @@
 Boundary-element Poisson-Boltzmann calculations
 ================================================
 
+This input file section documents boundary element method calculations with `TABI-PB <https://doi.org/10.1016/j.jcp.2013.03.056>`_.
+
+.. todo::  Add PyGBE
+
 .. todo::
 
    Make this more user-friendly by:
