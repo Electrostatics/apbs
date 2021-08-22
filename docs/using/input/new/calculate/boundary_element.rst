@@ -4,8 +4,6 @@
 Boundary-element Poisson-Boltzmann calculations
 ================================================
 
-.. todo::  FINISH
-
 .. todo::
 
    Make this more user-friendly by:
