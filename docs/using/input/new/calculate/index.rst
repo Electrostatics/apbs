@@ -15,6 +15,7 @@ Calculation types
 .. toctree::
    :maxdepth: 2
 
+   boundary_element
    finite_difference
    finite_element
    nonpolar

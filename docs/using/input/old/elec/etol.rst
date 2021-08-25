@@ -9,6 +9,7 @@ etol
 
    Some versions of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
 
+   * For a boundary element calculation, see :func:`boundary_element.BoundaryElement.error_tolerance`.
    * For a finite difference calculation, see :func:`finite_difference.FiniteDifference.error_tolerance`.
    * For a finite element calculation, see :func:`finite_element.FiniteElement.error_tolerance`.
 

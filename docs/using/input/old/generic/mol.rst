@@ -10,8 +10,9 @@ mol
    .. currentmodule::  apbs.input_file.calculate
 
    * Nonpolar calculations: see :func:`nonpolar.Nonpolar.molecule` for more information.
-
-   * Finite difference Poisson-Boltzmann calculations: see :func:`finite_difference.FiniteDifference.molecule` for more information.
+   * Boundary-element Poisson-Boltzmann calculations: see :func:`boundary_element.BoundaryElement.molecule` for more information.
+   * Finite-difference Poisson-Boltzmann calculations: see :func:`finite_difference.FiniteDifference.molecule` for more information.
+   * Finite-element Poisson-Boltzmann calculations: see :func:`finite_element.FiniteElement.molecule` for more information.
 
 .. todo:: port for other calculation types
 
