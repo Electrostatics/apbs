@@ -1,12 +1,14 @@
-APBS 3.1 CHANGELOG
+APBS 3.2 CHANGELOG
 ==================
 
-These are notes for APBS version 3.1
+These are notes for APBS version 3.2
 ------------------------------------
 
 * Binary releases may be found on [GitHub](https://github.com/Electrostatics/apbs/releases) and on [SourceForge](http://sourceforge.net/projects/apbs/files/apbs).
 
 ### New Features
+
+* Poisson-Boltzmann Analytical Method (PYGBE, see [ADD_AUTHORS](ADD_LINK)) integrated with APBS. PYGBE can be installed from the "slic" branch of the [PYGE Repository](https://github.com/matiasmartineza/pygbe.git).
 
 * Poisson-Boltzmann Analytical Method (PBAM, see [Lotan & Head-Gordon](http://pubs.acs.org/doi/full/10.1021/ct050263p)) and Semi-Analytical Method (PBSAM, see [Yap & Head-Gordon](http://pubs.acs.org/doi/abs/10.1021/ct100145f)) integrated with APBS. PBSAM is currently only available in the Linux and OS X distributions.
     - Examples are located with the APBS examples in the pbam/ and pbsam/ directories.

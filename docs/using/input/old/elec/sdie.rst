@@ -9,7 +9,7 @@ sdie
 
    Some versions of this command have been ported to the *new APBS syntax* (see :ref:`new_input_format`):
 
-
+   * Boundary element Poisson-Boltzmann calculations: see :func:`boundary_element.BoundaryElement.solvent_dielectric` for more information.
    * Finite difference Poisson-Boltzmann calculations: see :func:`finite_difference.FiniteDifference.solvent_dielectric` for more information.
    * Finite element Poisson-Boltzmann calculations: see :func:`finite_element.FiniteElement.solvent_dielectric` for more information.
 

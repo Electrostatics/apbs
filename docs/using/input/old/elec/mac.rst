@@ -3,7 +3,11 @@
 mac
 ===
 
-.. todo::  This command has not yet been ported to the *new APBS syntax* (see :ref:`new_input_format`).
+.. currentmodule:: apbs.input_file.calculate.boundary_element
+
+.. note::
+
+   This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see :func:`TABIParameters.multipole_acceptance_criterion`.
 
 TABI-PB parameter, multipole acceptance criterion (MAC), that controls distance ratio at which the method uses direct summation or Taylor approximation (a particle-cluster interaction) to calculate the integral kernels.
 The syntax is:

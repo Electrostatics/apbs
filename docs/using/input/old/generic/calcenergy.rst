@@ -13,6 +13,7 @@ calcenergy
    * Nonpolar calculations:  see :func:`nonpolar.Nonpolar.calculate_energy` for more information.
    * Polar calculations:
 
+     * Boundary elements:  see :func:`boundary_element.BoundaryElement.calculate_energy`
      * Finite difference:  see :func:`finite_difference.FiniteDifference.calculate_energy`
      * Finite element:  see :func:`finite_element.FiniteElement.calculate_energy`
 
