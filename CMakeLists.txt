@@ -487,12 +487,20 @@ if(ENABLE_FETK)
             # download package
             set(FETK_ZIP_FILE_NAME "${FETK_NAME}.${FETK_ZIP_EXT}")
             message(STATUS "Downloading FETK from ${FETK_FULL_URL}")
-            file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PKG_PATH}/${FETK_ZIP_FILE_NAME}")
+            file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PKG_PATH}/${FETK_ZIP_FILE_NAME}" STATUS FETK_DL_STATUS)
+            # check if download was successful
+            list(GET FETK_DL_STATUS 0 FETK_DL_STATUS_VALUE)
+            if(NOT FETK_DL_STATUS_VALUE EQUAL 0)
+                list(GET FETK_DL_STATUS 1 FETK_DL_STATUS_STRING)
+                message(FATAL "FETK download error: ${FETK_DL_STATUS_STRING}")
+            endif()
+
             # unzip
             execute_process(
                 COMMAND ${FETK_UNZIP_COMMAND} ${FETK_ZIP_FILE_NAME}
                 WORKING_DIRECTORY ${FETK_PKG_PATH}
             )
+            
             # specify the locations of the include and lib dirs for use at build time
             include_directories(${FETK_PKG_PATH}/${FETK_NAME}/include)
             link_directories(${FETK_PKG_PATH}/${FETK_NAME}/lib)
