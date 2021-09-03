@@ -13,6 +13,7 @@ calcforce
    * Nonpolar calculations:  see :func:`nonpolar.Nonpolar.calculate_forces` for more information.
    * Polar calculations:
 
+     * Boundary element:  see :func:`boundary_element.BoundaryElement.calculate_forces`
      * Finite difference:  see :func:`finite_difference.FiniteDifference.calculate_forces`
      * Finite element:  see :func:`finite_element.FiniteElement.calculate_forces`
 

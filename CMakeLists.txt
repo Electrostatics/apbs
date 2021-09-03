@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.14)
+cmake_minimum_required (VERSION 3.16)
 
 ###############################################################################
 #  Get the Current Version Number so that it can be embedded in files later
@@ -303,6 +303,21 @@ configure_file(
 ################################################################################
 option(GET_NanoShaper "Put NanoShaper executable in the build directory" OFF)
 
+################################################################################
+# Optionally build PYGBE: PYGBE method                                         #
+################################################################################
+option(ENABLE_PYGBE "Boundary element method using PYGBE" OFF)
+
+if(ENABLE_PYGBE)
+    message(STATUS "Building PYGBE")
+    add_definitions(-DENABLE_PYGBE)
+    find_package(Python REQUIRED COMPONENTS Interpreter Development)
+    message(STATUS "******** PYTHON_INCLUDE_DIRS ${Python_INCLUDE_DIRS}")
+    message(STATUS "******** PYTHON_LIBRARIES ${Python_LIBRARIES}")
+    include_directories(${Python_INCLUDE_DIRS})
+    list(APPEND APBS_LIBS ${Python_LIBRARIES})
+    #FindPython(REQUIRED Interpreter Development)
+endif() # ENABLE_PYGBE
 
 ################################################################################
 # Optionally build BEM: TABI-PB method                                         #
@@ -579,7 +594,8 @@ if(ENABLE_FETK)
                                   vf2c
                                   tetgen
                                   triangle
-                                  readline)
+                                  readline
+                                  termcap)
 
         if(BUILD_SHARED_LIBS)
             install(DIRECTORY ${install_dir}/lib/
@@ -989,7 +1005,18 @@ set(CPACK_PACKAGE_DESCRIPTION          "APBS - Adaptive Poisson Boltzmann Solver
 set(CPACK_RESOURCE_FILE_LICENSE        "${PROJECT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_DESCRIPTION_FILE     "${PROJECT_SOURCE_DIR}/README.md")
 
-set(CPACK_SOURCE_IGNORE_FILES          "${PROJECT_BINARY_DIR};/.git/;.gitignore;/tools/matlab/")
+set(CPACK_VERBATIM_VARIABLES            YES)
+set(CPACK_SOURCE_IGNORE_FILES           ${PROJECT_BINARY_DIR}
+                                        .gitignore
+                                        /.git/
+                                        /tools/matlab/
+                                        io.mc
+                                        \\.dx
+                                        \\.err
+                                        \\.log
+                                        \\.out
+                                        \\.vtk
+)
 set(CPACK_PACKAGE_VERSION_MAJOR        "${CMAKE_MAJOR_VERSION}")
 set(CPACK_PACKAGE_VERSION_MINOR        "${CMAKE_MINOR_VERSION}")
 set(CPACK_PACKAGE_VERSION_PATCH        "${CMAKE_MICRO_VERSION}")

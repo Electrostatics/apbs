@@ -80,7 +80,7 @@ mkdir -p $INSTALL_DIR                                     || exit 1
 echo "==================================== SETUP ENV =============================================== "
 export LD_LIBRARY_PATH=$HOME/apbs/lib:${LD_LIBRARY_PATH}
 export PATH=$HOME/apbs/bin:${PATH}
- 
+
 if [ "${BUILD_PYBIND}" -ne "0" ]; then
     echo "==================================== PYBIND =============================================== "
     pushd $(pwd)/externals/pybind11
@@ -127,7 +127,8 @@ echo "==================================== BUILD ===============================
 VERBOSE=1 make -j 1                                       || exit 1
 VERBOSE=1 make -j 1 install                               #|| exit 1
 export PATH="$INSTALL_DIR/bin:$PATH"
- 
+
+
 if [ "${TEST_APBS}" -ne "0" ]; then
     # Run a single test if it fails using the following:
     # echo "==================================== VERBOSE TEST ======================================= "
@@ -135,7 +136,8 @@ if [ "${TEST_APBS}" -ne "0" ]; then
     echo "==================================== TEST =============================================== "
     ctest -C Release --output-on-failure                      #|| exit 1
 fi
- 
+
+
 if [ "${PACKAGE_APBS}" -ne "0" ]; then
     echo "==================================== PACKAGE ============================================ "
     cpack -C Release -G ZIP                                   || exit 1

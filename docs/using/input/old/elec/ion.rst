@@ -10,6 +10,7 @@ ion
    This command has been ported to the *new APBS syntax* (see :ref:`new_input_format`); see:
    
    * General information about this object:  :class:`generic.MobileIons` for more information.
+   * Boundary element implementation:  :func:`boundary_element.BoundaryElement.ions`.
    * Finite difference implementation:  :func:`finite_difference.FiniteDifference.ions`.
    * Finite element implementation:  :func:`finite_element.FiniteElement.ions`.
 
