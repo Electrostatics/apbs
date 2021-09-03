@@ -443,7 +443,7 @@ file(COPY tools/maloccf.h DESTINATION ${APBS_BUILD}/src)
 ################################################################################
 # add_library(apbs_fetk_libraries INTERFACE)
 
-option(FETK_VERSION "1.6.0")
+option(FETK_VERSION "1.7.0")
 
 if(ENABLE_FETK)
     set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
