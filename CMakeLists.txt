@@ -476,7 +476,7 @@ if(ENABLE_FETK)
     if(FETK_DOWNLOAD_PKG)
         set(FETK_FULL_URL "${FETK_BASE_URL}/${FETK_NAME}.${FETK_ZIP_EXT}")
 
-        # use .../externals/fetk/pkg for the unzipped file location to enable future possibility of building from source in .../externals/fetk
+        # use .../download/fetk/pkg for the unzipped file location to enable future possibility of building from source in .../externals/fetk
         set(FETK_PKG_PATH "${PROJECT_BINARY_DIR}/downloads/fetk/pkg")
 
         if(NOT EXISTS ${FETK_PKG_PATH})
@@ -493,15 +493,21 @@ if(ENABLE_FETK)
                 COMMAND ${FETK_UNZIP_COMMAND} ${FETK_ZIP_FILE_NAME}
                 WORKING_DIRECTORY ${FETK_PKG_PATH}
             )
+            # specify the locations of the include and lib dirs for use at build time
+            include_directories(${FETK_PKG_PATH}/${FETK_NAME}/include)
+            link_directories(${FETK_PKG_PATH}/${FETK_NAME}/lib)
             # install
-            install(
-                DIRECTORY "${FETK_PKG_PATH}/${FETK_NAME}/include"
-                DESTINATION "${CMAKE_INSTALL_PREFIX}/include"
-            )
-            install(
-                DIRECTORY "${FETK_PKG_PATH}/${FETK_NAME}/lib"
-                DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
-            )
+            # maybe we don't need to do this?
+            # include files will be used at compile time
+            # all FETK libraries are static, so they'll be linked statically at build time
+            #install(
+            #    DIRECTORY "${FETK_PKG_PATH}/${FETK_NAME}/include"
+            #    DESTINATION "${CMAKE_INSTALL_PREFIX}/include"
+            #)
+            #install(
+            #    DIRECTORY "${FETK_PKG_PATH}/${FETK_NAME}/lib"
+            #    DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
+            #)
         endif()
     endif()
 endif()
