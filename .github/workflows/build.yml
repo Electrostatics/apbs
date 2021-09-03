@@ -55,6 +55,10 @@ jobs:
           # https://codecov.io/gh/Electrostatics/apbs
           CODECOV_TOKEN: "e3a1e24c-5598-4f47-9353-7fa0ac57f98e"
 
+      - name: Setup tmate session
+        if: ${{ ! success() }}
+        uses: mxschmitt/action-tmate@v3
+
       - name: Package
         uses: actions/upload-artifact@v2
         with:
