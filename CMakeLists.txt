@@ -428,7 +428,90 @@ file(COPY tools/maloccf.h DESTINATION ${APBS_BUILD}/src)
 ################################################################################
 # add_library(apbs_fetk_libraries INTERFACE)
 
+option(FETK_VERSION "1.6.0")
+
 if(ENABLE_FETK)
+    set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
+
+    # even though we don't currently support building from source, we'll use facilitate potentially supporting building 
+    # from source in the future by using FETK_DOWNLOAD_PKG as a flag to differentiate 
+    # between using a pre-built package and building from source
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        set(FETK_SYSTEM_COMPONENT "Linux")
+        set(FETK_ZIP_EXT "tar.gz")
+        set(FETK_DOWNLOAD_PKG TRUE)
+        set(FETK_UNZIP_COMMAND} "tar -xzf" )
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        set(FETK_SYSTEM_COMPONENT "Darwin")
+        set(FETK_ZIP_EXT "tar.gz")
+        set(FETK_DOWNLOAD_PKG TRUE)
+        set(FETK_UNZIP_COMMAND} "tar -xzf" )
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        set(FETK_SYSTEM_COMPONENT "win64")
+        set(FETK_ZIP_EXT "zip")
+        set(FETK_DOWNLOAD_PKG TRUE)
+        set(FETK_UNZIP_COMMAND} "unzip" )
+    else()
+        message(FATAL "System type <${CMAKE_SYSTEM_NAME}> is not supported when FETK is enabled; please disable FETK or change your system.")
+        #set(FETK_DOWNLOAD_PKG FALSE)
+    endif()
+
+    set(FETK_NAME "FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}")
+
+    if(FETK_DOWNLOAD_PKG)
+        set(FETK_FULL_URL "${FETK_BASE_URL}/${FETK_NAME}.${FETK_ZIP_EXT}")
+
+        # use .../externals/fetk/pkg for the unzipped file location to enable future possibility of building from source in .../externals/fetk
+        set(FETK_PKG_PATH "${PROJECT_BINARY_DIR}/externals/fetk/pkg")
+
+        if(NOT EXISTS ${FETK_PKG_PATH})
+            file(MAKE DIRECTORY ${FETK_PKG_PATH})
+        endif()
+
+        if(NOT EXISTS "${FETK_PKG_PATH}/${FETK_NAME}/lib")
+            # download package
+            set(FETK_ZIP_FILE_NAME "${FETK_NAME}.${FETK_ZIP_EXT}")
+            message(STATUS "Downloading FETK from ${FETK_FULL_URL}")
+            file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PKG_PATH}/${FETK_ZIP_FILE_NAME}")
+            # unzip
+            execute_process(
+                COMMAND ${FETK_UNZIP_COMMAND} ${FETK_ZIP_FILE_NAME}
+                WORKING_DIRECTORY ${FETK_PKG_PATH}
+            )
+            # install
+            install(
+                DIRECTORY "${FETK_PKG_PATH}/${FETK_NAME}/include"
+                DESTINATION "${CMAKE_INSTALL_PREFIX}/include"
+            )
+            install(
+                DIRECTORY "${FETK_PKG_PATH}/${FETK_NAME}/lib"
+                DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
+            )
+        endif()
+    endif()
+
+    set(NANOSHAPER_FULL_URL_PATH)
+    set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper")
+    message(STATUS "Copying NanoShaper executable")
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_OSX")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_Linux64")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper32.exe")
+        set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper.exe")
+    endif()
+
+    if(NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+        file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME})
+        message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+    endif()
+
+    install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}
+            DESTINATION ${EXECUTABLE_INSTALL_PATH})
+        message(STATUS "NanoShaper install: ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
+
+
     if(WIN32)
         message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
     else()
