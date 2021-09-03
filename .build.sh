@@ -8,7 +8,7 @@
 export INSTALL_PREREQS=1
  
 # Setup tests for APBS with TEST_APBS=1 or turn off with TEST_APBS=0
-export TEST_APBS=0
+export TEST_APBS=1
  
 # Create ZIP archive for APBS with PACKAGE_APBS=1 or turn off with PACKAGE_APBS=0
 export PACKAGE_APBS=0
@@ -22,7 +22,7 @@ case "${ostype}" in
       # NOTE: clang on Github Actions cannot fine Accelerate Framework
       #       so you will get errors about not being able to find xerbla_
       # Darwin*)    export CC=clang; export CXX=clang++;;
-      Darwin*)    export CC=gcc-9; export CXX=g++-9; export CMAKE_C_FLAGS="-Wl,-rpath=@executable_path/../lib "; export CMAKE_CXX_FLAGS="-Wl,-rpath=@executable_path/../lib ";;
+      Darwin*)    export CC=gcc-9; export CXX=g++-9;;# export CMAKE_C_FLAGS="-Wl,-rpath=@executable_path/../lib "; export CMAKE_CXX_FLAGS="-Wl,-rpath=@executable_path/../lib ";;
       Linux*)     export CC=gcc-9; export CXX=g++-9;;
 esac
  
@@ -111,10 +111,10 @@ cmake -S .. -B $BUILD_DIR --trace-source=../externals/geoflow_c/src/CMakeLists.t
       -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${COVERAGE}"  \
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE                    \
       -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR                 \
-      -DENABLE_PYGBE=ON                                   \
+      -DENABLE_PYGBE=OFF                                   \
       -DENABLE_BEM=ON                                     \
-      -DENABLE_GEOFLOW=OFF                                \
-      -DENABLE_FETK=OFF                                   \
+      -DENABLE_GEOFLOW=ON                                \
+      -DENABLE_FETK=ON                                   \
       -DENABLE_OPENMP=ON                                  \
       -DENABLE_PBAM=ON                                    \
       -DENABLE_PBSAM=ON                                   \
