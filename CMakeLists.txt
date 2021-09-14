@@ -492,18 +492,18 @@ if(ENABLE_FETK)
             list(GET FETK_DL_STATUS 0 FETK_DL_STATUS_VALUE)
             if(NOT FETK_DL_STATUS_VALUE EQUAL 0)
                 list(GET FETK_DL_STATUS 1 FETK_DL_STATUS_STRING)
-                message(FATAL "FETK download error: ${FETK_DL_STATUS_STRING}")
+                message(FATAL_ERROR "FETK download error: ${FETK_DL_STATUS_STRING}")
             endif()
 
             # unzip
-            message(STATUS "Unzipping: ${FETK_UNZIP_COMMAND} ${FETK_ZIP_FILE_NAME}")
+            message(STATUS "Unzipping: ${FETK_UNZIP_COMMAND} ${FETK_PKG_PATH}/${FETK_ZIP_FILE_NAME}")
             execute_process(
-                COMMAND ${FETK_UNZIP_COMMAND} ${FETK_ZIP_FILE_NAME}
+                COMMAND ${FETK_UNZIP_COMMAND} ${FETK_PKG_PATH}/${FETK_ZIP_FILE_NAME}
                 WORKING_DIRECTORY ${FETK_PKG_PATH}
                 RESULT_VARIABLE FETK_UNZIP_RETURN
             )
             if(NOT FETK_UNZIP_RETURN EQUAL 0)
-                message(FATAL, "Unzip operation failed")
+                message(FATAL_ERROR, "Unzip operation failed")
             endif()
             
             # specify the locations of the include and lib dirs for use at build time
