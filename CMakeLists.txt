@@ -455,12 +455,12 @@ if(ENABLE_FETK)
         set(FETK_SYSTEM_COMPONENT "Linux")
         set(FETK_ZIP_EXT "tar.gz")
         set(FETK_DOWNLOAD_PKG TRUE)
-        set(FETK_UNZIP_COMMAND "tar -xzf" )
+        set(FETK_UNZIP_COMMAND "tar -xzvf" )
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         set(FETK_SYSTEM_COMPONENT "Darwin")
         set(FETK_ZIP_EXT "tar.gz")
         set(FETK_DOWNLOAD_PKG TRUE)
-        set(FETK_UNZIP_COMMAND "tar -xzf" )
+        set(FETK_UNZIP_COMMAND "tar -xzvf" )
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         set(FETK_SYSTEM_COMPONENT "win64")
         set(FETK_ZIP_EXT "zip")
@@ -496,12 +496,21 @@ if(ENABLE_FETK)
             endif()
 
             # unzip
+            message(STATUS "Unzipping: ${FETK_UNZIP_COMMAND} ${FETK_ZIP_FILE_NAME}")
             execute_process(
                 COMMAND ${FETK_UNZIP_COMMAND} ${FETK_ZIP_FILE_NAME}
                 WORKING_DIRECTORY ${FETK_PKG_PATH}
+                RESULT_VARIABLE FETK_UNZIP_RETURN
             )
+            if(NOT FETK_UNZIP_RETURN EQUAL 0)
+                message(FATAL, "Unzip operation failed")
+            endif()
             
             # specify the locations of the include and lib dirs for use at build time
+            message(STATUS "Include dir: ${FETK_PKG_PATH}/${FETK_NAME}/include")
+            execute_process(
+                COMMAND ls ${FETK_PKG_PATH}/${FETK_NAME}/include
+            )
             include_directories(${FETK_PKG_PATH}/${FETK_NAME}/include)
             link_directories(${FETK_PKG_PATH}/${FETK_NAME}/lib)
             # install
