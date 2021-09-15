@@ -445,51 +445,57 @@ file(COPY tools/maloccf.h DESTINATION ${APBS_BUILD}/src)
 
 set(FETK_VERSION "1.7.0" CACHE STRING "Version of FETK to use")
 
+set(FETK_FROM_PKG TRUE)
+if(NOT FETK_VERSION MATCHES "[0-9]+\.[0-9]+\.[0-9]+")
+    set(FETK_FROM_PKG FALSE)
+    if(NOT DEFINED FETK_FULL_URL)
+        message(FATAL_ERROR "Please specify the source URL by defining: FETK_FULL_URL=[URL]")
+    endif()
+    string(REPLACE "/" "-" FETK_VERSION ${FETK_VERSION}) # this matches the replacement that GitHub makes for the directory within the zip file
+    message(STATUS "FETK VERSION (after replace): ${FETK_VERSION}")
+endif()
+
 if(ENABLE_FETK)
     set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
 
-    # even though we don't currently support building from source, we'll use facilitate potentially supporting building 
-    # from source in the future by using FETK_DOWNLOAD_PKG as a flag to differentiate 
-    # between using a pre-built package and building from source
-    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        set(FETK_SYSTEM_COMPONENT "Linux")
-        set(FETK_ZIP_EXT "tar.gz")
-        set(FETK_DOWNLOAD_PKG TRUE)
-        set(FETK_UNZIP_COMMAND "tar" )
-        set(FETK_UNZIP_OPTS "-xzvf")
-    elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-        set(FETK_SYSTEM_COMPONENT "Darwin")
-        set(FETK_ZIP_EXT "tar.gz")
-        set(FETK_DOWNLOAD_PKG TRUE)
-        set(FETK_UNZIP_COMMAND "tar" )
-        set(FETK_UNZIP_OPTS "-xzvf")
-    elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-        set(FETK_SYSTEM_COMPONENT "win64")
-        set(FETK_ZIP_EXT "zip")
-        set(FETK_DOWNLOAD_PKG TRUE)
-        set(FETK_UNZIP_COMMAND "unzip" )
+    if(FETK_FROM_PKG)
+        set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
+        if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+            set(FETK_SYSTEM_COMPONENT "Linux")
+            set(FETK_ZIP_EXT "tar.gz")
+            set(FETK_UNZIP_COMMAND "tar" )
+            set(FETK_UNZIP_OPTS "-xzvf")
+        elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+            set(FETK_SYSTEM_COMPONENT "Darwin")
+            set(FETK_ZIP_EXT "tar.gz")
+            set(FETK_UNZIP_COMMAND "tar" )
+            set(FETK_UNZIP_OPTS "-xzvf")
+        elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+            set(FETK_SYSTEM_COMPONENT "win64")
+            set(FETK_ZIP_EXT "zip")
+            set(FETK_UNZIP_COMMAND "unzip" )
+        else()
+            message(FATAL "System type <${CMAKE_SYSTEM_NAME}> is not supported when FETK is enabled; please disable FETK or change your system.")
+        endif()
     else()
-        message(FATAL "System type <${CMAKE_SYSTEM_NAME}> is not supported when FETK is enabled; please disable FETK or change your system.")
-        #set(FETK_DOWNLOAD_PKG FALSE)
+        set(FETK_ZIP_EXT "zip")
+        set(FETK_UNZIP_COMMAND "unzip")
     endif()
 
-    set(FETK_NAME "FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}")
+    set(FETK_PATH "${PROJECT_BINARY_DIR}/downloads/fetk")
+    if(NOT EXISTS ${FETK_PATH})
+        file(MAKE_DIRECTORY ${FETK_PATH})
+    endif()
 
-    if(FETK_DOWNLOAD_PKG)
+    if(FETK_FROM_PKG)
+        set(FETK_NAME "FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}")
         set(FETK_FULL_URL "${FETK_BASE_URL}/${FETK_NAME}.${FETK_ZIP_EXT}")
 
-        # use .../download/fetk/pkg for the unzipped file location to enable future possibility of building from source in .../externals/fetk
-        set(FETK_PKG_PATH "${PROJECT_BINARY_DIR}/downloads/fetk/pkg")
-
-        if(NOT EXISTS ${FETK_PKG_PATH})
-            file(MAKE_DIRECTORY ${FETK_PKG_PATH})
-        endif()
-
-        if(NOT EXISTS "${FETK_PKG_PATH}/${FETK_NAME}/lib")
+        if(NOT EXISTS "${FETK_PATH}/${FETK_NAME}/lib")
             # download package
             set(FETK_ZIP_FILE_NAME "${FETK_NAME}.${FETK_ZIP_EXT}")
             message(STATUS "Downloading FETK from ${FETK_FULL_URL}")
-            file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PKG_PATH}/${FETK_ZIP_FILE_NAME}" STATUS FETK_DL_STATUS)
+            file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PATH}/${FETK_ZIP_FILE_NAME}" STATUS FETK_DL_STATUS)
             # check if download was successful
             list(GET FETK_DL_STATUS 0 FETK_DL_STATUS_VALUE)
             if(NOT FETK_DL_STATUS_VALUE EQUAL 0)
@@ -498,11 +504,11 @@ if(ENABLE_FETK)
             endif()
 
             # unzip
-            message(STATUS "Unzipping: ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PKG_PATH}/${FETK_ZIP_FILE_NAME}")
+            message(STATUS "Unzipping: ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}")
             execute_process(
-                COMMAND ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PKG_PATH}/${FETK_ZIP_FILE_NAME}
+                COMMAND ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}
                 COMMAND_ECHO STDERR
-                WORKING_DIRECTORY ${FETK_PKG_PATH}
+                WORKING_DIRECTORY ${FETK_PATH}
                 RESULT_VARIABLE FETK_UNZIP_RETURN
             )
             if(NOT FETK_UNZIP_RETURN EQUAL 0)
@@ -510,26 +516,112 @@ if(ENABLE_FETK)
             endif()
             
             # specify the locations of the include and lib dirs for use at build time
-            message(STATUS "Include dir: ${FETK_PKG_PATH}/${FETK_NAME}/include")
-            execute_process(
-                COMMAND ls ${FETK_PKG_PATH}/${FETK_NAME}/include
-            )
-            include_directories(${FETK_PKG_PATH}/${FETK_NAME}/include)
-            link_directories(${FETK_PKG_PATH}/${FETK_NAME}/lib)
-            # install
-            # maybe we don't need to do this?
-            # include files will be used at compile time
-            # all FETK libraries are static, so they'll be linked statically at build time
-            #install(
-            #    DIRECTORY "${FETK_PKG_PATH}/${FETK_NAME}/include"
-            #    DESTINATION "${CMAKE_INSTALL_PREFIX}/include"
-            #)
-            #install(
-            #    DIRECTORY "${FETK_PKG_PATH}/${FETK_NAME}/lib"
-            #    DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
-            #)
+            include_directories(${FETK_PATH}/${FETK_NAME}/include)
+            link_directories(${FETK_PATH}/${FETK_NAME}/lib)
         endif()
+    else()
+        set(FETK_NAME "FETK-${FETK_VERSION}")
+        set(FETK_ZIP_FILE_NAME "${FETK_NAME}.${FETK_ZIP_EXT}")
+
+        message(STATUS "Downloading FETK from ${FETK_FULL_URL}")
+        file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PATH}/${FETK_ZIP_FILE_NAME}" STATUS FETK_DL_STATUS)
+        # check if download was successful
+        list(GET FETK_DL_STATUS 0 FETK_DL_STATUS_VALUE)
+        if(NOT FETK_DL_STATUS_VALUE EQUAL 0)
+            list(GET FETK_DL_STATUS 1 FETK_DL_STATUS_STRING)
+            message(FATAL_ERROR "FETK download error: ${FETK_DL_STATUS_STRING}")
+        endif()
+        execute_process(
+            COMMAND ls ${FETK_PATH}
+            COMMAND_ECHO STDERR
+            WORKING_DIRECTORY ${FETK_PATH}
+            OUTPUT_VARIABLE TEMP_STDOUT
+            ERROR_VARIABLE TEMP_STDERR
+        )
+        message(STATUS ${TEMP_STDOUT})
+        message(STATUS ${TEMP_STDERR})
+ 
+        # unzip
+        message(STATUS "Unzipping: ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}")
+        execute_process(
+            COMMAND ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}
+            COMMAND_ECHO STDERR
+            WORKING_DIRECTORY ${FETK_PATH}
+            RESULT_VARIABLE FETK_UNZIP_RETURN
+        )
+        if(NOT FETK_UNZIP_RETURN EQUAL 0)
+            message(FATAL_ERROR "Unzip operation failed")
+        endif()
+        
+        set(FETK_BUILD_PATH ${FETK_PATH}/${FETK_NAME}/build)
+        file(MAKE_DIRECTORY ${FETK_BUILD_PATH})
+        message(STATUS "Building in ${FETK_BUILD_PATH}")
+
+        # cmake configuration of FETK; occurs at configure time
+        execute_process( 
+            COMMAND cmake -D CMAKE_INSTALL_PREFIX:STRING=${FETK_BUILD_PATH} -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..
+            WORKING_DIRECTORY ${FETK_BUILD_PATH}
+            RESULT_VARIABLE FETK_BUILD_RETURN
+        )
+        if(NOT FETK_BUILD_RETURN EQUAL 0)
+            message(FATAL_ERROR "FETK build operation failed")
+        endif()
+        
+        execute_process( 
+            COMMAND make -j3 install
+            WORKING_DIRECTORY ${FETK_BUILD_PATH}
+            RESULT_VARIABLE FETK_BUILD_RETURN
+        )
+        if(NOT FETK_BUILD_RETURN EQUAL 0)
+            message(FATAL_ERROR "FETK build operation failed")
+        endif()
+
+        # Second we use the ExternalProject module to build and install FETK.
+        # This takes place during the build phase of APBS
+        # Note that we disable the configure stage of the ExternalProject because we already took care of the configure stage above.
+        #include(ExternalProject)
+        
+        #ExternalProject_Add( FETK
+        #    PREFIX            ${FETK_BUILD_PATH}
+        #    SOURCE_DIR        ${FETK_PATH}/${FETK_NAME}
+        #    BINARY_DIR        ${FETK_BUILD_PATH}
+        #    CONFIGURE_COMMAND ""
+        #    BUILD_ALWAYS      1
+        #    BUILD_COMMAND     $(MAKE)
+        #    INSTALL_DIR       ${FETK_BUILD_PATH}
+        #    INSTALL_COMMAND   $(MAKE) install
+        #)
+        
+        # specify the locations of the include and lib dirs for use at build time
+        message(STATUS "Include dir: ${FETK_BUILD_PATH}/include")
+        execute_process(
+            COMMAND ls ${FETK_BUILD_PATH}/include
+        )
+        include_directories(${FETK_BUILD_PATH}/include)
+        link_directories(${FETK_BUILD_PATH}/lib)
+
     endif()
+
+    list(APPEND APBS_LIBS
+        maloc
+        amd
+        punc
+        mc
+        gamer
+        superlu
+        umfpack
+        blas
+        vf2c
+#        tetgen
+#        triangle
+#        readline
+#        termcap
+    )
+
+    SET(HAVE_MC_H 1)
+    SET(HAVE_PUNC_H 1)
+    SET(HAVE_BIOM_H 1)
+
 endif()
 
 
