@@ -121,8 +121,8 @@ cmake -S .. -B $BUILD_DIR --trace-source=../externals/geoflow_c/src/CMakeLists.t
       -DENABLE_PYTHON=$BUILD_PYBIND                       \
       -DENABLE_TESTS=ON                                   \
       -DENABLE_TINKER=OFF                                 \
-      -DFETK_VERSION="nsoblath/issue_37" \
-      -DFETK_FULL_URL="https://github.com/Electrostatics/FETK/archive/refs/heads/nsoblath/issue_37.zip" \
+      -DFETK_VERSION="main" \
+      -DFETK_FULL_URL="https://github.com/Electrostatics/FETK/archive/refs/heads/main.zip" \
       ..                                                  || exit 1
  
 echo "==================================== BUILD =============================================== "
