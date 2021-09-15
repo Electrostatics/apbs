@@ -37,6 +37,11 @@ jobs:
         run: |
           brew install bison flex swig libomp lapack
           brew upgrade gcc@9
+          brew install \
+            arpack \
+            openblas \
+            superlu \
+            suite-sparse
 
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
         if: matrix.os == 'ubuntu-latest'
@@ -47,7 +52,13 @@ jobs:
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
           gcc --version
           g++ --version
-
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y \
+            libarpack2-dev \
+            libblas-dev \
+            liblapack-dev \
+            libsuperlu-dev \
+            libf2c2-dev \
+            libsuitesparse-dev
       - name: Build and Install
         run: |
           ./.build.sh
