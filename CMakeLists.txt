@@ -452,21 +452,16 @@ if(NOT FETK_VERSION MATCHES "[0-9]+\.[0-9]+\.[0-9]+")
         message(FATAL_ERROR "Please specify the source URL by defining: FETK_FULL_URL=[URL]")
     endif()
     string(REPLACE "/" "-" FETK_VERSION ${FETK_VERSION}) # this matches the replacement that GitHub makes for the directory within the zip file
-    message(STATUS "FETK VERSION (after replace): ${FETK_VERSION}")
 endif()
 
 if(ENABLE_FETK)
+
     set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
 
     if(FETK_FROM_PKG)
         set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
-        if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-            set(FETK_SYSTEM_COMPONENT "Linux")
-            set(FETK_ZIP_EXT "tar.gz")
-            set(FETK_UNZIP_COMMAND "tar" )
-            set(FETK_UNZIP_OPTS "-xzvf")
-        elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-            set(FETK_SYSTEM_COMPONENT "Darwin")
+        if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+            set(FETK_SYSTEM_COMPONENT ${CMAKE_SYSTEM_NAME})
             set(FETK_ZIP_EXT "tar.gz")
             set(FETK_UNZIP_COMMAND "tar" )
             set(FETK_UNZIP_OPTS "-xzvf")
@@ -489,10 +484,11 @@ if(ENABLE_FETK)
 
     if(FETK_FROM_PKG)
         set(FETK_NAME "FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}")
-        set(FETK_FULL_URL "${FETK_BASE_URL}/${FETK_NAME}.${FETK_ZIP_EXT}")
+        set(FETK_INSTALL_PREFIX "${FETK_PATH}/${FETK_NAME}")
 
-        if(NOT EXISTS "${FETK_PATH}/${FETK_NAME}/lib")
+        if(NOT EXISTS ${FETK_INSTALL_PREFIX}/lib)
             # download package
+            set(FETK_FULL_URL "${FETK_BASE_URL}/${FETK_NAME}.${FETK_ZIP_EXT}")
             set(FETK_ZIP_FILE_NAME "${FETK_NAME}.${FETK_ZIP_EXT}")
             message(STATUS "Downloading FETK from ${FETK_FULL_URL}")
             file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PATH}/${FETK_ZIP_FILE_NAME}" STATUS FETK_DL_STATUS)
@@ -514,16 +510,13 @@ if(ENABLE_FETK)
             if(NOT FETK_UNZIP_RETURN EQUAL 0)
                 message(FATAL_ERROR "Unzip operation failed")
             endif()
-            
-            # specify the locations of the include and lib dirs for use at build time
-            include_directories(${FETK_PATH}/${FETK_NAME}/include)
-            link_directories(${FETK_PATH}/${FETK_NAME}/lib)
         endif()
-    else()
+    else(FETK_FROM_PKG)
         set(FETK_NAME "FETK-${FETK_VERSION}")
-        set(FETK_ZIP_FILE_NAME "${FETK_NAME}.${FETK_ZIP_EXT}")
+        set(FETK_INSTALL_PREFIX ${FETK_BUILD_PATH})
 
         message(STATUS "Downloading FETK from ${FETK_FULL_URL}")
+        set(FETK_ZIP_FILE_NAME "${FETK_NAME}.${FETK_ZIP_EXT}")
         file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PATH}/${FETK_ZIP_FILE_NAME}" STATUS FETK_DL_STATUS)
         # check if download was successful
         list(GET FETK_DL_STATUS 0 FETK_DL_STATUS_VALUE)
@@ -531,15 +524,6 @@ if(ENABLE_FETK)
             list(GET FETK_DL_STATUS 1 FETK_DL_STATUS_STRING)
             message(FATAL_ERROR "FETK download error: ${FETK_DL_STATUS_STRING}")
         endif()
-        execute_process(
-            COMMAND ls ${FETK_PATH}
-            COMMAND_ECHO STDERR
-            WORKING_DIRECTORY ${FETK_PATH}
-            OUTPUT_VARIABLE TEMP_STDOUT
-            ERROR_VARIABLE TEMP_STDERR
-        )
-        message(STATUS ${TEMP_STDOUT})
-        message(STATUS ${TEMP_STDERR})
  
         # unzip
         message(STATUS "Unzipping: ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}")
@@ -591,16 +575,10 @@ if(ENABLE_FETK)
         #    INSTALL_DIR       ${FETK_BUILD_PATH}
         #    INSTALL_COMMAND   $(MAKE) install
         #)
-        
-        # specify the locations of the include and lib dirs for use at build time
-        message(STATUS "Include dir: ${FETK_BUILD_PATH}/include")
-        execute_process(
-            COMMAND ls ${FETK_BUILD_PATH}/include
-        )
-        include_directories(${FETK_BUILD_PATH}/include)
-        link_directories(${FETK_BUILD_PATH}/lib)
+    endif(FETK_FROM_PKG)
 
-    endif()
+    include_directories(${FETK_INSTALL_PREFIX}/include)
+    link_directories(${FETK_INSTALL_PREFIX}/lib)
 
     list(APPEND APBS_LIBS
         maloc
@@ -622,7 +600,7 @@ if(ENABLE_FETK)
     SET(HAVE_PUNC_H 1)
     SET(HAVE_BIOM_H 1)
 
-endif()
+endif(ENABLE_FETK)
 
 
 ################################################################################
