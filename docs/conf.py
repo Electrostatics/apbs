@@ -52,14 +52,13 @@ release = apbs._version.__version__
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.viewcode",
-    "sphinx.ext.napoleon",
-    "sphinx.ext.todo",
     "sphinx.ext.autosummary",
-    "sphinx_rtd_theme",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
-    "sphinx_sitemap",
+    "sphinx.ext.napoleon",
+    "sphinx_rtd_theme",
+    "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
 ]
 
 mathjax_path = "https://cdnjs.cloudflare.com"
