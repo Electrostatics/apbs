@@ -9,6 +9,12 @@ from setuptools import find_packages, setup
 with open("apbs/_version.py") as fobj:
     exec(fobj.read())
 
+# NOTE: The reason for version 3.7 vs. 3.8 is that ReadTheDocs
+#       is running version 3.7 so setting this to 3.8 causes
+#       the documentation build to fail.
+if version_info[:2] < (3, 7):
+    raise RuntimeError("Python version >= 3.7 is required.")
+
 with open("README.md", "r") as fobj:
     LONG_DESCRIPTION = fobj.read()
 
@@ -17,7 +23,7 @@ setup(
     version=__version__,  # noqa: F821
     description="APBS biomolecular solvation software",
     long_description=LONG_DESCRIPTION,
-    python_requires=">=3.8",
+    python_requires=">=3.7",
     author="Nathan Baker",
     author_email="nathanandrewbaker@gmail.com",
     url="https://www.poissonboltzmann.org",
