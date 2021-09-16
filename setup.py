@@ -1,16 +1,30 @@
 """Set up the APBS package."""
-import setuptools
+from sys import version_info
+from setuptools import find_packages, setup
 
+# NOTE: The following reads the version number and makes
+#       if available to the packaging tools before installation.
+#       REF: https://stackoverflow.com/questions/458550/standard-way-to-embed-version-into-python-package  # noqa: E501
+#       This makes __version__ valid below
+with open("apbs/_version.py") as fobj:
+    exec(fobj.read())
 
-setuptools.setup(
+if version_info[:2] < (3, 8):
+    raise RuntimeError("Python version >= 3.8 is required.")
+
+with open("README.md", "r") as fobj:
+    LONG_DESCRIPTION = fobj.read()
+
+setup(
     name="apbs",
-    version="broken",
+    version=__version__,  # noqa: F821
     description="APBS biomolecular solvation software",
+    long_description=LONG_DESCRIPTION,
     python_requires=">=3.8",
     author="Nathan Baker",
     author_email="nathanandrewbaker@gmail.com",
     url="https://www.poissonboltzmann.org",
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     package_data={"": ["*.yaml"]},
     install_requires=["numpy", "pyyaml"],
     tests_require=["pytest", "requests"],

@@ -10,9 +10,12 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath(".."))
+
+import apbs  # noqa: E402
+from datetime import date
 
 # Start TODO: This is part of issue https://github.com/Electrostatics/apbs/issues/41
 # Based on https://devblogs.microsoft.com/cppblog/clear-functional-c-documentation-with-sphinx-breathe-doxygen-cmake/
@@ -30,15 +33,15 @@
 #     breathe_projects['src'] = output_dir + '/xml'
 # End TODO:
 
-
 # -- Project information -----------------------------------------------------
 
-project = 'APBS'
-copyright = '2021, Nathan Baker and many others'
-author = 'Nathan Baker and many others'
+project = "APBS"
+copyright = f"{date.today().year}, Nathan Baker and many others"
+
+author = "Nathan Baker and many others"
 
 # The full version, including alpha/beta/rc tags
-release = '3.2.0'
+release = apbs._version.__version__
 
 
 # -- General configuration ---------------------------------------------------
