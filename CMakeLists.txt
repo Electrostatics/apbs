@@ -456,10 +456,15 @@ endif()
 
 if(ENABLE_FETK)
 
-    set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
+    set(FETK_PATH "${PROJECT_BINARY_DIR}/downloads/fetk")
+    if(NOT EXISTS ${FETK_PATH})
+        file(MAKE_DIRECTORY ${FETK_PATH})
+    endif()
 
     if(FETK_FROM_PKG)
+
         set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
+
         if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
             set(FETK_SYSTEM_COMPONENT ${CMAKE_SYSTEM_NAME})
             set(FETK_ZIP_EXT "tar.gz")
@@ -472,17 +477,7 @@ if(ENABLE_FETK)
         else()
             message(FATAL "System type <${CMAKE_SYSTEM_NAME}> is not supported when FETK is enabled; please disable FETK or change your system.")
         endif()
-    else()
-        set(FETK_ZIP_EXT "zip")
-        set(FETK_UNZIP_COMMAND "unzip")
-    endif()
 
-    set(FETK_PATH "${PROJECT_BINARY_DIR}/downloads/fetk")
-    if(NOT EXISTS ${FETK_PATH})
-        file(MAKE_DIRECTORY ${FETK_PATH})
-    endif()
-
-    if(FETK_FROM_PKG)
         set(FETK_NAME "FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}")
         set(FETK_INSTALL_PREFIX "${FETK_PATH}/${FETK_NAME}")
 
@@ -511,7 +506,14 @@ if(ENABLE_FETK)
                 message(FATAL_ERROR "Unzip operation failed")
             endif()
         endif()
+
     else(FETK_FROM_PKG)
+
+        # We assume that the user has provided FETK_FULL_URL
+            
+        set(FETK_ZIP_EXT "zip")
+        set(FETK_UNZIP_COMMAND "unzip")
+
         set(FETK_NAME "FETK-${FETK_VERSION}")
         set(FETK_INSTALL_PREFIX ${FETK_BUILD_PATH})
 
@@ -552,7 +554,7 @@ if(ENABLE_FETK)
         endif()
         
         execute_process( 
-            COMMAND make -j3 install
+            COMMAND make -j install
             WORKING_DIRECTORY ${FETK_BUILD_PATH}
             RESULT_VARIABLE FETK_BUILD_RETURN
         )
