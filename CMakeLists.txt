@@ -584,12 +584,12 @@ if(ENABLE_FETK)
 
     list(APPEND APBS_LIBS
         maloc
-        amd
+#        amd
         punc
         mc
         gamer
-        superlu
-        umfpack
+#        superlu
+#        umfpack
         blas
         vf2c
 #        tetgen
