@@ -6,8 +6,8 @@ on:
   push:
     branches: [master]
 
-    env:
-      WIN_DEPENDENCIES_RELEASE: "v0.2.0"
+env:
+  WIN_DEPENDENCIES_RELEASE: "v0.2.0"
 
 jobs:
   build:
