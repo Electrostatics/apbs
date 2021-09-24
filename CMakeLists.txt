@@ -589,7 +589,7 @@ if(ENABLE_FETK)
         mc
         gamer
 #        superlu
-#        umfpack
+        umfpack
         blas
         vf2c
 #        tetgen
