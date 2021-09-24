@@ -6,6 +6,9 @@ on:
   push:
     branches: [master]
 
+    env:
+      WIN_DEPENDENCIES_RELEASE: "v0.2.0"
+
 jobs:
   build:
     name: Compile Code
@@ -16,11 +19,17 @@ jobs:
       matrix:
         # os: [ubuntu-latest]
         # os: [macOS-latest]
-        os: [ubuntu-latest, macOS-latest]
+        # os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-latest, windows-latest]
         # os: [ubuntu-latest, macOS-latest, windows-latest]
         python-version: [3.9]
 
     steps:
+
+      - name: Add msbuild to PATH
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        uses: microsoft/setup-msbuild@v1.0.2
+
       - name: Checkout reposistory
         uses: actions/checkout@master
 
@@ -33,7 +42,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Mac Prereqs
-        if: matrix.os == 'macOS-latest'
+        if: startsWith(matrix.os, 'macos')  # Mac only
         run: |
           brew install bison flex swig libomp lapack
           brew upgrade gcc@9
@@ -44,7 +53,7 @@ jobs:
             suite-sparse
 
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
-        if: matrix.os == 'ubuntu-latest'
+        if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
           for apt_file in `grep -lr microsoft /etc/apt/sources.list.d/`; do sudo rm $apt_file; done
           sudo apt-get install -yq software-properties-common build-essential gcc-9 g++-9 bison flex swig libreadline-dev libomp5 libomp-dev
@@ -59,12 +68,40 @@ jobs:
             libsuperlu-dev \
             libf2c2-dev \
             libsuitesparse-dev
-      - name: Build and Install
+
+      - name: Install Window dependencies
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        run: |
+          choco install wget
+          wget https://github.com/Electrostatics/cache/releases/download/${WIN_DEPENDENCIES_RELEASE}/apbs_dependencies_vcpkg.zip
+          7z x apbs_dependencies_vcpkg.zip -aoa -o/c/vcpkg
+          ls /c/vcpkg
+        shell: bash
+
+      - name: Configure for Windows
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        env:
+          CMAKE_PREFIX_PATH: ${VCPKG_INSTALLATION_ROOT}/installed/x86-windows
+        run: |
+          mkdir -p build/Release
+          cd build
+          echo $CMAKE_PREFIX_PATH
+          cmake --trace-expand -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_FETK=ON -DENABLE_BEM=ON -DENABLE_GEOFLOW=ON -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=OFF -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 ..
+        shell: bash
+
+      - name: Build and Install on Linux and Mac
+        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')  # Linux and Mac only
         run: |
           ./.build.sh
         env:
           # https://codecov.io/gh/Electrostatics/apbs
           CODECOV_TOKEN: "e3a1e24c-5598-4f47-9353-7fa0ac57f98e"
+
+      - name: Build on Windows
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        run: |
+          cd build
+          cmake --build . --config Release --parallel 1 --target install
 
 #      - name: Setup tmate session
 #        if: ${{ ! success() }}
