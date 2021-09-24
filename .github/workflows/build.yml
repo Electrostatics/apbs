@@ -7,7 +7,7 @@ on:
     branches: [master]
 
 env:
-  WIN_DEPENDENCIES_RELEASE: "v0.2.0"
+  WIN_DEPENDENCIES_RELEASE: "v0.3.0"
 
 jobs:
   build:
