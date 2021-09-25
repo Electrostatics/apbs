@@ -8,7 +8,7 @@ on:
 
 env:
   WIN_DEPENDENCIES_RELEASE: "v0.3.0"
-  WIN_TOOLCHAIN_FILE: 'C:\vcpkg\scripts\buildsystems\vcpkg.cmake'
+  WIN_TOOLCHAIN_FILE: '/c/vcpkg/scripts/buildsystems/vcpkg.cmake'
 
 jobs:
   build:
@@ -88,28 +88,8 @@ jobs:
           mkdir -p build/Release
           cd build
           echo $CMAKE_PREFIX_PATH
-          cmake --trace-expand \
-            -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} \
-            -DVCPKG_TARGET_TRIPLET=x86-windows \
-            -DCMAKE_INSTALL_INCLUDEDIR=include \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
-            -DBUILD_TESTING=ON \
-            -DBUILD_TOOLS=ON \
-            -DCHECK_EPSILON=ON \
-            -DENABLE_FETK=ON \
-            -DENABLE_BEM=ON \
-            -DENABLE_GEOFLOW=ON \
-            -DENABLE_INLINE=ON \
-            -DENABLE_PBAM=ON \
-            -DENABLE_PYTHON=OFF \
-            -DENABLE_TESTS=ON \
-            -DBUILD_SHARED_LIBS=OFF \
-            -DENABLE_VERBOSE_DEBUG=ON \
-            -DGET_NanoShaper=ON \
-            -G "Visual Studio 16 2019" \
-            -A x64 \
-            ..
+          cmake --trace-expand -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DBUILD_TESTING=ON -DBUILD_TOOLS=ON -DCHECK_EPSILON=ON -DENABLE_FETK=ON -DENABLE_BEM=ON -DENABLE_GEOFLOW=ON -DENABLE_INLINE=ON -DENABLE_PBAM=ON -DENABLE_PYTHON=OFF -DENABLE_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DENABLE_VERBOSE_DEBUG=ON -DGET_NanoShaper=ON -G "Visual Studio 16 2019" -A x64 ..
+        shell: bash
 
       - name: Build and Install on Linux and Mac
         if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')  # Linux and Mac only
