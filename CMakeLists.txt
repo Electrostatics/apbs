@@ -443,7 +443,7 @@ file(COPY tools/maloccf.h DESTINATION ${APBS_BUILD}/src)
 ################################################################################
 # add_library(apbs_fetk_libraries INTERFACE)
 
-set(FETK_VERSION "1.7.0" CACHE STRING "Version of FETK to use")
+set(FETK_VERSION "1.8.0" CACHE STRING "Version of FETK to use")
 
 set(FETK_FROM_PKG TRUE)
 if(NOT FETK_VERSION MATCHES "[0-9]+\.[0-9]+\.[0-9]+")
