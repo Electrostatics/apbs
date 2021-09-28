@@ -84,8 +84,8 @@ jobs:
         if: startsWith(matrix.os, 'windows')  # Windows only
         env:
           CMAKE_PREFIX_PATH: ${VCPKG_INSTALLATION_ROOT}/installed/x86-windows
-          FETK_VERSION: 0.8.0
-          FETK_FULL_URL: ""
+          FETK_VERSION: main
+          FETK_FULL_URL: "https://github.com/Electrostatics/FETK/archive/refs/heads/main.zip"
         run: |
           mkdir -p build/Release
           cd build
