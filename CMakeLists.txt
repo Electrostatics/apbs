@@ -650,7 +650,7 @@ if(ENABLE_GEOFLOW)
         #endif()
         ExternalProject_Add(geoflow
             SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-            CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG} -G "Visual Studio 16 2019" -A Win32
+            CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG}
             BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target GeometricFlowLib
             INSTALL_COMMAND "")
     else()
@@ -686,7 +686,7 @@ if(ENABLE_PBAM)
     if(WIN32)
         ExternalProject_Add(pbam
             SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-            CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+            CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG}
             BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBAMLib
             INSTALL_COMMAND "")
     else()
@@ -732,7 +732,7 @@ if(ENABLE_PBSAM)
     if(WIN32)
         ExternalProject_Add(pbsam
             SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-            CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+            CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG}
             BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBSAMLib
             INSTALL_COMMAND "")
     else()
