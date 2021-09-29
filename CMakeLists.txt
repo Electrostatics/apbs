@@ -546,7 +546,7 @@ if(ENABLE_FETK)
         # cmake configuration and build of FETK; occurs at configure time
         if(WIN32)
             execute_process( 
-                COMMAND cmake -DCMAKE_BUILD_TYPE=Release -DCREATE_PACKAGE=FALSE -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_TOOLCHAIN_FILE=$ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake -G "Visual Studio 16 2019" -A Win32 ..
+                COMMAND cmake -DCMAKE_BUILD_TYPE=Release -DCREATE_PACKAGE=FALSE -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE} -G "Visual Studio 16 2019" -A Win32 ..
                 WORKING_DIRECTORY ${FETK_BUILD_PATH}
                 RESULT_VARIABLE FETK_BUILD_RETURN
             )
@@ -555,7 +555,7 @@ if(ENABLE_FETK)
             endif()
 
             execute_process( 
-                COMMAND cmake --build . --config Release --parallel 1
+                COMMAND cmake --build . --config Release --parallel 1 --target install
                 WORKING_DIRECTORY ${FETK_BUILD_PATH}
                 RESULT_VARIABLE FETK_BUILD_RETURN
             )
