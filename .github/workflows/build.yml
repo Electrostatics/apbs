@@ -8,7 +8,7 @@ on:
 
 env:
   WIN_DEPENDENCIES_RELEASE: "v0.3.0"
-  WIN_TOOLCHAIN_FILE: '/c/vcpkg/scripts/buildsystems/vcpkg.cmake'
+  WIN_TOOLCHAIN_FILE: "${VCPKG_INSTALLATION_ROOT}/vcpkg/scripts/buildsystems/vcpkg.cmake"
   FETK_VERSION: main
   FETK_FULL_URL: "https://github.com/Electrostatics/FETK/archive/refs/heads/main.zip"
 
@@ -108,9 +108,9 @@ jobs:
           cd build
           cmake --build . --config Release --parallel 1 --target install
 
-#      - name: Setup tmate session
-#        if: ${{ ! success() }}
-#        uses: mxschmitt/action-tmate@v3
+      - name: Setup tmate session
+        if: ${{ ! success() }}
+        uses: mxschmitt/action-tmate@v3
 
       - name: Package
         uses: actions/upload-artifact@v2
