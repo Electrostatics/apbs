@@ -543,24 +543,45 @@ if(ENABLE_FETK)
         file(MAKE_DIRECTORY ${FETK_BUILD_PATH})
         message(STATUS "Building in ${FETK_BUILD_PATH}")
 
-        # cmake configuration of FETK; occurs at configure time
-        execute_process( 
-            COMMAND cmake -D CMAKE_INSTALL_PREFIX:STRING=${FETK_BUILD_PATH} -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..
-            WORKING_DIRECTORY ${FETK_BUILD_PATH}
-            RESULT_VARIABLE FETK_BUILD_RETURN
-        )
-        if(NOT FETK_BUILD_RETURN EQUAL 0)
-            message(FATAL_ERROR "FETK build operation failed")
+        # cmake configuration and build of FETK; occurs at configure time
+        if(WIN32)
+            execute_process( 
+                COMMAND cmake -DCMAKE_BUILD_TYPE=Release -DCREATE_PACKAGE=FALSE -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_TOOLCHAIN_FILE=$ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake -G "Visual Studio 16 2019" -A Win32 ..
+                WORKING_DIRECTORY ${FETK_BUILD_PATH}
+                RESULT_VARIABLE FETK_BUILD_RETURN
+            )
+            if(NOT FETK_BUILD_RETURN EQUAL 0)
+                message(FATAL_ERROR "FETK configuration operation failed")
+            endif()
+
+            execute_process( 
+                COMMAND cmake --build . --config Release --parallel 1
+                WORKING_DIRECTORY ${FETK_BUILD_PATH}
+                RESULT_VARIABLE FETK_BUILD_RETURN
+            )
+            if(NOT FETK_BUILD_RETURN EQUAL 0)
+                message(FATAL_ERROR "FETK build operation failed")
+            endif()
+        else()
+           execute_process( 
+                COMMAND cmake -D CMAKE_INSTALL_PREFIX=${FETK_BUILD_PATH} -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..
+                WORKING_DIRECTORY ${FETK_BUILD_PATH}
+                RESULT_VARIABLE FETK_BUILD_RETURN
+            )
+            if(NOT FETK_BUILD_RETURN EQUAL 0)
+                message(FATAL_ERROR "FETK configuration operation failed")
+            endif()
+
+            execute_process( 
+                COMMAND make -j install
+                WORKING_DIRECTORY ${FETK_BUILD_PATH}
+                RESULT_VARIABLE FETK_BUILD_RETURN
+            )
+            if(NOT FETK_BUILD_RETURN EQUAL 0)
+                message(FATAL_ERROR "FETK build operation failed")
+            endif()
         endif()
-        
-        execute_process( 
-            COMMAND make -j install
-            WORKING_DIRECTORY ${FETK_BUILD_PATH}
-            RESULT_VARIABLE FETK_BUILD_RETURN
-        )
-        if(NOT FETK_BUILD_RETURN EQUAL 0)
-            message(FATAL_ERROR "FETK build operation failed")
-        endif()
+
 
         # Second we use the ExternalProject module to build and install FETK.
         # This takes place during the build phase of APBS
