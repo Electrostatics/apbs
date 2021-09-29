@@ -644,13 +644,13 @@ if(ENABLE_GEOFLOW)
     add_definitions(-DGEOFLOW_APBS)
 
     if(WIN32)
-        if($ENV{WIN_TOOLCHAIN_FILE})
+        #if($ENV{WIN_TOOLCHAIN_FILE})
             set(CMAKE_TOOLCHAIN_FILE_ARG "-DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE}")
             message(STATUS "Adding toolchain file argument: ${CMAKE_TOOLCHAIN_FILE_ARG}")
-        endif()
+        #endif()
         ExternalProject_Add(geoflow
             SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-            CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} ${CMAKE_TOOLCHAIN_FILE_ARG}
+            CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG} -G "Visual Studio 16 2019" -A Win32
             BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target GeometricFlowLib
             INSTALL_COMMAND "")
     else()
