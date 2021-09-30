@@ -634,6 +634,7 @@ option(ENABLE_GEOFLOW "geoflow method" OFF)
 if(ENABLE_GEOFLOW)
     message(STATUS "Building GEOFLOW")
     add_definitions(-DGEOFLOW_APBS)
+    set(ENABLE_GEOFLOW_APBS ON CACHE BOOL "Enable the APBS-Geoflow connection")
 
     add_subdirectory(externals/geoflow_c)
 
