@@ -603,29 +603,21 @@ if(ENABLE_FETK)
     include_directories(${FETK_INSTALL_PREFIX}/include)
     link_directories(${FETK_INSTALL_PREFIX}/lib)
 
-    if(WIN32)
-        list(APPEND APBS_LIBS
-            maloc
-            umfpack
-            blas
-        )
-    else()
-        list(APPEND APBS_LIBS
-            maloc
-#           amd
-            punc
-            mc
-            gamer
-#           superlu
-            umfpack
-            blas
-            vf2c
-#           tetgen
-#           triangle
-#           readline
-#           termcap
-        )
-    endif()
+    list(APPEND APBS_LIBS
+        maloc
+#        amd
+        punc
+        mc
+        gamer
+#        superlu
+        umfpack
+        blas
+        vf2c
+#        tetgen
+#        triangle
+#        readline
+#        termcap
+    )
 
     SET(HAVE_MC_H 1)
     SET(HAVE_PUNC_H 1)
