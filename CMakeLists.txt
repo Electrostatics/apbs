@@ -635,34 +635,36 @@ if(ENABLE_GEOFLOW)
     message(STATUS "Building GEOFLOW")
     add_definitions(-DGEOFLOW_APBS)
 
-    if(WIN32)
-        #if($ENV{WIN_TOOLCHAIN_FILE})
-            set(CMAKE_TOOLCHAIN_FILE_ARG "-DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE}")
-            message(STATUS "Adding toolchain file argument: ${CMAKE_TOOLCHAIN_FILE_ARG}")
-        #endif()
-        ExternalProject_Add(geoflow
-            SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-            CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target GeometricFlowLib
-            INSTALL_COMMAND "")
-    else()
-        ExternalProject_Add(geoflow
-            SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-            CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
-            INSTALL_COMMAND "")
-    endif()
+    add_subdirectory(externals/geoflow_c)
 
-    ExternalProject_Get_Property(geoflow binary_dir)
+#    if(WIN32)
+#        #if($ENV{WIN_TOOLCHAIN_FILE})
+#set(CMAKE_TOOLCHAIN_FILE_ARG "-DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE}")
+#            message(STATUS "Adding toolchain file argument: ${CMAKE_TOOLCHAIN_FILE_ARG}")
+#        #endif()
+#        ExternalProject_Add(geoflow
+#            SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
+#            CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG}
+#            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target GeometricFlowLib
+#            INSTALL_COMMAND "")
+#    else()
+#        ExternalProject_Add(geoflow
+#            SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
+#            CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+#            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
+#            INSTALL_COMMAND "")
+#    endif()
+
+#    ExternalProject_Get_Property(geoflow binary_dir)
     add_definitions(-DENABLE_GEOFLOW)
-    list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
+#    list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
     list(APPEND APBS_LIBS GeometricFlowLib)
     include_directories(${EXTERNALS_PATH}/geoflow_c/src)
 
-    if(BUILD_SHARED_LIBS)
-        install(FILES ${binary_dir}/lib/libGeometricFlowLib${CMAKE_SHARED_LIBRARY_SUFFIX}
-                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-    endif()
+#    if(BUILD_SHARED_LIBS)
+#        install(FILES ${binary_dir}/lib/libGeometricFlowLib${CMAKE_SHARED_LIBRARY_SUFFIX}
+#                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+#    endif()
 endif()
 
 
