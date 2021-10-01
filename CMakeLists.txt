@@ -87,6 +87,11 @@ set_package_properties(APBS PROPERTIES
              open-source APBS license ensures its accessibility to the entire \
              biomedical community.")
 
+if(CMAKE_TOOLCHAIN_FILE)
+    message(STATUS "Toolchain file is set to <${CMAKE_TOOLCHAIN_FILE}>.  Including the file.")
+    include(${CMAKE_TOOLCHAIN_FILE})
+endif()
+
 ###############################################################################
 ##  NOTE: For Debugging and generally nice information to have
 ###############################################################################
