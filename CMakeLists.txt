@@ -611,7 +611,7 @@ if(ENABLE_FETK)
         gamer
 #        superlu
 #        umfpack
-        blas
+#        blas
         vf2c
 #        tetgen
 #        triangle
@@ -621,10 +621,12 @@ if(ENABLE_FETK)
     if(WIN32)
         list(APPEND APBS_LIBS
             libumfpack
+            openblas
         )
     else()
         list(APPEND APBS_LIBS
             umfpack
+            blas
         )
     endif()
 
