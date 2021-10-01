@@ -461,6 +461,9 @@ if(ENABLE_FETK)
         file(MAKE_DIRECTORY ${FETK_PATH})
     endif()
 
+    set(FETK_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/fetk)
+    message(STATUS "FETK will be installed in <${FETK_INSTALL_PREFIX}>")
+    
     if(FETK_FROM_PKG)
 
         set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
