@@ -535,7 +535,8 @@ if(ENABLE_FETK)
             ExternalProject_Add( FETK
                 PREFIX ${FETK_PATH}
                 DOWNLOAD_DIR ${FETK_PATH}
-                BINARY_DIR ${FETK_PATH}/FETK-${FETK_VERSION}/build
+                SOURCE_DIR ${FETK_PATH}
+                BINARY_DIR ${FETK_PATH}/FETK/build
                 INSTALL_DIR ${FETK_INSTALL_PREFIX}
                 URL ${FETK_FULL_URL}
                 DOWNLOAD_NAME FETK-${FETK_VERSION}.zip
@@ -546,7 +547,8 @@ if(ENABLE_FETK)
             ExternalProject_Add( FETK
                 PREFIX ${FETK_PATH}
                 DOWNLOAD_DIR ${FETK_PATH}
-                BINARY_DIR ${FETK_PATH}/FETK-${FETK_VERSION}/build
+                SOURCE_DIR ${FETK_PATH}
+                BINARY_DIR ${FETK_PATH}/FETK/build
                 INSTALL_DIR ${FETK_INSTALL_PREFIX}
                 URL ${FETK_FULL_URL}
                 DOWNLOAD_NAME FETK-${FETK_VERSION}.zip
