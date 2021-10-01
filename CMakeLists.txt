@@ -610,7 +610,7 @@ if(ENABLE_FETK)
         mc
         gamer
 #        superlu
-        umfpack
+#        umfpack
         blas
         vf2c
 #        tetgen
@@ -618,6 +618,15 @@ if(ENABLE_FETK)
 #        readline
 #        termcap
     )
+    if(WIN32)
+        list(APPEND APBS_LIBS
+            libumfpack
+        )
+    else()
+        list(APPEND APBS_LIBS
+            umfpack
+        )
+    endif()
 
     SET(HAVE_MC_H 1)
     SET(HAVE_PUNC_H 1)
