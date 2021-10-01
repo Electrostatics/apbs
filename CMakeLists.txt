@@ -539,7 +539,7 @@ if(ENABLE_FETK)
                 INSTALL_DIR ${FETK_INSTALL_PREFIX}
                 URL ${FETK_FULL_URL}
                 DOWNLOAD_NAME FETK-${FETK_VERSION}.zip
-                CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release -DCREATE_PACKAGE=FALSE -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE} -G "Visual Studio 16 2019" -A Win32
+                CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release -DCREATE_PACKAGE=FALSE -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE}
                 BUILD_COMMAND cmake --build . --config Release --parallel 1 --target install
             )
         else()
