@@ -535,9 +535,7 @@ if(ENABLE_FETK)
             ExternalProject_Add( FETK
                 PREFIX ${FETK_PATH}
                 DOWNLOAD_DIR ${FETK_PATH}
-                SOURCE_DIR ${FETK_PATH}/src
-                BINARY_DIR ${FETK_PATH}/src/fetk-build
-                STAMP_DIR ${FETK_PATH}/timestamps
+                BINARY_DIR ${FETK_PATH}/build
                 INSTALL_DIR ${FETK_INSTALL_PREFIX}
                 URL ${FETK_FULL_URL}
                 CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${FETK_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=Release -DCREATE_PACKAGE=FALSE -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE}
@@ -547,9 +545,7 @@ if(ENABLE_FETK)
             ExternalProject_Add( FETK
                 PREFIX ${FETK_PATH}
                 DOWNLOAD_DIR ${FETK_PATH}
-                SOURCE_DIR ${FETK_PATH}/src
-                BINARY_DIR ${FETK_PATH}/src/fetk-build
-                STAMP_DIR ${FETK_PATH}/timestamps
+                BINARY_DIR ${FETK_PATH}/build
                 INSTALL_DIR ${FETK_INSTALL_PREFIX}
                 URL ${FETK_FULL_URL}
                 CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${FETK_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
