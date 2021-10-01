@@ -464,123 +464,167 @@ if(ENABLE_FETK)
     if(FETK_FROM_PKG)
 
         set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
-
-        if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-            set(FETK_SYSTEM_COMPONENT ${CMAKE_SYSTEM_NAME})
-            set(FETK_ZIP_EXT "tar.gz")
-            set(FETK_UNZIP_COMMAND "tar" )
-            set(FETK_UNZIP_OPTS "-xzf")
-        elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-            set(FETK_SYSTEM_COMPONENT "win64")
-            set(FETK_ZIP_EXT "zip")
-            set(FETK_UNZIP_COMMAND "unzip" )
+        if(WIN32)
+            set(FETK_ZIP_EXT zip)
+            set(FETK_SYSTEM_COMPONENT ${win32})
         else()
-            message(FATAL "System type <${CMAKE_SYSTEM_NAME}> is not supported when FETK is enabled; please disable FETK or change your system.")
+            set(FETK_ZIP_EXT tar.gz)
+            set(FETK_SYSTEM_COMPONENT ${CMAKE_SYSTEM_NAME})
         endif()
 
-        set(FETK_NAME "FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}")
-        set(FETK_INSTALL_PREFIX "${FETK_PATH}/${FETK_NAME}")
+        ExternalProject_Add( FETK
+            PREFIX ${FETK_PATH}
+            DOWNLOAD_DIR ${FETK_PATH}
+            INSTALL_DIR ${FETK_INSTALL_PREFIX}
+            URL ${FETK_BASE_URL}/FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}.${FETK_ZIP_EXT}
+            DOWNLOAD_NAME FETK-${FETK_VERSION}.zip
+            CONFIGURE_COMMAND ""
+            BUILD_COMMAND ""
+            INSTALL_COMMAND ""
+        )
 
-        if(NOT EXISTS ${FETK_INSTALL_PREFIX}/lib)
-            # download package
-            set(FETK_FULL_URL "${FETK_BASE_URL}/${FETK_NAME}.${FETK_ZIP_EXT}")
-            set(FETK_ZIP_FILE_NAME "${FETK_NAME}.${FETK_ZIP_EXT}")
-            message(STATUS "Downloading FETK from ${FETK_FULL_URL}")
-            file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PATH}/${FETK_ZIP_FILE_NAME}" STATUS FETK_DL_STATUS)
-            # check if download was successful
-            list(GET FETK_DL_STATUS 0 FETK_DL_STATUS_VALUE)
-            if(NOT FETK_DL_STATUS_VALUE EQUAL 0)
-                list(GET FETK_DL_STATUS 1 FETK_DL_STATUS_STRING)
-                message(FATAL_ERROR "FETK download error: ${FETK_DL_STATUS_STRING}")
-            endif()
 
-            # unzip
-            message(STATUS "Unzipping: ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}")
-            execute_process(
-                COMMAND ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}
-                COMMAND_ECHO STDERR
-                WORKING_DIRECTORY ${FETK_PATH}
-                RESULT_VARIABLE FETK_UNZIP_RETURN
-            )
-            if(NOT FETK_UNZIP_RETURN EQUAL 0)
-                message(FATAL_ERROR "Unzip operation failed")
-            endif()
-        endif()
+        #set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
+
+        #if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        #    set(FETK_SYSTEM_COMPONENT ${CMAKE_SYSTEM_NAME})
+        #    set(FETK_ZIP_EXT "tar.gz")
+        #    set(FETK_UNZIP_COMMAND "tar" )
+        #    set(FETK_UNZIP_OPTS "-xzf")
+        #elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        #    set(FETK_SYSTEM_COMPONENT "win64")
+        #    set(FETK_ZIP_EXT "zip")
+        #    set(FETK_UNZIP_COMMAND "unzip" )
+        #else()
+        #    message(FATAL "System type <${CMAKE_SYSTEM_NAME}> is not supported when FETK is enabled; please disable FETK or change your system.")
+        #endif()
+
+        #set(FETK_NAME "FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}")
+        #set(FETK_INSTALL_PREFIX "${FETK_PATH}/${FETK_NAME}")
+
+        #if(NOT EXISTS ${FETK_INSTALL_PREFIX}/lib)
+        #    # download package
+        #    set(FETK_FULL_URL "${FETK_BASE_URL}/${FETK_NAME}.${FETK_ZIP_EXT}")
+        #    set(FETK_ZIP_FILE_NAME "${FETK_NAME}.${FETK_ZIP_EXT}")
+        #    message(STATUS "Downloading FETK from ${FETK_FULL_URL}")
+        #    file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PATH}/${FETK_ZIP_FILE_NAME}" STATUS FETK_DL_STATUS)
+        #    # check if download was successful
+        #    list(GET FETK_DL_STATUS 0 FETK_DL_STATUS_VALUE)
+        #    if(NOT FETK_DL_STATUS_VALUE EQUAL 0)
+        #        list(GET FETK_DL_STATUS 1 FETK_DL_STATUS_STRING)
+        #        message(FATAL_ERROR "FETK download error: ${FETK_DL_STATUS_STRING}")
+        #    endif()
+
+        #    # unzip
+        #    message(STATUS "Unzipping: ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}")
+        #    execute_process(
+        #        COMMAND ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}
+        #        COMMAND_ECHO STDERR
+        #        WORKING_DIRECTORY ${FETK_PATH}
+        #        RESULT_VARIABLE FETK_UNZIP_RETURN
+        #    )
+        #    if(NOT FETK_UNZIP_RETURN EQUAL 0)
+        #        message(FATAL_ERROR "Unzip operation failed")
+        #    endif()
+        #endif()
 
     else(FETK_FROM_PKG)
 
         # We assume that the user has provided FETK_FULL_URL
-            
-        set(FETK_ZIP_EXT "zip")
-        set(FETK_UNZIP_COMMAND "unzip")
-
-        set(FETK_NAME "FETK-${FETK_VERSION}")
-        set(FETK_BUILD_PATH ${FETK_PATH}/${FETK_NAME}/build)
-        set(FETK_INSTALL_PREFIX ${FETK_BUILD_PATH})
-
-        message(STATUS "Downloading FETK from ${FETK_FULL_URL}")
-        set(FETK_ZIP_FILE_NAME "${FETK_NAME}.${FETK_ZIP_EXT}")
-        file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PATH}/${FETK_ZIP_FILE_NAME}" STATUS FETK_DL_STATUS)
-        # check if download was successful
-        list(GET FETK_DL_STATUS 0 FETK_DL_STATUS_VALUE)
-        if(NOT FETK_DL_STATUS_VALUE EQUAL 0)
-            list(GET FETK_DL_STATUS 1 FETK_DL_STATUS_STRING)
-            message(FATAL_ERROR "FETK download error: ${FETK_DL_STATUS_STRING}")
+        if(WIN32)
+            ExternalProject_Add( FETK
+                PREFIX ${FETK_PATH}
+                DOWNLOAD_DIR ${FETK_PATH}
+                BINARY_DIR ${FETK_PATH}/FETK-${FETK_VERSION}/build
+                INSTALL_DIR ${FETK_INSTALL_PREFIX}
+                URL ${FETK_FULL_URL}
+                DOWNLOAD_NAME FETK-${FETK_VERSION}.zip
+                CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release -DCREATE_PACKAGE=FALSE -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE} -G "Visual Studio 16 2019" -A Win32
+                BUILD_COMMAND cmake --build . --config Release --parallel 1 --target install
+            )
+        else()
+            ExternalProject_Add( FETK
+                PREFIX ${FETK_PATH}
+                DOWNLOAD_DIR ${FETK_PATH}
+                BINARY_DIR ${FETK_PATH}/FETK-${FETK_VERSION}/build
+                INSTALL_DIR ${FETK_INSTALL_PREFIX}
+                URL ${FETK_FULL_URL}
+                DOWNLOAD_NAME FETK-${FETK_VERSION}.zip
+                CMAKE_ARGS -D CMAKE_INSTALL_PREFIX=${FETK_BUILD_PATH} -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            )
         endif()
+
+            
+        #set(FETK_ZIP_EXT "zip")
+        #set(FETK_UNZIP_COMMAND "unzip")
+
+        #set(FETK_NAME "FETK-${FETK_VERSION}")
+        #set(FETK_BUILD_PATH ${FETK_PATH}/${FETK_NAME}/build)
+        #set(FETK_INSTALL_PREFIX ${FETK_BUILD_PATH})
+
+        #message(STATUS "Downloading FETK from ${FETK_FULL_URL}")
+        #set(FETK_ZIP_FILE_NAME "${FETK_NAME}.${FETK_ZIP_EXT}")
+        #file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PATH}/${FETK_ZIP_FILE_NAME}" STATUS FETK_DL_STATUS)
+        # check if download was successful
+        #list(GET FETK_DL_STATUS 0 FETK_DL_STATUS_VALUE)
+        #if(NOT FETK_DL_STATUS_VALUE EQUAL 0)
+        #    list(GET FETK_DL_STATUS 1 FETK_DL_STATUS_STRING)
+        #    message(FATAL_ERROR "FETK download error: ${FETK_DL_STATUS_STRING}")
+        #endif()
  
         # unzip
-        message(STATUS "Unzipping: ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}")
-        execute_process(
-            COMMAND ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}
-            COMMAND_ECHO STDERR
-            WORKING_DIRECTORY ${FETK_PATH}
-            RESULT_VARIABLE FETK_UNZIP_RETURN
-        )
-        if(NOT FETK_UNZIP_RETURN EQUAL 0)
-            message(FATAL_ERROR "Unzip operation failed")
-        endif()
+        #message(STATUS "Unzipping: ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}")
+        #execute_process(
+        #    COMMAND ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}
+        #    COMMAND_ECHO STDERR
+        #    WORKING_DIRECTORY ${FETK_PATH}
+        #    RESULT_VARIABLE FETK_UNZIP_RETURN
+        #)
+        #if(NOT FETK_UNZIP_RETURN EQUAL 0)
+        #    message(FATAL_ERROR "Unzip operation failed")
+        #endif()
         
-        file(MAKE_DIRECTORY ${FETK_BUILD_PATH})
-        message(STATUS "Building in ${FETK_BUILD_PATH}")
+        #file(MAKE_DIRECTORY ${FETK_BUILD_PATH})
+        #message(STATUS "Building in ${FETK_BUILD_PATH}")
 
         # cmake configuration and build of FETK; occurs at configure time
-        if(WIN32)
-            execute_process( 
-                COMMAND cmake -DCMAKE_BUILD_TYPE=Release -DCREATE_PACKAGE=FALSE -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE} -G "Visual Studio 16 2019" -A Win32 ..
-                WORKING_DIRECTORY ${FETK_BUILD_PATH}
-                RESULT_VARIABLE FETK_BUILD_RETURN
-            )
-            if(NOT FETK_BUILD_RETURN EQUAL 0)
-                message(FATAL_ERROR "FETK configuration operation failed")
-            endif()
+        #if(WIN32)
+        #    execute_process( 
+        #        COMMAND cmake -DCMAKE_BUILD_TYPE=Release -DCREATE_PACKAGE=FALSE -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE} -G "Visual Studio 16 2019" -A Win32 ..
+        #        WORKING_DIRECTORY ${FETK_BUILD_PATH}
+        #        RESULT_VARIABLE FETK_BUILD_RETURN
+        #    )
+        #    if(NOT FETK_BUILD_RETURN EQUAL 0)
+        #        message(FATAL_ERROR "FETK configuration operation failed")
+        #    endif()
 
-            execute_process( 
-                COMMAND cmake --build . --config Release --parallel 1 --target install
-                WORKING_DIRECTORY ${FETK_BUILD_PATH}
-                RESULT_VARIABLE FETK_BUILD_RETURN
-            )
-            if(NOT FETK_BUILD_RETURN EQUAL 0)
-                message(FATAL_ERROR "FETK build operation failed")
-            endif()
-        else()
-           execute_process( 
-                COMMAND cmake -D CMAKE_INSTALL_PREFIX=${FETK_BUILD_PATH} -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..
-                WORKING_DIRECTORY ${FETK_BUILD_PATH}
-                RESULT_VARIABLE FETK_BUILD_RETURN
-            )
-            if(NOT FETK_BUILD_RETURN EQUAL 0)
-                message(FATAL_ERROR "FETK configuration operation failed")
-            endif()
+        #    execute_process( 
+        #        COMMAND cmake --build . --config Release --parallel 1 --target install
+        #        WORKING_DIRECTORY ${FETK_BUILD_PATH}
+        #        RESULT_VARIABLE FETK_BUILD_RETURN
+        #    )
+        #    if(NOT FETK_BUILD_RETURN EQUAL 0)
+        #        message(FATAL_ERROR "FETK build operation failed")
+        #    endif()
+        #else()
+        #   execute_process( 
+        #        COMMAND cmake -D CMAKE_INSTALL_PREFIX=${FETK_BUILD_PATH} -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..
+        #        WORKING_DIRECTORY ${FETK_BUILD_PATH}
+        #        RESULT_VARIABLE FETK_BUILD_RETURN
+        #    )
+        #    if(NOT FETK_BUILD_RETURN EQUAL 0)
+        #        message(FATAL_ERROR "FETK configuration operation failed")
+        #    endif()
 
-            execute_process( 
-                COMMAND make -j install
-                WORKING_DIRECTORY ${FETK_BUILD_PATH}
-                RESULT_VARIABLE FETK_BUILD_RETURN
-            )
-            if(NOT FETK_BUILD_RETURN EQUAL 0)
-                message(FATAL_ERROR "FETK build operation failed")
-            endif()
-        endif()
+        #    execute_process( 
+        #        COMMAND make -j install
+        #        WORKING_DIRECTORY ${FETK_BUILD_PATH}
+        #        RESULT_VARIABLE FETK_BUILD_RETURN
+        #    )
+        #    if(NOT FETK_BUILD_RETURN EQUAL 0)
+        #        message(FATAL_ERROR "FETK build operation failed")
+        #    endif()
+        #endif()
 
 
         # Second we use the ExternalProject module to build and install FETK.
