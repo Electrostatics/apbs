@@ -65,6 +65,13 @@
  * @endverbatim
  */
 
+#ifdef ENABLE_PYGBE
+    // NOTE: Placeholder for any custom PYGBE parameter structure
+    #include <libgen.h>
+    #define PY_SSIZE_T_CLEAN
+    #include <Python.h>
+#endif
+
 #include <time.h>
 
 #include "routines.h"
@@ -455,6 +462,54 @@ int main(
     /* *************** DO THE CALCULATIONS ******************* */
     Vnm_tprint( 1, "Preparing to run %d PBE calculations.\n",
                 nosh->ncalc);
+#ifdef ENABLE_PYGBE
+    if ((int)nosh->elec[0]->calctype == (int)NCT_PYGBE)
+    {
+        /* PYGBE (pygbe) */
+        Vnm_tprint( 1, "Processing PYGBE.\n");
+        Vnm_tprint( 1, "  PYGBE...\n");
+        /* Set up problem */
+        Vnm_tprint( 1, "  Setting up problem...\n");
+
+        Py_Initialize();
+        PyObject * ModuleString = NULL;
+        PyObject * Module = NULL;
+        PyObject * Dict = NULL;
+        PyObject * Func = NULL;
+        PyObject * Result = NULL;
+        PyObject * StringList = NULL;
+        PyObject * ArgList = NULL;
+
+	    // Create parameters:
+	    StringList = PyList_New(1);
+        Vnm_tprint( 1, "  Processing file: %s\n", NOsh_getMolpath(nosh, 0));
+	    PyList_SetItem(StringList, 0, Py_BuildValue("s", dirname(NOsh_getMolpath(nosh, 0))));
+        ArgList = PyTuple_New(1);
+        PyTuple_SetItem(ArgList, 0, StringList);
+	
+        if ((ModuleString = PyUnicode_FromString("pygbe"))) {
+            Vnm_tprint( 1, "  ModuleString found\n");
+            if ((Module = PyImport_Import(ModuleString))) {
+                Vnm_tprint( 1, "  Module found\n");
+                if ((Dict = PyModule_GetDict(Module))) {
+                    Vnm_tprint( 1, "  Dict found\n");
+                    if ((Func = PyDict_GetItemString(Dict, "process"))) {
+                        Vnm_tprint( 1, "  Func found\n");
+                        Result = PyObject_CallObject(Func, ArgList);
+		            }
+	            }
+	        }
+        }
+
+        if (PyErr_Occurred()) PyErr_Print();
+
+        Py_FinalizeEx();
+
+        fflush(stdout);
+        fflush(stderr);
+        exit(0);
+    }
+#endif
     for (i=0; i<nosh->ncalc; i++) {
         Vnm_tprint( 1, "----------------------------------------\n");
 

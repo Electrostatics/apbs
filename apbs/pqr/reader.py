@@ -1,5 +1,20 @@
-from pyparsing import Group, Literal, Word, ZeroOrMore, alphas, alphanums, nums
+# -*- coding: utf-8 -*-
+
 from apbs.chemistry import Atom, AtomList
+from pyparsing import (
+    Group,
+    LineEnd,
+    LineStart,
+    Literal,
+    Word,
+    ZeroOrMore,
+    alphas,
+    alphanums,
+    nums,
+    printables,
+)
+
+import re
 
 
 class PQRReader:
@@ -7,14 +22,24 @@ class PQRReader:
 
     def __init__(self):
         """Define the grammar for an ATOM/HETATM in PQR format."""
-        identifier = Word(alphas, alphanums + "_")
+        identifier = Word(alphas, alphanums + r"_")
+        alphanumidentifier = Word(alphanums + r"_" + r"'" + r"*")
         integer_val = Word(nums + "-")
         float_val = Word(nums + "-" + ".")
+        anything = Word(printables + " " + "\t")
         keyword_val = Literal("ATOM") | Literal("HETATM")
+        skip_val = Literal("TER") | Literal("END") | Literal("REMARK")
+        skip_value = Group(
+            LineStart()
+            + skip_val("field_name")
+            + anything("anything")
+            + LineEnd(),
+        )
         atom_value = Group(
-            keyword_val("field_name")
+            LineStart()
+            + keyword_val("field_name")
             + integer_val("atom_number")
-            + identifier("atom_name")
+            + alphanumidentifier("atom_name")
             + identifier("residue_name")
             + ZeroOrMore(identifier("chain_id"))
             + integer_val("residue_number")
@@ -24,8 +49,10 @@ class PQRReader:
             + float_val("z")
             + float_val("charge")
             + float_val("radius")
+            + LineEnd(),
         )
-        self.atom = atom_value + ZeroOrMore(atom_value)
+        # NOTE: Skips blank or lines with only whitespace (tabs, spaces, etc.)
+        self.atom = ZeroOrMore(atom_value | skip_value)
 
     def loads(self, pqr_string: str) -> AtomList:
         """
@@ -37,24 +64,26 @@ class PQRReader:
         """
         atoms = []
         idx: int = 1
-        for item, _start, _stop in self.atom.scanString(pqr_string):
-            for match in item:
-                atom = Atom(
-                    field_name=match.field_name,
-                    atom_number=int(match.atom_number),
-                    atom_name=match.atom_name,
-                    residue_name=match.residue_name,
-                    chain_id=match.chain_id,
-                    residue_number=int(match.residue_number),
-                    ins_code=match.ins_code,
-                    x=float(match.x),
-                    y=float(match.y),
-                    z=float(match.z),
-                    charge=float(match.charge),
-                    radius=float(match.radius),
-                    id=int(idx),
-                )
-                atoms.append(atom)
+        matches = self.atom.parseString(pqr_string, parseAll=True)
+        for match in matches:
+            if re.search("REMARK|TER|END", match.field_name) is not None:
+                continue
+            atom = Atom(
+                field_name=match.field_name,
+                atom_number=int(match.atom_number),
+                atom_name=match.atom_name,
+                residue_name=match.residue_name,
+                chain_id=match.chain_id,
+                residue_number=int(match.residue_number),
+                ins_code=match.ins_code,
+                x=float(match.x),
+                y=float(match.y),
+                z=float(match.z),
+                charge=float(match.charge),
+                radius=float(match.radius),
+                id=int(idx),
+            )
+            atoms.append(atom)
             idx += 1
         return AtomList(atoms)
 
@@ -67,7 +96,7 @@ class PQRReader:
         :rtype: AtomList
         """
         with open(filename, "r") as fp:
-            data = fp.read().replace("\n", "")
+            data = fp.read()
         return self.loads(data)
 
 

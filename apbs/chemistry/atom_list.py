@@ -2,7 +2,6 @@ import numpy as np
 from typing import List
 from . import Atom
 from apbs.geometry import Coordinate
-from typing import Tuple
 
 
 class AtomList:
@@ -20,15 +19,25 @@ class AtomList:
 
         :param List atoms: A list of Atoms
         """
-        self._atoms: Tuple[Atom] = atoms if atoms is not None else []
+        self._atoms: List[Atom] = atoms if atoms is not None else []
         self.charge: float = None
         self.maxrad: float = None
 
         self._center = Coordinate()
         self._min_coord = Coordinate()
         self._max_coord = Coordinate()
-        self._dp = dict()
+        self._dp = {}
 
+    def __getattr__(self, method):
+        return getattr(self._atoms, method)
+
+    def __len__(self):
+        return len(self._atoms)
+
+    def __getitem__(self, item):
+        return self._atoms[item]
+
+    @property
     def center(self) -> Coordinate:
         """Molecule center
         note: not the median molecule, but the average of the max values int
@@ -38,15 +47,14 @@ class AtomList:
         :rtype: Coordinate
         """
         if "center" not in self._dp.keys():
-            ma = self.max_coord()
-            mi = self.min_coord()
+            ma = self.max_coord
+            mi = self.min_coord
             self._dp["center"] = Coordinate(
-                (ma.x + mi.x) * 0.5,
-                (ma.y + mi.y) * 0.5,
-                (ma.z + mi.z) * 0.5,
+                (ma.x + mi.x) * 0.5, (ma.y + mi.y) * 0.5, (ma.z + mi.z) * 0.5,
             )
         return self._dp["center"]
 
+    @property
     def min_coord(self) -> Coordinate:
         """Minimum coordinates
         :return: The minimum Coordinate
@@ -54,14 +62,15 @@ class AtomList:
         """
         if "min" not in self._dp.keys():
             x, y, z = np.inf, np.inf, np.inf
-            for a in self._atoms:
-                x = min(x, a.x)
-                y = min(y, a.y)
-                z = min(z, a.z)
+            for atom in self._atoms:
+                x = min(x, atom.x)
+                y = min(y, atom.y)
+                z = min(z, atom.z)
             self._dp["min"] = Coordinate(x, y, z)
 
         return self._dp["min"]
 
+    @property
     def max_coord(self) -> Coordinate:
         """Maximum coordinates
         :return: The maximum Coordinate
@@ -69,10 +78,10 @@ class AtomList:
         """
         if "max" not in self._dp.keys():
             x, y, z = 0.0, 0.0, 0.0
-            for a in self._atoms:
-                x = max(x, a.x)
-                y = max(y, a.y)
-                z = max(z, a.z)
+            for atom in self._atoms:
+                x = max(x, atom.x)
+                y = max(y, atom.y)
+                z = max(z, atom.z)
             self._dp["max"] = Coordinate(x, y, z)
 
         return self._dp["max"]
@@ -81,8 +90,8 @@ class AtomList:
     def max_radius(self) -> float:
         if "max_radius" not in self._dp.keys():
             m = 0.0
-            for a in self._atoms:
-                m = max(m, a.radius)
+            for atom in self._atoms:
+                m = max(m, atom.radius)
             self._dp["max_radius"] = m
 
         return self._dp["max_radius"]
@@ -90,7 +99,3 @@ class AtomList:
     @property
     def count(self) -> int:
         return len(self._atoms)
-
-    @property
-    def atoms(self) -> Tuple[Atom]:
-        return self._atoms

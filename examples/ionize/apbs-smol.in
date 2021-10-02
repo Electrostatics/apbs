@@ -1,7 +1,7 @@
 read 
-    mol xml acetic-acid.xml
-    mol xml acetate.xml
-    mol xml proton.xml
+    mol pqr acetic-acid.pqr
+    mol pqr acetate.pqr
+    mol pqr proton.pqr
 end
 
 # Solvated acetic acid

@@ -33,7 +33,7 @@ class AtomComplexCalc:
         self.surface_density = surface_density
         max_radius = alist.max_radius + clist.max_radius
         max_area = 4.0 * (max_radius ** 2) * np.pi
-        nsphere = np.ceil(max_area * surface_density)
+        nsphere = np.ceil(max_area * surface_density)  # noqa: F841
 
         # TODO: calculate reference shpere (see VaccSurf_refSphere)
 
@@ -56,7 +56,8 @@ class AtomComplexCalc:
         """
         if radius > self.clist.max_radius:
             raise RuntimeError(
-                f"Got radius {radius} greater than max radius {self.clist.max_radius} from cell list."
+                f"Got radius {radius} greater than max radius "
+                f"{self.clist.max_radius} from cell list."
             )
 
         c = (center - self.lower_corner) / self.stride
@@ -106,22 +107,22 @@ class AtomComplexCalc:
         # Possibly merge these two loops?
         npoints = 0
         pos = Coordinate()
-        for i in range(ref.npoints):
-            pos.x = rad(ref.xs[i]) + apos.x
-            pos.y = rad(ref.ys[i]) + apos.y
-            pos.z = rad(ref.zs[i]) + apos.z
+        for idx in range(ref.npoints):
+            pos.x = rad(ref.xs[idx]) + apos.x
+            pos.y = rad(ref.ys[idx]) + apos.y
+            pos.z = rad(ref.zs[idx]) + apos.z
 
             # need to implement
             if self.accessible_outside_inflated_vdw_radius(pos, prad, atom_id):
                 npoints += 1
-                ref.is_on_surf[i] = True
+                ref.is_on_surf[idx] = True
             else:
-                ref.is_on_surf[i] = False
+                ref.is_on_surf[idx] = False
 
         surf = Surface(prad, npoints)
-        for i in range(ref.npoints):
-            if ref.coords[i].is_on_surf:
-                surf.coords.append((rad * ref.coords[i] + apos))
+        for idx in range(ref.npoints):
+            if ref.coords[idx].is_on_surf:
+                surf.coords.append((rad * ref.coords[idx] + apos))
                 surf.coords[-1].is_on_surf = True
 
         surf.area = (

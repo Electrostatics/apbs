@@ -1,2 +1,6 @@
-python-dev-tools
+click
+mmcif-pdbx
+numpy
 pybind11
+pyparsing
+python-dev-tools

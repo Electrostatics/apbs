@@ -2,6 +2,8 @@
 Protein-RNA binding linked equilibria
 =====================================
 
+.. todo::  Update this documentation with the *new APBS syntax* (see :ref:`new_input_format`).
+
 Before reading this example, please review :ref:`errors` for relevant caveats.
 
 ------------
@@ -157,7 +159,7 @@ As used in the template file, the READ command, our calculation will have three 
 The calculations themselves will not be overly demanding, since we will use relatively coarse grids.
 This grid coarseness has a significant impact on the absolute electrostatic binding energy we obtain from this particular calculation: the calculated energy isn't converged with respect to grid spacing.
 However, the overall slope of binding energy with respect to monovalent ion concentration is rather insensitive with respect to the grid spacing, allowing us to save computational time and effort during the calculations.
-The calculation will conclude with a :doc:`/using/input/print` command which will combine the total energies from the three parts to obtain our approximate absolute electrostatic binding energy for the complex at 0.225 M monovalent salt concentration.
+The calculation will conclude with a :doc:`/using/input/old/print` command which will combine the total energies from the three parts to obtain our approximate absolute electrostatic binding energy for the complex at 0.225 M monovalent salt concentration.
 It is very important to note that this absolute energy no meaning in isolation for several reasons:  
 
 * It is not converged with respect to grid spacing  

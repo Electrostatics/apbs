@@ -1,0 +1,11 @@
+#######################
+
+read
+    mol pqr lys/lys1_charges.pqr
+end
+
+elec name mol1
+    pygbe
+end
+
+quit

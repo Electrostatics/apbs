@@ -37,69 +37,15 @@ The input file format is described below.
 Input file syntax
 -----------------
 
-APBS input files are loosely-formatted files which contain information about the input, parameters, and output for each calculation.
-
-These files are whitespace- or linefeed-delimited.
-Comments can be added to the input files via the ``#`` character; all text between the ``#`` and the end of the line is not parsed by APBS.
-If pathnames used in the input file contain spaces, then the entire pathname must be enclosed in quotes.
-For example, if you wanted to refer to the file :file:`foo` which resides in a directory with spaces in its name, then you should refer to :file:`foo` as :file:`"/path with spaces/foo"`.
-Specific examples of APBS input are provided in :ref:`examples`.
-
-APBS input files contain three basic sections which can be repeated any number of times:
-
-:ref:`read`
-  section for specifying input
-:ref:`elec`
-  section for specifying polar solvation (electrostatics) calculation parameters
-:ref:`apolar`
-  section for specifying apolar solvation calculation parameters
-:ref:`print`
-  section for specifying summary output
-
-The APBS input file is constructed from these sections in the following format:
-
-.. code-block:: bash
-   
-   READ
-   ...
-   END
-   
-   ELEC
-   ...
-   END
-   
-   APOLAR
-   ...
-   END
-   
-   PRINT
-   ...
-   END
-   
-   QUIT
-
-These sections can occur in any order and can be repeated any number of times.
-However, the sections are inter-dependent.
-For example, PRINT requires ELEC and/or APOLAR while ELEC requires one or more READ sections.
-Sections can also be repeated; several READ statements may be used to load molecules and multiple ELEC or APOLAR sections would specify various electrostatics calculations on one or more molecules.
-
-Each section has the following syntax:
-
-.. code-block:: bash
-   
-   SECTION [name <id>]
-
-where the optional ``name`` argument allows the user to include a string to identify the section.
-In the absence of this argument, sections are assigned numerical IDs.
+APBS has a :ref:`new input file format <new_input_format>` that accepts `YAML- <http://yaml.org>`_ or `JSON- <http://json.org>`_ format input.
+The :ref:`old APBS input format <old_input_format>` has been deprecated but will continue to be supported for the next few releases.
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Input file sections
+   :maxdepth: 2
+   :caption: New and old input file formats
 
-   input/read
-   input/elec/index
-   input/apolar/index
-   input/print
+   input/new/index
+   input/old/index
 
 .. _examples:
 
@@ -121,6 +67,17 @@ Some of these examples can be performed through the `APBS-PDB2PQR web interface`
    examples/salt-linkage
    examples/visualization-pymol
    examples/visualization-unitymol
+
+--------------------
+Tests and validation
+--------------------
+
+APBS is distributed with testing tools and validation examples.
+
+.. toctree::
+   :maxdepth: 1
+
+   tests
 
 -------------------
 Tools and utilities
@@ -160,3 +117,14 @@ As an example of PDB2PQR and APBS integration with molecular mechanics sofware, 
 This library has enabled the integration of APBS with several molecular dynamics packages, including `NAMD <http://www.ks.uiuc.edu/Research/namd/>`_, `AMBER <http://ambermd.org/>`_, and `CHARMM <https://www.charmm.org/charmm/>`_.
 
 APBS is also used directly by Brownian dynamics software such as `SDA <https://mcm.h-its.org/sda/>`_ and `BrownDye <http://browndye.ucsd.edu/>`_.
+
+--------------
+Notes on units
+--------------
+
+APBS and PDB2PQR use a few different sets of units, explained in the following sections:
+
+.. toctree::
+   :maxdepth: 2
+
+   units

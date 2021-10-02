@@ -1,4 +1,4 @@
-from . vgrid import (
+from .vgrid import (
     startVio,
     Vgrid_ctor,
     Vgrid_readDX,

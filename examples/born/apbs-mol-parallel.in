@@ -4,7 +4,7 @@
 
 # READ IN MOLECULES
 read
-    mol xml ion.xml
+    mol pqr ion.pqr
 end
 
 # COMPUTE POTENTIAL FOR SOLVATED STATE

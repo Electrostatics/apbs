@@ -34,11 +34,11 @@
 # -- Project information -----------------------------------------------------
 
 project = 'APBS'
-copyright = '2020, Nathan Baker and many others'
+copyright = '2021, Nathan Baker and many others'
 author = 'Nathan Baker and many others'
 
 # The full version, including alpha/beta/rc tags
-release = '3.1.3'
+release = '3.2.0'
 
 
 # -- General configuration ---------------------------------------------------

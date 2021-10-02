@@ -2,7 +2,7 @@
 
 import sys
 import getopt
-from . vgrid import (
+from .vgrid import (
     startVio,
     Vgrid_ctor,
     Vgrid_readDX,
@@ -158,21 +158,18 @@ def createGrid(inputpath, root):
 
         print("\tGrid dimensions: %i %i %i" % (grid.nx, grid.ny, grid.nz))
         print("\tGrid spacing: %.5f %.5f %.5f" % (grid.hx, grid.hy, grid.hzed))
-        print("\tGrid lower corner: %.2f %.2f %.2f" % (
-            grid.xmin,
-            grid.ymin,
-            grid.zmin,
-        ))
-        print("\tGrid upper corner: %.2f %.2f %.2f" % (
-            grid.xmax,
-            grid.ymax,
-            grid.zmax,
-        ))
-        print("\tGlobal Gridpoint Minima: %i %i %i\n" % (
-            mins[0],
-            mins[1],
-            mins[2],
-        ))
+        print(
+            "\tGrid lower corner: %.2f %.2f %.2f"
+            % (grid.xmin, grid.ymin, grid.zmin,)
+        )
+        print(
+            "\tGrid upper corner: %.2f %.2f %.2f"
+            % (grid.xmax, grid.ymax, grid.zmax,)
+        )
+        print(
+            "\tGlobal Gridpoint Minima: %i %i %i\n"
+            % (mins[0], mins[1], mins[2],)
+        )
 
         # If this is the first processor, initialize the merged grid
 

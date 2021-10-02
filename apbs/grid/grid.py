@@ -99,40 +99,27 @@ class Grid:
 
         if hi < self.dims:
             dx, dy, dz = tmp.x - lo.x, tmp.y - lo.y, tmp.z - lo.z
-            ret_value = list()
-            ret_value.append(float(dx * dy * dz * self.data[hi.x, hi.y, hi.z]))
-            ret_value.append(
-                float(dx * (1.0 - dy) * dz * self.data[hi.x, lo.y, hi.z])
-            )
-            ret_value.append(
-                float(dx * dy * (1.0 - dz) * self.data[hi.x, hi.y, lo.z])
-            )
-            ret_value.append(
+            ret_value = [
+                float(dx * dy * dz * self.data[hi.x, hi.y, hi.z]),
+                float(dx * (1.0 - dy) * dz * self.data[hi.x, lo.y, hi.z]),
+                float(dx * dy * (1.0 - dz) * self.data[hi.x, hi.y, lo.z]),
                 float(
                     dx * (1.0 - dy) * (1.0 - dz) * self.data[hi.x, lo.y, lo.z]
-                )
-            )
-            ret_value.append(
-                float((1.0 - dx) * dy * dz * self.data[lo.x, hi.y, hi.z])
-            )
-            ret_value.append(
+                ),
+                float((1.0 - dx) * dy * dz * self.data[lo.x, hi.y, hi.z]),
                 float(
                     (1.0 - dx) * (1.0 - dy) * dz * self.data[lo.x, lo.y, hi.z]
-                )
-            )
-            ret_value.append(
+                ),
                 float(
                     (1.0 - dx) * dy * (1.0 - dz) * self.data[lo.x, hi.y, lo.z]
-                )
-            )
-            ret_value.append(
+                ),
                 float(
                     (1.0 - dx)
                     * (1.0 - dy)
                     * (1.0 - dz)
                     * self.data[lo.x, lo.y, lo.z]
-                )
-            )
+                ),
+            ]
 
             ret_value = sum(ret_value)
 
@@ -188,7 +175,7 @@ class Grid:
     def seminormH1(self) -> float:
         r"""Get the \f$H_1\f$ semi-norm of the data.
         This returns the integral:
-          \f[ | u |_{H_1} = \left( \int_\Omega |\nabla u(x)|^2 dx \right)^{1/2} \f]
+          \f[ | u |_{H_1} = \left( \int_\Omega |\nabla u(x)|^2 dx \right)^{1/2} \f]  # noqa: E501
         """
         ...
 
@@ -203,7 +190,7 @@ class Grid:
 
     def read_dx(self, fn: str) -> None:
         lines = open(fn, "r").readlines()
-        self.data = list()
+        self.data = []
         for line in lines:
             lline = line.lower().strip()
 

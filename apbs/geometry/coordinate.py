@@ -30,16 +30,10 @@ class Coordinate(Generic[T]):
             self._data = np.zeros(3, dtype=np.float32)
 
     def any(self, predicate: Callable[[float], bool]) -> bool:
-        for i in self._data:
-            if predicate(i):
-                return True
-        return False
+        return any(predicate(idx) for idx in self._data)
 
     def all(self, predicate: Callable[[float], bool]) -> bool:
-        for i in self._data:
-            if not predicate(i):
-                return False
-        return True
+        return all(predicate(idx) for idx in self._data)
 
     def __getitem__(self, idx: int) -> T:
         if idx > 2 or idx < -2:

@@ -1,0 +1,210 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://json.schemastore.org/apbs-input.json",
+  "title": "APBS input",
+  "description": "Input file schema for APBS electrostatics software (https://apbs.readthedocs.io/)",
+  "type": "object",
+  "properties": {
+    "read": {
+      "description": "Specify input files for APBS calculation.",
+      "type": "object",
+      "properties": {
+        "charge": {
+          "description": "Specify input file for fixed (molecular) charge density function mapped to a mesh. The inputs are maps of charge densities; these values have units of e_c Å^{-3}, where e_c is the electron charge.",
+          "type": "object",
+          "properties": {
+            "format": {
+              "description": "Input file format",
+              "type": "object",
+              "oneOf": [
+                { "$ref": "#/$defs/dx" },
+                { "$ref": "#/$defs/gz" }
+              ]
+            },
+            "path": {
+              "description": "Path to input file",
+              "type": "string"
+            }
+          },
+          "required": [
+            "format",
+            "path"
+          ]
+        },
+        "dielectric": {
+          "description": "Specify input file for dielectric maps, the dielectric function mapped to 3 meshes shifted by one-half grid spacing in the x, y, and z directions. The inputs are maps of dielectric variables between the solvent and biomolecular dielectric constants; these values are unitless. If you choose this option and have a non-zero ionic strength, you must also include a kappa input map.",
+          "type": "object",
+          "properties": {
+            "format": {
+              "description": "Input file format",
+              "type": "object",
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/dx"
+                },
+                {
+                  "$ref": "#/$defs/gz"
+                }
+              ]
+            },
+            "path-x": {
+              "description": "x-shifted dielectric map",
+              "type": "string"
+            },
+            "path-y": {
+              "description": "y-shifted dielectric map",
+              "type": "string"
+            },
+            "path-z": {
+              "description": "z-shifted dielectric map",
+              "type": "string"
+            }
+          },
+          "required": [
+            "format",
+            "path-x",
+            "path-y",
+            "path-z"
+          ]
+        },
+        "ion accessibility": {
+          "description": "Specify input file for ion-accessibility function mapped to a mesh. The inputs are maps of ion accessibility values which range between 0 and the value of the Debye-Hückel screening parameter; these values have units of Å^{-2}.",
+          "type": "object",
+          "properties": {
+            "format": {
+              "description": "Input file format",
+              "type": "object",
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/dx"
+                },
+                {
+                  "$ref": "#/$defs/gz"
+                }
+              ]
+            },
+            "path": {
+              "description": "Path to input file",
+              "type": "string"
+            }
+          },
+          "required": [
+            "format",
+            "path"
+          ]
+        },
+        "molecule": {
+          "description": "Specify input file for molecular structure data.",
+          "type": "object",
+          "properties": {
+            "format": {
+              "description": "Input file format",
+              "type": "object",
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/pqr"
+                },
+                {
+                  "$ref": "#/$defs/pdb"
+                }
+              ]
+            },
+            "path": {
+              "description": "Path to input file",
+              "type": "string"
+            }
+          },
+          "required": [
+            "format",
+            "path"
+          ]
+        },
+        "parameter": {
+          "description": "Specify the charge and radius data to be used with PDB-format molecule files.",
+          "type": "object",
+          "properties": {
+            "format": {
+              "description": "Input file format",
+              "type": "object",
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/xml"
+                },
+                {
+                  "$ref": "#/$defs/flat"
+                }
+              ]
+            },
+            "path": {
+              "description": "Path to input file",
+              "type": "string"
+            }
+          },
+          "required": ["format", "path"]
+        },
+        "potential": {
+          "description": "Specify the electrostatic potential data (in units of k T/e_c) from previous calculations.",
+          "type": "object",
+          "properties": {
+            "format": {
+              "description": "Input file format",
+              "type": "object",
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/dx"
+                },
+                {
+                  "$ref": "#/$defs/gz"
+                }
+              ]
+            },
+            "path": {
+              "description": "Path to input file",
+              "type": "string"
+            }
+          },
+          "required": ["format", "path"]
+        }
+      },
+      "required": [
+        "mol"
+      ]
+    },
+    "polar": {
+      "description": "Specify configuration of an electrostatics (polar solvation) calculation",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "A name for your calculation.",
+          "type": "string"
+        },
+        "type": {
+          "description": "The type of calculation to perform"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "dx": {
+      "description": "OpenDX scalar data format"
+    },
+    "flat": {
+      "description": "Flat-format parameter file"
+    },
+    "gz": {
+      "description": "Gzip-compressed OpenDX scalar data format"
+    },
+    "pdb": {
+      "description": "Protein DataBank (PDB) old format"
+    },
+    "pqr": {
+      "description": "PQR (PDB with charge and radius information) format"
+    },
+    "xml": {
+      "description": "XML format parameter file"
+    }
+  },
+  "required": [
+    "read"
+  ]
+}

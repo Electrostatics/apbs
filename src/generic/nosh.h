@@ -121,7 +121,8 @@ enum eNOsh_CalcType {
     NCT_BEM=3, /**< Boundary element (TABI)*/
     NCT_GEOFLOW=4, /**< Geometric flow*/
     NCT_PBAM=5,/**< Analytical Poisson-Boltzmann Solver */
-    NCT_PBSAM=6 /**< Semi-Analytical Poisson-Boltzmann Solver */
+    NCT_PBSAM=6, /**< Semi-Analytical Poisson-Boltzmann Solver */
+    NCT_PYGBE=7
 };
 
 /**
