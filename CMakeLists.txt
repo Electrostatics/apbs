@@ -87,6 +87,8 @@ set_package_properties(APBS PROPERTIES
              open-source APBS license ensures its accessibility to the entire \
              biomedical community.")
 
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
 if(CMAKE_TOOLCHAIN_FILE)
     message(STATUS "Toolchain file is set to <${CMAKE_TOOLCHAIN_FILE}>.  Including the file.")
     include(${CMAKE_TOOLCHAIN_FILE})
@@ -668,17 +670,27 @@ if(ENABLE_FETK)
 #        readline
 #        termcap
     )
-    if(WIN32)
-        list(APPEND APBS_LIBS
-            libumfpack
-            openblas
-        )
-    else()
-        list(APPEND APBS_LIBS
-            umfpack
-            blas
-        )
-    endif()
+
+#    if(WIN32)
+#        list(APPEND APBS_LIBS
+#            libumfpack
+#            openblas
+#        )
+#    else()
+#        list(APPEND APBS_LIBS
+#            umfpack
+#            blas
+#        )
+#    endif()
+
+
+    set( BLA_VENDOR OpenBLAS )
+    find_package( BLAS REQUIRED )
+    find_package( UMFPACK REQUIRED )
+    list(APPEND APBS_LIBS
+        ${UMFPACK_LIBRARIES}
+        ${BLAS_LIBRARIES}
+    )
 
     SET(HAVE_MC_H 1)
     SET(HAVE_PUNC_H 1)
