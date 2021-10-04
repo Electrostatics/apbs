@@ -47,30 +47,43 @@ jobs:
       - name: Mac Prereqs
         if: startsWith(matrix.os, 'macos')  # Mac only
         run: |
-          brew install bison flex swig libomp lapack
-          brew upgrade gcc@9
           brew install \
-            arpack \
-            openblas \
-            superlu \
+            bison \
+            flex \
+            swig \
+            libomp \
+            lapack \
             suite-sparse
+          brew upgrade gcc@9
+
+#          brew install \
+#            arpack \
+#            openblas \
+#            superlu \
+#            suite-sparse
 
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
           for apt_file in `grep -lr microsoft /etc/apt/sources.list.d/`; do sudo rm $apt_file; done
-          sudo apt-get install -yq software-properties-common build-essential gcc-9 g++-9 bison flex swig libreadline-dev libomp5 libomp-dev
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
-          gcc --version
-          g++ --version
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y \
-            libarpack2-dev \
-            libblas-dev \
-            liblapack-dev \
-            libsuperlu-dev \
-            libf2c2-dev \
+          sudo apt-get install -yq \
+            software-properties-common \
+            build-essential \
+            bison \
+            flex \
+            swig \
+            libreadline-dev \
+            libomp5 \
+            libomp-dev \
             libsuitesparse-dev
+
+#          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y \
+#            libarpack2-dev \
+#            libblas-dev \
+#            liblapack-dev \
+#            libsuperlu-dev \
+#            libf2c2-dev \
+#            libsuitesparse-dev
 
       - name: Install Window dependencies
         if: startsWith(matrix.os, 'windows')  # Windows only
