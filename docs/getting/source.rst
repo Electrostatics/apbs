@@ -127,10 +127,6 @@ NanoShaper is a molecular surface mesh generation software package developed by 
 Using finite element support
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. warning::
-
-   Finite element methods are currently only supported on POSIX-like operating systems such as OS X or Linux.
-
 To enable finite element support, set the CMake :makevar:`ENABLE_FETK` variable to ``ON``.
 
 On Linux, the FETK shared libraries need to be locatable by the shared library loader.
