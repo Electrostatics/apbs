@@ -1,10 +1,6 @@
 [submodule "externals/geoflow_c"]
 	path = externals/geoflow_c
 	url = https://github.com/Electrostatics/geoflow_c
-[submodule "externals/fetk"]
-	path = externals/fetk
-	url = https://github.com/Electrostatics/FETK.git
-	ignore = untracked
 [submodule "externals/pb_s_am"]
 	path = externals/pb_s_am
 	url = https://github.com/Electrostatics/pb_solvers
