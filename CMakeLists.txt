@@ -684,7 +684,6 @@ if(ENABLE_FETK)
 #    endif()
 
 
-    set( BLA_VENDOR OpenBLAS )
     find_package( BLAS REQUIRED )
     find_package( UMFPACK REQUIRED )
     list(APPEND APBS_LIBS
