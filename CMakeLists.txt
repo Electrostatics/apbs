@@ -427,28 +427,17 @@ endif()
 
 ################################################################################
 # Handle the finite element solver dependencies                                #
+#
+# To use a released version of FETK:
+#   - Set FETK_VERSION to the version number (e.g. 1.8.0)
+# In this case, the binary archive will be downloaded and used.
+#
+# To use a non-released version of FETK:
+#   - Set FETK_VERSION to the git branch or commit hash you want to use (e.g. main)
+#   - Set FETK_FULL_URL to the URL of the FETK source code archive of the branch or commit you're using 
+#     (e.g. https://github.com/Electrostatics/FETK/archive/refs/heads/main.zip)
 ################################################################################
 option(ENABLE_FETK "Enable the finite element solver" ON)
-
-
-#  HACK START - This used to be in tools/windows/configuration headers/*.h
-#file(COPY tools/apbscfg.h DESTINATION ${APBS_BUILD}/src)
-file(COPY tools/maloccf.h DESTINATION ${APBS_BUILD}/src)
-#  if should be done something like the following:
-#configure_file(
-#     ${EXTERNALS_PATH}/fetk/maloc/src/config/maloccf.h.in
-#     DESTINATION ${APBS_BUILD}/src/maloccf.h
-#)
-#  HACK END   - This used to be in tools/windows/configuration headers/*.h
-
-
-################################################################################
-# Deal with MALOC                                                              #
-# Note that we depend exclusively on the MALOC that is in our external FETK    #
-# repository.  Also note, that in order for this to work on Windows, we've had #
-# to add CMake support to MALOC, and that FETK has no such support, in general.#
-################################################################################
-# add_library(apbs_fetk_libraries INTERFACE)
 
 set(FETK_VERSION "1.8.0" CACHE STRING "Version of FETK to use")
 
@@ -493,51 +482,6 @@ if(ENABLE_FETK)
             INSTALL_COMMAND ""
         )
 
-
-        #set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
-
-        #if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-        #    set(FETK_SYSTEM_COMPONENT ${CMAKE_SYSTEM_NAME})
-        #    set(FETK_ZIP_EXT "tar.gz")
-        #    set(FETK_UNZIP_COMMAND "tar" )
-        #    set(FETK_UNZIP_OPTS "-xzf")
-        #elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-        #    set(FETK_SYSTEM_COMPONENT "win64")
-        #    set(FETK_ZIP_EXT "zip")
-        #    set(FETK_UNZIP_COMMAND "unzip" )
-        #else()
-        #    message(FATAL "System type <${CMAKE_SYSTEM_NAME}> is not supported when FETK is enabled; please disable FETK or change your system.")
-        #endif()
-
-        #set(FETK_NAME "FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}")
-        #set(FETK_INSTALL_PREFIX "${FETK_PATH}/${FETK_NAME}")
-
-        #if(NOT EXISTS ${FETK_INSTALL_PREFIX}/lib)
-        #    # download package
-        #    set(FETK_FULL_URL "${FETK_BASE_URL}/${FETK_NAME}.${FETK_ZIP_EXT}")
-        #    set(FETK_ZIP_FILE_NAME "${FETK_NAME}.${FETK_ZIP_EXT}")
-        #    message(STATUS "Downloading FETK from ${FETK_FULL_URL}")
-        #    file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PATH}/${FETK_ZIP_FILE_NAME}" STATUS FETK_DL_STATUS)
-        #    # check if download was successful
-        #    list(GET FETK_DL_STATUS 0 FETK_DL_STATUS_VALUE)
-        #    if(NOT FETK_DL_STATUS_VALUE EQUAL 0)
-        #        list(GET FETK_DL_STATUS 1 FETK_DL_STATUS_STRING)
-        #        message(FATAL_ERROR "FETK download error: ${FETK_DL_STATUS_STRING}")
-        #    endif()
-
-        #    # unzip
-        #    message(STATUS "Unzipping: ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}")
-        #    execute_process(
-        #        COMMAND ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}
-        #        COMMAND_ECHO STDERR
-        #        WORKING_DIRECTORY ${FETK_PATH}
-        #        RESULT_VARIABLE FETK_UNZIP_RETURN
-        #    )
-        #    if(NOT FETK_UNZIP_RETURN EQUAL 0)
-        #        message(FATAL_ERROR "Unzip operation failed")
-        #    endif()
-        #endif()
-
     else(FETK_FROM_PKG)
 
         # We assume that the user has provided FETK_FULL_URL
@@ -562,94 +506,6 @@ if(ENABLE_FETK)
             )
         endif()
 
-            
-        #set(FETK_ZIP_EXT "zip")
-        #set(FETK_UNZIP_COMMAND "unzip")
-
-        #set(FETK_NAME "FETK-${FETK_VERSION}")
-        #set(FETK_BUILD_PATH ${FETK_PATH}/${FETK_NAME}/build)
-        #set(FETK_INSTALL_PREFIX ${FETK_BUILD_PATH})
-
-        #message(STATUS "Downloading FETK from ${FETK_FULL_URL}")
-        #set(FETK_ZIP_FILE_NAME "${FETK_NAME}.${FETK_ZIP_EXT}")
-        #file(DOWNLOAD ${FETK_FULL_URL} "${FETK_PATH}/${FETK_ZIP_FILE_NAME}" STATUS FETK_DL_STATUS)
-        # check if download was successful
-        #list(GET FETK_DL_STATUS 0 FETK_DL_STATUS_VALUE)
-        #if(NOT FETK_DL_STATUS_VALUE EQUAL 0)
-        #    list(GET FETK_DL_STATUS 1 FETK_DL_STATUS_STRING)
-        #    message(FATAL_ERROR "FETK download error: ${FETK_DL_STATUS_STRING}")
-        #endif()
- 
-        # unzip
-        #message(STATUS "Unzipping: ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}")
-        #execute_process(
-        #    COMMAND ${FETK_UNZIP_COMMAND} ${FETK_UNZIP_OPTS} ${FETK_PATH}/${FETK_ZIP_FILE_NAME}
-        #    COMMAND_ECHO STDERR
-        #    WORKING_DIRECTORY ${FETK_PATH}
-        #    RESULT_VARIABLE FETK_UNZIP_RETURN
-        #)
-        #if(NOT FETK_UNZIP_RETURN EQUAL 0)
-        #    message(FATAL_ERROR "Unzip operation failed")
-        #endif()
-        
-        #file(MAKE_DIRECTORY ${FETK_BUILD_PATH})
-        #message(STATUS "Building in ${FETK_BUILD_PATH}")
-
-        # cmake configuration and build of FETK; occurs at configure time
-        #if(WIN32)
-        #    execute_process( 
-        #        COMMAND cmake -DCMAKE_BUILD_TYPE=Release -DCREATE_PACKAGE=FALSE -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE} -G "Visual Studio 16 2019" -A Win32 ..
-        #        WORKING_DIRECTORY ${FETK_BUILD_PATH}
-        #        RESULT_VARIABLE FETK_BUILD_RETURN
-        #    )
-        #    if(NOT FETK_BUILD_RETURN EQUAL 0)
-        #        message(FATAL_ERROR "FETK configuration operation failed")
-        #    endif()
-
-        #    execute_process( 
-        #        COMMAND cmake --build . --config Release --parallel 1 --target install
-        #        WORKING_DIRECTORY ${FETK_BUILD_PATH}
-        #        RESULT_VARIABLE FETK_BUILD_RETURN
-        #    )
-        #    if(NOT FETK_BUILD_RETURN EQUAL 0)
-        #        message(FATAL_ERROR "FETK build operation failed")
-        #    endif()
-        #else()
-        #   execute_process( 
-        #        COMMAND cmake -D CMAKE_INSTALL_PREFIX=${FETK_BUILD_PATH} -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..
-        #        WORKING_DIRECTORY ${FETK_BUILD_PATH}
-        #        RESULT_VARIABLE FETK_BUILD_RETURN
-        #    )
-        #    if(NOT FETK_BUILD_RETURN EQUAL 0)
-        #        message(FATAL_ERROR "FETK configuration operation failed")
-        #    endif()
-
-        #    execute_process( 
-        #        COMMAND make -j install
-        #        WORKING_DIRECTORY ${FETK_BUILD_PATH}
-        #        RESULT_VARIABLE FETK_BUILD_RETURN
-        #    )
-        #    if(NOT FETK_BUILD_RETURN EQUAL 0)
-        #        message(FATAL_ERROR "FETK build operation failed")
-        #    endif()
-        #endif()
-
-
-        # Second we use the ExternalProject module to build and install FETK.
-        # This takes place during the build phase of APBS
-        # Note that we disable the configure stage of the ExternalProject because we already took care of the configure stage above.
-        #include(ExternalProject)
-        
-        #ExternalProject_Add( FETK
-        #    PREFIX            ${FETK_BUILD_PATH}
-        #    SOURCE_DIR        ${FETK_PATH}/${FETK_NAME}
-        #    BINARY_DIR        ${FETK_BUILD_PATH}
-        #    CONFIGURE_COMMAND ""
-        #    BUILD_ALWAYS      1
-        #    BUILD_COMMAND     $(MAKE)
-        #    INSTALL_DIR       ${FETK_BUILD_PATH}
-        #    INSTALL_COMMAND   $(MAKE) install
-        #)
     endif(FETK_FROM_PKG)
 
     include_directories(${FETK_INSTALL_PREFIX}/include)
@@ -657,32 +513,11 @@ if(ENABLE_FETK)
 
     list(APPEND APBS_LIBS
         maloc
-#        amd
         punc
         mc
         gamer
-#        superlu
-#        umfpack
-#        blas
         vf2c
-#        tetgen
-#        triangle
-#        readline
-#        termcap
     )
-
-#    if(WIN32)
-#        list(APPEND APBS_LIBS
-#            libumfpack
-#            openblas
-#        )
-#    else()
-#        list(APPEND APBS_LIBS
-#            umfpack
-#            blas
-#        )
-#    endif()
-
 
     find_package( BLAS REQUIRED )
     find_package( UMFPACK REQUIRED )
@@ -710,34 +545,10 @@ if(ENABLE_GEOFLOW)
 
     add_subdirectory(externals/geoflow_c)
 
-#    if(WIN32)
-#        #if($ENV{WIN_TOOLCHAIN_FILE})
-#set(CMAKE_TOOLCHAIN_FILE_ARG "-DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE}")
-#            message(STATUS "Adding toolchain file argument: ${CMAKE_TOOLCHAIN_FILE_ARG}")
-#        #endif()
-#        ExternalProject_Add(geoflow
-#            SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-#            CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG}
-#            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target GeometricFlowLib
-#            INSTALL_COMMAND "")
-#    else()
-#        ExternalProject_Add(geoflow
-#            SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-#            CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-#            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
-#            INSTALL_COMMAND "")
-#    endif()
-
-#    ExternalProject_Get_Property(geoflow binary_dir)
     add_definitions(-DENABLE_GEOFLOW)
-#    list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
     list(APPEND APBS_LIBS GeometricFlowLib)
     include_directories(${EXTERNALS_PATH}/geoflow_c/src)
 
-#    if(BUILD_SHARED_LIBS)
-#        install(FILES ${binary_dir}/lib/libGeometricFlowLib${CMAKE_SHARED_LIBRARY_SUFFIX}
-#                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-#    endif()
 endif()
 
 
