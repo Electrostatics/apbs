@@ -556,91 +556,118 @@ endif()
 # Optionally build pbam (git submodule)
 ################################################################################
 option(ENABLE_PBAM "pbam method" OFF)
+option(ENABLE_PBSAM "pbsam method" OFF)
 
 if(ENABLE_PBAM)
     message(STATUS "Building PBAM")
     add_definitions(-DPBAM_APBS)
+    set(ENABLE_PBAM_APBS ON CACHE BOOL "Enable the APBS-PBAM connection")
 
-    if(WIN32)
-        ExternalProject_Add(pbam
-            SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-            CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBAMLib
-            INSTALL_COMMAND "")
-    else()
-        ExternalProject_Add(pbam
-            SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-            CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
-            INSTALL_COMMAND "")
-    endif()
-
-    ExternalProject_Get_Property(pbam binary_dir)
     add_definitions(-DENABLE_PBAM)
-    list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
-    if (WIN32)
-        list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src/${CMAKE_BUILD_TYPE}")
-    endif()
     list(APPEND APBS_LIBS PBAMLib)
     include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
     include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
     include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
-
-    if(BUILD_SHARED_LIBS)
-        install(FILES ${binary_dir}/pbam/src/libPBAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
-                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-    endif()
 endif()
+
+if(ENABLE_PBSAM)
+    message(STATUS "Building PBSAM")
+    add_definitions(-DPBSAM_APBS)
+    set(ENABLE_PBSAM_APBS ON CACHE BOOL "Enable the APBS-PBSAM connection")
+
+    add_definitions(-DENABLE_PBSAM)
+    list(APPEND APBS_LIBS PBSAMLib)
+    include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
+    include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
+    include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
+endif()
+
+if(ENABLE_PBAM OR ENABLE_PBSAM)
+
+    add_subdirectory(externals/pb_s_am)
+
+endif()
+
+    #if(WIN32)
+    #    ExternalProject_Add(pbam
+    #        SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+    #        CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG}
+    #        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBAMLib
+    #        INSTALL_COMMAND "")
+    #else()
+    #    ExternalProject_Add(pbam
+    #        SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+    #        CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+    #        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
+    #        INSTALL_COMMAND "")
+    #endif()
+
+    #ExternalProject_Get_Property(pbam binary_dir)
+    #add_definitions(-DENABLE_PBAM)
+    #list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
+    #if (WIN32)
+    #    list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src/${CMAKE_BUILD_TYPE}")
+    #endif()
+    #list(APPEND APBS_LIBS PBAMLib)
+    #include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
+    #include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
+    #include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
+
+    #if(BUILD_SHARED_LIBS)
+    #    install(FILES ${binary_dir}/pbam/src/libPBAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
+    #            DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+    #endif()
+#endif()
 
 
 ################################################################################
 # Optionally build pbsam (git submodule)
 ################################################################################
-option(ENABLE_PBSAM "pbsam method" OFF)
+#option(ENABLE_PBSAM "pbsam method" OFF)
 
-if(ENABLE_PBSAM)
-    message(STATUS "Building PBSAM")
-    add_definitions(-DPBSAM_APBS)
+#if(ENABLE_PBSAM)
+#    message(STATUS "Building PBSAM")
+#    add_definitions(-DPBSAM_APBS)
 
-    list(APPEND CMAKE_MODULE_PATH ${EXTERNALS_PATH}/pb_s_am/cmake/modules)
-    include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
-    include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
-    include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
+#    list(APPEND CMAKE_MODULE_PATH ${EXTERNALS_PATH}/pb_s_am/cmake/modules)
+#    include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
+#    include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
+#    include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
 
-    if(WIN32)
-        ExternalProject_Add(pbsam
-            SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-            CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBSAMLib
-            INSTALL_COMMAND "")
-    else()
-        ExternalProject_Add(pbsam
-            SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-            CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
-            INSTALL_COMMAND "")
-    endif()
+#    if(WIN32)
+#        ExternalProject_Add(pbsam
+#            SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+#            CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG}
+#            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBSAMLib
+#            INSTALL_COMMAND "")
+#    else()
+#        ExternalProject_Add(pbsam
+#            SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
+#            CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+#            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
+#            INSTALL_COMMAND "")
+#    endif()
 
-    ExternalProject_Get_Property(pbsam binary_dir)
-    add_definitions(-DENABLE_PBSAM)
-    list(APPEND APBS_LIB_DIRS "${binary_dir}/pbsam/src")
+#    ExternalProject_Get_Property(pbsam binary_dir)
+#    add_definitions(-DENABLE_PBSAM)
+#    list(APPEND APBS_LIB_DIRS "${binary_dir}/pbsam/src")
 
-    if(WIN32)
-        list(APPEND APBS_LIBS PBSAMLib ${PBSAM_LINKER_LIBS})
-    else()
-        list(APPEND APBS_LIBS stdc++ PBSAMLib ${PBSAM_LINKER_LIBS})
-    endif()
+#    if(WIN32)
+#        list(APPEND APBS_LIBS PBSAMLib ${PBSAM_LINKER_LIBS})
+#    else()
+#        list(APPEND APBS_LIBS stdc++ PBSAMLib ${PBSAM_LINKER_LIBS})
+#    endif()
 
-    message(STATUS "Adding in " ${PBSAM_LINKER_LIBS} )
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pbsam/src)
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
+#    message(STATUS "Adding in " ${PBSAM_LINKER_LIBS} )
+#    include_directories(${EXTERNALS_PATH}/pb_s_am/pbsam/src)
+#    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
+#    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
 
-    if(BUILD_SHARED_LIBS)
-        install(FILES ${binary_dir}/pbsam/src/libPBSAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
-                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-    endif()
-endif()
+#    if(BUILD_SHARED_LIBS)
+#        install(FILES ${binary_dir}/pbsam/src/libPBSAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
+#                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+#    endif()
+#endif()
 
 
 ################################################################################
