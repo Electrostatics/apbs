@@ -129,13 +129,24 @@ jobs:
           cd build
           cmake --build . --config Release --parallel 1 --target install
 
+      - name: Run tests
+        run: |
+          ctest -C Release --output-on-failure 
+
+      - name: Create package
+        run: |
+          cpack -C Release -G ZIP
+          unzip -l APBS*.zip
+          mkdir -p artifacts
+          mv APBS*.zip $HOME/artifacts
+
       - name: Setup tmate session
         if: ${{ ! success() }}
         uses: mxschmitt/action-tmate@v3
 
-      - name: Package
+      - name: Upload package
         uses: actions/upload-artifact@v2
         with:
           name: APBS-${{ matrix.os }}.zip
-          path: "~/**/artifacts/APBS*.zip"
+          path: artifacts/APBS*.zip
           retention-days: 5
