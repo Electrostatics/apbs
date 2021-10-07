@@ -435,8 +435,6 @@ endif()
 #
 # To use a non-released version of FETK:
 #   - Set FETK_VERSION to the git branch or commit hash you want to use (e.g. main)
-#   - Set FETK_FULL_URL to the URL of the FETK source code archive of the branch or commit you're using 
-#     (e.g. https://github.com/Electrostatics/FETK/archive/refs/heads/main.zip)
 ################################################################################
 option(ENABLE_FETK "Enable the finite element solver" ON)
 
@@ -475,23 +473,16 @@ if(ENABLE_FETK)
         FetchContent_Declare( fetk
             URL ${FETK_BASE_URL}/FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}.${FETK_ZIP_EXT}
         )
-        #ExternalProject_Add( FETK
-        #    PREFIX ${FETK_PATH}
-        #    DOWNLOAD_DIR ${FETK_PATH}
-        #    INSTALL_DIR ${FETK_INSTALL_PREFIX}
-        #    URL ${FETK_BASE_URL}/FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}.${FETK_ZIP_EXT}
-        #    DOWNLOAD_NAME FETK-${FETK_VERSION}.zip
-        #    CONFIGURE_COMMAND ""
-        #    BUILD_COMMAND ""
-        #    INSTALL_COMMAND ""
-        #)
+        FetchContent_MakeAvailable( fetk )
+
+        include_directories(${fetk_SOURCE_DIR}/include)
+        link_directories(${fetk_SOURCE_DIR}/lib)
 
     else(FETK_FROM_PKG)
 
-        # We assume that the user has provided FETK_FULL_URL
         FetchContent_Declare( fetk
             GIT_REPOSITORY https://github.com/Electrostatics/FETK.git
-            GIT_TAG main
+            GIT_TAG ${FETK_VERSION}
         )
         FetchContent_MakeAvailable( fetk )
 
@@ -512,31 +503,7 @@ if(ENABLE_FETK)
             ${fetk_SOURCE_DIR}/punc/src/base
         )
 
-        #if(WIN32)
-        #    ExternalProject_Add( FETK
-        #        PREFIX ${FETK_PATH}
-        #        DOWNLOAD_DIR ${FETK_PATH}
-        #        BINARY_DIR ${FETK_PATH}/build
-        #        INSTALL_DIR ${FETK_INSTALL_PREFIX}
-        #        URL ${FETK_FULL_URL}
-        #        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${FETK_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=Release -DCREATE_PACKAGE=FALSE -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE}
-        #        BUILD_COMMAND cmake --build . --config Release --parallel 1 --target install
-        #    )
-        #else()
-        #    ExternalProject_Add( FETK
-        #        PREFIX ${FETK_PATH}
-        #        DOWNLOAD_DIR ${FETK_PATH}
-        #        BINARY_DIR ${FETK_PATH}/build
-        #        INSTALL_DIR ${FETK_INSTALL_PREFIX}
-        #        URL ${FETK_FULL_URL}
-        #        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${FETK_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        #    )
-        #endif()
-
     endif(FETK_FROM_PKG)
-
-    #include_directories(${FETK_INSTALL_PREFIX}/include)
-    #link_directories(${FETK_INSTALL_PREFIX}/lib)
 
     list(APPEND APBS_LIBS
         maloc
@@ -591,7 +558,7 @@ endif()
 
 
 ################################################################################
-# Optionally build pbam (git submodule)
+# Optionally build pbam and pbsam (git submodule)
 ################################################################################
 option(ENABLE_PBAM "pbam method" OFF)
 option(ENABLE_PBSAM "pbsam method" OFF)
@@ -629,87 +596,6 @@ if(ENABLE_PBAM OR ENABLE_PBSAM)
 
     add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
 endif()
-
-    #if(WIN32)
-    #    ExternalProject_Add(pbam
-    #        SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-    #        CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG}
-    #        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBAMLib
-    #        INSTALL_COMMAND "")
-    #else()
-    #    ExternalProject_Add(pbam
-    #        SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-    #        CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-    #        BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
-    #        INSTALL_COMMAND "")
-    #endif()
-
-    #ExternalProject_Get_Property(pbam binary_dir)
-    #add_definitions(-DENABLE_PBAM)
-    #list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
-    #if (WIN32)
-    #    list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src/${CMAKE_BUILD_TYPE}")
-    #endif()
-    #list(APPEND APBS_LIBS PBAMLib)
-    #include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
-    #include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
-    #include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
-
-    #if(BUILD_SHARED_LIBS)
-    #    install(FILES ${binary_dir}/pbam/src/libPBAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
-    #            DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-    #endif()
-#endif()
-
-
-################################################################################
-# Optionally build pbsam (git submodule)
-################################################################################
-#option(ENABLE_PBSAM "pbsam method" OFF)
-
-#if(ENABLE_PBSAM)
-#    message(STATUS "Building PBSAM")
-#    add_definitions(-DPBSAM_APBS)
-
-#    list(APPEND CMAKE_MODULE_PATH ${EXTERNALS_PATH}/pb_s_am/cmake/modules)
-#    include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
-#    include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
-#    include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
-
-#    if(WIN32)
-#        ExternalProject_Add(pbsam
-#            SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-#            CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DVCPKG_TARGET_TRIPLET=x86-windows ${CMAKE_TOOLCHAIN_FILE_ARG}
-#            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBSAMLib
-#            INSTALL_COMMAND "")
-#    else()
-#        ExternalProject_Add(pbsam
-#            SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-#            CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-#            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
-#            INSTALL_COMMAND "")
-#    endif()
-
-#    ExternalProject_Get_Property(pbsam binary_dir)
-#    add_definitions(-DENABLE_PBSAM)
-#    list(APPEND APBS_LIB_DIRS "${binary_dir}/pbsam/src")
-
-#    if(WIN32)
-#        list(APPEND APBS_LIBS PBSAMLib ${PBSAM_LINKER_LIBS})
-#    else()
-#        list(APPEND APBS_LIBS stdc++ PBSAMLib ${PBSAM_LINKER_LIBS})
-#    endif()
-
-#    message(STATUS "Adding in " ${PBSAM_LINKER_LIBS} )
-#    include_directories(${EXTERNALS_PATH}/pb_s_am/pbsam/src)
-#    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
-#    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
-
-#    if(BUILD_SHARED_LIBS)
-#        install(FILES ${binary_dir}/pbsam/src/libPBSAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
-#                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-#    endif()
-#endif()
 
 
 ################################################################################
