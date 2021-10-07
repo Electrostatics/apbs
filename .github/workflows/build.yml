@@ -53,7 +53,10 @@ jobs:
             swig \
             libomp \
             lapack \
-            suite-sparse
+            suite-sparse \
+            superlu \
+            boost \
+            eigen
           brew upgrade gcc@9
 
 #          brew install \
@@ -75,7 +78,11 @@ jobs:
             libreadline-dev \
             libomp5 \
             libomp-dev \
-            libsuitesparse-dev
+            libsuitesparse-dev \
+            libsuperlu-dev \
+            libeigen3-dev \
+            libboost-dev
+
 
 #          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y \
 #            libarpack2-dev \
