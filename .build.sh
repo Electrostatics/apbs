@@ -112,8 +112,8 @@ cmake -S .. -B $BUILD_DIR \
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE                    \
       -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR                 \
       -DENABLE_PYGBE=OFF                                   \
-      -DENABLE_BEM=ON                                     \
-      -DENABLE_GEOFLOW=OFF                                \
+      -DENABLE_BEM=OFF                                     \
+      -DENABLE_GEOFLOW=ON                                \
       -DENABLE_FETK=ON                                   \
       -DENABLE_OPENMP=ON                                  \
       -DENABLE_PBAM=ON                                    \
