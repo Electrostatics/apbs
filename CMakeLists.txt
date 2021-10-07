@@ -50,6 +50,7 @@ set(CMAKE_MACOSX_RPATH 1)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(ExternalProject)
+include(FetchContent)
 include(FeatureSummary)
 include(InstallRequiredSystemLibraries)
 
@@ -471,45 +472,71 @@ if(ENABLE_FETK)
             set(FETK_SYSTEM_COMPONENT ${CMAKE_SYSTEM_NAME})
         endif()
 
-        ExternalProject_Add( FETK
-            PREFIX ${FETK_PATH}
-            DOWNLOAD_DIR ${FETK_PATH}
-            INSTALL_DIR ${FETK_INSTALL_PREFIX}
+        FetchContent_Declare( fetk
             URL ${FETK_BASE_URL}/FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}.${FETK_ZIP_EXT}
-            DOWNLOAD_NAME FETK-${FETK_VERSION}.zip
-            CONFIGURE_COMMAND ""
-            BUILD_COMMAND ""
-            INSTALL_COMMAND ""
         )
+        #ExternalProject_Add( FETK
+        #    PREFIX ${FETK_PATH}
+        #    DOWNLOAD_DIR ${FETK_PATH}
+        #    INSTALL_DIR ${FETK_INSTALL_PREFIX}
+        #    URL ${FETK_BASE_URL}/FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}.${FETK_ZIP_EXT}
+        #    DOWNLOAD_NAME FETK-${FETK_VERSION}.zip
+        #    CONFIGURE_COMMAND ""
+        #    BUILD_COMMAND ""
+        #    INSTALL_COMMAND ""
+        #)
 
     else(FETK_FROM_PKG)
 
         # We assume that the user has provided FETK_FULL_URL
-        if(WIN32)
-            ExternalProject_Add( FETK
-                PREFIX ${FETK_PATH}
-                DOWNLOAD_DIR ${FETK_PATH}
-                BINARY_DIR ${FETK_PATH}/build
-                INSTALL_DIR ${FETK_INSTALL_PREFIX}
-                URL ${FETK_FULL_URL}
-                CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${FETK_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=Release -DCREATE_PACKAGE=FALSE -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE}
-                BUILD_COMMAND cmake --build . --config Release --parallel 1 --target install
-            )
-        else()
-            ExternalProject_Add( FETK
-                PREFIX ${FETK_PATH}
-                DOWNLOAD_DIR ${FETK_PATH}
-                BINARY_DIR ${FETK_PATH}/build
-                INSTALL_DIR ${FETK_INSTALL_PREFIX}
-                URL ${FETK_FULL_URL}
-                CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${FETK_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-            )
-        endif()
+        FetchContent_Declare( fetk
+            GIT_REPOSITORY https://github.com/Electrostatics/FETK.git
+            GIT_TAG main
+        )
+        FetchContent_MakeAvailable( fetk )
+
+        include_directories(
+            ${fetk_SOURCE_DIR}/maloc/src/base
+            ${fetk_SOURCE_DIR}/maloc/src/psh
+            ${fetk_SOURCE_DIR}/maloc/src/vsh
+            ${fetk_SOURCE_DIR}/maloc/src/vsys
+            ${fetk_SOURCE_DIR}/mc/src/aprx
+            ${fetk_SOURCE_DIR}/mc/src/bam
+            ${fetk_SOURCE_DIR}/mc/src/base
+            ${fetk_SOURCE_DIR}/mc/src/dyn
+            ${fetk_SOURCE_DIR}/mc/src/gem
+            ${fetk_SOURCE_DIR}/mc/src/mcsh
+            ${fetk_SOURCE_DIR}/mc/src/nam
+            ${fetk_SOURCE_DIR}/mc/src/pde
+            ${fetk_SOURCE_DIR}/mc/src/whb
+            ${fetk_SOURCE_DIR}/punc/src/base
+        )
+
+        #if(WIN32)
+        #    ExternalProject_Add( FETK
+        #        PREFIX ${FETK_PATH}
+        #        DOWNLOAD_DIR ${FETK_PATH}
+        #        BINARY_DIR ${FETK_PATH}/build
+        #        INSTALL_DIR ${FETK_INSTALL_PREFIX}
+        #        URL ${FETK_FULL_URL}
+        #        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${FETK_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=Release -DCREATE_PACKAGE=FALSE -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_TOOLCHAIN_FILE=$ENV{WIN_TOOLCHAIN_FILE}
+        #        BUILD_COMMAND cmake --build . --config Release --parallel 1 --target install
+        #    )
+        #else()
+        #    ExternalProject_Add( FETK
+        #        PREFIX ${FETK_PATH}
+        #        DOWNLOAD_DIR ${FETK_PATH}
+        #        BINARY_DIR ${FETK_PATH}/build
+        #        INSTALL_DIR ${FETK_INSTALL_PREFIX}
+        #        URL ${FETK_FULL_URL}
+        #        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${FETK_INSTALL_PREFIX} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        #    )
+        #endif()
 
     endif(FETK_FROM_PKG)
 
-    include_directories(${FETK_INSTALL_PREFIX}/include)
-    link_directories(${FETK_INSTALL_PREFIX}/lib)
+    #include_directories(${FETK_INSTALL_PREFIX}/include)
+    #link_directories(${FETK_INSTALL_PREFIX}/lib)
 
     list(APPEND APBS_LIBS
         maloc
@@ -525,6 +552,17 @@ if(ENABLE_FETK)
         ${UMFPACK_LIBRARIES}
         ${BLAS_LIBRARIES}
     )
+
+    find_package( SuperLU )
+    if(SuperLU_FOUND)
+        # include from find_package variables
+        list(APPEND APBS_LIBS
+            ${SUPERLU_LIBRARIES}
+        )
+    else()
+        # library built with FETK
+        list(APPEND APBS_LIBS superlu)
+    endif()
 
     SET(HAVE_MC_H 1)
     SET(HAVE_PUNC_H 1)
@@ -543,7 +581,7 @@ if(ENABLE_GEOFLOW)
     add_definitions(-DGEOFLOW_APBS)
     set(ENABLE_GEOFLOW_APBS ON CACHE BOOL "Enable the APBS-Geoflow connection")
 
-    add_subdirectory(externals/geoflow_c)
+    add_subdirectory(${EXTERNALS_PATH}/geoflow_c)
 
     add_definitions(-DENABLE_GEOFLOW)
     list(APPEND APBS_LIBS GeometricFlowLib)
@@ -560,32 +598,36 @@ option(ENABLE_PBSAM "pbsam method" OFF)
 
 if(ENABLE_PBAM)
     message(STATUS "Building PBAM")
-    add_definitions(-DPBAM_APBS)
     set(ENABLE_PBAM_APBS ON CACHE BOOL "Enable the APBS-PBAM connection")
 
-    add_definitions(-DENABLE_PBAM)
+    add_definitions(
+        -DENABLE_PBAM
+        -DPBAM_APBS
+    )
     list(APPEND APBS_LIBS PBAMLib)
     include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
 endif()
 
 if(ENABLE_PBSAM)
     message(STATUS "Building PBSAM")
-    add_definitions(-DPBSAM_APBS)
     set(ENABLE_PBSAM_APBS ON CACHE BOOL "Enable the APBS-PBSAM connection")
 
-    add_definitions(-DENABLE_PBSAM)
+    add_definitions(
+        -DENABLE_PBSAM
+        -DPBSAM_APBS
+    )
     list(APPEND APBS_LIBS PBSAMLib)
+    include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
     include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
     include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
     include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
 endif()
 
 if(ENABLE_PBAM OR ENABLE_PBSAM)
+    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
+    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
 
-    add_subdirectory(externals/pb_s_am)
-
+    add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
 endif()
 
     #if(WIN32)
