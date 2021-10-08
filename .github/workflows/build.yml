@@ -127,7 +127,7 @@ jobs:
         if: startsWith(matrix.os, 'windows')  # Windows only
         run: |
           cd build
-          cmake --build . --config Release --parallel 1 --target install
+          cmake --build . --config Release --parallel 2 --target install
 
       - name: Run tests
         run: |
