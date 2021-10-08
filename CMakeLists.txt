@@ -328,105 +328,6 @@ if(ENABLE_PYGBE)
 endif() # ENABLE_PYGBE
 
 ################################################################################
-# Optionally build BEM: TABI-PB method                                         #
-################################################################################
-option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
-
-if(ENABLE_BEM)
-    message(STATUS "Building TABIPB")
-    add_definitions(-DENABLE_BEM)
-    set(TABI bem)
-    set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
-
-    set(GET_NanoShaper ON) #CACHE BOOL "Grabbing NanoShaper path"
-
-    if(WIN32)
-        ExternalProject_add(${TABI}
-            SOURCE_DIR ${TABI_PATH}
-            CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-                       -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
-                       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target TABIPBlib
-            INSTALL_COMMAND "")
-    else()
-        ExternalProject_add(${TABI}
-            SOURCE_DIR ${TABI_PATH}
-            CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-                       -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
-                       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
-            INSTALL_COMMAND "")
-    endif()
-
-    ExternalProject_Get_Property(${TABI} binary_dir)
-    list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
-    list(APPEND APBS_LIBS TABIPBlib)
-    include_directories(${EXTERNALS_PATH}/${TABI})
-    include_directories(${EXTERNALS_PATH}/${TABI}/src)
-    include_directories(${EXTERNALS_PATH}/${TABI}/src/tabipb_wrap)
-
-    if(BUILD_SHARED_LIBS)
-        install(FILES ${binary_dir}/lib/libTABIPBlib${CMAKE_SHARED_LIBRARY_SUFFIX}
-                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-    endif()
-endif() # ENABLE_BEM
-
-
-################################################################################
-# Getting nanoshaper binary
-################################################################################
-set(MESH_ROOT_URL_PATH "https://github.com/lwwilson1/mesh_routines/releases/download/v1.6")
-
-if(GET_NanoShaper)
-    set(NANOSHAPER_FULL_URL_PATH)
-    set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper")
-    message(STATUS "Copying NanoShaper executable")
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
-        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_OSX")
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
-        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_Linux64")
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
-        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper32.exe")
-        set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper.exe")
-    endif()
-
-    if(NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
-        file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME})
-        message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
-    endif()
-
-    install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}
-            DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    message(STATUS "NanoShaper install: ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
-endif()
-
-
-################################################################################
-# Handle conditional building with MPI Support                                 #
-# There may be a better way, but for now this comes before FETK because FETK   #
-# depends on having the libraries located.                                     #
-################################################################################
-option(ENABLE_MPI "Enable MPI parallelism" OFF)
-
-if(ENABLE_MPI)
-    if(NOT ENABLE_DEBUG)
-        message(STATUS "Checking for MPI")
-        find_package(MPI)
-        if(MPI_FOUND)
-            message(STATUS "MPI support enabled")
-            set(HAVE_MPI_H 1)
-            include_directories(${MPI_C_INCLUDE_PATH})
-            list(APPEND APBS_LIBS ${MPI_C_LIBRARIES})
-        else()
-            message(WARNING "MPI was not found; disabling")
-        endif()
-    else()
-        message(WARNING "MPI may not be enabled in debugging mode")
-    endif()
-endif()
-
-
-################################################################################
 # Handle the finite element solver dependencies                                #
 #
 # To use a released version of FETK:
@@ -536,6 +437,109 @@ if(ENABLE_FETK)
     SET(HAVE_BIOM_H 1)
 
 endif(ENABLE_FETK)
+
+
+################################################################################
+# Optionally build BEM: TABI-PB method                                         #
+################################################################################
+option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
+
+if(ENABLE_BEM)
+    message(STATUS "Building TABIPB")
+    set(TABI bem)
+    set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
+    set(GET_NanoShaper ON) #CACHE BOOL "Grabbing NanoShaper path"
+    add_definitions(-DENABLE_BEM)
+    # We turn the TABIPB/APBS wrapper off and build here instead
+    set(ENABLE_TABIPB_APBS OFF CACHE BOOL "Turn off TABIPB/APBS wrapper" FORCE)
+
+    add_subdirectory(${EXTERNALS_PATH}/${TABI})
+
+    list(APPEND APBS_LIB_DIRS "${CMAKE_CURRENT_BINARY_DIR}/externals/${TABI}/lib")
+    list(APPEND APBS_LIBS TABIPBlib)
+    include_directories(${EXTERNALS_PATH}/${TABI}/src)
+    include_directories(${EXTERNALS_PATH}/${TABI}/src/tabipb_wrap)
+    add_definitions(-DTABIPB_APBS)
+  
+    set(TABIPB_LIBFILES
+        ${EXTERNALS_PATH}/${TABI}/src/params.cpp
+        ${EXTERNALS_PATH}/${TABI}/src/molecule.cpp
+        ${EXTERNALS_PATH}/${TABI}/src/particles.cpp
+        ${EXTERNALS_PATH}/${TABI}/src/tree.cpp
+        ${EXTERNALS_PATH}/${TABI}/src/clusters.cpp 
+        ${EXTERNALS_PATH}/${TABI}/src/interaction_list.cpp
+        ${EXTERNALS_PATH}/${TABI}/src/boundary_element.cpp 
+        ${EXTERNALS_PATH}/${TABI}/src/gmres.cpp 
+        ${EXTERNALS_PATH}/${TABI}/src/precondition.cpp 
+        ${EXTERNALS_PATH}/${TABI}/src/output.cpp
+        ${EXTERNALS_PATH}/${TABI}/src/tabipb_wrap/TABIPBWrap.cpp
+        ${EXTERNALS_PATH}/${TABI}/src/tabipb_wrap/params_apbs_ctor.cpp
+        ${EXTERNALS_PATH}/${TABI}/src/tabipb_wrap/molecule_apbs_ctor.cpp
+    )
+  
+    set(TABIPB_LIBNAME TABIPBlib)
+    add_library(${TABIPB_LIBNAME} ${TABIPB_LIBFILES})
+    target_compile_features(${TABIPB_LIBNAME} PRIVATE cxx_std_11)
+    target_compile_options(${TABIPB_LIBNAME} PRIVATE 
+                           $<$<CONFIG:RELEASE>:-O3>
+                           $<$<CONFIG:RELWITHDEBINFO>:-O3>
+                           $<$<CONFIG:DEBUG>:-O0 -Wall>)
+
+endif() # ENABLE_BEM
+
+
+################################################################################
+# Getting nanoshaper binary
+################################################################################
+set(MESH_ROOT_URL_PATH "https://github.com/lwwilson1/mesh_routines/releases/download/v1.6")
+
+if(GET_NanoShaper)
+    set(NANOSHAPER_FULL_URL_PATH)
+    set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper")
+    message(STATUS "Copying NanoShaper executable")
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")      # Mac OS X specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_OSX")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")   # Linux specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper_Linux64")
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows") # Windows specific code
+        set(NANOSHAPER_FULL_URL_PATH "${MESH_ROOT_URL_PATH}/NanoShaper32.exe")
+        set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper.exe")
+    endif()
+
+    if(NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+        file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME})
+        message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+    endif()
+
+    install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}
+            DESTINATION ${EXECUTABLE_INSTALL_PATH})
+    message(STATUS "NanoShaper install: ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
+endif()
+
+
+################################################################################
+# Handle conditional building with MPI Support                                 #
+# There may be a better way, but for now this comes before FETK because FETK   #
+# depends on having the libraries located.                                     #
+################################################################################
+option(ENABLE_MPI "Enable MPI parallelism" OFF)
+
+if(ENABLE_MPI)
+    if(NOT ENABLE_DEBUG)
+        message(STATUS "Checking for MPI")
+        find_package(MPI)
+        if(MPI_FOUND)
+            message(STATUS "MPI support enabled")
+            set(HAVE_MPI_H 1)
+            include_directories(${MPI_C_INCLUDE_PATH})
+            list(APPEND APBS_LIBS ${MPI_C_LIBRARIES})
+        else()
+            message(WARNING "MPI was not found; disabling")
+        endif()
+    else()
+        message(WARNING "MPI may not be enabled in debugging mode")
+    endif()
+endif()
 
 
 ################################################################################
