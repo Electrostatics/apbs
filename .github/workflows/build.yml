@@ -135,10 +135,11 @@ jobs:
 
       - name: Create package
         run: |
+          cd build
           cpack -C Release -G ZIP
           unzip -l APBS*.zip
           mkdir -p artifacts
-          mv APBS*.zip $HOME/artifacts
+          mv APBS*.zip artifacts
 
       - name: Setup tmate session
         if: ${{ ! success() }}
@@ -148,5 +149,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: APBS-${{ matrix.os }}.zip
-          path: artifacts/APBS*.zip
+          path: build/artifacts/APBS*.zip
           retention-days: 5
