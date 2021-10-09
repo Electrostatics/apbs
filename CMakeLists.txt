@@ -577,45 +577,52 @@ option(ENABLE_PBAM "pbam method" OFF)
 option(ENABLE_PBSAM "pbsam method" OFF)
 
 if(ENABLE_PBAM OR ENABLE_PBSAM)
+    if(ENABLE_PBAM)
+        message(STATUS "Building PBAM")
+        set(ENABLE_PBAM_APBS ON CACHE BOOL "Enable the APBS-PBAM connection")
+
+        add_definitions(
+            -DENABLE_PBAM
+            -DPBAM_APBS
+        )
+        list(APPEND APBS_LIBS PBAMLib)
+    endif()
+
+    if(ENABLE_PBSAM)
+        message(STATUS "Building PBSAM")
+        set(ENABLE_PBSAM_APBS ON CACHE BOOL "Enable the APBS-PBSAM connection")
+
+        add_definitions(
+            -DENABLE_PBSAM
+            -DPBSAM_APBS
+        )
+        list(APPEND APBS_LIBS PBSAMLib)
+    endif()
+
     FetchContent_Declare( pb_s_am
         GIT_REPOSITORY https://github.com/Electrostatics/pb_solvers.git
         GIT_TAG cdaae35c89af605a573e8f17be6494cbc43fc559
     )
+    #add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
+    FetchContent_MakeAvailable( pb_s_am )
 endif()
 
 if(ENABLE_PBAM)
-    message(STATUS "Building PBAM")
-    set(ENABLE_PBAM_APBS ON CACHE BOOL "Enable the APBS-PBAM connection")
-
-    add_definitions(
-        -DENABLE_PBAM
-        -DPBAM_APBS
-    )
-    list(APPEND APBS_LIBS PBAMLib)
     include_directories(${pb_s_am_SOURCE_DIR}/pbam/src)
 endif()
 
 if(ENABLE_PBSAM)
-    message(STATUS "Building PBSAM")
-    set(ENABLE_PBSAM_APBS ON CACHE BOOL "Enable the APBS-PBSAM connection")
-
-    add_definitions(
-        -DENABLE_PBSAM
-        -DPBSAM_APBS
-    )
-    list(APPEND APBS_LIBS PBSAMLib)
     include_directories(${pb_s_am_SOURCE_DIR}/pbam/src)
-    include(${pb_s_am_SOURCE_DIR}/cmake/Utils.cmake)
-    include(${pb_s_am_SOURCE_DIR}/cmake/Dependencies.cmake)
-    include(${pb_s_am_SOURCE_DIR}/cmake/Summary.cmake)
+    if(ENABLE_PBSAM)
+        include(${pb_s_am_SOURCE_DIR}/cmake/Utils.cmake)
+        include(${pb_s_am_SOURCE_DIR}/cmake/Dependencies.cmake)
+        include(${pb_s_am_SOURCE_DIR}/cmake/Summary.cmake)
+    endif()    
 endif()
 
 if(ENABLE_PBAM OR ENABLE_PBSAM)
     include_directories(${pb_s_am_SOURCE_DIR}/pb_shared/src)
     include_directories(${pb_s_am_SOURCE_DIR}/pb_wrap/src)
-
-    #add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
-    FetchContent_MakeAvailable( pb_s_am )
 endif()
 
 
