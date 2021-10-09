@@ -446,35 +446,40 @@ option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
 
 if(ENABLE_BEM)
     message(STATUS "Building TABIPB")
-    set(TABI bem)
-    set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
+    #set(TABI bem)
+    #set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
     set(GET_NanoShaper ON) #CACHE BOOL "Grabbing NanoShaper path"
     add_definitions(-DENABLE_BEM)
     # We turn the TABIPB/APBS wrapper off and build here instead
     set(ENABLE_TABIPB_APBS OFF CACHE BOOL "Turn off TABIPB/APBS wrapper" FORCE)
 
-    add_subdirectory(${EXTERNALS_PATH}/${TABI})
+    #add_subdirectory(${EXTERNALS_PATH}/${TABI})
+    FetchContent_Declare( tabi
+        GIT_REPOSITORY https://github.com/Treecodes/TABI-PB.git
+        GIT_TAG fe1c237b057418fed48535db125394607040d9de
+    )
+    FetchContent_MakeAvailable( tabi )
 
-    list(APPEND APBS_LIB_DIRS "${CMAKE_CURRENT_BINARY_DIR}/externals/${TABI}/lib")
+    list(APPEND APBS_LIB_DIRS "${tabi_BINARY_DIR}/lib")
     list(APPEND APBS_LIBS TABIPBlib)
-    include_directories(${EXTERNALS_PATH}/${TABI}/src)
-    include_directories(${EXTERNALS_PATH}/${TABI}/src/tabipb_wrap)
+    include_directories(${tabi_SOURCE_DIR}/src)
+    include_directories(${tabi_SOURCE_DIR}/src/tabipb_wrap)
     add_definitions(-DTABIPB_APBS)
   
     set(TABIPB_LIBFILES
-        ${EXTERNALS_PATH}/${TABI}/src/params.cpp
-        ${EXTERNALS_PATH}/${TABI}/src/molecule.cpp
-        ${EXTERNALS_PATH}/${TABI}/src/particles.cpp
-        ${EXTERNALS_PATH}/${TABI}/src/tree.cpp
-        ${EXTERNALS_PATH}/${TABI}/src/clusters.cpp 
-        ${EXTERNALS_PATH}/${TABI}/src/interaction_list.cpp
-        ${EXTERNALS_PATH}/${TABI}/src/boundary_element.cpp 
-        ${EXTERNALS_PATH}/${TABI}/src/gmres.cpp 
-        ${EXTERNALS_PATH}/${TABI}/src/precondition.cpp 
-        ${EXTERNALS_PATH}/${TABI}/src/output.cpp
-        ${EXTERNALS_PATH}/${TABI}/src/tabipb_wrap/TABIPBWrap.cpp
-        ${EXTERNALS_PATH}/${TABI}/src/tabipb_wrap/params_apbs_ctor.cpp
-        ${EXTERNALS_PATH}/${TABI}/src/tabipb_wrap/molecule_apbs_ctor.cpp
+        ${tabi_SOURCE_DIR}/src/params.cpp
+        ${tabi_SOURCE_DIR}/src/molecule.cpp
+        ${tabi_SOURCE_DIR}/src/particles.cpp
+        ${tabi_SOURCE_DIR}/src/tree.cpp
+        ${tabi_SOURCE_DIR}/src/clusters.cpp 
+        ${tabi_SOURCE_DIR}/src/interaction_list.cpp
+        ${tabi_SOURCE_DIR}/src/boundary_element.cpp 
+        ${tabi_SOURCE_DIR}/src/gmres.cpp 
+        ${tabi_SOURCE_DIR}/src/precondition.cpp 
+        ${tabi_SOURCE_DIR}/src/output.cpp
+        ${tabi_SOURCE_DIR}/src/tabipb_wrap/TABIPBWrap.cpp
+        ${tabi_SOURCE_DIR}/src/tabipb_wrap/params_apbs_ctor.cpp
+        ${tabi_SOURCE_DIR}/src/tabipb_wrap/molecule_apbs_ctor.cpp
     )
   
     set(TABIPB_LIBNAME TABIPBlib)
@@ -552,12 +557,16 @@ if(ENABLE_GEOFLOW)
     add_definitions(-DGEOFLOW_APBS)
     set(ENABLE_GEOFLOW_APBS ON CACHE BOOL "Enable the APBS-Geoflow connection")
 
-    add_subdirectory(${EXTERNALS_PATH}/geoflow_c)
+    #add_subdirectory(${EXTERNALS_PATH}/geoflow_c)
+    FetchContent_Declare( geoflow
+        GIT_REPOSITORY https://github.com/Electrostatics/geoflow_c.git
+        GIT_TAG 37ad882793478a9c3a7b729f4b696883c84a7d7c
+    )
+    FetchContent_MakeAvailable( geoflow )
 
     add_definitions(-DENABLE_GEOFLOW)
     list(APPEND APBS_LIBS GeometricFlowLib)
-    include_directories(${EXTERNALS_PATH}/geoflow_c/src)
-
+    include_directories(${geoflow_SOURCE_DIR}/src)
 endif()
 
 
@@ -566,6 +575,13 @@ endif()
 ################################################################################
 option(ENABLE_PBAM "pbam method" OFF)
 option(ENABLE_PBSAM "pbsam method" OFF)
+
+if(ENABLE_PBAM OR ENABLE_PBSAM)
+    FetchContent_Declare( pb_s_am
+        GIT_REPOSITORY https://github.com/Electrostatics/pb_solvers.git
+        GIT_TAG cdaae35c89af605a573e8f17be6494cbc43fc559
+    )
+endif()
 
 if(ENABLE_PBAM)
     message(STATUS "Building PBAM")
@@ -576,7 +592,7 @@ if(ENABLE_PBAM)
         -DPBAM_APBS
     )
     list(APPEND APBS_LIBS PBAMLib)
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
+    include_directories(${pb_s_am_SOURCE_DIR}/pbam/src)
 endif()
 
 if(ENABLE_PBSAM)
@@ -588,17 +604,18 @@ if(ENABLE_PBSAM)
         -DPBSAM_APBS
     )
     list(APPEND APBS_LIBS PBSAMLib)
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
-    include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
-    include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
-    include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
+    include_directories(${pb_s_am_SOURCE_DIR}/pbam/src)
+    include(${pb_s_am_SOURCE_DIR}/cmake/Utils.cmake)
+    include(${pb_s_am_SOURCE_DIR}/cmake/Dependencies.cmake)
+    include(${pb_s_am_SOURCE_DIR}/cmake/Summary.cmake)
 endif()
 
 if(ENABLE_PBAM OR ENABLE_PBSAM)
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
+    include_directories(${pb_s_am_SOURCE_DIR}/pb_shared/src)
+    include_directories(${pb_s_am_SOURCE_DIR}/pb_wrap/src)
 
-    add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
+    #add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
+    FetchContent_MakeAvailable( pb_s_am )
 endif()
 
 
