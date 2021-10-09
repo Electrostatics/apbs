@@ -141,9 +141,9 @@ jobs:
           mkdir -p artifacts
           mv APBS*.zip artifacts
 
-      - name: Setup tmate session
-        if: ${{ ! success() }}
-        uses: mxschmitt/action-tmate@v3
+      #- name: Setup tmate session
+      #  if: ${{ ! success() }}
+      #  uses: mxschmitt/action-tmate@v3
 
       - name: Upload package
         uses: actions/upload-artifact@v2
