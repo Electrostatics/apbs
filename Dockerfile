@@ -7,15 +7,6 @@ RUN apt-get update && \
         unzip \
         cmake \
         git \
-        && \
-    for apt_file in `grep -lr microsoft /etc/apt/sources.list.d/`; do sudo rm $apt_file; done && \
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9 && \
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9 && \
-    gcc --version && \
-    g++ --version && \
-    /bin/true
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
         libarpack2-dev \
         libopenblas-dev \
         liblapack-dev \
@@ -61,7 +52,7 @@ RUN cd /tmp_source && \
       -DFETK_VERSION=${FETK_VERSION} \
       -DGIT_SUBMODULE=OFF \
       .. && \
-    make VERBOSE=1 install && \
+    make -j install && \
     /bin/true
 
 #RUN cd /tmp_source && \
