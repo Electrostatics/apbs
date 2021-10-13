@@ -122,7 +122,6 @@ cmake -S .. -B $BUILD_DIR \
       -DENABLE_TESTS=ON                                   \
       -DENABLE_TINKER=OFF                                 \
       -DFETK_VERSION="${FETK_VERSION}" \
-      -DFETK_FULL_URL="${FETK_FULL_URL}" \
       -DGIT_SUBMODULE=OFF \
       ..                                                  || exit 1
  
