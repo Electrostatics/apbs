@@ -549,8 +549,7 @@ if(ENABLE_GEOFLOW)
     #add_subdirectory(${EXTERNALS_PATH}/geoflow_c)
     FetchContent_Declare( geoflow
         GIT_REPOSITORY https://github.com/Electrostatics/geoflow_c.git
-        GIT_TAG 327f135c255067f7183e9a49d499b3a5e4efffd6
-#        GIT_TAG 37ad882793478a9c3a7b729f4b696883c84a7d7c
+        GIT_TAG cb259d47acb613e61b272b1968c109fc039bff1b
     )
     FetchContent_MakeAvailable( geoflow )
 
