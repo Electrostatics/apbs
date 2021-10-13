@@ -105,7 +105,7 @@ cd $BUILD_DIR                                             || exit 1
 cmake -S .. -B $BUILD_DIR \
       -DCMAKE_INSTALL_INCLUDEDIR="include"                \
       -DBUILD_DOC=ON                                      \
-      -DBUILD_SHARED_LIBS=ON                              \
+      -DBUILD_SHARED_LIBS=OFF                              \
       -DBUILD_TOOLS=ON                                    \
       -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} ${COVERAGE}"      \
       -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${COVERAGE}"  \

@@ -20,6 +20,7 @@ RUN apt-get update && \
 
 ADD . /tmp_source
 
+ARG BUILD_SHARED_LIBS=OFF
 ARG INSTALL_DIR=/usr/local
 ARG RELEASE_TYPE=Debug
 ARG ENABLE_PYGBE=OFF
@@ -35,7 +36,7 @@ RUN cd /tmp_source && \
     cmake \
       -DCMAKE_INSTALL_INCLUDEDIR="include" \
       -DBUILD_DOC=ON \
-      -DBUILD_SHARED_LIBS=ON  \
+      -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}  \
       -DBUILD_TOOLS=ON \
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE \
       -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
