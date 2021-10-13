@@ -9,8 +9,7 @@ on:
 env:
   WIN_DEPENDENCIES_RELEASE: "v0.4.0"
   WIN_TOOLCHAIN_FILE: '/c/vcpkg/scripts/buildsystems/vcpkg.cmake'
-  FETK_VERSION: main
-  FETK_FULL_URL: "https://github.com/Electrostatics/FETK/archive/refs/heads/main.zip"
+  FETK_VERSION: "1.8.1"
 
 
 jobs:

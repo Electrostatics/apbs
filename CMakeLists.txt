@@ -339,27 +339,16 @@ endif() # ENABLE_PYGBE
 ################################################################################
 option(ENABLE_FETK "Enable the finite element solver" ON)
 
-set(FETK_VERSION "1.8.0" CACHE STRING "Version of FETK to use")
+set(FETK_VERSION "1.8.1" CACHE STRING "Version of FETK to use")
 
 set(FETK_FROM_PKG TRUE)
 if(NOT FETK_VERSION MATCHES "[0-9]+\.[0-9]+\.[0-9]+")
     set(FETK_FROM_PKG FALSE)
-    if(NOT DEFINED FETK_FULL_URL)
-        message(FATAL_ERROR "Please specify the source URL by defining: FETK_FULL_URL=[URL]")
-    endif()
     string(REPLACE "/" "-" FETK_VERSION ${FETK_VERSION}) # this matches the replacement that GitHub makes for the directory within the zip file
 endif()
 
 if(ENABLE_FETK)
-
-    set(FETK_PATH "${PROJECT_BINARY_DIR}/downloads/fetk")
-    if(NOT EXISTS ${FETK_PATH})
-        file(MAKE_DIRECTORY ${FETK_PATH})
-    endif()
-
-    set(FETK_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/fetk)
-    message(STATUS "FETK will be installed in <${FETK_INSTALL_PREFIX}>")
-    
+   
     if(FETK_FROM_PKG)
 
         set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
