@@ -549,7 +549,8 @@ if(ENABLE_GEOFLOW)
     #add_subdirectory(${EXTERNALS_PATH}/geoflow_c)
     FetchContent_Declare( geoflow
         GIT_REPOSITORY https://github.com/Electrostatics/geoflow_c.git
-        GIT_TAG 37ad882793478a9c3a7b729f4b696883c84a7d7c
+        GIT_TAG 327f135c255067f7183e9a49d499b3a5e4efffd6
+#        GIT_TAG 37ad882793478a9c3a7b729f4b696883c84a7d7c
     )
     FetchContent_MakeAvailable( geoflow )
 
@@ -590,7 +591,8 @@ if(ENABLE_PBAM OR ENABLE_PBSAM)
 
     FetchContent_Declare( pb_s_am
         GIT_REPOSITORY https://github.com/Electrostatics/pb_solvers.git
-        GIT_TAG cdaae35c89af605a573e8f17be6494cbc43fc559
+        GIT_TAG f42588ac2f80010a947fc0faa760ff4ae67fc0d1
+        #        GIT_TAG cdaae35c89af605a573e8f17be6494cbc43fc559
     )
     #add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
     FetchContent_MakeAvailable( pb_s_am )
