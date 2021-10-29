@@ -102,15 +102,17 @@ fi
 echo "==================================== CONFIG =============================================== "
 cd $BUILD_DIR                                             || exit 1
 #cmake                                                     \
-cmake -S .. -B $BUILD_DIR \
-      -DCMAKE_INSTALL_INCLUDEDIR="include"                \
+cmake -S .. -B $BUILD_DIR                                 \
+      -DBLA_VENDOR=OpenBLAS                               \
       -DBUILD_DOC=ON                                      \
       -DBUILD_SHARED_LIBS=OFF                              \
       -DBUILD_TOOLS=ON                                    \
       -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} ${COVERAGE}"      \
       -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${COVERAGE}"  \
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE                    \
+      -DCMAKE_INSTALL_INCLUDEDIR="include"                \
       -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR                 \
+      -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}            \
       -DENABLE_PYGBE=OFF                                   \
       -DENABLE_BEM=ON                                     \
       -DENABLE_GEOFLOW=ON                                \
@@ -123,11 +125,12 @@ cmake -S .. -B $BUILD_DIR \
       -DENABLE_TINKER=OFF                                 \
       -DFETK_VERSION="${FETK_VERSION}" \
       -DGIT_SUBMODULE=OFF \
+
       ..                                                  || exit 1
  
 echo "==================================== BUILD =============================================== "
-VERBOSE=1 make -j 2                                       || exit 1
-VERBOSE=1 make -j 2 install                               #|| exit 1
+VERBOSE=1 make -j                                       || exit 1
+VERBOSE=1 make -j install                               #|| exit 1
 export PATH="$INSTALL_DIR/bin:$PATH"
 
 
