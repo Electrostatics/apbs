@@ -54,7 +54,8 @@ jobs:
             suite-sparse \
             superlu \
             boost \
-            eigen
+            eigen \
+            openblas
           brew upgrade gcc@9
 
 #          brew install \
@@ -113,8 +114,15 @@ jobs:
           cat CMakeCache.txt
         shell: bash
 
-      - name: Build and Install on Linux and Mac
-        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')  # Linux and Mac only
+      - name: Configure and Build for Mac
+        if: startsWith(matrix.os, 'macos')  # Mac only
+        env:
+          CMAKE_PREFIX_PATH: /usr/local/opt/openblas
+        run: |
+          ./.build.sh
+
+      - name: Configure and Build for Linux
+        if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
           ./.build.sh
         env:
