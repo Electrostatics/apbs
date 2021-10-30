@@ -125,7 +125,6 @@ cmake -S .. -B $BUILD_DIR                                 \
       -DENABLE_TINKER=OFF                                 \
       -DFETK_VERSION="${FETK_VERSION}" \
       -DGIT_SUBMODULE=OFF \
-
       ..                                                  || exit 1
  
 echo "==================================== BUILD =============================================== "
