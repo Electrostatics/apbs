@@ -143,7 +143,9 @@ jobs:
       - name: Create package
         run: |
           cd build
-          cpack -C Release -G ZIP
+          ls
+          cpack -C Release -G ZIP -V
+          ls
           unzip -l APBS*.zip
           mkdir -p artifacts
           mv APBS*.zip artifacts
