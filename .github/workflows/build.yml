@@ -149,6 +149,7 @@ jobs:
           unzip -l APBS*.zip
           mkdir -p artifacts
           mv APBS*.zip artifacts
+        shell: bash
 
       - name: Setup tmate session
         if: ${{ ! success() }}
