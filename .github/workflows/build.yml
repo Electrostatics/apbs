@@ -80,7 +80,8 @@ jobs:
             libsuitesparse-dev \
             libsuperlu-dev \
             libeigen3-dev \
-            libboost-dev
+            libboost-dev \
+            libopenblas-dev
 
 
 #          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y \
