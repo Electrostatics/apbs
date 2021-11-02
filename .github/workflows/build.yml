@@ -140,13 +140,23 @@ jobs:
         run: |
           ctest -C Release --output-on-failure 
 
-      - name: Create package
+      - name: Create package for Mac and Linux
+        if: startsWith(matrix.os, 'macos') or startswith(matrix.os, 'ubuntu') # Mac or Linux only
         run: |
           cd build
-          cpack -h
+          cpack -C Release -G ZIP -V
+          unzip -l APBS*.zip
+          mkdir -p artifacts
+          mv APBS*.zip artifacts
+
+      - name: Create package for Windows
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        run: |
+          cd build
+          which cpack
           ls
           echo "Running cpack"
-          cpack -C Release -G ZIP -V
+          /c/Program\ Files/CMake.bin/cpack.exe -C Release -G ZIP -V
           echo "done with cpack"
           ls
           unzip -l APBS*.zip
