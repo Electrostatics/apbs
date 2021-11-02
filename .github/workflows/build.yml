@@ -153,20 +153,15 @@ jobs:
         if: startsWith(matrix.os, 'windows')  # Windows only
         run: |
           cd build
-          which cpack
-          ls
-          echo "Running cpack"
           /c/Program\ Files/CMake/bin/cpack.exe -C Release -G ZIP -V
-          echo "done with cpack"
-          ls
           unzip -l APBS*.zip
           mkdir -p artifacts
           mv APBS*.zip artifacts
         shell: bash
 
-      - name: Setup tmate session
-        if: ${{ ! success() }}
-        uses: mxschmitt/action-tmate@v3
+      #- name: Setup tmate session
+      #  if: ${{ ! success() }}
+      #  uses: mxschmitt/action-tmate@v3
 
       - name: Upload package
         uses: actions/upload-artifact@v2
