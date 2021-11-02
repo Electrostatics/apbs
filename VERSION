@@ -10,4 +10,4 @@
 #   The third number is the Micro number of the release
 #     - Only increment the Micro number when:
 #       - Fixing bugs, adding tests, changing packaging
-3_2_0
+3_2_1

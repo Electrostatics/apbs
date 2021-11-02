@@ -2,14 +2,6 @@
 # TODO:  Generate license.html
 ################################################################################
 
-file(READ conf.py.in CONFPYDATA)
-message(STATUS "Update RTD conf.py to VERSION ${CMAKE_PROJECT_VERSION}")
-STRING(REGEX REPLACE __PROJECT_VERSION__ ${CMAKE_PROJECT_VERSION} CONFPYDATA ${CONFPYDATA})
-message(STATUS "Update RTD conf.py to YEAR ${COMPILE_YEAR}")
-STRING(REGEX REPLACE __YEAR__ ${COMPILE_YEAR} CONFPYDATA ${CONFPYDATA})
-file(WRITE conf.py ${CONFPYDATA})
-
-
 ################################################################################
 # NOTE: Don't do this unless you have LaTex and way too much time to kill
 ################################################################################

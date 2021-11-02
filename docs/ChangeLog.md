@@ -40,6 +40,7 @@ These are notes for APBS version 3.2
 * Fixed miscellaneous Windows build issues.
 * Update the build configurations for the Pythons libraries.
 * Removed unused files that no longer worked (e.g. Makefile in example directories)
+* Updated Sphinx configuration to build API documentation
 
 ### Notes
 
