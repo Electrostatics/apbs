@@ -143,8 +143,11 @@ jobs:
       - name: Create package
         run: |
           cd build
+          cpack -h
           ls
+          echo "Running cpack"
           cpack -C Release -G ZIP -V
+          echo "done with cpack"
           ls
           unzip -l APBS*.zip
           mkdir -p artifacts
