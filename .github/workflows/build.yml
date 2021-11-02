@@ -141,7 +141,7 @@ jobs:
           ctest -C Release --output-on-failure 
 
       - name: Create package for Mac and Linux
-        if: startsWith(matrix.os, 'macos') or startswith(matrix.os, 'ubuntu') # Mac or Linux only
+        if: startsWith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu') # Mac or Linux only
         run: |
           cd build
           cpack -C Release -G ZIP -V
