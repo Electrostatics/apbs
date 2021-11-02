@@ -19,10 +19,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # os: [ubuntu-latest]
-        # os: [macOS-latest]
-        # os: [ubuntu-latest, macOS-latest]
-        # os: [ubuntu-latest, windows-latest]
         os: [ubuntu-latest, macOS-latest, windows-latest]
         python-version: [3.9]
 
@@ -58,12 +54,6 @@ jobs:
             openblas
           brew upgrade gcc@9
 
-#          brew install \
-#            arpack \
-#            openblas \
-#            superlu \
-#            suite-sparse
-
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
@@ -82,15 +72,6 @@ jobs:
             libeigen3-dev \
             libboost-dev \
             libopenblas-dev
-
-
-#          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y \
-#            libarpack2-dev \
-#            libblas-dev \
-#            liblapack-dev \
-#            libsuperlu-dev \
-#            libf2c2-dev \
-#            libsuitesparse-dev
 
       - name: Install Window dependencies
         if: startsWith(matrix.os, 'windows')  # Windows only
@@ -144,7 +125,7 @@ jobs:
         if: startsWith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu') # Mac or Linux only
         run: |
           cd build
-          cpack -C Release -G ZIP -V
+          cpack -C Release -G ZIP
           unzip -l APBS*.zip
           mkdir -p artifacts
           mv APBS*.zip artifacts
