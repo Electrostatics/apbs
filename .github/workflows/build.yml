@@ -156,7 +156,7 @@ jobs:
           which cpack
           ls
           echo "Running cpack"
-          /c/Program\ Files/CMake.bin/cpack.exe -C Release -G ZIP -V
+          /c/Program\ Files/CMake/bin/cpack.exe -C Release -G ZIP -V
           echo "done with cpack"
           ls
           unzip -l APBS*.zip
