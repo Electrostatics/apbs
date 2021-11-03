@@ -83,9 +83,9 @@ Current platform support
 | OS         | PYTHON  | GEOFLOW | BEM,       | FETK | PBSAM | PBAM | PYTHON  | SHARED_LIBS |
 |            | VERSION |         | NanoShaper |      |       |      | SUPPORT |             |
 +============+=========+=========+============+======+=======+======+=========+=============+
-| Ubuntu     | 3.7+    | Yes     | Yes        | Yes  | Yes   | Yes  | Yes     | Yes         |
+| Ubuntu     | 3.9     | Yes     | Yes        | Yes  | Yes   | Yes  | Yes     | No          |
 +------------+---------+---------+------------+------+-------+------+---------+-------------+
-| MacOSX     | 3.7+    | Yes     | Yes        | Yes  | Yes   | Yes  | Yes     | Yes         |
+| MacOSX     | 3.9     | Yes     | Yes        | Yes  | Yes   | Yes  | Yes     | No          |
 +------------+---------+---------+------------+------+-------+------+---------+-------------+
-| Windows 10 | 3.7+    | Yes     | Yes        | Yes  | No    | Yes  | No      | No          |
+| Windows 10 | 3.9     | Yes     | Yes        | Yes  | Yes   | Yes  | No      | No          |
 +------------+---------+---------+------------+------+-------+------+---------+-------------+
