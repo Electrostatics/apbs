@@ -151,3 +151,29 @@ jobs:
           name: APBS-${{ matrix.os }}.zip
           path: build/artifacts/APBS*.zip
           retention-days: 5
+
+  test:
+    name: Test Usage
+
+    needs: build
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+
+      - name: Checkout reposistory
+        uses: actions/checkout@master
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: APBS-ubuntu-latest.zip
+
+      - name: Setup tmate session
+      #  if: ${{ ! success() }}
+        uses: mxschmitt/action-tmate@v3
