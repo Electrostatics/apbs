@@ -8,10 +8,10 @@
 export INSTALL_PREREQS=1
  
 # Setup tests for APBS with TEST_APBS=1 or turn off with TEST_APBS=0
-export TEST_APBS=1
+export TEST_APBS=0
  
 # Create ZIP archive for APBS with PACKAGE_APBS=1 or turn off with PACKAGE_APBS=0
-export PACKAGE_APBS=1
+export PACKAGE_APBS=0
  
 # Configure and Build pybind11 with BUILD_PYBIND=1 or turn off with BUILD_PYBIND=0
 export BUILD_PYBIND=0
