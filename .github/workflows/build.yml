@@ -166,14 +166,29 @@ jobs:
 
     steps:
 
-      - name: Checkout reposistory
-        uses: actions/checkout@master
+      - name: Linux Prereqs
+        if: startsWith(matrix.os, 'ubuntu')  # Linux only
+        run: |
+          sudo apt-get install -yq \
+            libsuitesparse-dev \
+            libsuperlu-dev \
+            libopenblas-dev
 
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
-          name: APBS-ubuntu-latest.zip
+          name: APBS-${{ matrix.os }}.zip
+
+      - name: Run examples
+        run: |
+          unzip APBS*.zip
+          APBS_DIR=$(basename -- "$(ls APBS*.zip)" .zip)
+          export PATH=${RUNNER_WORKSPACE}/${APBS_DIR}/bin:$PATH
+          chmod a+x ${RUNNER_WORKSPACE}/${APBS_DIR}/bin/apbs
+          cd ${APBS_DIR}/share/apbs/examples/born
+          apbs apbs-apolar.in
+        shell: bash
 
       - name: Setup tmate session
-      #  if: ${{ ! success() }}
+        if: ${{ ! success() }}
         uses: mxschmitt/action-tmate@v3
