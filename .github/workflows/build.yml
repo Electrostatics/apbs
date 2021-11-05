@@ -190,5 +190,5 @@ jobs:
 
       - name: Setup tmate session
       #  if: ${{ ! success() }}
-        if: ! startsWith(matrix.os, 'ubuntu')
+        if: ${{ ! startsWith(matrix.os, 'ubuntu') }}
         uses: mxschmitt/action-tmate@v3
