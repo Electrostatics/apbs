@@ -162,7 +162,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
 
     steps:
 
@@ -189,5 +189,6 @@ jobs:
         shell: bash
 
       - name: Setup tmate session
-        if: ${{ ! success() }}
+      #  if: ${{ ! success() }}
+        if: ! startsWith(matrix.os, 'ubuntu')
         uses: mxschmitt/action-tmate@v3
