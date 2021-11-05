@@ -183,7 +183,7 @@ jobs:
         run: |
           unzip APBS*.zip
           APBS_DIR=$(basename -- "$(ls APBS*.zip)" .zip)
-          export PATH=${RUNNER_WORKSPACE}/${APBS_DIR}/bin:$PATH
+          export PATH=${RUNNER_WORKSPACE}/apbs/${APBS_DIR}/bin:$PATH
           chmod a+x ${RUNNER_WORKSPACE}/${APBS_DIR}/bin/apbs
           cd ${APBS_DIR}/share/apbs/examples/born
           apbs apbs-apolar.in
