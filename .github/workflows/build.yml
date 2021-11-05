@@ -174,7 +174,13 @@ jobs:
             libsuperlu-dev \
             libopenblas-dev
 
-      # Mac prereqs
+      - name: Mac Prereqs
+        if: startsWith(matrix.os, 'macos')  # Mac only
+        run: |
+          brew install \
+            suite-sparse \
+            superlu \
+            openblas
 
       # Windows prereqs: none
 
@@ -192,6 +198,6 @@ jobs:
           apbs apbs-apolar.in
         shell: bash
 
-      - name: Setup tmate session
-        if: ${{ ! success() }}
-        uses: mxschmitt/action-tmate@v3
+      #- name: Setup tmate session
+      #  if: ${{ ! success() }}
+      #  uses: mxschmitt/action-tmate@v3
