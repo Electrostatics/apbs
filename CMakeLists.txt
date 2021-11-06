@@ -804,14 +804,17 @@ endif()
 ################################################################################
 install(DIRECTORY ${APBS_ROOT}/docs
         DESTINATION ${SHARE_INSTALL_PATH}
+        COMPONENT docs
         PATTERN "programmer" EXCLUDE
         PATTERN "CMakeLists.txt" EXCLUDE)
 
 install(DIRECTORY ${APBS_ROOT}/examples
-        DESTINATION ${SHARE_INSTALL_PATH})
+        DESTINATION ${SHARE_INSTALL_PATH}
+        COMPONENT examples)
 
 install(DIRECTORY ${APBS_ROOT}/tests
         DESTINATION ${SHARE_INSTALL_PATH}
+        COMPONENT tests
         FILES_MATCHING
         PATTERN "*.py"
         PATTERN "*.cfg"
@@ -821,6 +824,7 @@ if(BUILD_TOOLS)
     install(DIRECTORY ${APBS_ROOT}/tools
             DESTINATION ${SHARE_INSTALL_PATH}
             USE_SOURCE_PERMISSIONS
+            COMPONENT tools
             PATTERN "CMakeLists.txt"
             PATTERN "matlab"      EXCLUDE
             PATTERN "__pycache__" EXCLUDE
@@ -829,7 +833,8 @@ if(BUILD_TOOLS)
     if(NOT "${APBS_ROOT}" STREQUAL "${APBS_BUILD}")
     install(DIRECTORY ${APBS_BUILD}/tools/bin
             DESTINATION ${SHARE_INSTALL_PATH}/tools
-            USE_SOURCE_PERMISSIONS)
+            USE_SOURCE_PERMISSIONS
+            COMPONENT tools)
     endif()
 endif()
 
@@ -896,10 +901,17 @@ set(CPACK_STRIP_FILES                   True)
 list(APPEND CPACK_GENERATOR            "ZIP")
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY    True)
 
+# Control which components get included in the package
+# Components in use are: executables, libraries, headers, docs, examples, tests, tools, python
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_COMPONENTS_GROUPING ALL_COMPONENTS_IN_ONE)
+get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
+list(REMOVE_ITEM CPACK_COMPONENTS_ALL "libraries" "headers" "docs" )
+
 if(CPACK_GENERATOR MATCHES "^(7Z|TBZ2|TGZ|TXZ|TZ|TZST|ZIP)$")
     set(CPACK_TOPLEVEL_TAG ${CPACK_PACKAGE_NAME})
     set(CPACK_SET_DESTDIR  False)
-    set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY False)
+    set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY True)
 endif()
 
 include (CPack)

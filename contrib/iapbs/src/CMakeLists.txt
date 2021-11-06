@@ -22,9 +22,9 @@ if(BUILD_iAPBS_FORTRAN_WRAPPER)
      apbs_mg
      apbs_generic
      apbs_pmgc)
-   INSTALL(TARGETS wrapper DESTINATION bin)
+   INSTALL(TARGETS wrapper DESTINATION bin COMPONENT executables)
 endif()
 
-INSTALL(TARGETS iapbs DESTINATION lib)
+INSTALL(TARGETS iapbs DESTINATION lib COMPONENT libraries)
 
-install(FILES apbs_driver.h DESTINATION include/iapbs)
+install(FILES apbs_driver.h DESTINATION include/iapbs COMPONENT headers)

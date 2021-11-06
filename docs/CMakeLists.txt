@@ -54,6 +54,7 @@ if(BUILD_DOXYGEN)
             PATTERN "Doxyfile" EXCLUDE
             PATTERN "latex" EXCLUDE
 			PATTERN "mainpage.h" EXCLUDE
+            COMPONENT docs
 		)
 
 	endif(Doxygen_FOUND)
@@ -129,7 +130,7 @@ if(BUILD_BREATHE)
 
   # Add an install target to install the docs
   include(GNUInstallDirs)
-  install(DIRECTORY ${SPHINX_BUILD} DESTINATION ${CMAKE_INSTALL_DOCDIR})
+  install(DIRECTORY ${SPHINX_BUILD} DESTINATION ${CMAKE_INSTALL_DOCDIR} COMPONENT docs)
 
 endif()
 message(STATUS "================================================================")
