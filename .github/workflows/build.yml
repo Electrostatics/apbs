@@ -198,6 +198,6 @@ jobs:
           apbs apbs-apolar.in
         shell: bash
 
-      #- name: Setup tmate session
-      #  if: ${{ ! success() }}
-      #  uses: mxschmitt/action-tmate@v3
+      - name: Setup tmate session
+        if: ${{ ! success() }}
+        uses: mxschmitt/action-tmate@v3
