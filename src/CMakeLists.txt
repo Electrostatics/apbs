@@ -40,6 +40,7 @@ macro(add_sublibrary LIBRARY)
     list(APPEND APBS_INTERNAL_LIBS ${LIBRARY_NAME})
     set(APBS_INTERNAL_LIBS ${APBS_INTERNAL_LIBS} PARENT_SCOPE)
     message(STATUS "Added ${LIBRARY_NAME}")
+    set(SOURCES) # clear the SOURCES variable
 endmacro()
 
 add_subdirectory(generic)
@@ -50,13 +51,18 @@ if(ENABLE_FETK)
    add_subdirectory(fem)
 endif(ENABLE_FETK)
 
+if(ENABLE_GEOFLOW)
+#    add_items(SOURCES geoflow_wrap_apbs.c)
+     add_subdirectory(geoflow)
+endif(ENABLE_GEOFLOW)
+
 add_items(SOURCES routines.c)
-add_sublibrary(routines)
+add_sublibrary(routines ${APBS_INTERNAL_LIBS})
 
 message(STATUS "External Headers: ${EXTERNAL_HEADERS}")
 
 #add_executable(apbs main.c routines.c)
-add_executable(apbs main.c apbs.h routines.c routines.h)
+add_executable(apbs main.c)
 message(STATUS " ")
 message(STATUS "APBS Libraries: ${APBS_LIBS}")
 message(STATUS "Internal Libraries: ${APBS_INTERNAL_LIBS}")
@@ -64,7 +70,7 @@ message(STATUS " ")
 
 #add_dependencies(apbs ${BEM_LIB})
 #target_include_directories(apbs PRIVATE apbs.h routines.h)
-target_link_libraries(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
+target_link_libraries(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS})
 #add_dependencies(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
 
 

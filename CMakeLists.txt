@@ -547,13 +547,13 @@ option(ENABLE_GEOFLOW "geoflow method" OFF)
 
 if(ENABLE_GEOFLOW)
     message(STATUS "Building GEOFLOW")
-    add_definitions(-DGEOFLOW_APBS)
-    set(ENABLE_GEOFLOW_APBS ON CACHE BOOL "Enable the APBS-Geoflow connection")
+    #add_definitions(-DGEOFLOW_APBS)
+    #set(ENABLE_GEOFLOW_APBS ON CACHE BOOL "Enable the APBS-Geoflow connection")
 
     #add_subdirectory(${EXTERNALS_PATH}/geoflow_c)
     FetchContent_Declare( geoflow
         GIT_REPOSITORY https://github.com/Electrostatics/geoflow_c.git
-        GIT_TAG f788c61c2ffca01d056448d41d254902e8947f39
+        GIT_TAG 7712a7f47569a165ee70339447588dfe841e84d0
     )
     FetchContent_MakeAvailable( geoflow )
 

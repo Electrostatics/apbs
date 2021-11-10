@@ -77,6 +77,7 @@
 
 #ifdef ENABLE_GEOFLOW
   #include "GeometricFlowWrap.h"
+  #include "geoflow/geoflow_wrap_apbs.h"
 #endif
 
 #if defined(ENABLE_PBAM) || defined(ENABLE_PBSAM)
