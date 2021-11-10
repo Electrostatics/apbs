@@ -94,7 +94,7 @@
 #include "mg/vpmgp.h"
 
 /* FEM headers */
-#if defined(FETK_ENABLED)
+#if defined(ENABLE_FETK)
     #include "fem/vfetk.h"
     #include "fem/vpee.h"
 #endif

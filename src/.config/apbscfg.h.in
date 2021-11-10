@@ -44,7 +44,7 @@
 
 
 // FEtk components is enabled
-#cmakedefine FETK_ENABLED
+#cmakedefine ENABLE_FETK
 
 // have FEtk component PUNC
 // TODO: Rename this to HAVE_PUNC in source and ${APBS_ROOT}/CMakeLists.txt

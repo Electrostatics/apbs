@@ -6136,8 +6136,8 @@ VPUBLIC void dump_options()
     puts("0");
 #endif
 
-    printf("FETK_ENABLED:");
-#ifdef FETK_ENABLED
+    printf("ENABLE_FETK:");
+#ifdef ENABLE_FETK
     printf("1");
 #else
     puts("0");
