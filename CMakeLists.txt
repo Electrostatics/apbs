@@ -606,7 +606,7 @@ endif()
 
 if(ENABLE_PBSAM)
     include_directories(${pb_s_am_SOURCE_DIR}/pbam/src)
-    if(ENABLE_PBSAM)
+    if(ENABLE_PBAM)
         include(${pb_s_am_SOURCE_DIR}/cmake/Utils.cmake)
         include(${pb_s_am_SOURCE_DIR}/cmake/Dependencies.cmake)
         include(${pb_s_am_SOURCE_DIR}/cmake/Summary.cmake)
