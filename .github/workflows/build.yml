@@ -182,7 +182,16 @@ jobs:
             superlu \
             openblas
 
-      # Windows prereqs: none
+      - name: Windows Prereqs
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        run: |
+          choco install wget
+          wget https://github.com/Electrostatics/cache/releases/download/${WIN_DEPENDENCIES_RELEASE}/apbs_dependencies_vcpkg.zip
+          7z x apbs_dependencies_vcpkg.zip -aoa -o/c/vcpkg
+          ls /c/vcpkg
+          vcpkg integrate install
+          vcpkg list --triplet x86-windows
+        shell: bash
 
       - name: Download artifacts
         uses: actions/download-artifact@v2
