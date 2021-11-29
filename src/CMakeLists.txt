@@ -67,17 +67,6 @@ message(STATUS " ")
 target_link_libraries(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
 #add_dependencies(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
 
-#configure_file(
-#    ${APBS_ROOT}/src/.config/apbscfg.h.in
-#    ${APBS_BUILD}/src/apbscfg.h
-#    )
-
-if(ENABLE_iAPBS)
-#    ADD_LIBRARY(apbs_routines routines.c routines.h)
-#    INSTALL(TARGETS apbs_routines DESTINATION ${LIBRARY_INSTALL_PATH})
-    INSTALL(FILES ${APBS_BUILD}/src/apbscfg.h DESTINATION ${HEADER_INSTALL_PATH} COMPONENT headers)
-endif()
-
 
 ################################################################################
 #  We have to fix the dynamically linked libraries 

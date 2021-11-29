@@ -300,6 +300,10 @@ configure_file(
     ${APBS_BUILD}/src/apbscfg.h
     @ONLY
 )
+if(ENABLE_iAPBS)
+    INSTALL(FILES ${APBS_BUILD}/src/apbscfg.h DESTINATION ${HEADER_INSTALL_PATH} COMPONENT headers)
+endif()
+
 #file(READ ${APBS_BUILD}/src/apbscfg.h APBS_CFG)
 #message(STATUS "** APBS_CFG")
 #message(FATAL_ERROR ${APBS_CFG})
@@ -770,6 +774,24 @@ endif()
 
 
 ################################################################################
+# Optionally build iAPBS interface                                             #
+################################################################################
+option(ENABLE_iAPBS "Enable iAPBS" OFF)
+
+if(ENABLE_iAPBS)
+    message(STATUS "Building of iAPBS interface enabled")
+    set(iAPBS_LIBRARY iapbs)
+    include_directories(${APBS_BUILD}/src)
+    add_subdirectory(contrib/iapbs/src)
+    if(NOT TARGET ${iAPBS_LIBRARY})
+        message(FATAL_ERROR "iAPBS target does not exist: <${iAPBS_LIBRARY}>")
+    endif()
+    list(APPEND APBS_LIBS ${iAPBS_LIBRARY})
+else()
+    message(STATUS "Building of iAPBS interface disabled")
+endif()
+
+################################################################################
 # Build APBS sources                                                           #
 ################################################################################
 link_directories(${APBS_LIB_DIRS})
@@ -837,18 +859,6 @@ if(BUILD_TOOLS)
             COMPONENT tools)
     endif()
 endif()
-
-################################################################################
-# Optionally build iAPBS interface                                             #
-################################################################################
-option(ENABLE_iAPBS "Enable iAPBS" OFF)
-
-if(ENABLE_iAPBS)
-    message(STATUS "Building of iAPBS interface enabled")
-    add_subdirectory(contrib/iapbs/src)
-    list(APPEND APBS_LIBS ${iAPBS_LIBRARY})
-endif()
-
 
 ################################################################################
 # Clean up temporary files and directories                                     #

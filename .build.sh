@@ -117,6 +117,7 @@ cmake -S .. -B $BUILD_DIR                                 \
       -DENABLE_BEM=ON                                     \
       -DENABLE_GEOFLOW=ON                                \
       -DENABLE_FETK=ON                                   \
+      -DENABLE_iAPBS=ON                                   \
       -DENABLE_OPENMP=ON                                  \
       -DENABLE_PBAM=ON                                    \
       -DENABLE_PBSAM=ON                                   \
