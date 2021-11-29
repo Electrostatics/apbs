@@ -560,6 +560,9 @@ if(ENABLE_GEOFLOW)
     add_definitions(-DENABLE_GEOFLOW)
     list(APPEND APBS_LIBS GeometricFlowLib)
     include_directories(${geoflow_SOURCE_DIR}/src)
+
+    find_package(Eigen3 REQUIRED)
+    include_directories(${EIGEN3_INCLUDE_DIR})
 endif()
 
 
