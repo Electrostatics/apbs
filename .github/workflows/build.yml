@@ -199,6 +199,6 @@ jobs:
         shell: bash
 
       - name: Setup tmate session
-        #if: ${{ ! success() }}
-        if: startsWith(matrix.os, 'windows')  # Windows only
+        if: ${{ ! success() }}
+        #if: startsWith(matrix.os, 'windows')  # Windows only
         uses: mxschmitt/action-tmate@v3
