@@ -293,23 +293,6 @@ endif()
 
 
 ################################################################################
-# Create APBS configuration file
-################################################################################
-configure_file(
-    src/.config/apbscfg.h.in
-    ${APBS_BUILD}/src/apbscfg.h
-    @ONLY
-)
-if(ENABLE_iAPBS)
-    INSTALL(FILES ${APBS_BUILD}/src/apbscfg.h DESTINATION ${HEADER_INSTALL_PATH} COMPONENT headers)
-endif()
-
-#file(READ ${APBS_BUILD}/src/apbscfg.h APBS_CFG)
-#message(STATUS "** APBS_CFG")
-#message(FATAL_ERROR ${APBS_CFG})
-
-
-################################################################################
 # Optionally copy NanoShaper executable                                        #
 # the actual grab is later for BEM enable                                      #
 ################################################################################
@@ -777,7 +760,22 @@ endif()
 
 
 ################################################################################
+# Create APBS configuration file
+################################################################################
+configure_file(
+    src/.config/apbscfg.h.in
+    ${APBS_BUILD}/src/apbscfg.h
+    @ONLY
+)
+if(ENABLE_iAPBS)
+    INSTALL(FILES ${APBS_BUILD}/src/apbscfg.h DESTINATION ${HEADER_INSTALL_PATH} COMPONENT headers)
+endif()
+
+
+################################################################################
 # Optionally build iAPBS interface                                             #
+#   Note that this requires apbscfg.h,                                         #
+#   and so must follow the APBS config file section                            #
 ################################################################################
 option(ENABLE_iAPBS "Enable iAPBS" OFF)
 
@@ -793,6 +791,7 @@ if(ENABLE_iAPBS)
 else()
     message(STATUS "Building of iAPBS interface disabled")
 endif()
+
 
 ################################################################################
 # Build APBS sources                                                           #
