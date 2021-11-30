@@ -595,7 +595,7 @@ int apbsdrv_(
 		printPBEPARM(pbeparm);
 
 		/* Refine mesh */
-		if (!preRefineFE(i, nosh, feparm, fetk)) {
+		if (!preRefineFE(i, feparm, fetk)) {
 		    Vnm_tprint( 2, "Error pre-refining mesh!\n");
 		    VJMPERR1(0);
 		}
@@ -609,7 +609,7 @@ int apbsdrv_(
 		Vnm_tprint(1, "  Beginning solve-estimate-refine cycle:\n");
 		for (isolve=0; isolve<feparm->maxsolve; isolve++) {
 		    Vnm_tprint(1, "    Solve #%d...\n", isolve);
-		    if (!solveFE(i, nosh, pbeparm, feparm, fetk)) {
+		    if (!solveFE(i, pbeparm, feparm, fetk)) {
 			Vnm_tprint(2, "ERROR SOLVING EQUATION!\n");
 			VJMPERR1(0);
 		    }
@@ -622,7 +622,7 @@ int apbsdrv_(
 		    /* We're not going to refine if we've hit the max number
 		     * of solves */
 		    if (isolve < (feparm->maxsolve)-1) {
-			if (!postRefineFE(i, nosh, feparm, fetk)) break;
+			if (!postRefineFE(i, feparm, fetk)) break;
 		    }
 		    bytesTotal = Vmem_bytesTotal();
 		    highWater = Vmem_highWaterTotal();
