@@ -63,11 +63,11 @@
 
 #include "apbs.h"
 
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
 #    include "mc/mc.h"
 #    include "fem/vfetk.h"
 #endif
-#ifdef HAVE_MCX_H
+#ifdef HAVE_MCX
 #    include "mcx/mcx.h"
 #endif
 
@@ -556,7 +556,7 @@ VEXTERNC int initAPOL(
                       );
 
 
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
 #include "fem/vfetk.h"
 
 /**

@@ -4059,7 +4059,7 @@ calculations %d and %d\n",
     return 1;
 }
 
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
 
 VPUBLIC void killFE(NOsh *nosh,
                     Vpbe *pbe[NOSH_MAXCALC],
@@ -4912,7 +4912,7 @@ VPUBLIC int writedataFE(int rank,         /**< Rank of processor (for parallel r
 
     return 1;
 }
-#endif /* ifdef HAVE_MCX_H */
+#endif /* ifdef HAVE_MCX */
 
 VPUBLIC int initAPOL(NOsh *nosh,            /**< Input parameter object */
                      Vmem *mem,             /**< Memory manager */
@@ -6143,29 +6143,29 @@ VPUBLIC void dump_options()
     puts("0");
 #endif
 
-    printf("HAVE_PUNC_H:");
-#ifdef HAVE_PUNC_H
+    printf("HAVE_PUNC:");
+#ifdef HAVE_PUNC
     puts("1");
 #else
     printf("0");
 #endif
 
-    printf("HAVE_MCX_H:");
-#ifdef HAVE_MCX_H
+    printf("HAVE_MCX:");
+#ifdef HAVE_MCX
     puts("1");
 #else
     puts("0");
 #endif
 
-    printf("HAVE_MC_H:");
-#ifdef HAVE_MC_H
+    printf("HAVE_MC:");
+#ifdef HAVE_MC
     printf("1");
 #else
     puts("0");
 #endif
 
-    printf("HAVE_BIOM_H:");
-#ifdef HAVE_BIOM_H
+    printf("HAVE_GAMER:");
+#ifdef HAVE_GAMER
     puts("1");
 #else
     printf("0");

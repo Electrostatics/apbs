@@ -673,7 +673,7 @@ VPUBLIC double Vacc_fastMolAcc(Vacc *thee, double center[VAPBS_DIM],
 }
 
 
-#if defined(HAVE_MC_H)
+#if defined(HAVE_MC)
 VPUBLIC void Vacc_writeGMV(Vacc *thee, double radius, int meth, Gem *gm,
   char *iodev, char *iofmt, char *iohost, char *iofile) {
 
@@ -706,7 +706,7 @@ VPUBLIC void Vacc_writeGMV(Vacc *thee, double radius, int meth, Gem *gm,
     Vmem_free(thee->mem, Gem_numVV(gm), sizeof(double),
       (void **)&(accVals[1]));
 }
-#endif /* defined(HAVE_MC_H) */
+#endif /* defined(HAVE_MC) */
 
 VPUBLIC double Vacc_SASA(Vacc *thee,
                          double radius

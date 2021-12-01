@@ -123,7 +123,7 @@ int main(
     Vmem *mem = VNULL;
     Vcom *com = VNULL;
     Vio *sock = VNULL;
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
     Vfetk *fetk[NOSH_MAXCALC];
     Gem *gm[NOSH_MAXMOL];
     int isolve;
@@ -587,7 +587,7 @@ int main(
 
                 /* ***** Do FEM calculation ***** */
             case NCT_FEM:
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
                 for (k=0; k<nosh->nelec; k++) {
                     if (nosh->elec2calc[k] >= i) break;
                 }
@@ -679,10 +679,10 @@ int main(
                 if (!writedataFE(rank, nosh, pbeparm, fetk[i])) {
                     Vnm_tprint(2, "  Error while writing FEM data!\n");
                 }
-#else /* ifdef HAVE_MC_H */
+#else /* ifdef HAVE_MC */
                     Vnm_print(2, "Error!  APBS not compiled with FEtk!\n");
                 exit(2);
-#endif /* ifdef HAVE_MC_H */
+#endif /* ifdef HAVE_MC */
                 break;
 
             /* Do an apolar calculation */
@@ -956,7 +956,7 @@ int main(
     killForce(mem, nosh, nforce, atomForce);
     killEnergy();
     killMG(nosh, pbe, pmgp, pmg);
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
     killFE(nosh, pbe, fetk, gm);
 #endif
     killChargeMaps(nosh, chargeMap);

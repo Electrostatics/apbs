@@ -408,9 +408,9 @@ if(ENABLE_FETK)
         list(APPEND APBS_LIBS superlu)
     endif()
 
-    SET(HAVE_MC_H 1)
-    SET(HAVE_PUNC_H 1)
-    SET(HAVE_BIOM_H 1)
+    SET(HAVE_MC 1)
+    SET(HAVE_PUNC 1)
+    SET(HAVE_GAMER 1)
 
 endif(ENABLE_FETK)
 
