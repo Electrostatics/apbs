@@ -150,28 +150,9 @@ jobs:
           path: build/artifacts/APBS*.zip
           retention-days: 5
 
-      - name: Extract version
-        if: startswith(github.ref, 'refs/tags/')  # Tag/release only
-        run: |
-          version="$(grep -E '^[0-9]+_[0-9]+_[0-9]+' VERSION | sed 's/_/./g')"
-          echo $version
-          echo ::set-output name=apbs-version::${version}
-        shell: bash
-
-      - name: Release artifacts
-        if: startsWith(github.ref, 'refs/tags/')  # Tag/release only
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          files: |
-            build/artifacts/APBS*.zip
-          fail_on_unmatched_files: true
-          tag_name: ${{ steps.job-values.outputs.apbs-version }}
-
-      - name: Setup tmate session
-        if: ${{ ! success() }}
-        uses: mxschmitt/action-tmate@v3
+      #- name: Setup tmate session
+      #  if: ${{ ! success() }}
+      #  uses: mxschmitt/action-tmate@v3
 
 
   test:
@@ -232,7 +213,41 @@ jobs:
           ./run_selected_examples.sh
         shell: bash
 
+      #- name: Setup tmate session
+      #  if: ${{ ! success() }}
+      #  uses: mxschmitt/action-tmate@v3
+
+
+  release:
+    name: Publish Release Artifacts
+
+    needs: test
+
+    runs-on: ubuntu-latest
+
+    if: startswith(github.ref, 'refs/tags/')  # Tag/release only
+
+    steps:
+
+      - name: Extract version
+        run: |
+          version="$(grep -E '^[0-9]+_[0-9]+_[0-9]+' VERSION | sed 's/_/./g')"
+          echo $version
+          echo ::set-output name=apbs-version::${version}
+        shell: bash
+
+      - name: Release artifacts
+        if: startsWith(github.ref, 'refs/tags/')  # Tag/release only
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          files: |
+            build/artifacts/APBS*.zip
+          fail_on_unmatched_files: true
+          tag_name: ${{ steps.job-values.outputs.apbs-version }}
+
       - name: Setup tmate session
         if: ${{ ! success() }}
-        #if: startsWith(matrix.os, 'windows')  # Windows only
         uses: mxschmitt/action-tmate@v3
+
