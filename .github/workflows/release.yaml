@@ -25,12 +25,13 @@ jobs:
           echo $version
           echo ::set-output name=apbs-version::${version}
         shell: bash
+        id: extract-version
 
       - name: Create tag
         uses: tvdias/github-tagger@v0.0.1
         with:
           repo-token: "${{ secrets.RELEASE_TOKEN }}"
-          tag: ${{ steps.job-values.outputs.apbs-version }}
+          tag: ${{ steps.extract-version.outputs.apbs-version }}
 
       - name: Extract release text
         run: |

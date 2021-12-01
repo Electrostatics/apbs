@@ -235,6 +235,7 @@ jobs:
           echo $version
           echo ::set-output name=apbs-version::${version}
         shell: bash
+        id: extract-version
 
       - name: Release artifacts
         if: startsWith(github.ref, 'refs/tags/')  # Tag/release only
@@ -245,7 +246,7 @@ jobs:
           files: |
             build/artifacts/APBS*.zip
           fail_on_unmatched_files: true
-          tag_name: ${{ steps.job-values.outputs.apbs-version }}
+          tag_name: ${{ steps.extract-version.outputs.apbs-version }}
 
       - name: Setup tmate session
         if: ${{ ! success() }}
