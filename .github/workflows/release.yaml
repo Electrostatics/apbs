@@ -35,7 +35,7 @@ jobs:
 
       - name: Extract release text
         run: |
-          ./.extract_section.sh -f CHANGELOG.md -v ${{ steps.job-values.outputs.fetk-version }} > release.md
+          ./.extract_section.sh -f CHANGELOG.md -v ${{ steps.extract-version.outputs.fetk-version }} > release.md
           cat release.md
 
       - name: Create Release
@@ -44,4 +44,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           body_path: release.md
-          tag_name: ${{ steps.job-values.outputs.apbs-version }}
+          tag_name: ${{ steps.extract-version.outputs.apbs-version }}
