@@ -35,7 +35,7 @@ jobs:
 
       - name: Extract release text
         run: |
-          ./.extract_section.sh -f CHANGELOG.md -v ${{ steps.extract-version.outputs.fetk-version }} > release.md
+          ./.extract_section.sh -f CHANGELOG.md -v ${{ steps.extract-version.outputs.apbs-version }} > release.md
           cat release.md
 
       - name: Create Release
