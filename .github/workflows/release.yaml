@@ -30,7 +30,7 @@ jobs:
         uses: tvdias/github-tagger@v0.0.1
         with:
           repo-token: "${{ secrets.RELEASE_TOKEN }}"
-          tag: ${{ steps.job-values.outputs.fetk-version }}
+          tag: ${{ steps.job-values.outputs.apbs-version }}
 
       - name: Extract release text
         run: |
