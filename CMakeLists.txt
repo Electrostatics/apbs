@@ -834,6 +834,7 @@ install(DIRECTORY ${APBS_ROOT}/docs
 
 install(DIRECTORY ${APBS_ROOT}/examples
         DESTINATION ${SHARE_INSTALL_PATH}
+        USE_SOURCE_PERMISSIONS
         COMPONENT examples)
 
 install(DIRECTORY ${APBS_ROOT}/tests
