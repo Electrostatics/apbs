@@ -16,13 +16,19 @@ jobs:
 
   build:
     name: Compile Code
+
     runs-on: ${{ matrix.os }}
+
     if: "!contains(github.event.head_commit.message, 'noci')"
+    
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
         python-version: [3.9]
+
+    outputs:
+      apbs-version: ${{ steps.extract-version.outputs.apbs-version }}
 
     steps:
 
@@ -34,6 +40,14 @@ jobs:
         uses: actions/checkout@master
         with:
           submodules: recursive
+
+      - name: Extract version
+        run: |
+          version="$(grep -E '^[0-9]+_[0-9]+_[0-9]+' VERSION | sed 's/_/./g')"
+          echo $version
+          echo ::set-output name=apbs-version::${version}
+        shell: bash
+        id: extract-version
 
       - name: Set up Python
         uses: actions/setup-python@v1
@@ -221,21 +235,33 @@ jobs:
   release:
     name: Publish Release Artifacts
 
-    needs: test
+    needs: [build, test]
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
 
     if: startswith(github.ref, 'refs/tags/')  # Tag/release only
 
     steps:
 
-      - name: Extract version
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: APBS-${{ matrix.os }}.zip
+
+      - name: Rename artifacts file
+        id: rename-file
         run: |
-          version="$(grep -E '^[0-9]+_[0-9]+_[0-9]+' VERSION | sed 's/_/./g')"
-          echo $version
-          echo ::set-output name=apbs-version::${version}
-        shell: bash
-        id: extract-version
+          ls
+          OUTPUT_FILENAME="APBS-${{ needs.build.outputs.apbs-version }}-${{ matrix.os }}.zip"
+          mv APBS-${{ matrix.os }}.zip ${OUTPUT_FILENAME}
+          echo ::set-output name=output-filename::${OUTPUT_FILENAME}
+          echo "Output filename should be ${OUTPUT_FILENAME}.zip"
+          ls
 
       - name: Release artifacts
         if: startsWith(github.ref, 'refs/tags/')  # Tag/release only
@@ -244,11 +270,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           files: |
-            build/artifacts/APBS*.zip
+            ${{ steps.rename-file.outputs.output-filename }}
           fail_on_unmatched_files: true
-          tag_name: ${{ steps.extract-version.outputs.apbs-version }}
+          tag_name: ${{ needs.build.outputs.apbs-version }}
 
       - name: Setup tmate session
         if: ${{ ! success() }}
         uses: mxschmitt/action-tmate@v3
-
