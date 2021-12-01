@@ -1,0 +1,46 @@
+name: Tag and Release
+
+on:
+  push:
+     branches: [nsoblath/issue_163]
+#    branches: [ release ]
+
+  workflow_dispatch:
+
+
+jobs:
+
+  Release:
+  
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout the repo 
+        uses: actions/checkout@v2
+
+      - name: Extract version
+        run: |
+          version="$(grep -E '^[0-9]+_[0-9]+_[0-9]+' VERSION | sed 's/_/./g')"
+          echo $version
+          echo ::set-output name=apbs-version::${version}
+        shell: bash
+
+      - name: Create tag
+        uses: tvdias/github-tagger@v0.0.1
+        with:
+          repo-token: "${{ secrets.RELEASE_TOKEN }}"
+          tag: ${{ steps.job-values.outputs.fetk-version }}
+
+      - name: Extract release text
+        run: |
+          ./.extract_section.sh -f CHANGELOG.md -v ${{ steps.job-values.outputs.fetk-version }} > release.md
+          cat release.md
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          body_path: release.md
+          tag_name: ${{ steps.job-values.outputs.apbs-version }}
