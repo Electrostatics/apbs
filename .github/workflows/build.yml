@@ -201,12 +201,13 @@ jobs:
 
       - name: Run examples
         run: |
-          echo $PATH
           unzip APBS*.zip
           APBS_DIR=${RUNNER_WORKSPACE}/apbs/$(basename -- "$(ls APBS*.zip)" .zip)
           export PATH=${APBS_DIR}/bin:$PATH
-          cd ${APBS_DIR}/share/apbs/examples/born
-          apbs apbs-apolar.in
+          #cd ${APBS_DIR}/share/apbs/examples/born
+          #apbs apbs-apolar.in
+          cd ${APBS_DIR}/share/apbs/examples
+          ./run_selected_examples.sh
         shell: bash
 
       - name: Setup tmate session
