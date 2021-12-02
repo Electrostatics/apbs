@@ -173,8 +173,8 @@ jobs:
       - name: Upload package to the action
         uses: actions/upload-artifact@v2
         with:
-          name: ${PACKAGE_FILE}
-          path: build/${PACKAGE_FILE}
+          name: ${{ env.PACKAGE_FILE }}
+          path: build/${{ env.PACKAGE_FILE }}
           retention-days: 5
 
       - name: Setup tmate session
