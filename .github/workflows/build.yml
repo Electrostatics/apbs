@@ -29,6 +29,7 @@ jobs:
 
     outputs:
       apbs-version: ${{ steps.extract-version.outputs.apbs-version }}
+      apbs-tag: ${{ steps.extract-version.outputs.apbs-tag }}
       package-file-lin: ${{ steps.cpack-ml.outputs.package-file-ubuntu-latest }}
       package-file-mac: ${{ steps.cpack-ml.outputs.package-file-macOS-latest }}
       package-file-win: ${{ steps.cpack-w.outputs.package-file-windows-latest }}
@@ -49,6 +50,7 @@ jobs:
           version="$(grep -E '^[0-9]+_[0-9]+_[0-9]+' VERSION | sed 's/_/./g')"
           echo $version
           echo ::set-output name=apbs-version::${version}
+          echo ::set-output name=apbs-tag::v${version}
         shell: bash
         id: extract-version
 
@@ -283,7 +285,7 @@ jobs:
           files: |
             ${{ matrix.package_file }}
           fail_on_unmatched_files: true
-          tag_name: ${{ needs.build.outputs.apbs-version }}
+          tag_name: ${{ needs.build.outputs.apbs-tag }}
 
 # For debugging
 #      - name: Setup tmate session

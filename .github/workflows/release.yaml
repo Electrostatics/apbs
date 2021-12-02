@@ -23,6 +23,7 @@ jobs:
           version="$(grep -E '^[0-9]+_[0-9]+_[0-9]+' VERSION | sed 's/_/./g')"
           echo $version
           echo ::set-output name=apbs-version::${version}
+          echo ::set-output name=apbs-tag::v${version}
         shell: bash
         id: extract-version
 
@@ -30,7 +31,7 @@ jobs:
         uses: tvdias/github-tagger@v0.0.1
         with:
           repo-token: "${{ secrets.RELEASE_TOKEN }}"
-          tag: ${{ steps.extract-version.outputs.apbs-version }}
+          tag: ${{ steps.extract-version.outputs.apbs-tag }}
 
       - name: Extract release text
         run: |
@@ -43,4 +44,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           body_path: release.md
-          tag_name: ${{ steps.extract-version.outputs.apbs-version }}
+          tag_name: ${{ steps.extract-version.outputs.apbs-tag }}
