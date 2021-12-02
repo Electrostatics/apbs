@@ -147,7 +147,8 @@ jobs:
         run: |
           cd build
           cpack -C Release -G ZIP
-          echo "PACKAGE_FILE=`ls APBS*.zip`" >> $GITHUB_ENV
+          PACKAGE_FILE=`ls APBS*.zip`
+          echo "PACKAGE_FILE=${PACKAGE_FILE}" >> $GITHUB_ENV
           echo $PACKAGE_FILE
           echo ::set-output name=package-file-${{ matrix.os }}::${PACKAGE_FILE}
           unzip -l ${PACKAGE_FILE}
@@ -160,7 +161,8 @@ jobs:
         run: |
           cd build
           /c/Program\ Files/CMake/bin/cpack.exe -C Release -G ZIP -V
-          echo "PACKAGE_FILE=`ls APBS*.zip`" >> $GITHUB_ENV
+          PACKAGE_FILE=`ls APBS*.zip`
+          echo "PACKAGE_FILE=${PACKAGE_FILE}" >> $GITHUB_ENV
           echo $PACKAGE_FILE
           echo ::set-output name=package-file-${{ matrix.os }}::${PACKAGE_FILE}
           unzip -l ${PACKAGE_FILE}
