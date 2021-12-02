@@ -149,11 +149,9 @@ jobs:
           cpack -C Release -G ZIP
           PACKAGE_FILE=`ls APBS*.zip`
           echo "PACKAGE_FILE=${PACKAGE_FILE}" >> $GITHUB_ENV
-          echo $PACKAGE_FILE
           echo ::set-output name=package-file-${{ matrix.os }}::${PACKAGE_FILE}
+          echo "Package file: $PACKAGE_FILE"
           unzip -l ${PACKAGE_FILE}
-#      mkdir -p artifacts
-#      mv APBS*.zip artifacts
 
       - name: Create package for Windows
         if: startsWith(matrix.os, 'windows')  # Windows only
@@ -163,11 +161,9 @@ jobs:
           /c/Program\ Files/CMake/bin/cpack.exe -C Release -G ZIP -V
           PACKAGE_FILE=`ls APBS*.zip`
           echo "PACKAGE_FILE=${PACKAGE_FILE}" >> $GITHUB_ENV
-          echo $PACKAGE_FILE
           echo ::set-output name=package-file-${{ matrix.os }}::${PACKAGE_FILE}
+          echo "Package file: $PACKAGE_FILE"
           unzip -l ${PACKAGE_FILE}
-#      mkdir -p artifacts
-#      mv APBS*.zip artifacts
         shell: bash
 
       - name: Upload package to the action
@@ -177,9 +173,10 @@ jobs:
           path: build/${{ env.PACKAGE_FILE }}
           retention-days: 5
 
-      - name: Setup tmate session
-        if: ${{ ! success() }}
-        uses: mxschmitt/action-tmate@v3
+# For debugging
+#      - name: Setup tmate session
+#        if: ${{ ! success() }}
+#        uses: mxschmitt/action-tmate@v3
 
 
   test:
@@ -244,9 +241,10 @@ jobs:
           ./run_selected_examples.sh
         shell: bash
 
-      - name: Setup tmate session
-        if: ${{ ! success() }}
-        uses: mxschmitt/action-tmate@v3
+# For debugging
+#      - name: Setup tmate session
+#        if: ${{ ! success() }}
+#        uses: mxschmitt/action-tmate@v3
 
  
   release:
@@ -277,18 +275,7 @@ jobs:
         with:
           name: ${{ matrix.package_file }}
 
-#      - name: Rename artifacts file
-#        id: rename-file
-#        run: |
-#          ls
-#          OUTPUT_FILENAME="APBS-${{ needs.build.outputs.apbs-version }}-${{ matrix.os }}.zip"
-#          mv APBS-${{ matrix.os }}.zip ${OUTPUT_FILENAME}
-#          echo ::set-output name=output-filename::${OUTPUT_FILENAME}
-#          echo "Output filename should be ${OUTPUT_FILENAME}.zip"
-#          ls
-
       - name: Release artifacts
-        if: startsWith(github.ref, 'refs/tags/')  # Tag/release only
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
@@ -298,6 +285,7 @@ jobs:
           fail_on_unmatched_files: true
           tag_name: ${{ needs.build.outputs.apbs-version }}
 
-      - name: Setup tmate session
-        if: ${{ ! success() }}
-        uses: mxschmitt/action-tmate@v3
+# For debugging
+#      - name: Setup tmate session
+#        if: ${{ ! success() }}
+#        uses: mxschmitt/action-tmate@v3
