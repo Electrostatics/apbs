@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     if: "!contains(github.event.head_commit.message, 'noci')"
-    
+
     strategy:
       fail-fast: false
       matrix:
@@ -29,6 +29,9 @@ jobs:
 
     outputs:
       apbs-version: ${{ steps.extract-version.outputs.apbs-version }}
+      package-file-lin: ${{ steps.cpack-ml.outputs.package-file-ubuntu-latest }}
+      package-file-mac: ${{ steps.cpack-ml.outputs.package-file-macOS-latest }}
+      package-file-win: ${{ steps.cpack-w.outputs.package-file-windows-latest }}
 
     steps:
 
@@ -140,33 +143,41 @@ jobs:
 
       - name: Create package for Mac and Linux
         if: startsWith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu') # Mac or Linux only
+        id: cpack-ml
         run: |
           cd build
           cpack -C Release -G ZIP
-          unzip -l APBS*.zip
-          mkdir -p artifacts
-          mv APBS*.zip artifacts
+          echo "PACKAGE_FILE=`ls APBS*.zip`" >> $GITHUB_ENV
+          echo $PACKAGE_FILE
+          echo ::set-output name=package-file-${{ matrix.os }}::${PACKAGE_FILE}
+          unzip -l ${PACKAGE_FILE}
+#      mkdir -p artifacts
+#      mv APBS*.zip artifacts
 
       - name: Create package for Windows
         if: startsWith(matrix.os, 'windows')  # Windows only
+        id: cpack-w
         run: |
           cd build
           /c/Program\ Files/CMake/bin/cpack.exe -C Release -G ZIP -V
-          unzip -l APBS*.zip
-          mkdir -p artifacts
-          mv APBS*.zip artifacts
+          echo "PACKAGE_FILE=`ls APBS*.zip`" >> $GITHUB_ENV
+          echo $PACKAGE_FILE
+          echo ::set-output name=package-file-${{ matrix.os }}::${PACKAGE_FILE}
+          unzip -l ${PACKAGE_FILE}
+#      mkdir -p artifacts
+#      mv APBS*.zip artifacts
         shell: bash
 
       - name: Upload package to the action
         uses: actions/upload-artifact@v2
         with:
-          name: APBS-${{ matrix.os }}.zip
-          path: build/artifacts/APBS*.zip
+          name: ${PACKAGE_FILE}
+          path: build/${PACKAGE_FILE}
           retention-days: 5
 
-      #- name: Setup tmate session
-      #  if: ${{ ! success() }}
-      #  uses: mxschmitt/action-tmate@v3
+      - name: Setup tmate session
+        if: ${{ ! success() }}
+        uses: mxschmitt/action-tmate@v3
 
 
   test:
@@ -180,6 +191,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            package_file: ${{ needs.build.outputs.package-file-lin }}
+          - os: macOS-latest
+            package_file: ${{ needs.build.outputs.package-file-mac }}
+          - os: windows-latest
+            package_file: ${{ needs.build.outputs.package-file-win }}
 
     steps:
 
@@ -214,22 +232,19 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
-          name: APBS-${{ matrix.os }}.zip
+          name: ${{ matrix.package_file }}
 
       - name: Run examples
         run: |
           unzip APBS*.zip
-          APBS_DIR=${RUNNER_WORKSPACE}/apbs/$(basename -- "$(ls APBS*.zip)" .zip)
-          export PATH=${APBS_DIR}/bin:$PATH
-          #cd ${APBS_DIR}/share/apbs/examples/born
-          #apbs apbs-apolar.in
+          APBS_DIR=${RUNNER_WORKSPACE}/apbs/$(basename -- "$(ls ${{ matrix.package_file }})" .zip)
           cd ${APBS_DIR}/share/apbs/examples
           ./run_selected_examples.sh
         shell: bash
 
-      #- name: Setup tmate session
-      #  if: ${{ ! success() }}
-      #  uses: mxschmitt/action-tmate@v3
+      - name: Setup tmate session
+        if: ${{ ! success() }}
+        uses: mxschmitt/action-tmate@v3
 
 
   release:
@@ -237,31 +252,38 @@ jobs:
 
     needs: [build, test]
 
+    if: startswith(github.ref, 'refs/tags/')  # Tag/release only
+
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-
-    if: startswith(github.ref, 'refs/tags/')  # Tag/release only
+        include:
+          - os: ubuntu-latest
+            package_file: ${{ needs.build.outputs.package-file-lin }}
+          - os: macOS-latest
+            package_file: ${{ needs.build.outputs.package-file-mac }}
+          - os: windows-latest
+            package_file: ${{ needs.build.outputs.package-file-win }}
 
     steps:
 
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
-          name: APBS-${{ matrix.os }}.zip
+          name: ${{ matrix.package_file }}
 
-      - name: Rename artifacts file
-        id: rename-file
-        run: |
-          ls
-          OUTPUT_FILENAME="APBS-${{ needs.build.outputs.apbs-version }}-${{ matrix.os }}.zip"
-          mv APBS-${{ matrix.os }}.zip ${OUTPUT_FILENAME}
-          echo ::set-output name=output-filename::${OUTPUT_FILENAME}
-          echo "Output filename should be ${OUTPUT_FILENAME}.zip"
-          ls
+#      - name: Rename artifacts file
+#        id: rename-file
+#        run: |
+#          ls
+#          OUTPUT_FILENAME="APBS-${{ needs.build.outputs.apbs-version }}-${{ matrix.os }}.zip"
+#          mv APBS-${{ matrix.os }}.zip ${OUTPUT_FILENAME}
+#          echo ::set-output name=output-filename::${OUTPUT_FILENAME}
+#          echo "Output filename should be ${OUTPUT_FILENAME}.zip"
+#          ls
 
       - name: Release artifacts
         if: startsWith(github.ref, 'refs/tags/')  # Tag/release only
@@ -270,7 +292,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           files: |
-            ${{ steps.rename-file.outputs.output-filename }}
+            ${{ matrix.package_file }}
           fail_on_unmatched_files: true
           tag_name: ${{ needs.build.outputs.apbs-version }}
 
