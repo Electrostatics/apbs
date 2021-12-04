@@ -37,8 +37,28 @@ export COVERAGE=""
 export BUILD_DIR="$SRC_DIR/build"
 export INSTALL_DIR=$HOME/apbs
 export PATH=$INSTALL_DIR:$PATH
-export RELEASE_TYPE=Debug
-export RELEASE_TYPE=Release
+
+# set variables only if they're not already set
+: ${RELEASE_TYPE:=Release}
+: ${BLA_VENDOR:=OpenBLAS}
+: ${BUILD_DOC:=ON}
+: ${BUILD_SHARED_LIBS:=OFF}
+: ${BUILD_TOOLS:=ON}
+: ${RELEASE_TYPE:=Release}
+: ${ENABLE_PYGBE:=OFF}
+: ${ENABLE_BEM:=ON}
+: ${ENABLE_GEOFLOW:=ON}
+: ${ENABLE_FETK:=ON}
+: ${FETK_VERSION:="1.8.1"}
+: ${ENABLE_iAPBS:=ON}
+: ${ENABLE_OPENMP:=ON}
+: ${ENABLE_PBAM:=ON}
+: ${ENABLE_PBSAM:=ON}
+: ${ENABLE_PYTHON:=OFF}
+: ${ENABLE_TESTS:=ON}
+: ${ENABLE_TINKER:=OFF}
+: ${GIT_SUBMODULE:=OFF}
+: ${GET_NanoShaper:=ON}
  
 echo "==================================== WHERE AM I ==================================== "
 pwd
@@ -103,29 +123,29 @@ echo "==================================== CONFIG ==============================
 cd $BUILD_DIR                                             || exit 1
 #cmake                                                     \
 cmake -S .. -B $BUILD_DIR                                 \
-      -DBLA_VENDOR=OpenBLAS                               \
-      -DBUILD_DOC=ON                                      \
-      -DBUILD_SHARED_LIBS=OFF                              \
-      -DBUILD_TOOLS=ON                                    \
+      -DBLA_VENDOR=${BLA_VENDOR}                          \
+      -DBUILD_DOC=${BUILD_DOC}                            \
+      -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}            \
+      -DBUILD_TOOLS=${BUILD_TOOLS}                        \
       -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} ${COVERAGE}"      \
       -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} ${COVERAGE}"  \
-      -DCMAKE_BUILD_TYPE=$RELEASE_TYPE                    \
+      -DCMAKE_BUILD_TYPE=${RELEASE_TYPE}                  \
       -DCMAKE_INSTALL_INCLUDEDIR="include"                \
       -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR                 \
       -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}            \
-      -DENABLE_PYGBE=OFF                                   \
-      -DENABLE_BEM=ON                                     \
-      -DENABLE_GEOFLOW=ON                                \
-      -DENABLE_FETK=ON                                   \
-      -DENABLE_iAPBS=ON                                   \
-      -DENABLE_OPENMP=ON                                  \
-      -DENABLE_PBAM=ON                                    \
-      -DENABLE_PBSAM=ON                                   \
-      -DENABLE_PYTHON=$BUILD_PYBIND                       \
-      -DENABLE_TESTS=ON                                   \
-      -DENABLE_TINKER=OFF                                 \
-      -DFETK_VERSION="${FETK_VERSION}" \
-      -DGIT_SUBMODULE=OFF \
+      -DENABLE_PYGBE=${ENABLE_PYGBE}                      \
+      -DENABLE_BEM=${ENABLE_BEM}                          \
+      -DENABLE_GEOFLOW=${ENABLE_GEOFLOW}                  \
+      -DENABLE_FETK=${ENABLE_FETK}                        \
+      -DENABLE_iAPBS=${ENABLE_iAPBS}                      \
+      -DENABLE_OPENMP=${ENABLE_OPENMP}                    \
+      -DENABLE_PBAM=${ENABLE_PBAM}                        \
+      -DENABLE_PBSAM=${ENABLE_PBSAM}                      \
+      -DENABLE_PYTHON=${ENABLE_PYBIND}                    \
+      -DENABLE_TESTS=${ENABLE_TESTS}                      \
+      -DENABLE_TINKER=${ENABLE_TINKER}                    \
+      -DFETK_VERSION="${FETK_VERSION}"                    \
+      -DGIT_SUBMODULE=${GIT_SUBMODULE}                    \
       ..                                                  || exit 1
  
 echo "==================================== BUILD =============================================== "
