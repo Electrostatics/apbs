@@ -56,7 +56,6 @@ export PATH=$INSTALL_DIR:$PATH
 : ${ENABLE_PBSAM:=ON}
 : ${ENABLE_PYTHON:=OFF}
 : ${ENABLE_TESTS:=ON}
-: ${ENABLE_TINKER:=OFF}
 : ${GIT_SUBMODULE:=OFF}
 : ${GET_NanoShaper:=ON}
  
@@ -143,7 +142,6 @@ cmake -S .. -B $BUILD_DIR                                 \
       -DENABLE_PBSAM=${ENABLE_PBSAM}                      \
       -DENABLE_PYTHON=${ENABLE_PYBIND}                    \
       -DENABLE_TESTS=${ENABLE_TESTS}                      \
-      -DENABLE_TINKER=${ENABLE_TINKER}                    \
       -DFETK_VERSION="${FETK_VERSION}"                    \
       -DGIT_SUBMODULE=${GIT_SUBMODULE}                    \
       ..                                                  || exit 1

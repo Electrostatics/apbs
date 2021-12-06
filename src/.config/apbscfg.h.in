@@ -38,9 +38,6 @@
 // zlib compression is available
 #cmakedefine HAVE_ZLIB
 
-// include TINKER support
-#cmakedefine WITH_TINKER
-
 
 
 // FEtk components is enabled

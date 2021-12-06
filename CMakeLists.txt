@@ -616,17 +616,6 @@ endif()
 
 
 ################################################################################
-# Handle conditional TINKER support                                            #
-################################################################################
-option(ENABLE_TINKER "Enable TINKER support" OFF)
-
-if(ENABLE_TINKER)
-    set(WITH_TINKER 1)
-    message(STATUS "Tinker enabled")
-endif()
-
-
-################################################################################
 # Handle conditional availability of macro embedding                           #
 ################################################################################
 try_compile(

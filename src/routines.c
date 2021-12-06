@@ -6129,13 +6129,6 @@ VPUBLIC void dump_options()
     puts("0");
 #endif
 
-    printf("WITH_TINKER:");
-#ifdef WITH_TINKER
-    puts("1");
-#else
-    puts("0");
-#endif
-
     printf("ENABLE_FETK:");
 #ifdef ENABLE_FETK
     printf("1");

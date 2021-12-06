@@ -198,7 +198,6 @@ Building the code - advanced
       -DENABLE_PBSAM=ON                         \
       -DENABLE_PYTHON=ON                        \
       -DENABLE_TESTS=ON                         \
-      -DENABLE_TINKER=OFF                       \
       -DBUILD_SHARED_LIBS=ON                    \
       ..
    VERBOSE=1 make -j 1

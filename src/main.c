@@ -303,12 +303,6 @@ int main(
 
     Vnm_tprint( 1, "This executable compiled on %s at %s\n\n", __DATE__, __TIME__);
 
-#if defined(WITH_TINKER)
-    Vnm_tprint( 2, "This executable was compiled with TINKER support and is not intended for stand-alone execution.\n");
-    Vnm_tprint( 2, "Please compile another version without TINKER support.\n");
-    exit(2);
-#endif
-
     /* Process program arguments */
     i=0;
     outputformat = OUTPUT_NULL;

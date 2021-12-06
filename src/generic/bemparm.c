@@ -105,9 +105,6 @@ VPUBLIC Vrc_Codes BEMparm_ctor2(BEMparm *thee, BEMparm_CalcType type) {
     thee->nonlintype = 0;
     thee->setnonlintype = 0;
 
-    /* *** Default parameters for TINKER *** */
-    thee->chgs = VCM_CHARGE;
-
     return VRC_SUCCESS;
 }
 

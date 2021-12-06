@@ -163,9 +163,6 @@ VPUBLIC Vrc_Codes MGparm_ctor2(MGparm *thee, MGparm_CalcType type) {
     for (i=0; i<6; i++) thee->partDisjOwnSide[i] = 0;
     thee->setasync = 0;
 
-    /* *** Default parameters for TINKER *** */
-    thee->chgs = VCM_CHARGE;
-
     thee->useAqua = 0;
     thee->setUseAqua = 0;
 

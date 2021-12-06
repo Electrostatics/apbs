@@ -7,20 +7,6 @@ void bind_vatom(py::module& m)
 {
   py::class_<sVatom>(m, "Vatom")
     .def(py::init<>())
-#ifdef WITH_TINKER
-    .def("setInducedDipole"  , &Vatom_setInducedDipole)
-    .def("setNLInducedDipole", &Vatom_setNLInducedDipole)
-    .def("setDipole"         , &Vatom_setDipole)
-    .def("setQuadrupole"     , &Vatom_setQuadrupole)
-    .def("getDipole"         , &Vatom_getDipole)
-    .def("getQuadrupole"     , &Vatom_getQuadrupole)
-    .def("getInducedDipole"  , &Vatom_getInducedDipole)
-    .def("getNLInducedDipole", &Vatom_getNLInducedDipole)
-    .def_readwrite("dipole"			     , &sVatom::dipole)  /**< Permanent dipole */
-    .def_readwrite("quadrupole"		   , &sVatom::quadrupole)  /**< Permanent quadrupole */
-    .def_readwrite("inducedDipole"	 , &sVatom::inducedDipole)   /**< Induced dipole */
-    .def_readwrite("nlInducedDipole" , &sVatom::nlInducedDipole)	  /**< Non-local induced dipole */
-#endif
     .def("copyTo"            , &Vatom_copyTo)
     .def("copyFrom"          , &Vatom_copyFrom)
     .def_readwrite("radius"  , &sVatom::radius)
