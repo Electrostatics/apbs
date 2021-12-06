@@ -6,7 +6,7 @@ find_package(Python3 COMPONENTS Interpreter)
 if(${Python3_FOUND})
     message(STATUS "******* Python3 FOUND ${Python3_EXECUTABLE}")
 else()
-    message(FATAL  "******* Python3 NOT FOUND *****************")
+    message(FATAL_ERROR  "******* Python3 NOT FOUND *****************")
 endif()
 
 set(APBS_BINARY "apbs")

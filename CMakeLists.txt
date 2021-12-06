@@ -306,12 +306,11 @@ option(ENABLE_PYGBE "Boundary element method using PYGBE" OFF)
 if(ENABLE_PYGBE)
     message(STATUS "Building PYGBE")
     add_definitions(-DENABLE_PYGBE)
-    find_package(Python REQUIRED COMPONENTS Interpreter Development)
-    message(STATUS "******** PYTHON_INCLUDE_DIRS ${Python_INCLUDE_DIRS}")
-    message(STATUS "******** PYTHON_LIBRARIES ${Python_LIBRARIES}")
-    include_directories(${Python_INCLUDE_DIRS})
-    list(APPEND APBS_LIBS ${Python_LIBRARIES})
-    #FindPython(REQUIRED Interpreter Development)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+    message(STATUS "******** PYTHON_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
+    message(STATUS "******** PYTHON_LIBRARIES ${Python3_LIBRARIES}")
+    include_directories(${Python3_INCLUDE_DIRS})
+    list(APPEND APBS_LIBS ${Python3_LIBRARIES})
 endif() # ENABLE_PYGBE
 
 ################################################################################

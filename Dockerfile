@@ -16,6 +16,7 @@ RUN apt-get update && \
         libsuitesparse-dev \
         libeigen3-dev \
         libboost-dev \
+        python3-dev \
         && \
     /bin/true
 
@@ -28,7 +29,7 @@ ARG BUILD_SHARED_LIBS=OFF
 ARG BUILD_TOOLS=ON
 ARG INSTALL_DIR=/usr/local
 ARG RELEASE_TYPE=Debug
-ARG ENABLE_PYGBE=OFF
+ARG ENABLE_PYGBE=ON
 ARG ENABLE_BEM=ON
 ARG ENABLE_GEOFLOW=ON
 ARG ENABLE_FETK=ON
