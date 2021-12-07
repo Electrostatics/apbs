@@ -74,6 +74,7 @@ jobs:
         id: extract-version
 
       - name: Convert release text to markdown
+        if: startsWith(matrix.os, 'ubuntu')  # Linux only
         uses: docker://pandoc/core:2.16.2
         with:
           args: >-
