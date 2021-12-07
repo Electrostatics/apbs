@@ -244,7 +244,6 @@ jobs:
           wget https://github.com/Electrostatics/cache/releases/download/${WIN_DEPENDENCIES_RELEASE}/apbs_dependencies_vcpkg.zip
           7z x apbs_dependencies_vcpkg.zip -aoa -o/c/vcpkg
           ls /c/vcpkg
-          vcpkg integrate install
           vcpkg list --triplet x86-windows
           echo "/c/vcpkg/installed/x86-windows/bin" >> $GITHUB_PATH
         shell: bash
