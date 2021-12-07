@@ -34,8 +34,8 @@ export CMAKE_CXX_LINK_EXECUTABLE=$CXX
 export SRC_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export COVERAGE="-g -O0 -fprofile-arcs -ftest-coverage"
 export COVERAGE=""
-export BUILD_DIR="$SRC_DIR/build"
-export INSTALL_DIR=$HOME/apbs
+: ${BUILD_DIR=$SRC_DIR/build}
+: ${INSTALL_DIR=$HOME/apbs}
 export PATH=$INSTALL_DIR:$PATH
 
 # set variables only if they're not already set
