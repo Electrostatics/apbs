@@ -26,18 +26,23 @@ if [ -z "$version" ]; then
 fi
 
 #echo "Analyzing file $filename"
-header="## ${version}"
+header="APBS[[:space:]]${version}"
 #echo "Section title: <${header}>"
 
 foundTitle=false
+foundFirstHyphens=false
 while read line; do
     if [ "$foundTitle" == false ]; then
         if [[ "$line" =~ ^${header} ]]; then
             foundTitle=true
         fi
     else
-        if [[ $line = '## '* ]]; then
-            break
+        if [[ $line =~ ^-+ ]]; then
+            if [ "$foundFirstHyphens" == false ]; then
+                foundFirstHyphens=true
+            else
+                break
+            fi
         else
             echo "$line"
         fi
