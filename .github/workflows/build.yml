@@ -50,7 +50,7 @@ jobs:
       cpack-out-lin-zip: ${{ steps.cpack-ml.outputs.cpack-out-ubuntu-latest-zip }}
       cpack-out-mac-zip: ${{ steps.cpack-ml.outputs.cpack-out-macos-latest-zip }}
       cpack-out-win-zip: ${{ steps.cpack-w.outputs.cpack-out-windows-latest-zip }}
-#      cpack-out-win-nsis: ${{ steps.cpack-w.outputs.cpack-out-windows-latest-nsis }}
+      cpack-out-win-nsis: ${{ steps.cpack-w.outputs.cpack-out-windows-latest-nsis }}
 
     steps:
 
@@ -203,9 +203,11 @@ jobs:
           echo ::set-output name=cpack-out-${{ matrix.os }}-zip::${ZIP_CPACK_FILE}
           echo "ZIP CPack file: $ZIP_CPACK_FILE"
           unzip -l ${ZIP_CPACK_FILE}
-          ls
+          NSIS_CPACK_FILE=`ls APBS*.exe`
+          echo "NSIS_CPACK_FILE=${NSIS_CPACK_FILE}" >> $GITHUB_ENV
+          echo ::set-output name=cpack-out-${{ matrix.os }}-nsis::${NSIS_CPACK_FILE}
+          echo "NSIS CPack file: $NSIS_CPACK_FILE"
         shell: bash
-        # TODO: add handling of the NSIS file
 
       - name: Upload ZIP package to the action
         uses: actions/upload-artifact@v2
@@ -214,13 +216,13 @@ jobs:
           path: build/${{ env.ZIP_CPACK_FILE }}
           retention-days: 5
 
-#      - name: Upload NSIS package to the action
-#        if: startsWith(matrix.os, 'windows') # Windows only
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: ${{ env.NSIS_CPACK_FILE }}
-#          path: build/${{ env.NSIS_CPACK_FILE }}
-#          retention-days: 5
+      - name: Upload NSIS package to the action
+        if: startsWith(matrix.os, 'windows') # Windows only
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.NSIS_CPACK_FILE }}
+          path: build/${{ env.NSIS_CPACK_FILE }}
+          retention-days: 5
 
 # For debugging
       - name: Setup tmate session
@@ -246,7 +248,7 @@ jobs:
 #            package_file: ${{ needs.build.outputs.package-file-mac }}
 #          - os: windows-latest
 #            package_file: ${{ needs.build.outputs.package-file-win }}
-        cpack: [lin-zip, mac-zip, win-zip]
+        cpack: [lin-zip, mac-zip, win-zip, win-nsis]
         include:
           - cpack: lin-zip
             os: ubuntu-latest
@@ -257,9 +259,9 @@ jobs:
           - cpack: win-zip
             os: windows-latest
             package_file: ${{ needs.build.outputs.cpack-out-win-zip }}
-#          - cpack: win-nsis
-#            os: windows-latest
-#            package_file: ${{ needs.build.outputs.cpack-out-win-nsis}}
+          - cpack: win-nsis
+            os: windows-latest
+            package_file: ${{ needs.build.outputs.cpack-out-win-nsis}}
 
     steps:
 
@@ -294,13 +296,19 @@ jobs:
         with:
           name: ${{ matrix.package_file }}
 
-      - name: Run examples
+      - name: Run zipped examples
+        if: endsWith(matrix.cpack, 'zip')
         run: |
-          unzip APBS*.zip
+          unzip ${{ matrix.package_file }}
           APBS_DIR=${RUNNER_WORKSPACE}/apbs/$(basename -- "$(ls ${{ matrix.package_file }})" .zip)
           cd ${APBS_DIR}/share/apbs/examples
           ./run_selected_examples.sh
         shell: bash
+
+      - name: Run NSIS examples
+        if: endsWith(matrix.cpack, 'nsis')
+        run: |
+          ./${{ matrix.package_file }}
 
 # For debugging
       - name: Setup tmate session
