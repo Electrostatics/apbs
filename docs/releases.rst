@@ -2,6 +2,38 @@
 Release history
 ===============
 
+
+---------------------------
+APBS 3.3.0.alpha (Dec 2021)
+---------------------------
+
+* Binary releases may be found in `GitHub releases <https://github.com/Electrostatics/apbs/releases>`_.
+
+^^^^^^^^^^^^
+New Features
+^^^^^^^^^^^^
+
+* Revamped build system
+* Etc
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+Known Bugs and Limitations
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* anything?
+
+^^^^^^^^^^^^^
+Minor Updates
+^^^^^^^^^^^^^
+
+* small thing 1
+* small thing 2
+
+^^^^^
+Notes
+^^^^^
+
+
 -------------------
 APBS 3.0 (May 2020)
 -------------------
