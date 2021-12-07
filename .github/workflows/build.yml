@@ -186,8 +186,8 @@ jobs:
         run: |
           cd build
           cpack -C Release -G ZIP
-          PACKAGEZIP_CPACK_FILE_FILE=`ls APBS*.zip`
-          echo "PACKZIP_CPACK_FILEAGE_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
+          ZIP_CPACK_FILE=`ls APBS*.zip`
+          echo "ZIP_CPACK_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
           echo ::set-output name=cpack-out-${{ matrix.os }}-zip::${ZIP_CPACK_FILE}
           echo "ZIP CPack file: $ZIP_CPACK_FILE"
           unzip -l ${ZIP_CPACK_FILE}
