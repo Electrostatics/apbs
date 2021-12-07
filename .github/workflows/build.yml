@@ -227,7 +227,8 @@ jobs:
           sudo apt-get install -yq \
             libsuitesparse-dev \
             libsuperlu-dev \
-            libopenblas-dev
+            libopenblas-dev \
+            python3-dev
 
       - name: Mac Prereqs
         if: startsWith(matrix.os, 'macos')  # Mac only
