@@ -89,7 +89,8 @@ jobs:
             superlu \
             boost \
             eigen \
-            openblas
+            openblas \
+            python
           brew upgrade gcc@9
 
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
@@ -109,7 +110,8 @@ jobs:
             libsuperlu-dev \
             libeigen3-dev \
             libboost-dev \
-            libopenblas-dev
+            libopenblas-dev \
+            python3-dev
 
       - name: Install Window dependencies
         if: startsWith(matrix.os, 'windows')  # Windows only
