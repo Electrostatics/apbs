@@ -85,6 +85,7 @@ jobs:
             this_release.rst
 
       - name: Check release text (remove this step)
+        if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: cat this_release.md
 
       - name: Set up Python
