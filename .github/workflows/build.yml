@@ -197,12 +197,20 @@ jobs:
         id: cpack-w
         run: |
           cd build
-          /c/Program\ Files/CMake/bin/cpack.exe -C Release -G ZIP;NSIS -V
+          /c/Program\ Files/CMake/bin/cpack.exe -C Release -G ZIP -V
           ZIP_CPACK_FILE=`ls APBS*.zip`
           echo "ZIP_CPACK_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
           echo ::set-output name=cpack-out-${{ matrix.os }}-zip::${ZIP_CPACK_FILE}
           echo "ZIP CPack file: $ZIP_CPACK_FILE"
           unzip -l ${ZIP_CPACK_FILE}
+        shell: bash
+
+      - name: Create package for Windows NSIS
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        id: cpack-w
+        run: |
+          cd build
+          /c/Program\ Files/CMake/bin/cpack.exe -C Release -G NSIS -V
           NSIS_CPACK_FILE=`ls APBS*.exe`
           echo "NSIS_CPACK_FILE=${NSIS_CPACK_FILE}" >> $GITHUB_ENV
           echo ::set-output name=cpack-out-${{ matrix.os }}-nsis::${NSIS_CPACK_FILE}
