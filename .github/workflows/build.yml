@@ -47,9 +47,10 @@ jobs:
     outputs:
       apbs-version: ${{ steps.extract-version.outputs.apbs-version }}
       apbs-tag: ${{ steps.extract-version.outputs.apbs-tag }}
-      package-file-lin: ${{ steps.cpack-ml.outputs.package-file-ubuntu-latest }}
-      package-file-mac: ${{ steps.cpack-ml.outputs.package-file-macOS-latest }}
-      package-file-win: ${{ steps.cpack-w.outputs.package-file-windows-latest }}
+      cpack-out-lin-zip: ${{ steps.cpack-ml.outputs.cpack-out-ubuntu-latest-zip }}
+      cpack-out-mac-zip: ${{ steps.cpack-ml.outputs.cpack-out-macos-latest-zip }}
+      cpack-out-win-zip: ${{ steps.cpack-w.outputs.cpack-out-windows-latest-zip }}
+#      cpack-out-win-nsis: ${{ steps.cpack-w.outputs.cpack-out-windows-latest-nsis }}
 
     steps:
 
@@ -185,31 +186,41 @@ jobs:
         run: |
           cd build
           cpack -C Release -G ZIP
-          PACKAGE_FILE=`ls APBS*.zip`
-          echo "PACKAGE_FILE=${PACKAGE_FILE}" >> $GITHUB_ENV
-          echo ::set-output name=package-file-${{ matrix.os }}::${PACKAGE_FILE}
-          echo "Package file: $PACKAGE_FILE"
-          unzip -l ${PACKAGE_FILE}
+          PACKAGEZIP_CPACK_FILE_FILE=`ls APBS*.zip`
+          echo "PACKZIP_CPACK_FILEAGE_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
+          echo ::set-output name=cpack-out-${{ matrix.os }}-zip::${ZIP_CPACK_FILE}
+          echo "ZIP CPack file: $ZIP_CPACK_FILE"
+          unzip -l ${ZIP_CPACK_FILE}
 
       - name: Create package for Windows
         if: startsWith(matrix.os, 'windows')  # Windows only
         id: cpack-w
         run: |
           cd build
-          /c/Program\ Files/CMake/bin/cpack.exe -C Release -G ZIP -V
-          PACKAGE_FILE=`ls APBS*.zip`
-          echo "PACKAGE_FILE=${PACKAGE_FILE}" >> $GITHUB_ENV
-          echo ::set-output name=package-file-${{ matrix.os }}::${PACKAGE_FILE}
-          echo "Package file: $PACKAGE_FILE"
-          unzip -l ${PACKAGE_FILE}
+          /c/Program\ Files/CMake/bin/cpack.exe -C Release -G ZIP;NSIS -V
+          ZIP_CPACK_FILE=`ls APBS*.zip`
+          echo "ZIP_CPACK_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
+          echo ::set-output name=cpack-out-${{ matrix.os }}-zip::${ZIP_CPACK_FILE}
+          echo "ZIP CPack file: $ZIP_CPACK_FILE"
+          unzip -l ${ZIP_CPACK_FILE}
+          ls
         shell: bash
+        # TODO: add handling of the NSIS file
 
-      - name: Upload package to the action
+      - name: Upload ZIP package to the action
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.PACKAGE_FILE }}
-          path: build/${{ env.PACKAGE_FILE }}
+          name: ${{ env.ZIP_CPACK_FILE }}
+          path: build/${{ env.ZIP_CPACK_FILE }}
           retention-days: 5
+
+#      - name: Upload NSIS package to the action
+#        if: startsWith(matrix.os, 'windows') # Windows only
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: ${{ env.NSIS_CPACK_FILE }}
+#          path: build/${{ env.NSIS_CPACK_FILE }}
+#          retention-days: 5
 
 # For debugging
       - name: Setup tmate session
@@ -227,14 +238,28 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+#        os: [ubuntu-latest, macOS-latest, windows-latest]
+#        include:
+#          - os: ubuntu-latest
+#            package_file: ${{ needs.build.outputs.package-file-lin }}
+#          - os: macOS-latest
+#            package_file: ${{ needs.build.outputs.package-file-mac }}
+#          - os: windows-latest
+#            package_file: ${{ needs.build.outputs.package-file-win }}
+        cpack: [lin-zip, mac-zip, win-zip]
         include:
-          - os: ubuntu-latest
-            package_file: ${{ needs.build.outputs.package-file-lin }}
-          - os: macOS-latest
-            package_file: ${{ needs.build.outputs.package-file-mac }}
-          - os: windows-latest
-            package_file: ${{ needs.build.outputs.package-file-win }}
+          - cpack: lin-zip
+            os: ubuntu-latest
+            package_file: ${{ needs.build.outputs.cpack-out-lin-zip }}
+          - cpack: mac-zip
+            os: macOS-latest
+            package_file: ${{ needs.build.outputs.cpack-out-mac-zip }}
+          - cpack: win-zip
+            os: windows-latest
+            package_file: ${{ needs.build.outputs.cpack-out-win-zip }}
+#          - cpack: win-nsis
+#            os: windows-latest
+#            package_file: ${{ needs.build.outputs.cpack-out-win-nsis}}
 
     steps:
 
@@ -261,8 +286,6 @@ jobs:
           choco install wget
           wget https://github.com/Electrostatics/cache/releases/download/${WIN_DEPENDENCIES_RELEASE}/apbs_dependencies_vcpkg.zip
           7z x apbs_dependencies_vcpkg.zip -aoa -o/c/vcpkg
-          ls /c/vcpkg
-          vcpkg list --triplet x86-windows
           echo "/c/vcpkg/installed/x86-windows/bin" >> $GITHUB_PATH
         shell: bash
 
