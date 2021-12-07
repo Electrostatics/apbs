@@ -50,7 +50,7 @@ jobs:
       cpack-out-lin-zip: ${{ steps.cpack-ml.outputs.cpack-out-ubuntu-latest-zip }}
       cpack-out-mac-zip: ${{ steps.cpack-ml.outputs.cpack-out-macos-latest-zip }}
       cpack-out-win-zip: ${{ steps.cpack-w.outputs.cpack-out-windows-latest-zip }}
-      cpack-out-win-nsis: ${{ steps.cpack-w.outputs.cpack-out-windows-latest-nsis }}
+      cpack-out-win-nsis: ${{ steps.cpack-w-nsis.outputs.cpack-out-windows-latest-nsis }}
 
     steps:
 
@@ -207,7 +207,7 @@ jobs:
 
       - name: Create package for Windows NSIS
         if: startsWith(matrix.os, 'windows')  # Windows only
-        id: cpack-w
+        id: cpack-w-nsis
         run: |
           cd build
           /c/Program\ Files/CMake/bin/cpack.exe -C Release -G NSIS -V
