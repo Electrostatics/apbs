@@ -56,7 +56,6 @@ export PATH=$INSTALL_DIR:$PATH
 : ${ENABLE_PBSAM:=ON}
 : ${ENABLE_PYTHON:=OFF}
 : ${ENABLE_TESTS:=ON}
-: ${GIT_SUBMODULE:=OFF}
 : ${GET_NanoShaper:=ON}
  
 echo "==================================== WHERE AM I ==================================== "
@@ -85,11 +84,6 @@ fi
 #  Just build APBS for now
 echo "==================================== PWD FOR TOP DIR ==================================== "
 pwd
-echo "==================================== Get External SubModules ==================================== "
-git submodule init
-git submodule update
-git submodule sync
-git ls-tree HEAD externals
  
 echo "==================================== CLEAN =============================================== "
 rm -rf $BUILD_DIR                                         || exit 1
@@ -143,7 +137,6 @@ cmake -S .. -B $BUILD_DIR                                 \
       -DENABLE_PYTHON=${ENABLE_PYBIND}                    \
       -DENABLE_TESTS=${ENABLE_TESTS}                      \
       -DFETK_VERSION="${FETK_VERSION}"                    \
-      -DGIT_SUBMODULE=${GIT_SUBMODULE}                    \
       ..                                                  || exit 1
  
 echo "==================================== BUILD =============================================== "
