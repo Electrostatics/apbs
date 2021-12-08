@@ -24,8 +24,23 @@ jobs:
           echo $version
           echo ::set-output name=apbs-version::${version}
           echo ::set-output name=apbs-tag::v${version}
+          ./.extract_section.sh -v ${version} -f docs/releases.rst > this_release.rst
+          cat this_release.rst
         shell: bash
         id: extract-version
+
+      - name: Convert release text to markdown
+        uses: docker://pandoc/core:2.16.2
+        with:
+          args: >-
+            --standalone
+            --from rst
+            --to markdown
+            --output=this_release.md
+            this_release.rst
+
+      - name: Check release text
+        run: cat this_release.md
 
       - name: Create tag
         uses: tvdias/github-tagger@v0.0.1
@@ -33,15 +48,10 @@ jobs:
           repo-token: "${{ secrets.RELEASE_TOKEN }}"
           tag: ${{ steps.extract-version.outputs.apbs-tag }}
 
-      - name: Extract release text
-        run: |
-          ./.extract_section.sh -f CHANGELOG.md -v ${{ steps.extract-version.outputs.apbs-version }} > release.md
-          cat release.md
-
       - name: Create Release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          body_path: release.md
+          body_path: this_release.md
           tag_name: ${{ steps.extract-version.outputs.apbs-tag }}

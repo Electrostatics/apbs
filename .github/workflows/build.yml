@@ -63,34 +63,17 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Extract version and changes
+      - name: Extract version
         run: |
           version="$(grep -E '^[0-9]+_[0-9]+_[0-9]+' VERSION | sed 's/_/./g')"
           echo $version
           echo ::set-output name=apbs-version::${version}
           echo ::set-output name=apbs-tag::v${version}
-          ./.extract_section.sh -v ${version} -f docs/releases.rst > this_release.rst
-          cat this_release.rst
         shell: bash
         id: extract-version
 
-      - name: Convert release text to markdown
-        if: startsWith(matrix.os, 'ubuntu')  # Linux only
-        uses: docker://pandoc/core:2.16.2
-        with:
-          args: >-
-            --standalone
-            --from rst
-            --to markdown
-            --output=this_release.md
-            this_release.rst
-
-      - name: Check release text (remove this step)
-        if: startsWith(matrix.os, 'ubuntu')  # Linux only
-        run: cat this_release.md
-
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -107,8 +90,7 @@ jobs:
             superlu \
             boost \
             eigen \
-            openblas \
-            python
+            openblas
           brew upgrade gcc@9
 
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
@@ -128,8 +110,7 @@ jobs:
             libsuperlu-dev \
             libeigen3-dev \
             libboost-dev \
-            libopenblas-dev \
-            python3-dev
+            libopenblas-dev
 
       - name: Install Window dependencies
         if: startsWith(matrix.os, 'windows')  # Windows only
@@ -257,6 +238,7 @@ jobs:
 #          - os: windows-latest
 #            package_file: ${{ needs.build.outputs.package-file-win }}
         cpack: [lin-zip, mac-zip, win-zip, win-nsis]
+        python-version: [3.9]
         include:
           - cpack: lin-zip
             os: ubuntu-latest
@@ -272,6 +254,11 @@ jobs:
             package_file: ${{ needs.build.outputs.cpack-out-win-nsis}}
 
     steps:
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Linux Prereqs
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
