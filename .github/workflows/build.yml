@@ -291,15 +291,15 @@ jobs:
           ./run_selected_examples.sh
         shell: bash
 
-      - name: Run NSIS examples
-        if: endsWith(matrix.cpack, 'nsis')
-        run: |
-          ./${{ matrix.package_file }}
+#      - name: Run NSIS examples
+#        if: endsWith(matrix.cpack, 'nsis')
+#        run: |
+#          ./${{ matrix.package_file }}
 
 # For debugging
       - name: Setup tmate session
-#        if: ${{ ! success() }}
-        if: endsWith(matrix.cpack, 'nsis')
+        if: ${{ ! success() }}
+#        if: endsWith(matrix.cpack, 'nsis')
         uses: mxschmitt/action-tmate@v3
 
  
