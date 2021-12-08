@@ -229,14 +229,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-#        os: [ubuntu-latest, macOS-latest, windows-latest]
-#        include:
-#          - os: ubuntu-latest
-#            package_file: ${{ needs.build.outputs.package-file-lin }}
-#          - os: macOS-latest
-#            package_file: ${{ needs.build.outputs.package-file-mac }}
-#          - os: windows-latest
-#            package_file: ${{ needs.build.outputs.package-file-win }}
         cpack: [lin-zip, mac-zip, win-zip, win-nsis]
         python-version: [3.9]
         include:
@@ -307,7 +299,8 @@ jobs:
 
 # For debugging
       - name: Setup tmate session
-        if: ${{ ! success() }}
+#        if: ${{ ! success() }}
+        if: endsWith(matrix.cpack, 'nsis')
         uses: mxschmitt/action-tmate@v3
 
  
