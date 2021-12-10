@@ -121,6 +121,8 @@ else()
         list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .so)
     endif()
 endif()
+message(STATUS "Building shared libs: ${BUILD_SHARED_LIBS}")
+message(STATUS "Find-library suffixes: ${CMAKE_FIND_LIBRARY_SUFFIXES")
 
 set(APBS_ROOT ${PROJECT_SOURCE_DIR})
 set(APBS_BUILD ${PROJECT_BINARY_DIR})
