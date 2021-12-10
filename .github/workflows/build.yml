@@ -208,7 +208,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cpack: [lin-zip, mac-zip, win-zip]
+#        cpack: [lin-zip, mac-zip, win-zip]
+        cpack: [win-zip]
         python-version: [3.9]
         include:
           - cpack: lin-zip
@@ -272,7 +273,7 @@ jobs:
         if: startsWith(matrix.os, 'windows')  # Windows only
         run: |
           docker pull mcr.microsoft.com/windows:1809
-          docker run -v ${{ matrix.package_file }}:${{ matrix.package_file }} mcr.microsoft.com/windows:1809 ls
+          docker run -v `pwd`:/c/apbs mcr.microsoft.com/windows:1809 ls
         shell: bash
 
 # For debugging
