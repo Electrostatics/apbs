@@ -40,8 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-#        os: [ubuntu-latest, macOS-latest, windows-latest]
-        os: [windows-latest]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
         python-version: [3.9]
 
     outputs:
@@ -155,10 +154,10 @@ jobs:
           cd build
           cmake --build . --config Release --parallel 2 --target install
 
-#      - name: Run tests
-#        run: |
-#          cd build
-#          ctest -C Release --output-on-failure 
+      - name: Run tests
+        run: |
+          cd build
+          ctest -C Release --output-on-failure 
 
       - name: Create package for Mac and Linux
         if: startsWith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu') # Mac or Linux only
@@ -208,8 +207,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-#        cpack: [lin-zip, mac-zip, win-zip]
-        cpack: [win-zip]
+        cpack: [lin-zip, mac-zip, win-zip]
         python-version: [3.9]
         include:
           - cpack: lin-zip
@@ -269,18 +267,18 @@ jobs:
           ./run_selected_examples.sh
         shell: bash
 
-      - name: Test container
-        if: startsWith(matrix.os, 'windows')  # Windows only
-        run: |
-          docker pull mcr.microsoft.com/windows:1809
-          docker run mcr.microsoft.com/windows:1809 pwd
-        shell: bash
+#      - name: Test container
+#        if: startsWith(matrix.os, 'windows')  # Windows only
+#        run: |
+#          docker pull mcr.microsoft.com/windows:1809
+#          docker run mcr.microsoft.com/windows:1809 pwd
+#        shell: bash
 #          docker run -v `pwd`:/c/apbs mcr.microsoft.com/windows:1809 ls
 
 # For debugging
       - name: Setup tmate session
-#        if: ${{ ! success() }}
-        if: startsWith(matrix.os, 'windows')
+        if: ${{ ! success() }}
+#        if: startsWith(matrix.os, 'windows')
         uses: mxschmitt/action-tmate@v3
 
  
