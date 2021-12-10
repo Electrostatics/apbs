@@ -40,7 +40,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+#        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [windows-latest]
         python-version: [3.9]
 
     outputs:
@@ -154,10 +155,10 @@ jobs:
           cd build
           cmake --build . --config Release --parallel 2 --target install
 
-      - name: Run tests
-        run: |
-          cd build
-          ctest -C Release --output-on-failure 
+#      - name: Run tests
+#        run: |
+#          cd build
+#          ctest -C Release --output-on-failure 
 
       - name: Create package for Mac and Linux
         if: startsWith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu') # Mac or Linux only
@@ -265,6 +266,13 @@ jobs:
           APBS_DIR=${RUNNER_WORKSPACE}/apbs/$(basename -- "$(ls ${{ matrix.package_file }})" .zip)
           cd ${APBS_DIR}/share/apbs/examples
           ./run_selected_examples.sh
+        shell: bash
+
+      - name: Test container
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        run: |
+          docker pull mcr.microsoft.com/windows:1809
+          docker run -v ${{ matrix.package_file }}:${{ matrix.package_file }} mcr.microsoft.com/windows:1809 ls
         shell: bash
 
 # For debugging
