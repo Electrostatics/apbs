@@ -273,8 +273,9 @@ jobs:
         if: startsWith(matrix.os, 'windows')  # Windows only
         run: |
           docker pull mcr.microsoft.com/windows:1809
-          docker run -v `pwd`:/c/apbs mcr.microsoft.com/windows:1809 ls
+          docker run mcr.microsoft.com/windows:1809 pwd
         shell: bash
+#          docker run -v `pwd`:/c/apbs mcr.microsoft.com/windows:1809 ls
 
 # For debugging
       - name: Setup tmate session
