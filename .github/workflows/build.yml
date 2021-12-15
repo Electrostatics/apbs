@@ -138,11 +138,10 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         env:
           BLA_VENDOR: OpenBLAS
-        run: |
-          ./.build.sh
-        env:
           # https://codecov.io/gh/Electrostatics/apbs
           CODECOV_TOKEN: "e3a1e24c-5598-4f47-9353-7fa0ac57f98e"
+        run: |
+          ./.build.sh
 
       - name: Build on Windows
         if: startsWith(matrix.os, 'windows')  # Windows only
