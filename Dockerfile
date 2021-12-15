@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 AS apbs_base
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -9,19 +9,22 @@ RUN apt-get update && \
         cmake \
         git \
         libarpack2-dev \
-        libopenblas-dev \
-        liblapack-dev \
-        libsuperlu-dev \
+#        libopenblas-dev \
+#        liblapack-dev \
+#        libsuperlu-dev \
         libf2c2-dev \
-        libsuitesparse-dev \
+#        libsuitesparse-dev \
         libeigen3-dev \
         libboost-dev \
         python3-dev \
         && \
     /bin/true
 
-ADD . /tmp_source
+#########################################
 
+FROM apbs_base
+
+ADD . /tmp_source
 
 ARG BLA_VENDOR="OpenBLAS"
 ARG BUILD_DOC=ON
@@ -33,7 +36,8 @@ ARG ENABLE_PYGBE=ON
 ARG ENABLE_BEM=ON
 ARG ENABLE_GEOFLOW=ON
 ARG ENABLE_FETK=ON
-ARG FETK_VERSION="1.8.1"
+#ARG FETK_VERSION="1.8.1"
+ARG FETK_VERSION=d3165f0293759196814c3053056af17850c9d9f0
 ARG ENABLE_iAPBS=ON
 ARG ENABLE_OPENMP=OFF
 ARG ENABLE_PBAM=ON

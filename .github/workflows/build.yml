@@ -10,7 +10,6 @@ on:
 env:
   WIN_DEPENDENCIES_RELEASE: "v0.4.0"
   WIN_TOOLCHAIN_FILE: '/c/vcpkg/scripts/buildsystems/vcpkg.cmake'
-  BLA_VENDOR: OpenBLAS
   BUILD_DOC: ON
   BUILD_SHARED_LIBS: OFF
   BUILD_TOOLS: ON
@@ -19,7 +18,8 @@ env:
   ENABLE_BEM: ON
   ENABLE_GEOFLOW: ON
   ENABLE_FETK: ON
-  FETK_VERSION: "1.8.1"
+#  FETK_VERSION: "1.8.1"
+  FETK_VERSION: d3165f0293759196814c3053056af17850c9d9f0
   ENABLE_iAPBS: ON
   ENABLE_OPENMP: OFF
   ENABLE_PBAM: ON
@@ -83,12 +83,8 @@ jobs:
             flex \
             swig \
             libomp \
-            lapack \
-            suite-sparse \
-            superlu \
             boost \
-            eigen \
-            openblas
+            eigen
           brew upgrade gcc@9
 
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
@@ -104,11 +100,8 @@ jobs:
             libreadline-dev \
             libomp5 \
             libomp-dev \
-            libsuitesparse-dev \
-            libsuperlu-dev \
             libeigen3-dev \
-            libboost-dev \
-            libopenblas-dev
+            libboost-dev
 
       - name: Install Window dependencies
         if: startsWith(matrix.os, 'windows')  # Windows only
@@ -125,6 +118,7 @@ jobs:
         if: startsWith(matrix.os, 'windows')  # Windows only
         env:
           CMAKE_PREFIX_PATH: ${VCPKG_INSTALLATION_ROOT}/installed/x86-windows
+          BLA_VENDOR: OpenBLAS
         run: |
           mkdir -p build/${RELEASE_TYPE}
           cd build
@@ -136,12 +130,14 @@ jobs:
       - name: Configure and Build for Mac
         if: startsWith(matrix.os, 'macos')  # Mac only
         env:
-          CMAKE_PREFIX_PATH: /usr/local/opt/openblas
+          BLA_VENDR: Apple
         run: |
           ./.build.sh
 
       - name: Configure and Build for Linux
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
+        env:
+          BLA_VENDOR: OpenBLAS
         run: |
           ./.build.sh
         env:

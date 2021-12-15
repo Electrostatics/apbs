@@ -18,8 +18,10 @@ set(CMAKE_PROJECT_VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION})
 #        (configure.ac:1306)
 ################################################################################
 set(CMAKE_VERBOSE_MAKEFILE true)
-cmake_policy(SET CMP0054 OLD)
 cmake_policy(SET CMP0042 NEW)
+cmake_policy(SET CMP0048 NEW)
+cmake_policy(SET CMP0054 NEW)
+cmake_policy(SET CMP0077 NEW)
 set(CMAKE_MACOSX_RPATH 1)
 
 ################################################################################
@@ -382,26 +384,27 @@ if(ENABLE_FETK)
         punc
         mc
         gamer
+        superlu
         vf2c
     )
 
-    find_package( BLAS REQUIRED )
-    find_package( UMFPACK REQUIRED )
-    list(APPEND APBS_LIBS
-        ${UMFPACK_LIBRARIES}
-        ${BLAS_LIBRARIES}
-    )
+#    find_package( BLAS REQUIRED )
+#    find_package( UMFPACK REQUIRED )
+#    list(APPEND APBS_LIBS
+#        ${UMFPACK_LIBRARIES}
+#        ${BLAS_LIBRARIES}
+#    )
 
-    find_package( SuperLU )
-    if(SuperLU_FOUND)
-        # include from find_package variables
-        list(APPEND APBS_LIBS
-            ${SUPERLU_LIBRARIES}
-        )
-    else()
-        # library built with FETK
-        list(APPEND APBS_LIBS superlu)
-    endif()
+#    find_package( SuperLU )
+#    if(SuperLU_FOUND)
+#        # include from find_package variables
+#        list(APPEND APBS_LIBS
+#            ${SUPERLU_LIBRARIES}
+#        )
+#    else()
+#        # library built with FETK
+#        list(APPEND APBS_LIBS superlu)
+#    endif()
 
     SET(HAVE_MC 1)
     SET(HAVE_PUNC 1)
