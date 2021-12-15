@@ -87,6 +87,14 @@ jobs:
             eigen
           brew upgrade gcc@9
 
+      # Uncomment if building FETK from source
+      - name: Mac Prereqs needed by FETK
+        if: startsWith(matrix.os, 'macos')  # Mac only
+        run: |
+          brew install \
+            lapack \
+            suite-sparse
+
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
@@ -102,6 +110,15 @@ jobs:
             libomp-dev \
             libeigen3-dev \
             libboost-dev
+
+      # Uncomment if building FETK from source
+      - name: Linux Prereqs needed by FETK
+        if: startsWith(matrix.os, 'ubuntu')  # Linux only
+        run: |
+          sudo apt-get install -yq \
+            libopenblas-dev \
+            liblapack-dev \
+            libsuitesparse-dev
 
       - name: Install Window dependencies
         if: startsWith(matrix.os, 'windows')  # Windows only
@@ -218,27 +235,27 @@ jobs:
 
     steps:
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
+#      - name: Set up Python
+#        uses: actions/setup-python@v2
+#        with:
+#          python-version: ${{ matrix.python-version }}
 
-      - name: Linux Prereqs
-        if: startsWith(matrix.os, 'ubuntu')  # Linux only
-        run: |
-          sudo apt-get install -yq \
-            libsuitesparse-dev \
-            libsuperlu-dev \
-            libopenblas-dev \
-            python3-dev
+#      - name: Linux Prereqs
+#        if: startsWith(matrix.os, 'ubuntu')  # Linux only
+#        run: |
+#          sudo apt-get install -yq \
+#            libsuitesparse-dev \
+#            libsuperlu-dev \
+#            libopenblas-dev \
+#            python3-dev
 
-      - name: Mac Prereqs
-        if: startsWith(matrix.os, 'macos')  # Mac only
-        run: |
-          brew install \
-            suite-sparse \
-            superlu \
-            openblas
+#      - name: Mac Prereqs
+#        if: startsWith(matrix.os, 'macos')  # Mac only
+#        run: |
+#          brew install \
+#            suite-sparse \
+#            superlu \
+#            openblas
 
 #      - name: Windows Prereqs
 #        if: startsWith(matrix.os, 'windows')  # Windows only
