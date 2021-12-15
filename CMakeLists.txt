@@ -333,7 +333,8 @@ endif()
 
 if(ENABLE_FETK)
    
-    if(FETK_FROM_PKG)
+#    if(FETK_FROM_PKG)
+    if(FALSE)
 
         set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
         if(WIN32)
