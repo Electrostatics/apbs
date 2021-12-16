@@ -13,6 +13,7 @@ RUN apt-get update && \
         libeigen3-dev \
         libboost-dev \
         python3-dev \
+        libopenblas-dev \
         && \
     /bin/true
 
@@ -23,7 +24,6 @@ FROM apbs_base
 # These dependencies are needed only if building FETK from source
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        libopenblas-dev \
         liblapack-dev \
         libsuitesparse-dev \
         && \

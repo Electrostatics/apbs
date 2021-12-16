@@ -570,6 +570,8 @@ if(ENABLE_PBAM OR ENABLE_PBSAM)
         message(STATUS "Building PBSAM")
         set(ENABLE_PBSAM_APBS ON CACHE BOOL "Enable the APBS-PBSAM connection")
 
+        find_package(BLAS REQUIRED)
+
         add_definitions(
             -DENABLE_PBSAM
             -DPBSAM_APBS
@@ -579,7 +581,7 @@ if(ENABLE_PBAM OR ENABLE_PBSAM)
 
     FetchContent_Declare( pb_s_am
         GIT_REPOSITORY https://github.com/Electrostatics/pb_solvers.git
-        GIT_TAG c08c7a6b8f31c1b218033329471562c85331b001
+        GIT_TAG 03ed2e197a412cd9b7850699caea9d1f4c086f52
     )
     #add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
     FetchContent_MakeAvailable( pb_s_am )

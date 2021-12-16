@@ -109,14 +109,14 @@ jobs:
             libomp5 \
             libomp-dev \
             libeigen3-dev \
-            libboost-dev
+            libboost-dev \
+            libopenblas-dev
 
       # Uncomment if building FETK from source
       - name: Linux Prereqs needed by FETK
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
           sudo apt-get install -yq \
-            libopenblas-dev \
             liblapack-dev \
             libsuitesparse-dev
 
@@ -140,14 +140,14 @@ jobs:
           mkdir -p build/${RELEASE_TYPE}
           cd build
           echo $CMAKE_PREFIX_PATH
-          cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=${RELEASE_TYPE} -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF -DBUILD_TESTING=${BUILD_TESTING} -DBUILD_TOOLS=${BUILD_TOOLS} -DCHECK_EPSILON=ON -DENABLE_FETK=${ENABLE_FETK} -DENABLE_BEM=${ENABLE_BEM} -DENABLE_GEOFLOW=${ENABLE_GEOFLOW} -DENABLE_iAPBS=${ENABLE_iAPBS} -DENABLE_INLINE=ON -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PYTHON=${ENABLE_PYTHON} -DENABLE_TESTS=${ENABLE_TESTS} -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DENABLE_VERBOSE_DEBUG=OFF -DGET_NanoShaper=${GET_NanoShaper} -DFETK_VERSION=${FETK_VERSION} -G "Visual Studio 16 2019" -A Win32 ..
+          cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=${RELEASE_TYPE} -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF -DBUILD_TESTING=${BUILD_TESTING} -DBUILD_TOOLS=${BUILD_TOOLS} -DCHECK_EPSILON=ON -DBLA_VENDOR=${BLA_VENDOR} -DENABLE_FETK=${ENABLE_FETK} -DENABLE_BEM=${ENABLE_BEM} -DENABLE_GEOFLOW=${ENABLE_GEOFLOW} -DENABLE_iAPBS=${ENABLE_iAPBS} -DENABLE_INLINE=ON -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PYTHON=${ENABLE_PYTHON} -DENABLE_TESTS=${ENABLE_TESTS} -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DENABLE_VERBOSE_DEBUG=OFF -DGET_NanoShaper=${GET_NanoShaper} -DFETK_VERSION=${FETK_VERSION} -G "Visual Studio 16 2019" -A Win32 ..
           cat CMakeCache.txt
         shell: bash
 
       - name: Configure and Build for Mac
         if: startsWith(matrix.os, 'macos')  # Mac only
         env:
-          BLA_VENDR: Apple
+          BLA_VENDOR: Apple
         run: |
           ./.build.sh
 
