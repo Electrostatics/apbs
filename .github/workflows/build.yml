@@ -82,7 +82,6 @@ jobs:
             bison \
             flex \
             swig \
-            libomp \
             boost \
             eigen
 #          brew upgrade gcc@9
@@ -106,8 +105,6 @@ jobs:
             flex \
             swig \
             libreadline-dev \
-            libomp5 \
-            libomp-dev \
             libeigen3-dev \
             libboost-dev \
             libopenblas-dev
