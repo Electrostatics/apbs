@@ -18,6 +18,12 @@
 
 #include "apbs_driver.h"
 
+#ifdef WIN32
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
+
 
 /*! \def MAX_BUF_SIZE
     \brief Buffer size for internal APBS string input.
