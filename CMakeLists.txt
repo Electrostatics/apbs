@@ -353,7 +353,7 @@ if(ENABLE_FETK)
         include_directories(${fetk_SOURCE_DIR}/include)
         link_directories(${fetk_SOURCE_DIR}/lib)
 
-    else(FETK_FROM_PKG)
+    else()
 
         FetchContent_Declare( fetk
             GIT_REPOSITORY https://github.com/Electrostatics/FETK.git
@@ -378,7 +378,7 @@ if(ENABLE_FETK)
             ${fetk_SOURCE_DIR}/punc/src/base
         )
 
-    endif(FETK_FROM_PKG)
+    endif()
 
     list(APPEND APBS_LIBS
         maloc
@@ -581,7 +581,7 @@ if(ENABLE_PBAM OR ENABLE_PBSAM)
 
     FetchContent_Declare( pb_s_am
         GIT_REPOSITORY https://github.com/Electrostatics/pb_solvers.git
-        GIT_TAG b5fd5f84eff71be628ab025a3a7298fc9e13c15c
+        GIT_TAG c7cb48a5683a084eb51d6c58940deb4c0c7500c6
     )
     #add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
     FetchContent_MakeAvailable( pb_s_am )
