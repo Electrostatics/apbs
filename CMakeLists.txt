@@ -581,7 +581,7 @@ if(ENABLE_PBAM OR ENABLE_PBSAM)
 
     FetchContent_Declare( pb_s_am
         GIT_REPOSITORY https://github.com/Electrostatics/pb_solvers.git
-        GIT_TAG 03ed2e197a412cd9b7850699caea9d1f4c086f52
+        GIT_TAG cc38c4af28ee0a6cd474146a5350bd1cc696ef1f
     )
     #add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
     FetchContent_MakeAvailable( pb_s_am )
