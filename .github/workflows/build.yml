@@ -107,7 +107,7 @@ jobs:
             libreadline-dev \
             libeigen3-dev \
             libboost-dev \
-            libopenblas-dev
+            libopenblas-serial-dev
 
       # Uncomment if building FETK from source
       - name: Linux Prereqs needed by FETK
