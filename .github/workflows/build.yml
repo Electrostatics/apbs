@@ -85,7 +85,7 @@ jobs:
             libomp \
             boost \
             eigen
-          brew upgrade gcc@9
+#          brew upgrade gcc@9
 
       # Uncomment if building FETK from source
       - name: Mac Prereqs needed by FETK

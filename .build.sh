@@ -16,20 +16,20 @@ export PACKAGE_APBS=0
 # Configure and Build pybind11 with BUILD_PYBIND=1 or turn off with BUILD_PYBIND=0
 export BUILD_PYBIND=0
  
-echo "==================================== WHICH GCC ==================================== "
-ostype="$(uname -s)"
-case "${ostype}" in
-      # NOTE: clang on Github Actions cannot fine Accelerate Framework
-      #       so you will get errors about not being able to find xerbla_
-      # Darwin*)    export CC=clang; export CXX=clang++;;
-      Darwin*)    export CC=gcc-9; export CXX=g++-9;;# export CMAKE_C_FLAGS="-Wl,-rpath=@executable_path/../lib "; export CMAKE_CXX_FLAGS="-Wl,-rpath=@executable_path/../lib ";;
-      Linux*)     export CC=gcc-9; export CXX=g++-9;;
-esac
+#echo "==================================== WHICH GCC ==================================== "
+#ostype="$(uname -s)"
+#case "${ostype}" in
+#      # NOTE: clang on Github Actions cannot fine Accelerate Framework
+#      #       so you will get errors about not being able to find xerbla_
+#      # Darwin*)    export CC=clang; export CXX=clang++;;
+#      Darwin*)    export CC=gcc-9; export CXX=g++-9;;# export CMAKE_C_FLAGS="-Wl,-rpath=@executable_path/../lib "; export CMAKE_CXX_FLAGS="-Wl,-rpath=@executable_path/../lib ";;
+#      Linux*)     export CC=gcc-9; export CXX=g++-9;;
+#esac
  
-export CMAKE_C_COMPILER=$CC
-export CMAKE_CXX_COMPILER=$CXX
-export CMAKE_C_LINK_EXECUTABLE=$CC
-export CMAKE_CXX_LINK_EXECUTABLE=$CXX
+#export CMAKE_C_COMPILER=$CC
+#export CMAKE_CXX_COMPILER=$CXX
+#export CMAKE_C_LINK_EXECUTABLE=$CC
+#export CMAKE_CXX_LINK_EXECUTABLE=$CXX
  
 export SRC_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export COVERAGE="-g -O0 -fprofile-arcs -ftest-coverage"
@@ -65,10 +65,10 @@ echo "==================================== PYTHON VERSION"
 python -c "import sys; print(sys.version)"
 echo "==================================== CMAKE VERSION"
 cmake --version
-echo "==================================== C Compiler VERSION"
-$CMAKE_C_COMPILER --version
-echo "==================================== C++ Compiler VERSION"
-$CMAKE_CXX_COMPILER --version
+#echo "==================================== C Compiler VERSION"
+#$CMAKE_C_COMPILER --version
+#echo "==================================== C++ Compiler VERSION"
+#$CMAKE_CXX_COMPILER --version
 echo "==================================== SWIG VERSION"
 swig -version
  
