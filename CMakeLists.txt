@@ -282,13 +282,19 @@ endif()
 
 
 ################################################################################
-# Find some libraries; Windows finds these automatically                       #
+# Find some libraries                       #
 ################################################################################
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
     list(APPEND APBS_LIBS m stdc++)
 endif()
 
+    find_package( BLAS REQUIRED )
+    find_package( UMFPACK REQUIRED )
+    list(APPEND APBS_LIBS
+        ${UMFPACK_LIBRARIES}
+        ${BLAS_LIBRARIES}
+    )
 
 ################################################################################
 # Optionally copy NanoShaper executable                                        #
