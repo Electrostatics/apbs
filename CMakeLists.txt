@@ -289,12 +289,14 @@ if(NOT WIN32)
     list(APPEND APBS_LIBS m stdc++)
 endif()
 
-    find_package( BLAS REQUIRED )
-    find_package( UMFPACK REQUIRED )
-    list(APPEND APBS_LIBS
-        ${UMFPACK_LIBRARIES}
-        ${BLAS_LIBRARIES}
-    )
+find_package( AMD REQUIRED )
+find_package( BLAS REQUIRED )
+find_package( UMFPACK REQUIRED )
+list(APPEND APBS_LIBS
+    ${AMD_LIBRARIES}
+    ${UMFPACK_LIBRARIES}
+    ${BLAS_LIBRARIES}
+)
 
 ################################################################################
 # Optionally copy NanoShaper executable                                        #
