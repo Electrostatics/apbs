@@ -75,6 +75,26 @@ if(CMAKE_TOOLCHAIN_FILE)
     include(${CMAKE_TOOLCHAIN_FILE})
 endif()
 
+
+################################################################################
+# Handle the Finite Element Toolkit
+#
+# To use a released version of FETK:
+#   - Set FETK_VERSION to the version number (e.g. 1.8.0)
+# In this case, the binary archive will be downloaded and used.
+#
+# To use a non-released version of FETK:
+#   - Set FETK_VERSION to the git branch or commit hash you want to use (e.g. main)
+################################################################################
+
+# FETK is currently required, and therefore this option is disabled
+#option(ENABLE_FETK "Enable the finite element solver" ON)
+
+set(FETK_VERSION "1.8.1" CACHE STRING "Version of FETK to use")
+include(ImportFETK)
+import_fetk(${FETK_VERSION})
+
+
 ###############################################################################
 ##  NOTE: For Debugging and generally nice information to have
 ###############################################################################
@@ -318,108 +338,6 @@ if(ENABLE_PYGBE)
     include_directories(${Python3_INCLUDE_DIRS})
     list(APPEND APBS_LIBS ${Python3_LIBRARIES})
 endif() # ENABLE_PYGBE
-
-################################################################################
-# Handle the finite element solver dependencies                                #
-#
-# To use a released version of FETK:
-#   - Set FETK_VERSION to the version number (e.g. 1.8.0)
-# In this case, the binary archive will be downloaded and used.
-#
-# To use a non-released version of FETK:
-#   - Set FETK_VERSION to the git branch or commit hash you want to use (e.g. main)
-################################################################################
-option(ENABLE_FETK "Enable the finite element solver" ON)
-
-set(FETK_VERSION "1.8.1" CACHE STRING "Version of FETK to use")
-
-set(FETK_FROM_PKG TRUE)
-if(NOT FETK_VERSION MATCHES "[0-9]+\.[0-9]+\.[0-9]+")
-    set(FETK_FROM_PKG FALSE)
-    string(REPLACE "/" "-" FETK_VERSION ${FETK_VERSION}) # this matches the replacement that GitHub makes for the directory within the zip file
-endif()
-
-if(ENABLE_FETK)
-   
-#    if(FETK_FROM_PKG)
-    if(FALSE)
-
-        set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_VERSION}")
-        if(WIN32)
-            set(FETK_ZIP_EXT zip)
-            set(FETK_SYSTEM_COMPONENT win32)
-        else()
-            set(FETK_ZIP_EXT tar.gz)
-            set(FETK_SYSTEM_COMPONENT ${CMAKE_SYSTEM_NAME})
-        endif()
-
-        FetchContent_Declare( fetk
-            URL ${FETK_BASE_URL}/FETK-${FETK_VERSION}-${FETK_SYSTEM_COMPONENT}.${FETK_ZIP_EXT}
-        )
-        FetchContent_MakeAvailable( fetk )
-
-        include_directories(${fetk_SOURCE_DIR}/include)
-        link_directories(${fetk_SOURCE_DIR}/lib)
-
-    else()
-
-        FetchContent_Declare( fetk
-            GIT_REPOSITORY https://github.com/Electrostatics/FETK.git
-            GIT_TAG ${FETK_VERSION}
-        )
-        FetchContent_MakeAvailable( fetk )
-
-        include_directories(
-            ${fetk_SOURCE_DIR}/maloc/src/base
-            ${fetk_SOURCE_DIR}/maloc/src/psh
-            ${fetk_SOURCE_DIR}/maloc/src/vsh
-            ${fetk_SOURCE_DIR}/maloc/src/vsys
-            ${fetk_SOURCE_DIR}/mc/src/aprx
-            ${fetk_SOURCE_DIR}/mc/src/bam
-            ${fetk_SOURCE_DIR}/mc/src/base
-            ${fetk_SOURCE_DIR}/mc/src/dyn
-            ${fetk_SOURCE_DIR}/mc/src/gem
-            ${fetk_SOURCE_DIR}/mc/src/mcsh
-            ${fetk_SOURCE_DIR}/mc/src/nam
-            ${fetk_SOURCE_DIR}/mc/src/pde
-            ${fetk_SOURCE_DIR}/mc/src/whb
-            ${fetk_SOURCE_DIR}/punc/src/base
-        )
-
-    endif()
-
-    list(APPEND APBS_LIBS
-        maloc
-        punc
-        mc
-        gamer
-        superlu
-        vf2c
-    )
-
-#    find_package( BLAS REQUIRED )
-#    find_package( UMFPACK REQUIRED )
-#    list(APPEND APBS_LIBS
-#        ${UMFPACK_LIBRARIES}
-#        ${BLAS_LIBRARIES}
-#    )
-
-#    find_package( SuperLU )
-#    if(SuperLU_FOUND)
-#        # include from find_package variables
-#        list(APPEND APBS_LIBS
-#            ${SUPERLU_LIBRARIES}
-#        )
-#    else()
-#        # library built with FETK
-#        list(APPEND APBS_LIBS superlu)
-#    endif()
-
-    SET(HAVE_MC 1)
-    SET(HAVE_PUNC 1)
-    SET(HAVE_GAMER 1)
-
-endif(ENABLE_FETK)
 
 
 ################################################################################
