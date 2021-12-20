@@ -50,7 +50,7 @@ if(BUILD_DOXYGEN)
 		)
 
     	install(DIRECTORY ${APBS_BUILD}/docs/programmer
-            DESTINATION ${SHARE_INSTALL_PATH}/docs
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/docs
             PATTERN "Doxyfile" EXCLUDE
             PATTERN "latex" EXCLUDE
 			PATTERN "mainpage.h" EXCLUDE

@@ -17,7 +17,7 @@ set(CMAKE_PROJECT_VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION})
 # TODO:  Handle special mac dependencies
 #        (configure.ac:1306)
 ################################################################################
-set(CMAKE_VERBOSE_MAKEFILE true)
+#set(CMAKE_VERBOSE_MAKEFILE false)
 cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0054 NEW)
@@ -75,6 +75,33 @@ if(CMAKE_TOOLCHAIN_FILE)
     include(${CMAKE_TOOLCHAIN_FILE})
 endif()
 
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Install prefix" FORCE)
+endif()
+message(STATUS "Install prefix: ${CMAKE_INSTALL_PREFIX}")
+
+set(CMAKE_INSTALL_DATAROOTDIR "share/apbs")
+include(GNUInstallDirs)
+
+set(APBS_ROOT ${PROJECT_SOURCE_DIR})
+set(APBS_BUILD ${PROJECT_BINARY_DIR})
+set(EXECUTABLE_OUTPUT_PATH ${APBS_BUILD}/bin)
+set(LIBRARY_OUTPUT_PATH ${APBS_BUILD}/lib)
+set(TOOLS_PATH ${APBS_BUILD}/tools)
+set(APBS_BINARY ${EXECUTABLE_OUTPUT_PATH}/apbs)
+message(STATUS "*&^*&^ ${CMAKE_INSTALL_DATADIR}")
+set(APBS_LIBS)
+set(APBS_LIB_DIRS)
+
+find_file(CONTRIB_PATH "contrib"
+          PATHS "${APBS_ROOT}"
+          DOC "The path to contributed modules for apbs")
+find_file(EXTERNALS_PATH "externals"
+          PATHS "${APBS_ROOT}"
+          DOC "The path to the external git submodules")
+
+set(SYS_LIBPATHS /usr/lib64)
+#list(APPEND SYS_LIBPATHS /usr/lib64)
 
 ################################################################################
 # Handle the Finite Element Toolkit
@@ -145,31 +172,6 @@ else()
 endif()
 message(STATUS "Building shared libs: ${BUILD_SHARED_LIBS}")
 message(STATUS "Find-library suffixes: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
-
-set(APBS_ROOT ${PROJECT_SOURCE_DIR})
-set(APBS_BUILD ${PROJECT_BINARY_DIR})
-set(EXECUTABLE_OUTPUT_PATH ${APBS_BUILD}/bin)
-set(LIBRARY_OUTPUT_PATH ${APBS_BUILD}/lib)
-set(TOOLS_PATH ${APBS_BUILD}/tools)
-set(APBS_BINARY ${EXECUTABLE_OUTPUT_PATH}/apbs)
-
-set(LIBRARY_INSTALL_PATH lib)
-set(HEADER_INSTALL_PATH include/apbs)
-set(EXECUTABLE_INSTALL_PATH bin)
-set(SHARE_INSTALL_PATH share/apbs)
-
-set(APBS_LIBS)
-set(APBS_LIB_DIRS)
-
-find_file(CONTRIB_PATH "contrib"
-          PATHS "${APBS_ROOT}"
-          DOC "The path to contributed modules for apbs")
-find_file(EXTERNALS_PATH "externals"
-          PATHS "${APBS_ROOT}"
-          DOC "The path to the external git submodules")
-
-set(SYS_LIBPATHS /usr/lib64)
-#list(APPEND SYS_LIBPATHS /usr/lib64)
 
 
 ###############################################################################
@@ -418,8 +420,8 @@ if(GET_NanoShaper)
     endif()
 
     install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}
-            DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    message(STATUS "NanoShaper install: ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
+            DESTINATION ${CMAKE_INSTALL_BINDIR})
+    message(STATUS "NanoShaper install: ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME} ${CMAKE_INSTALL_BINDIR}")
 endif()
 
 
@@ -687,7 +689,7 @@ configure_file(
     @ONLY
 )
 if(ENABLE_iAPBS)
-    INSTALL(FILES ${APBS_BUILD}/src/apbscfg.h DESTINATION ${HEADER_INSTALL_PATH} COMPONENT headers)
+    INSTALL(FILES ${APBS_BUILD}/src/apbscfg.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT headers)
 endif()
 
 
@@ -746,18 +748,18 @@ endif()
 # Set up additional directories to install                                     #
 ################################################################################
 install(DIRECTORY ${APBS_ROOT}/docs
-        DESTINATION ${SHARE_INSTALL_PATH}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}
         COMPONENT docs
         PATTERN "programmer" EXCLUDE
         PATTERN "CMakeLists.txt" EXCLUDE)
 
 install(DIRECTORY ${APBS_ROOT}/examples
-        DESTINATION ${SHARE_INSTALL_PATH}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}
         USE_SOURCE_PERMISSIONS
         COMPONENT examples)
 
 install(DIRECTORY ${APBS_ROOT}/tests
-        DESTINATION ${SHARE_INSTALL_PATH}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}
         COMPONENT tests
         FILES_MATCHING
         PATTERN "*.py"
@@ -766,7 +768,7 @@ install(DIRECTORY ${APBS_ROOT}/tests
 
 if(BUILD_TOOLS)
     install(DIRECTORY ${APBS_ROOT}/tools
-            DESTINATION ${SHARE_INSTALL_PATH}
+            DESTINATION ${CMAKE_INSTALL_DATADIR}
             USE_SOURCE_PERMISSIONS
             COMPONENT tools
             PATTERN "CMakeLists.txt"
@@ -776,7 +778,7 @@ if(BUILD_TOOLS)
 
     if(NOT "${APBS_ROOT}" STREQUAL "${APBS_BUILD}")
     install(DIRECTORY ${APBS_BUILD}/tools/bin
-            DESTINATION ${SHARE_INSTALL_PATH}/tools
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/tools
             USE_SOURCE_PERMISSIONS
             COMPONENT tools)
     endif()

@@ -18,10 +18,7 @@ PROJECT(iAPBS)
 
 message(STATUS "Setting iAPBS project paths")
 set(iAPBS_ROOT ${PROJECT_SOURCE_DIR})
-set(EXECUTABLE_OUTPUT_PATH ${iAPBS_ROOT}/bin)
-set(LIBRARY_OUTPUT_PATH ${iAPBS_ROOT}/lib)
 
-set(LIBRARY_INSTALL_DIR lib)
 
 ################################################################################
 # add src

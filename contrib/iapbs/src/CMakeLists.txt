@@ -3,7 +3,7 @@
 #Removed ${APBS_INST_PATH}/include from INCLUDE_DIRECTORIES,
 #       because it doesn't exist
 
-INCLUDE_DIRECTORIES(. ${APBS_ROOT}/src)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${APBS_ROOT}/src)
 LINK_DIRECTORIES(${APBS_ROOT_PATH}/lib)
 
 #ADD_LIBRARY(iapbs SHARED apbs_driver.c apbs_driver.h)
@@ -22,9 +22,9 @@ if(BUILD_iAPBS_FORTRAN_WRAPPER)
      apbs_mg
      apbs_generic
      apbs_pmgc)
-   INSTALL(TARGETS wrapper DESTINATION bin COMPONENT executables)
+   INSTALL(TARGETS wrapper DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT executables)
 endif()
 
-INSTALL(TARGETS iapbs DESTINATION lib COMPONENT libraries)
+INSTALL(TARGETS iapbs DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries)
 
-install(FILES apbs_driver.h DESTINATION include/iapbs COMPONENT headers)
+install(FILES apbs_driver.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/iapbs COMPONENT headers)
