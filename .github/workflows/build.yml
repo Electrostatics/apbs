@@ -19,7 +19,7 @@ env:
   ENABLE_GEOFLOW: ON
   ENABLE_FETK: ON
 #  FETK_VERSION: "1.8.1"
-  FETK_VERSION: 7caccc2e61adfcb5753345c86d375d32d4db1cde
+  FETK_VERSION: 93ee68c1207941f8d3765f7eab5cf9b32015a925
   ENABLE_iAPBS: ON
   ENABLE_OPENMP: OFF
   ENABLE_PBAM: ON
@@ -42,6 +42,16 @@ jobs:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
         python-version: [3.9]
+        include:
+          - os: ubuntu-latest
+            BLA_VENDOR: OpenBLAS
+          - os: macos-latest
+            BLA_VENDOR: Apple
+          - os: windows-latest
+            BLA_VENDOR: OpenBLAS
+
+    env:
+      BLA_VENDOR: ${{ matrix.BLA_VENDOR }}
 
     outputs:
       apbs-version: ${{ steps.extract-version.outputs.apbs-version }}
@@ -89,14 +99,6 @@ jobs:
             suite-sparse
 #          brew upgrade gcc@9
 
-      # Uncomment if building FETK from source
-#      - name: Mac Prereqs needed by FETK
-#        if: startsWith(matrix.os, 'macos')  # Mac only
-#        run: |
-#          brew install \
-#            lapack \
-#            suite-sparse
-
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
@@ -115,14 +117,6 @@ jobs:
             liblapack-dev \
             libsuitesparse-dev
 
-      # Uncomment if building FETK from source
-#      - name: Linux Prereqs needed by FETK
-#        if: startsWith(matrix.os, 'ubuntu')  # Linux only
-#        run: |
-#          sudo apt-get install -yq \
-#            liblapack-dev \
-#            libsuitesparse-dev
-
       - name: Install Window dependencies
         if: startsWith(matrix.os, 'windows')  # Windows only
         run: |
@@ -138,7 +132,6 @@ jobs:
         if: startsWith(matrix.os, 'windows')  # Windows only
         env:
           CMAKE_PREFIX_PATH: ${VCPKG_INSTALLATION_ROOT}/installed/x86-windows
-          BLA_VENDOR: OpenBLAS
         run: |
           mkdir -p build/${RELEASE_TYPE}
           cd build
@@ -149,15 +142,12 @@ jobs:
 
       - name: Configure and Build for Mac
         if: startsWith(matrix.os, 'macos')  # Mac only
-        env:
-          BLA_VENDOR: Apple
         run: |
           ./.build.sh
 
       - name: Configure and Build for Linux
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         env:
-          BLA_VENDOR: OpenBLAS
           # https://codecov.io/gh/Electrostatics/apbs
           CODECOV_TOKEN: "e3a1e24c-5598-4f47-9353-7fa0ac57f98e"
         run: |

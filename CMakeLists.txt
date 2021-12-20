@@ -309,13 +309,13 @@ if(NOT WIN32)
     list(APPEND APBS_LIBS m stdc++)
 endif()
 
-find_package( AMD REQUIRED )
-find_package( BLAS REQUIRED )
 find_package( UMFPACK REQUIRED )
+find_package( SuiteSparse REQUIRED )
+message(STATUS "SUITESPARSE_INCLUDE_DIRS: ${SUITESPARSE_INCLUDE_DIRS}")
+message(STATUS "SUITESPARSE_LIBRARIES: ${SUITESPARSE_LIBRARIES}")
 list(APPEND APBS_LIBS
-    ${AMD_LIBRARIES}
     ${UMFPACK_LIBRARIES}
-    ${BLAS_LIBRARIES}
+    ${SUITESPARSE_LIBRARIES}
 )
 
 ################################################################################

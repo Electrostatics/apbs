@@ -13,21 +13,16 @@ RUN apt-get update && \
         libeigen3-dev \
         libboost-dev \
         python3-dev \
-        libopenblas-dev \
-        && \
-    /bin/true
-
-#########################################
-
-FROM apbs_base
-
-# These dependencies are needed only if building FETK from source
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        libopenblas-serial-dev \
         liblapack-dev \
         libsuitesparse-dev \
         && \
     /bin/true
+
+
+#########################################
+
+FROM apbs_base
 
 ADD . /tmp_source
 
@@ -42,7 +37,7 @@ ARG ENABLE_BEM=ON
 ARG ENABLE_GEOFLOW=ON
 ARG ENABLE_FETK=ON
 #ARG FETK_VERSION="1.8.1"
-ARG FETK_VERSION=d3165f0293759196814c3053056af17850c9d9f0
+ARG FETK_VERSION=93ee68c1207941f8d3765f7eab5cf9b32015a925
 ARG ENABLE_iAPBS=ON
 ARG ENABLE_OPENMP=OFF
 ARG ENABLE_PBAM=ON
