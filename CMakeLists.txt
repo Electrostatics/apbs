@@ -22,6 +22,7 @@ cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0054 NEW)
 cmake_policy(SET CMP0077 NEW)
+cmake_policy(SET CMP0091 NEW)
 set(CMAKE_MACOSX_RPATH 1)
 
 ################################################################################
@@ -100,16 +101,32 @@ find_file(EXTERNALS_PATH "externals"
 set(SYS_LIBPATHS /usr/lib64)
 #list(APPEND SYS_LIBPATHS /usr/lib64)
 
-if(NOT BUILD_SHARED_LIBS)
+# If this option is true: static libraries will be built
+#                         static dependencies will be preferred
+#                         executables will be statically linked
+# If this option is false: dynamic libraries will be built
+#                          dynamic libraries of dependencies will be preferred
+#                          executables will be dynamically linked
+option(APBS_STATIC_BUILD "Flag to indicate whether a static build should be used (if false, will be dynamic)" ON)
+
+if(APBS_STATIC_BUILD)
     set(BLA_STATIC ON)
+    set(BUILD_SHARED_LIBS OFF)
+    set(CMAKE_LINK_SEARCH_START_STATIC ON)
+    set(CMAKE_LINK_SEARCH_END_STATIC ON)
     if(WIN32)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
         list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .lib .a)
     else()
         list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .a)
     endif()
 else()
     set(BLA_STATIC OFF)
+    set(BUILD_SHARED_LIBS ON)
+    set(CMAKE_LINK_SEARCH_START_STATIC OFF)
+    set(CMAKE_LINK_SEARCH_END_STATIC OFF)
     if(WIN32)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL$<$<CONFIG:Debug>:Debug>")
         list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .dll)
     elseif(APPLE)
         list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .dylib .so)
@@ -117,8 +134,12 @@ else()
         list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .so)
     endif()
 endif()
+
+message(STATUS "")
+message(STATUS "APBS Static build: ${APBS_STATIC_BUILD}")
 message(STATUS "Building shared libs: ${BUILD_SHARED_LIBS}")
 message(STATUS "Find-library suffixes: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
+message(STATUS "")
 
 ################################################################################
 # Handle the Finite Element Toolkit
