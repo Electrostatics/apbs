@@ -103,6 +103,26 @@ find_file(EXTERNALS_PATH "externals"
 set(SYS_LIBPATHS /usr/lib64)
 #list(APPEND SYS_LIBPATHS /usr/lib64)
 
+if(NOT BUILD_SHARED_LIBS)
+    set(BLA_STATIC ON)
+    if(WIN32)
+        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .lib .a)
+    else()
+        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .a)
+    endif()
+else()
+    set(BLA_STATIC OFF)
+    if(WIN32)
+        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .dll)
+    elseif(APPLE)
+        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .dylib .so)
+    else()
+        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .so)
+    endif()
+endif()
+message(STATUS "Building shared libs: ${BUILD_SHARED_LIBS}")
+message(STATUS "Find-library suffixes: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
+
 ################################################################################
 # Handle the Finite Element Toolkit
 #
@@ -154,24 +174,6 @@ endif()
 if(APPLE AND BUILD_SHARED_LIBS AND (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU"))
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -undefined dynamic_lookup")
 endif()
-
-if(NOT BUILD_SHARED_LIBS)
-    if(WIN32)
-        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .lib .a)
-    else()
-        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .a)
-    endif()
-else()
-    if(WIN32)
-        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .dll)
-    elseif(APPLE)
-        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .dylib .so)
-    else()
-        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .so)
-    endif()
-endif()
-message(STATUS "Building shared libs: ${BUILD_SHARED_LIBS}")
-message(STATUS "Find-library suffixes: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
 
 
 ###############################################################################
