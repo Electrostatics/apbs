@@ -176,7 +176,6 @@ message(STATUS "** VERSION_DATA:  ${CMAKE_PROJECT_VERSION}")
 message(STATUS "** CURRENT_TIME:  ${COMPILE_TIME}")
 message(STATUS "** CURRENT_YEAR:  ${COMPILE_YEAR}")
 
-OPTION(BUILD_SHARED_LIBS "Build shared libraries." OFF)
 
 ################################################################################
 # Set project paths                                                            #
@@ -336,6 +335,7 @@ endif()
 
 find_package( UMFPACK REQUIRED )
 find_package( SuiteSparse REQUIRED )
+message(STATUS "UMFPack libraries: ${UMFPACK_LIBRARIES}")
 message(STATUS "SUITESPARSE_INCLUDE_DIRS: ${SUITESPARSE_INCLUDE_DIRS}")
 message(STATUS "SUITESPARSE_LIBRARIES: ${SUITESPARSE_LIBRARIES}")
 list(APPEND APBS_LIBS
