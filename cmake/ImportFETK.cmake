@@ -25,6 +25,7 @@ macro(import_fetk FETK_IMPORT_VERSION)
                 set(FETK_SYSTEM_COMPONENT ${CMAKE_SYSTEM_NAME})
             endif()
 
+            message(STATUS "Downloading built FETK package ${FETK_IMPORT_VERSION}")
             FetchContent_Declare( fetk
                 URL ${FETK_BASE_URL}/FETK-${FETK_IMPORT_VERSION}-${FETK_SYSTEM_COMPONENT}.${FETK_ZIP_EXT}
             )
@@ -36,7 +37,7 @@ macro(import_fetk FETK_IMPORT_VERSION)
 
         else()
 
-            set(FETK_STANDALONE TRUE)
+            message(STATUS "Building FETK from commit ${FETK_IMPORT_VERSION}")
             FetchContent_Declare( fetk
                 GIT_REPOSITORY https://github.com/Electrostatics/FETK.git
                 GIT_TAG ${FETK_IMPORT_VERSION}
