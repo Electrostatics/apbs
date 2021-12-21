@@ -11,7 +11,6 @@ env:
   WIN_DEPENDENCIES_RELEASE: "v0.4.0"
   WIN_TOOLCHAIN_FILE: '/c/vcpkg/scripts/buildsystems/vcpkg.cmake'
   BUILD_DOC: ON
-  BUILD_SHARED_LIBS: OFF
   BUILD_TOOLS: ON
   RELEASE_TYPE: Release
   ENABLE_PYGBE: ON
@@ -21,7 +20,6 @@ env:
 #  FETK_VERSION: "1.8.1"
   FETK_VERSION: 93ee68c1207941f8d3765f7eab5cf9b32015a925
   ENABLE_iAPBS: ON
-  ENABLE_OPENMP: OFF
   ENABLE_PBAM: ON
   ENABLE_PBSAM: ON
   ENABLE_PYTHON: OFF
@@ -41,17 +39,24 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
+        openmp: [OFF]
+        static-build: [ON]
         python-version: [3.9]
         include:
           - os: ubuntu-latest
-            BLA_VENDOR: OpenBLAS
+            bla-vendor: OpenBLAS
+            create-package: true
           - os: macos-latest
-            BLA_VENDOR: Apple
+            bla-vendor: Apple
+            create-package: true
           - os: windows-latest
-            BLA_VENDOR: OpenBLAS
+            bla-vendor: OpenBLAS
+            create-package: true
 
     env:
-      BLA_VENDOR: ${{ matrix.BLA_VENDOR }}
+      BLA_VENDOR: ${{ matrix.bla-vendor }}
+      ENABLE_OPENMP: ${{ matrix.openmp }}
+      APBS_STATIC_BUILD: ${{matrix.static-build }}
 
     outputs:
       apbs-version: ${{ steps.extract-version.outputs.apbs-version }}
@@ -179,7 +184,7 @@ jobs:
           ctest -C Release --output-on-failure 
 
       - name: Create package for Mac and Linux
-        if: startsWith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu') # Mac or Linux only
+        if: matrix.create-package && startsWith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu') # Mac or Linux only
         id: cpack-ml
         run: |
           cd build
@@ -191,7 +196,7 @@ jobs:
           unzip -l ${ZIP_CPACK_FILE}
 
       - name: Create package for Windows
-        if: startsWith(matrix.os, 'windows')  # Windows only
+        if: matrix.create-package && startsWith(matrix.os, 'windows')  # Windows only
         id: cpack-w
         run: |
           cd build
@@ -205,6 +210,7 @@ jobs:
         shell: bash
 
       - name: Upload ZIP package to the action
+        if: matrix.create-package
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.ZIP_CPACK_FILE }}
