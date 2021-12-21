@@ -242,10 +242,11 @@ jobs:
 
     steps:
 
-#      - name: Set up Python
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: ${{ matrix.python-version }}
+      - name: Set up Python
+        if: startsWith(matrix.os, 'ubuntu')  # Linux only
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
 #      - name: Linux Prereqs
 #        if: startsWith(matrix.os, 'ubuntu')  # Linux only
