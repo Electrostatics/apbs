@@ -85,11 +85,8 @@ include(GNUInstallDirs)
 
 set(APBS_ROOT ${PROJECT_SOURCE_DIR})
 set(APBS_BUILD ${PROJECT_BINARY_DIR})
-set(EXECUTABLE_OUTPUT_PATH ${APBS_BUILD}/bin)
-set(LIBRARY_OUTPUT_PATH ${APBS_BUILD}/lib)
 set(TOOLS_PATH ${APBS_BUILD}/tools)
-set(APBS_BINARY ${EXECUTABLE_OUTPUT_PATH}/apbs)
-message(STATUS "*&^*&^ ${CMAKE_INSTALL_DATADIR}")
+
 set(APBS_LIBS)
 set(APBS_LIB_DIRS)
 
@@ -217,7 +214,8 @@ endif()
 ################################################################################
 # Set up temporary files and directories                                       #
 ################################################################################
-file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}/temp)
+set(TEMP_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/temp)
+file(MAKE_DIRECTORY ${TEMP_OUTPUT_DIR})
 
 
 ################################################################################
@@ -251,7 +249,7 @@ if(CHECK_EPSILON)
     try_run(
         FLOAT_EPSILON_COMPILED
         FLOAT_EPSILON_COMPUTED
-        ${EXECUTABLE_OUTPUT_PATH}/temp
+        ${TEMP_OUTPUT_DIR}
         ${APBS_ROOT}/src/.config/float_epsilon.c
         RUN_OUTPUT_VARIABLE FLOAT_EPSILON_OUTPUT
     )
@@ -266,7 +264,7 @@ if(CHECK_EPSILON)
     try_run(
         DOUBLE_EPSILON_COMPILED
         DOUBLE_EPSILON_COMPUTED
-        ${EXECUTABLE_OUTPUT_PATH}/temp
+        ${TEMP_OUTPUT_DIR}
         ${APBS_ROOT}/src/.config/double_epsilon.c
         RUN_OUTPUT_VARIABLE DOUBLE_EPSILON_OUTPUT
     )
@@ -416,14 +414,15 @@ if(GET_NanoShaper)
         set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper.exe")
     endif()
 
-    if(NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
-        file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME})
-        message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+    if(NOT EXISTS "${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME}")
+        file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME})
+        message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME}")
     endif()
 
-    install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}
-            DESTINATION ${CMAKE_INSTALL_BINDIR})
-    message(STATUS "NanoShaper install: ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME} ${CMAKE_INSTALL_BINDIR}")
+    install(PROGRAMS ${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME}
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT executables)
+    message(STATUS "NanoShaper install: ${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME} ${CMAKE_INSTALL_BINDIR}")
 endif()
 
 
@@ -789,7 +788,7 @@ endif()
 ################################################################################
 # Clean up temporary files and directories                                     #
 ################################################################################
-file(REMOVE_RECURSE ${EXECUTABLE_OUTPUT_PATH}/temp)
+file(REMOVE_RECURSE ${TEMP_OUTPUT_DIR})
 
 
 ###############################################################################
