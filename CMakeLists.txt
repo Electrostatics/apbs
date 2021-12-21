@@ -384,6 +384,22 @@ if(ENABLE_BEM)
         ${tabi_SOURCE_DIR}/src/tabipb_wrap/params_apbs_ctor.cpp
         ${tabi_SOURCE_DIR}/src/tabipb_wrap/molecule_apbs_ctor.cpp
     )
+
+    set(TABIPB_HEADERS
+        ${tabi_SOURCE_DIR}/src/boundary_element.h
+        ${tabi_SOURCE_DIR}/src/clusters.h
+        ${tabi_SOURCE_DIR}/src/constants.h
+        ${tabi_SOURCE_DIR}/src/interaction_list.h
+        ${tabi_SOURCE_DIR}/src/molecule.h
+        ${tabi_SOURCE_DIR}/src/output.h
+        ${tabi_SOURCE_DIR}/src/params.h
+        ${tabi_SOURCE_DIR}/src/particles.h
+        ${tabi_SOURCE_DIR}/src/partition.h
+        ${tabi_SOURCE_DIR}/src/tabipb_timers.h
+        ${tabi_SOURCE_DIR}/src/timer.h
+        ${tabi_SOURCE_DIR}/src/tree.h
+        ${tabi_SOURCE_DIR}/src/tabipb_wrap/TABIPBStruct.h
+        ${tabi_SOURCE_DIR}/src/tabipb_wrap/TABIPBWrap.h)
   
     set(TABIPB_LIBNAME TABIPBlib)
     add_library(${TABIPB_LIBNAME} ${TABIPB_LIBFILES})
@@ -392,7 +408,9 @@ if(ENABLE_BEM)
                            $<$<CONFIG:RELEASE>:-O3>
                            $<$<CONFIG:RELWITHDEBINFO>:-O3>
                            $<$<CONFIG:DEBUG>:-O0 -Wall>)
-
+    install(FILES ${TABIPB_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tabi COMPONENT headers)
+    install(TARGETS ${TABIPB_LIBNAME} DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries)
+                       
 endif() # ENABLE_BEM
 
 
@@ -419,10 +437,12 @@ if(GET_NanoShaper)
         message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME}")
     endif()
 
-    install(PROGRAMS ${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME}
-            DESTINATION ${CMAKE_INSTALL_BINDIR}
-            COMPONENT executables)
-    message(STATUS "NanoShaper install: ${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME} ${CMAKE_INSTALL_BINDIR}")
+    if(NOT ENABLE_BEM)
+        install(PROGRAMS ${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME}
+                DESTINATION ${CMAKE_INSTALL_BINDIR}
+                COMPONENT executables)
+        message(STATUS "NanoShaper install: ${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME} ${CMAKE_INSTALL_BINDIR}")
+    endif()
 endif()
 
 
