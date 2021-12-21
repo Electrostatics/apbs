@@ -36,6 +36,7 @@ macro(import_fetk FETK_IMPORT_VERSION)
 
         else()
 
+            set(FETK_STANDALONE TRUE)
             FetchContent_Declare( fetk
                 GIT_REPOSITORY https://github.com/Electrostatics/FETK.git
                 GIT_TAG ${FETK_IMPORT_VERSION}
