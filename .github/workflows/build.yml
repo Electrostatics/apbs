@@ -219,8 +219,8 @@ jobs:
 
 # For debugging
       - name: Setup tmate session
-        if: startsWith(matrix.os, 'windows')
-#        if: ${{ ! success() }}
+#        if: startsWith(matrix.os, 'windows')
+        if: ${{ ! success() }}
         uses: mxschmitt/action-tmate@v3
 
 
@@ -272,14 +272,15 @@ jobs:
 #            superlu \
 #            openblas
 
-#      - name: Windows Prereqs
-#        if: startsWith(matrix.os, 'windows')  # Windows only
-#        run: |
-#          choco install wget
-#          wget https://github.com/Electrostatics/cache/releases/download/${WIN_DEPENDENCIES_RELEASE}/apbs_dependencies_vcpkg.zip
-#          7z x apbs_dependencies_vcpkg.zip -aoa -o/c/vcpkg
-#          echo "/c/vcpkg/installed/x86-windows/bin" >> $GITHUB_PATH
-#        shell: bash
+      # We only need libumfpack.  For some reason it's still being linked into apbs.exe
+      - name: Windows Prereqs
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        run: |
+          choco install wget
+          wget https://github.com/Electrostatics/cache/releases/download/${WIN_DEPENDENCIES_RELEASE}/apbs_dependencies_vcpkg.zip
+          7z x apbs_dependencies_vcpkg.zip -aoa -o/c/vcpkg
+          echo "/c/vcpkg/installed/x86-windows/bin" >> $GITHUB_PATH
+        shell: bash
 
       - name: Download artifacts
         uses: actions/download-artifact@v2
