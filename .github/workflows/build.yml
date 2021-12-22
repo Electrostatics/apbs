@@ -207,7 +207,7 @@ jobs:
           cp $ZIP_CPACK_FILE unzip
           cd unzip
           unzip $ZIP_CPACK_FILE
-          PACKAGE_DIR=$(basename -- "$ZIP_CPACK_FILE")
+          PACKAGE_DIR=${ZIP_CPACK_FILE%.*}
           cp /c/vcpkg/installed/x86-windows/bin/{libumfpack.dll,libcholmod.dll,libamd.dll,openblas.dll,libcamd.dll,libcolamd.dll,libccolamd.dll,liblapack.dll,libgfortran-5.dll,libgcc_s_dw2-1.dll,libwinpthread-1.dll,libquadmath-0.dll} ./${PACKAGE_DIR}/bin
           zip -ur $ZIP_CPACK_FILE $PACKAGE_DIR
           echo "ZIP_CPACK_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
