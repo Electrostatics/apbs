@@ -484,7 +484,7 @@ int main(
         Vnm_tprint( 1, "  Processing file: %s\n", molpath);
 #ifdef _WIN32
         char* mol_dirname;
-        _splitpath(molpath, NULL, dirname, NULL, NULL);
+        _splitpath(molpath, NULL, mol_dirname, NULL, NULL);
 #else
         char* mol_dirname = dirname(molpath);
 #endif
