@@ -67,7 +67,11 @@
 
 #ifdef ENABLE_PYGBE
     // NOTE: Placeholder for any custom PYGBE parameter structure
+#ifdef _WIN32
+    #include <stdlib.h>
+#else
     #include <libgen.h>
+#endif
     #define PY_SSIZE_T_CLEAN
     #include <Python.h>
 #endif
@@ -476,8 +480,15 @@ int main(
 
 	    // Create parameters:
 	    StringList = PyList_New(1);
-        Vnm_tprint( 1, "  Processing file: %s\n", NOsh_getMolpath(nosh, 0));
-	    PyList_SetItem(StringList, 0, Py_BuildValue("s", dirname(NOsh_getMolpath(nosh, 0))));
+        char* molpath = NOsh_getMolpath(nosh, 0);
+        Vnm_tprint( 1, "  Processing file: %s\n", molpath);
+#ifdef _WIN32
+        char* mol_dirname;
+        _splitpath(molpath, NULL, dirname, NULL, NULL);
+#else
+        char* mol_dirname = dirname(molpath);
+#endif
+	    PyList_SetItem(StringList, 0, Py_BuildValue("s",mol_dirname));
         ArgList = PyTuple_New(1);
         PyTuple_SetItem(ArgList, 0, StringList);
 	
