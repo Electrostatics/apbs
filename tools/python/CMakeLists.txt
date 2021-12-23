@@ -8,7 +8,7 @@ INCLUDE(${SWIG_USE_FILE})
 
 
 set(CMAKE_FIND_FRAMEWORK NEVER)
-find_package(Python3 ${PYTHON_VERSION} COMPONENTS Interpreter Development)
+find_package(Python3 ${PYTHON_MIN_VERSION}...<${PYTHON_MAX_VERSION} COMPONENTS Interpreter Development)
 if(${Python3_FOUND})
     message(STATUS "******* Python3 FOUND")
 endif()
