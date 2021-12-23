@@ -96,7 +96,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-min-version }}
 
       - name: Mac Prereqs
         if: startsWith(matrix.os, 'macos')  # Mac only
