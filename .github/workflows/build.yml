@@ -191,6 +191,7 @@ jobs:
           cpack -C Release -G ZIP
           ZIP_CPACK_FILE=`ls APBS*.zip`
           echo "ZIP_CPACK_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
+          echo "PATH_TO_PACKAGE=build/" >> $GITHUB_ENV
           echo ::set-output name=cpack-out-${{ matrix.os }}-zip::${ZIP_CPACK_FILE}
           echo "ZIP CPack file: $ZIP_CPACK_FILE"
           unzip -l ${ZIP_CPACK_FILE}
@@ -211,6 +212,7 @@ jobs:
           cp /c/vcpkg/installed/x86-windows/bin/{libumfpack.dll,libcholmod.dll,libamd.dll,openblas.dll,libcamd.dll,libcolamd.dll,libccolamd.dll,liblapack.dll,libgfortran-5.dll,libgcc_s_dw2-1.dll,libwinpthread-1.dll,libquadmath-0.dll} ./${PACKAGE_DIR}/bin
           7z a -r $ZIP_CPACK_FILE $PACKAGE_DIR/bin/*.dll
           echo "ZIP_CPACK_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
+          echo "PATH_TO_PACKAGE=build/unzip/" >> $GITHUB_ENV
           echo ::set-output name=cpack-out-${{ matrix.os }}-zip::${ZIP_CPACK_FILE}
           echo "ZIP CPack file: $ZIP_CPACK_FILE"
           unzip -l ${ZIP_CPACK_FILE}
@@ -221,7 +223,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.ZIP_CPACK_FILE }}
-          path: build/${{ env.ZIP_CPACK_FILE }}
+          path: ${{ env.PATH_TO_PACKAGE }}${{ env.ZIP_CPACK_FILE }}
           retention-days: 5
 
 # For debugging
