@@ -2,7 +2,7 @@ include (CTest)
 enable_testing()
 
 message(STATUS "******* TESTING ADDED *****************")
-find_package(Python3 COMPONENTS Interpreter)
+find_package(Python3 ${PYTHON_VERSION} COMPONENTS Interpreter)
 if(${Python3_FOUND})
     message(STATUS "******* Python3 FOUND ${Python3_EXECUTABLE}")
 else()
