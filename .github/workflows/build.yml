@@ -320,6 +320,17 @@ jobs:
 #        shell: bash
 #          docker run -v `pwd`:/c/apbs mcr.microsoft.com/windows:1809 ls
 
+      - name: ldd
+        if: ${{ ! success() && startsWith(matrix.os, 'windows') }}
+        run: |
+          git clone https://github.com/LRN/ntldd.git
+          cd ntldd
+          ./makeldd.cmd
+          export PATH=/d/a/apbs/apbs/ntldd:$PATH
+          cd ../APBS-3.3.0.Windows/bin
+          ntldd.exe ./apbs.exe
+        shell: bash
+
 # For debugging
       - name: Setup tmate session
         if: ${{ ! success() }}
