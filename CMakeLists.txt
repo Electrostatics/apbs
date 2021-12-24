@@ -364,6 +364,13 @@ if(ENABLE_PYGBE)
     list(APPEND APBS_LIBS ${Python3_LIBRARIES})
 endif() # ENABLE_PYGBE
 
+if(WIN32)
+    find_package(Python3 ${PYTHON_MIN_VERSION}...<${PYTHON_MAX_VERSION} REQUIRED COMPONENTS Interpreter Development)
+    message(STATUS "******** PYTHON_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
+    message(STATUS "******** PYTHON_LIBRARIES ${Python3_LIBRARIES}")
+    include_directories(${Python3_INCLUDE_DIRS})
+    list(APPEND APBS_LIBS ${Python3_LIBRARIES})
+endif()
 
 ################################################################################
 # Optionally build BEM: TABI-PB method                                         #
