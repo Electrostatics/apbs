@@ -34,17 +34,10 @@ A few libraries are needed to run APBS from the pre-built binary:
 
 * All platforms
   * Python 3.9
-* Windows
-  * UMFPack (e.g. via suitesparse from vcpkg)
-  * If you get a popup error when running the APBS binaries, you will need to install the `Visual C++ Redistributable Package`_
-* Linux/Mac
-  * suite-sparse
-  * superlu \
-  * openblas
 
 .. caution:: 
 
-  On Linux and MacOS, you may need to set your LD_LIBRARY_PATH and PATH environment variables:
+  On Linux you may need to set your LD_LIBRARY_PATH and PATH environment variables:
   For example, in bash with APBS installed in $HOME/apbs, you would set the environment variables in your .bashrc like:
   .. code-block:: bash
 
