@@ -483,8 +483,10 @@ int main(
         char* molpath = NOsh_getMolpath(nosh, 0);
         Vnm_tprint( 1, "  Processing file: %s\n", molpath);
 #ifdef _WIN32
-        char mol_dirname[_MAX_DIR];
-        _splitpath(molpath, NULL, mol_dirname, NULL, NULL);
+        //char mol_dirname[_MAX_DIR];
+        //_splitpath(molpath, NULL, mol_dirname, NULL, NULL);
+        char mol_dirname[50];
+        strcpy(mol_dirname, "blah");
 #else
         char* mol_dirname = dirname(molpath);
 #endif
