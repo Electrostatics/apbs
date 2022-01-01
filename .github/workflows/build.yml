@@ -48,16 +48,19 @@ jobs:
             create-package: true
             python-min-version: "3.9"
             python-max-version: "3.10"
+            architecture: x64
           - os: macos-latest
             bla-vendor: Apple
             create-package: true
             python-min-version: "3.9"
             python-max-version: "3.10"
+            architecture: x64
           - os: windows-latest
             bla-vendor: OpenBLAS
             create-package: true
             python-min-version: "3.9"
             python-max-version: "3.10"
+            architecture: x86
 
     env:
       BLA_VENDOR: ${{ matrix.bla-vendor }}
@@ -97,6 +100,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-min-version }}
+          architecture: ${{ matrix.architecture }}
 
       - name: Mac Prereqs
         if: startsWith(matrix.os, 'macos')  # Mac only
@@ -257,12 +261,15 @@ jobs:
           - cpack: lin-zip
             os: ubuntu-latest
             package_file: ${{ needs.build.outputs.cpack-out-lin-zip }}
+            architecture: x64
           - cpack: mac-zip
             os: macOS-latest
             package_file: ${{ needs.build.outputs.cpack-out-mac-zip }}
+            architecture: x64
           - cpack: win-zip
             os: windows-latest
             package_file: ${{ needs.build.outputs.cpack-out-win-zip }}
+            architecture: x86
 
     steps:
 
@@ -270,6 +277,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.architecture }}
 
 #      - name: Linux Prereqs
 #        if: startsWith(matrix.os, 'ubuntu')  # Linux only
