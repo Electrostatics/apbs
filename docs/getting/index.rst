@@ -30,10 +30,10 @@ The best way to install APBS is via download of a pre-compiled binary from `GitH
 Requirements
 ^^^^^^^^^^^^
 
-A few libraries are needed to run APBS from the pre-built binary:
+The pre-compiled binaries include nearly all dependencies, so the only requirement is Python:
 
 * All platforms
-  * Python 3.9
+  * Python 3 (tested with 3.9)
 
 .. caution:: 
 
