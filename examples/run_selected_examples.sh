@@ -65,6 +65,16 @@ exit $total_status
 #   Error while parsing input file.
 #run_example "bem/1a63_NanoShaper_SES.in" (runs)
 #run_example "geoflow/glycerol.in" (seg fault, failed, 139)
+#   Program received signal SIGSEGV, Segmentation fault.
+#   Valist_getNumberAtoms (thee=thee@entry=0x100000014) at /src/src/generic/valist.c:111
+#   111	    return thee->number;
+#   (gdb) bt
+#   #0  Valist_getNumberAtoms (thee=thee@entry=0x100000014) at /src/src/generic/valist.c:111
+#   #1  0x000055989f52fdca in runGeometricFlowWrapAPBS (geoflowParams=..., molecules=0x100000014)
+#       at /src/src/geoflow/geoflow_wrap_apbs.cpp:78
+#   #2  0x000055989f4db593 in solveGeometricFlow (molecules=0x7ffd4f828420, nosh=<optimized out>, pbeparm=0x5598a1721ac0, 
+#       apolparm=0x5598a17150f0, parm=0x5598a17150d0) at /src/src/routines.c:5645
+#   #3  0x000055989f4b12aa in main (argc=<optimized out>, argv=<optimized out>) at /src/src/main.c:818
 #run_example "born/apbs-mol-fem-extmesh.in" (seg fault, fails, 134;VASSERT: ASSERTION FAILURE!  filename /home/runner/work/FETK/FETK/mc/src/gem/gem.c, line 915, ((*thee) != ((void *)0)), 134)
 #run_example "born/apbs-mol-fem.in" (runs)
 #run_example "born/apbs-mol-auto.in" (runs)
