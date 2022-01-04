@@ -4,7 +4,7 @@ Release history
 
 
 ---------------------------
-APBS 3.3.0.alpha (Dec 2021)
+APBS 3.3.0.alpha (Jan 2022)
 ---------------------------
 
 * Binary releases may be found in `GitHub releases <https://github.com/Electrostatics/apbs/releases>`_.
@@ -14,7 +14,12 @@ New Features
 ^^^^^^^^^^^^
 
 * Revamped build system
-* Etc
+* Most submodule switched to using CMake's FetchContent
+* FETK is now required
+* Automatic release processes implemented
+* Cross-platform builds performed on GitHub Actions
+* Pre-compiled binaries posted to each Release
+* Binaries are currently single-threaded (no OpenMP)
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 Known Bugs and Limitations
