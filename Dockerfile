@@ -8,6 +8,7 @@ RUN apt-get update && \
         unzip \
         cmake \
         git \
+        wget \
         libarpack2-dev \
         libf2c2-dev \
         libeigen3-dev \
@@ -17,6 +18,12 @@ RUN apt-get update && \
         liblapack-dev \
         libsuitesparse-dev \
         && \
+    wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz && \
+    gunzip metis-5.1.0.tar.gz && \
+    tar -xf metis-5.1.0.tar && \
+    cd metis-5.1.0 && \
+    make config prefix=/usr/local && \
+    make install && \
     /bin/true
 
 
