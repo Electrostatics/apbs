@@ -6,15 +6,15 @@ macro(import_fetk FETK_IMPORT_VERSION)
     set(ENABLE_FETK TRUE) # FETK is required
 
     set(FETK_FROM_PKG TRUE)
-    if(NOT FETK_IMPORT_VERSION MATCHES "[0-9]+\.[0-9]+\.[0-9]+")
+    set(MATCH_STRING "^v?[0-9]+\.[0-9]+\.[0-9]+$")
+    if(NOT ${FETK_IMPORT_VERSION} MATCHES ${MATCH_STRING})
         set(FETK_FROM_PKG FALSE)
         string(REPLACE "/" "-" FETK_IMPORT_VERSION ${FETK_IMPORT_VERSION}) # this matches the replacement that GitHub makes for the directory within the zip file
     endif()
 
     if(ENABLE_FETK)
     
-    #    if(FETK_FROM_PKG)
-        if(FALSE)
+        if(FETK_FROM_PKG)
 
             set(FETK_BASE_URL "https://github.com/Electrostatics/FETK/releases/download/${FETK_IMPORT_VERSION}")
             if(WIN32)
