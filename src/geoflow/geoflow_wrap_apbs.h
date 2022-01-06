@@ -61,7 +61,7 @@
 #endif
 
 struct GeometricFlowOutput runGeometricFlowWrapAPBS( 
-    struct GeometricFlowInput geoflowParams, 
+    struct GeometricFlowInput* geoflowParams, 
     Valist* all_molecules ); 
 
 #ifdef __cplusplus

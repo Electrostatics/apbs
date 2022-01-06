@@ -60,7 +60,7 @@
 #include "GeometricFlow.h"
 
 struct GeometricFlowOutput runGeometricFlowWrapAPBS
-    ( struct GeometricFlowInput geoflowParams,
+    ( struct GeometricFlowInput* geoflowParams,
     Valist* molecules )   // or Valist* molecules[]
 {
     //cout << "boo from GeometricFlowWrap!" << endl; 
@@ -68,7 +68,7 @@ struct GeometricFlowOutput runGeometricFlowWrapAPBS
     //
     //  create the GeometricFlow object
     //
-    geoflow::GeometricFlow GF( geoflowParams );
+    geoflow::GeometricFlow GF( *geoflowParams );
 
     //
     //

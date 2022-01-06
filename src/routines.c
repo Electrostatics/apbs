@@ -5643,7 +5643,7 @@ VPUBLIC int solveGeometricFlow(Valist *molecules[NOSH_MAXMOL],
 
     //printf("num mols: %i\n", nosh->nmol);
     struct GeometricFlowOutput geoflowOut =
-        runGeometricFlowWrapAPBS(geoflowIn, molecules[0]);
+        runGeometricFlowWrapAPBS(&geoflowIn, molecules[pbeparm->molid - 1]);
 
     Vnm_tprint(1, "  Global net energy = %1.12E\n", geoflowOut.m_totalSolvation);
     Vnm_tprint(1, "  Global net ELEC energy = %1.12E\n", geoflowOut.m_elecSolvation);
