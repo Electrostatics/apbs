@@ -40,7 +40,8 @@ run_example() {
 
 total_status=0
 
-run_example "pbsam-barn_bars" "barn_bars_electro.in"
+# pbam and pbsam examples are currently disabled; pbam/pbsam integration needs further development
+#run_example "pbsam-barn_bars" "barn_bars_electro.in"
 run_example "bem" "1a63_NanoShaper_SES.in"
 run_example "geoflow" "glycerol.in"
 run_example "born" "apbs-mol-fem-extmesh.in"
@@ -50,8 +51,8 @@ run_example "FKBP" "1d7h-dmso-mol.in"
 run_example "bem-pKa" "2LZT-noASH66.in"
 run_example "actin-dimer" "apbs-mol-auto.in"
 #run_example "actin-dimer" "apbs-smol-parallel.in"
-run_example "pbam" "toy_electrostatic.in"
-run_example "pbsam-gly/msms" "gly_electrostatic.in"
+#run_example "pbam" "toy_electrostatic.in"
+#run_example "pbsam-gly/msms" "gly_electrostatic.in"
 
 echo "exit: $total_status"
 
