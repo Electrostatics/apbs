@@ -77,6 +77,23 @@ exit $total_status
 #       apolparm=0x5598a17150f0, parm=0x5598a17150d0) at /src/src/routines.c:5645
 #   #3  0x000055989f4b12aa in main (argc=<optimized out>, argv=<optimized out>) at /src/src/main.c:818
 #run_example "born/apbs-mol-fem-extmesh.in" (seg fault, fails, 134;VASSERT: ASSERTION FAILURE!  filename /home/runner/work/FETK/FETK/mc/src/gem/gem.c, line 915, ((*thee) != ((void *)0)), 134)
+#   Breakpoint 1, Gem_dtor (thee=thee@entry=0x7ffe69194230) at /src/build-docker/_deps/fetk-src/mc/src/gem/gem.c:915
+#   915	    VASSERT( (*thee) != VNULL );
+#   (gdb) bt
+#   #0  Gem_dtor (thee=thee@entry=0x7ffe69194230) at /src/build-docker/_deps/fetk-src/mc/src/gem/gem.c:915
+#   #1  0x0000559b6a395777 in killFE (nosh=0x7fc835391010, pbe=<optimized out>, fetk=<optimized out>, gm=<optimized out>)
+#       at /src/src/routines.c:4083
+#   #2  0x0000559b6a36e9ce in main (argc=<optimized out>, argv=<optimized out>) at /src/src/main.c:967
+####
+#   Breakpoint 3, main (argc=<optimized out>, argv=<optimized out>) at /src/src/main.c:967
+#   967	    killFE(nosh, pbe, fetk, gm);
+#   (gdb) p gm
+#   $3 = {0x0 <repeats 20 times>}
+####
+#   Elements of gm are never initialized.  Why?  Is that intended?  Is that a problem?
+#   Can we solve the problem by removing the requirement in the gm destructor that the pointer be non-null?
+#   It could just only do destruction if it's not null (which it already checks after the assertion).
+#   Code is fetk/mc/src/gem/gem.c
 #run_example "born/apbs-mol-fem.in" (runs)
 #run_example "born/apbs-mol-auto.in" (runs)
 #run_example "FKBP/1d7h-dmso-mol.in" (runs)
