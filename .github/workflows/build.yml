@@ -197,6 +197,7 @@ jobs:
       - name: Run tests
         run: |
           cd build
+          export PATH=$(pwd)/bin:$PATH
           ctest -C Release -VV --output-on-failure 
         shell: bash
 
