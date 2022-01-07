@@ -20,6 +20,7 @@ def round_sigfigs(x, sigfigs):
         value = round(x, sigfigs - int(floor(log10(abs(x)))) - 1)
     except ValueError as msg:
         sys.stderr.write(f"The value ({x}) caused an error: {msg}")
+        raise
     return value
 
 
@@ -67,6 +68,7 @@ def check_results(computed_result, expected_result, input_file, logger, ocd):
             f"FAILED ({computed_result:.12e}; "
             + f"expected {expected_result:.12e}; {error}% error)\n"
         )
+        raise RuntimeError
 
 
 if __name__ == "__main__":

@@ -83,6 +83,7 @@ def check_energies(input_file):
         f = open(input_file, "r")
     except IOError:
         print(f"Couldn't read from energy file {input_file}", file=sys.stderr)
+        raise
 
     input_lines = f.readlines()
 
