@@ -174,8 +174,7 @@ jobs:
       - name: Configure and Build for Mac
         if: startsWith(matrix.os, 'macos')  # Mac only
         env:
-          INSTALL_DIR: >
-            '${SRC_DIR}/build'
+          INSTALL_DIR: build
         run: |
           ./.build.sh
 
