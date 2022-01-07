@@ -38,6 +38,9 @@ export COVERAGE=""
 : ${INSTALL_DIR=$HOME/apbs}
 export PATH=$INSTALL_DIR:$PATH
 
+echo "Build dir: ${BUILD_DIR}"
+echo "Install dir: ${INSTALL_DIR}"
+
 # set variables only if they're not already set
 : ${RELEASE_TYPE:=Release}
 : ${BLA_VENDOR:=OpenBLAS}
