@@ -189,11 +189,13 @@ jobs:
         run: |
           cd build
           cmake --build . --config Release --parallel 2 --target install
+        shell: bash
 
       - name: Run tests
         run: |
           cd build
           ctest -C Release -VV --output-on-failure 
+        shell: bash
 
       - name: Create package for Mac and Linux
         if: matrix.create-package && startsWith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu') # Mac or Linux only
