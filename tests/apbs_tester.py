@@ -281,8 +281,8 @@ def run_test(
                     )
         except Exception as error:
             error_count += 1
-            logger.message(f"Test failed: {error}")
-            logger.log(f"Test failed: {error}")
+            logger.message(f"Test failed: {error}\n")
+            logger.log(f"Test failed: {error}\n")
 
         # Record the end time after the test
         end_time = datetime.datetime.now()
@@ -445,8 +445,8 @@ def main():
                 options.ocd,
             )
         except RuntimeError as error:
-            logger.message(f"Some tests failed:  {error}")
-            logger.log(f"Some tests failed:  {error}")
+            logger.message(f"Some tests failed:  {error}\n")
+            logger.log(f"Some tests failed:  {error}\n")
             return 1
     return 0
 
