@@ -370,6 +370,16 @@ if(ENABLE_PYGBE)
     message(STATUS "******** PYTHON_LIBRARIES ${Python3_LIBRARIES}")
     include_directories(${Python3_INCLUDE_DIRS})
     list(APPEND APBS_LIBS ${Python3_LIBRARIES})
+
+    # make sure we have PYGBE
+    # detect virtualenv and set pip args accordingly
+    if(DEFINED ENV{VIRTUAL_ENV} OR DEFINED ENV{CONDA_PREFIX})
+        set(_pip_args)
+    else()
+        set(_pip_args "--user")
+    endif()
+    # then install PYGBE with pip
+    execute_process(COMMAND ${Python3_EXECUTABLE} -m pip install pygbe ${_pip_args})
 endif() # ENABLE_PYGBE
 
 

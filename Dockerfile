@@ -14,6 +14,7 @@ RUN apt-get update && \
         libeigen3-dev \
         libboost-dev \
         python3-dev \
+        python3-pip \
         libopenblas-serial-dev \
         liblapack-dev \
         libsuitesparse-dev \
