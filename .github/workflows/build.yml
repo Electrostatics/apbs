@@ -174,7 +174,7 @@ jobs:
       - name: Configure and Build for Mac
         if: startsWith(matrix.os, 'macos')  # Mac only
         env:
-          INSTALL_DIR: build
+          INSTALL_DIR: "./"
         run: |
           ./.build.sh
 
@@ -183,7 +183,7 @@ jobs:
         env:
           # https://codecov.io/gh/Electrostatics/apbs
           CODECOV_TOKEN: "e3a1e24c-5598-4f47-9353-7fa0ac57f98e"
-          INSTALL_DIR: build
+          INSTALL_DIR: "./"
         run: |
           ./.build.sh
 
