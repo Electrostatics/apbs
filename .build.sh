@@ -91,10 +91,10 @@ echo "==================================== PWD FOR TOP DIR =====================
 pwd
  
 echo "==================================== CLEAN =============================================== "
-rm -rf $BUILD_DIR                                         || exit 1
-rm -rf $INSTALL_DIR                                       || exit 1
-mkdir -p $BUILD_DIR                                       || exit 1
-mkdir -p $INSTALL_DIR                                     || exit 1
+#rm -rf $BUILD_DIR                                         || exit 1
+#rm -rf $INSTALL_DIR                                       || exit 1
+#mkdir -p $BUILD_DIR                                       || exit 1
+#mkdir -p $INSTALL_DIR                                     || exit 1
 echo "==================================== SETUP ENV =============================================== "
 export LD_LIBRARY_PATH=$HOME/apbs/lib:${LD_LIBRARY_PATH}
 export PATH=$HOME/apbs/bin:${PATH}
