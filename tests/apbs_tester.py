@@ -248,11 +248,11 @@ def run_test(
                     computed_results = process_serial(binary, input_file)
 
                 # Split the expected results into a list of text values
+                expected_results = expected_results.split()
                 print(f"EXPECTED COMPUTED: {len(computed_results)}")
                 print(f"EXPECTED EXPECTED: {len(expected_results)}")
                 print(f"COMPUTED: {computed_results}")
                 print(f"EXPECTED: {expected_results}")
-                expected_results = expected_results.split()
                 for result in computed_results:
                     print(f"COMPUTED RESULT {result}")
                 for i in range(len(expected_results)):
