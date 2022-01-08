@@ -461,7 +461,7 @@ int main(
     Vnm_tprint( 1, "Preparing to run %d PBE calculations.\n",
                 nosh->ncalc);
 #ifdef ENABLE_PYGBE
-    if ((int)nosh->elec[0]->calctype == (int)NCT_PYGBE)
+    if (nosh->nelec != 0 && (int)nosh->elec[0]->calctype == (int)NCT_PYGBE)
     {
         /* PYGBE (pygbe) */
         Vnm_tprint( 1, "Processing PYGBE.\n");
