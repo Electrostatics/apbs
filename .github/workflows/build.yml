@@ -195,9 +195,10 @@ jobs:
         shell: bash
 
       - name: Run tests
+        # Path setting includes a windows-specific path, but this should just be ignored in linux/mac
         run: |
           cd build
-          export PATH=$(pwd)/bin:$PATH
+          export PATH=$(pwd)/bin:/c/vcpkg/installed/x86-windows/bin:$PATH
           ctest -C Release -VV --output-on-failure 
         shell: bash
 
