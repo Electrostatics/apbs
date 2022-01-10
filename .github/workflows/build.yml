@@ -191,7 +191,7 @@ jobs:
         if: startsWith(matrix.os, 'windows')  # Windows only
         run: |
           cd build
-          cmake --build . --config Release --parallel 2 --target install
+          cmake --build . --config ${RELEASE_TYPE} --parallel 2 --target install
         shell: bash
 
       - name: Configure Pagefile on Windows
@@ -206,7 +206,7 @@ jobs:
         run: |
           cd build
           export PATH=$(pwd)/bin:/c/vcpkg/installed/x86-windows/bin:$PATH
-          ctest -C Release -VV --output-on-failure 
+          ctest -C ${RELEASE_TYPE} -VV --output-on-failure 
         shell: bash
 
       - name: Create package for Mac and Linux
@@ -214,7 +214,7 @@ jobs:
         id: cpack-ml
         run: |
           cd build
-          cpack -C Release -G ZIP
+          cpack -C ${RELEASE_TYPE} -G ZIP
           ZIP_CPACK_FILE=`ls APBS*.zip`
           echo "ZIP_CPACK_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
           echo "PATH_TO_PACKAGE=build/" >> $GITHUB_ENV
@@ -227,7 +227,7 @@ jobs:
         id: cpack-w
         run: |
           cd build
-          /c/Program\ Files/CMake/bin/cpack.exe -C Release -G ZIP -V
+          /c/Program\ Files/CMake/bin/cpack.exe -C ${RELEASE_TYPE} -G ZIP -V
           ZIP_CPACK_FILE=`ls APBS*.zip`
           echo "Repackaging with extra dlls"
           mkdir unzip
