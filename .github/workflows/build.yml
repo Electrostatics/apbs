@@ -12,7 +12,7 @@ env:
   WIN_TOOLCHAIN_FILE: '/c/vcpkg/scripts/buildsystems/vcpkg.cmake'
   BUILD_DOC: ON
   BUILD_TOOLS: ON
-  RELEASE_TYPE: Release
+  RELEASE_TYPE: Debug
   ENABLE_PYGBE: ON
   ENABLE_BEM: ON
   ENABLE_GEOFLOW: ON
