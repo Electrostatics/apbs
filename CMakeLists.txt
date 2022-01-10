@@ -384,8 +384,9 @@ if(ENABLE_PYGBE)
     endif()
     message(STATUS "******** PYTHON_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
     message(STATUS "******** PYTHON_LIBRARIES ${Python3_LIBRARIES}")
+    message(STATUS "******** *** Release lib: ${Python_LIBRARY_RELEASE}")
     include_directories(${Python3_INCLUDE_DIRS})
-    list(APPEND APBS_LIBS ${Python3_LIBRARIES})
+    list(APPEND APBS_LIBS ${Python_LIBRARY_RELEASE})
 
     # make sure we have PYGBE
     # detect virtualenv and set pip args accordingly
