@@ -371,6 +371,7 @@ if(ENABLE_PYGBE)
     else()
         message(STATUS "  version < 3.19")
     endif()
+    set (Python3_FIND_ABI "OFF" "ANY" "ANY")
     if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.19" AND PYTHON_MAX_VERSION)
         message(STATUS "^^^^ finding python with min AND max")
         find_package(Python3 ${PYTHON_MIN_VERSION}...<${PYTHON_MAX_VERSION} REQUIRED COMPONENTS Interpreter Development)
@@ -384,9 +385,8 @@ if(ENABLE_PYGBE)
     endif()
     message(STATUS "******** PYTHON_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
     message(STATUS "******** PYTHON_LIBRARIES ${Python3_LIBRARIES}")
-    message(STATUS "******** *** Release lib: ${Python_LIBRARY_RELEASE}")
     include_directories(${Python3_INCLUDE_DIRS})
-    list(APPEND APBS_LIBS ${Python_LIBRARY_RELEASE})
+    list(APPEND APBS_LIBS ${Python3_LIBRARIES})
 
     # make sure we have PYGBE
     # detect virtualenv and set pip args accordingly
