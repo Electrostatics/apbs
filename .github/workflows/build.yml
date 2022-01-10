@@ -194,12 +194,13 @@ jobs:
           cmake --build . --config Release --parallel 2 --target install
         shell: bash
 
-      - name: Set Swap Space on Windows
+      - name: Configure Pagefile on Windows
         if: startsWith(matrix.os, 'windows')  # Windows only
-        uses: pierotofy/set-swap-space@master
+        uses: al-cheb/configure-pagefile-action@v1.2
         with:
-          swap-size-gb: 10
-          
+          minimum-size: 8GB
+          maximum-size: 16GB
+
       - name: Run tests
         # Path setting includes a windows-specific path, but this should just be ignored in linux/mac
         run: |
