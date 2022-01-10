@@ -2,7 +2,7 @@ include (CTest)
 enable_testing()
 
 message(STATUS "******* TESTING ADDED *****************")
-set (Python3_FIND_ABI "OFF" "ANY" "ANY")
+#set (Python3_FIND_ABI "OFF" "ANY" "ANY")
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.19" AND DEFINED ${PYTHON_MAX_VERSION})
     find_package(Python3 ${PYTHON_MIN_VERSION}...<${PYTHON_MAX_VERSION} REQUIRED COMPONENTS Interpreter)
 else()
