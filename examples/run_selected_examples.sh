@@ -32,6 +32,8 @@ run_example() {
   echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
   if [[ "$status" -ne "0" ]]; then
     echo "     failed: $status"
+    echo "     printing execution log"
+    cat ${curr_dir}/${in_file}.OUTPUT.txt
   fi
 
   ((total_status+=$status))
