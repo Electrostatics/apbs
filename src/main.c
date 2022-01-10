@@ -73,7 +73,15 @@
     #include <libgen.h>
 #endif
     #define PY_SSIZE_T_CLEAN
+    #ifdef _DEBUG
+    #define _DEBUG_WAS_DEFINED
+    #undef _DEBUG
+    #endif
     #include <Python.h>
+    #ifdef _DEBUG_WAS_DEFINED
+    #define _DEBUG
+    #undef _DEBUG_WAS_DEFINED
+    #endif
 #endif
 
 #include <time.h>
