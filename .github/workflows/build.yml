@@ -201,6 +201,12 @@ jobs:
           minimum-size: 8GB
           maximum-size: 16GB
 
+# For debugging -- TEMPORARY
+      - name: Debug tmate session
+        if: startsWith(matrix.os, 'windows') || ! success()
+#        if: ${{ ! success() }}
+        uses: mxschmitt/action-tmate@v3
+
       - name: Run tests
         # Path setting includes a windows-specific path, but this should just be ignored in linux/mac
         run: |
