@@ -203,7 +203,7 @@ jobs:
 
 # For debugging -- TEMPORARY
       - name: Debug tmate session
-        if: startsWith(matrix.os, 'windows') || ! success()
+        if: startsWith(matrix.os, 'macos') || ! success()
 #        if: ${{ ! success() }}
         uses: mxschmitt/action-tmate@v3
 
