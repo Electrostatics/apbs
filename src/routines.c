@@ -4075,12 +4075,12 @@ VPUBLIC void killFE(NOsh *nosh,
 
     for (i = 0; i < nosh->ncalc; i++)
     {
-        Vpbe_dtor(&(pbe[i]));
-        Vfetk_dtor(&(fetk[i]));
+        if(pbe[i] != VNULL) Vpbe_dtor(&(pbe[i]));
+        if(fetk[i] != VNULL) Vfetk_dtor(&(fetk[i]));
     }
     for (i = 0; i < nosh->nmesh; i++)
     {
-        Gem_dtor(&(gm[i]));
+        if(gm[i] != VNULL) Gem_dtor(&(gm[i]));
     }
 }
 
