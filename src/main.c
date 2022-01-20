@@ -182,7 +182,7 @@ int main(
                                * calculation. */
 
     /* The real partition centers */
-    double realCenter[3];
+    double realCenter[3] = {0., 0., 0.};
 
     /* Instructions: */
     char header[] = {"\n\n\
@@ -280,6 +280,7 @@ int main(
     /* A bit of array/pointer initialization */
     mem = Vmem_ctor("MAIN");
     for (i=0; i<NOSH_MAXCALC; i++) {
+        fetk[i] = VNULL;
         pmg[i] = VNULL;
         pmgp[i] = VNULL;
         fetk[i] = VNULL;
@@ -288,11 +289,13 @@ int main(
         qmEnergy[i] = 0;
         dielEnergy[i] = 0;
         totEnergy[i] = 0;
+        atomEnergy[i] = VNULL;
         atomForce[i] = VNULL;
         nenergy[i] = 0;
         nforce[i] = 0;
     }
     for (i=0; i<NOSH_MAXMOL; i++) {
+        gm[i] = VNULL;
         alist[i] = VNULL;
         dielXMap[i] = VNULL;
         dielYMap[i] = VNULL;
