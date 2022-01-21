@@ -26,12 +26,6 @@ Shortcut to build
 
 There is a script that is used to build APBS in the Github Actions. You may want to use the file, :file:`.build.sh`, as a template for building APBS.
 
-.. caution:: When using make, there can be race conditions with CMake, autoconf, downloading dependencies, and make. It is best to run 
-
-.. code:: bash
-
-   VERBOSE=1 make -j 1
-
 -----------------
 Import submodules
 -----------------
@@ -129,14 +123,14 @@ NanoShaper is a molecular surface mesh generation software package developed by 
 Using finite element support
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-*As of v3.3.0:* The Finite Element Toolkit, FETK, is required for building APBS.  
+*As of v3.4.0:* The Finite Element Toolkit, FETK, is required for building APBS.  
 You can set the version of FETK used with the CMake variable :makevar:`FETK_VERSION`.
 That variable will be set to a working default if not manually set.
 
 .. code:: bash
 
    cd $APBS_BUILD_DIR
-   cmake -DENABLE_FETK_=v1.8.1
+   cmake -DENABLE_FETK_=v1.9.1
 
 For advanced users, you can use a version of FETK other than a released version by setting ``FETK_VERSION``
 to the desired git commit hash instead of a version number:
