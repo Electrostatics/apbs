@@ -52,7 +52,7 @@ echo "Install dir: ${INSTALL_DIR}"
 : ${ENABLE_BEM:=ON}
 : ${ENABLE_GEOFLOW:=ON}
 : ${ENABLE_FETK:=ON}
-: ${FETK_VERSION:="1.8.1"}
+: ${FETK_VERSION:="1.9.0"}
 : ${ENABLE_iAPBS:=ON}
 : ${ENABLE_OPENMP:=OFF}
 : ${ENABLE_PBAM:=OFF}

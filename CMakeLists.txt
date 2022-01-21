@@ -157,7 +157,7 @@ message(STATUS "")
 # FETK is currently required, and therefore this option is disabled
 #option(ENABLE_FETK "Enable the finite element solver" ON)
 
-set(FETK_VERSION "1.8.1" CACHE STRING "Version of FETK to use")
+set(FETK_VERSION "1.9.0" CACHE STRING "Version of FETK to use")
 include(ImportFETK)
 import_fetk(${FETK_VERSION})
 
@@ -588,7 +588,7 @@ if(ENABLE_PBAM OR ENABLE_PBSAM)
 
     FetchContent_Declare( pb_s_am
         GIT_REPOSITORY https://github.com/Electrostatics/pb_solvers.git
-        GIT_TAG 752f67704cdbbeb7c33c979758936d776024e832
+        GIT_TAG d3ba994d7ec2b2cad5b3e843784c7cb9f41ace37
     )
     #add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
     FetchContent_MakeAvailable( pb_s_am )
