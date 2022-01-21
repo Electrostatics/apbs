@@ -17,7 +17,7 @@ env:
   ENABLE_BEM: ON
   ENABLE_GEOFLOW: ON
   ENABLE_FETK: ON
-  FETK_VERSION: "1.9.0"
+  FETK_VERSION: "1.9.1"
 #  FETK_VERSION: af45142e23bc98371f797e8a69a9308b032228c9
   ENABLE_iAPBS: ON
   ENABLE_PBAM: OFF
@@ -200,12 +200,6 @@ jobs:
         with:
           minimum-size: 8GB
           maximum-size: 16GB
-
-# For debugging -- TEMPORARY
-      - name: Debug tmate session
-        if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'windows') || ! success()
-#        if: ${{ ! success() }}
-        uses: mxschmitt/action-tmate@v3
 
       - name: Run tests
         # Path setting includes a windows-specific path, but this should just be ignored in linux/mac
