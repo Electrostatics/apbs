@@ -43,11 +43,6 @@ macro(add_sublibrary LIBRARY)
     set(SOURCES) # clear the SOURCES variable
 endmacro()
 
-if(WIN32)
-else()
-    add_compile_options(-fPIE)
-endif()
-
 add_subdirectory(generic)
 add_subdirectory(pmgc)
 add_subdirectory(mg)
