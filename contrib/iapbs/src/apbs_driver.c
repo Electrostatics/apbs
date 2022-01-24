@@ -18,6 +18,12 @@
 
 #include "apbs_driver.h"
 
+#ifdef WIN32
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
+
 
 /*! \def MAX_BUF_SIZE
     \brief Buffer size for internal APBS string input.
@@ -90,7 +96,7 @@ int apbsdrv_(
     Vmem *mem = VNULL;
     Vcom *com = VNULL;
     Vio *sock = VNULL;
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
     Vfetk *fetk[NOSH_MAXCALC];
     Gem *gm[NOSH_MAXMOL];
 #else
@@ -564,7 +570,7 @@ int apbsdrv_(
 
 		/* ***** Do FEM calculation ***** */
 	    case NCT_FEM:
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
 		for (k=0; k<nosh->nelec; k++) {
 		    if (nosh->elec2calc[k] >= i) break;
 		}
@@ -595,7 +601,7 @@ int apbsdrv_(
 		printPBEPARM(pbeparm);
 
 		/* Refine mesh */
-		if (!preRefineFE(i, nosh, feparm, fetk)) {
+		if (!preRefineFE(i, feparm, fetk)) {
 		    Vnm_tprint( 2, "Error pre-refining mesh!\n");
 		    VJMPERR1(0);
 		}
@@ -609,7 +615,7 @@ int apbsdrv_(
 		Vnm_tprint(1, "  Beginning solve-estimate-refine cycle:\n");
 		for (isolve=0; isolve<feparm->maxsolve; isolve++) {
 		    Vnm_tprint(1, "    Solve #%d...\n", isolve);
-		    if (!solveFE(i, nosh, pbeparm, feparm, fetk)) {
+		    if (!solveFE(i, pbeparm, feparm, fetk)) {
 			Vnm_tprint(2, "ERROR SOLVING EQUATION!\n");
 			VJMPERR1(0);
 		    }
@@ -622,7 +628,7 @@ int apbsdrv_(
 		    /* We're not going to refine if we've hit the max number
 		     * of solves */
 		    if (isolve < (feparm->maxsolve)-1) {
-			if (!postRefineFE(i, nosh, feparm, fetk)) break;
+			if (!postRefineFE(i, feparm, fetk)) break;
 		    }
 		    bytesTotal = Vmem_bytesTotal();
 		    highWater = Vmem_highWaterTotal();
@@ -636,10 +642,10 @@ int apbsdrv_(
 		if (!writedataFE(rank, nosh, pbeparm, fetk[i])) {
 		    Vnm_tprint(2, "  Error while writing FEM data!\n");
 		}
-#else /* ifdef HAVE_MC_H */
+#else /* ifdef HAVE_MC */
 		Vnm_print(2, "Error!  APBS not compiled with FEtk!\n");
 		exit(2);
-#endif /* ifdef HAVE_MC_H */
+#endif /* ifdef HAVE_MC */
 		break;
 
 		/* Do an apolar calculation */
@@ -744,7 +750,7 @@ int apbsdrv_(
     killForce(mem, nosh, nforce, atomForce);
     killEnergy();
     killMG(nosh, pbe, pmgp, pmg);
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
     killFE(nosh, pbe, fetk, gm);
 #endif
     killChargeMaps(nosh, chargeMap);

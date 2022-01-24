@@ -4,9 +4,9 @@ set(LIBS "")
 list(APPEND LIBS "apbs_generic")
 list(APPEND LIBS "apbs_mg")
 list(APPEND LIBS "apbs_pmgc")
-if(FETK_ENABLED)
+if(ENABLE_FETK)
     list(APPEND LIBS "apbs_fem")
-endif(FETK_ENABLED)
+endif(ENABLE_FETK)
 
 message(STATUS "libraries: ${LIBS}")
 

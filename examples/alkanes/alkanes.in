@@ -190,16 +190,16 @@ APOLAR name solvated-propane
 	calcforce no
 END
 
-print apolEnergy solvated - 2 - methylbutane end
-print apolEnergy solvated - butane end
-print apolEnergy solvated - cyclohexane end
-print apolEnergy solvated - cyclopentane end
-print apolEnergy solvated - ethane end
-print apolEnergy solvated - hexane end
-print apolEnergy solvated - isobutane end
-print apolEnergy solvated - methane end
-print apolEnergy solvated - neopentane end
-print apolEnergy solvated - pentane end
-print apolEnergy solvated - propane end
+print apolEnergy solvated-2-methylbutane end
+print apolEnergy solvated-butane end
+print apolEnergy solvated-cyclohexane end
+print apolEnergy solvated-cyclopentane end
+print apolEnergy solvated-ethane end
+print apolEnergy solvated-hexane end
+print apolEnergy solvated-isobutane end
+print apolEnergy solvated-methane end
+print apolEnergy solvated-neopentane end
+print apolEnergy solvated-pentane end
+print apolEnergy solvated-propane end
 
 quit

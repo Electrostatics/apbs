@@ -38,29 +38,22 @@
 // zlib compression is available
 #cmakedefine HAVE_ZLIB
 
-// include TINKER support
-#cmakedefine WITH_TINKER
-
 
 
 // FEtk components is enabled
-#cmakedefine FETK_ENABLED
+#cmakedefine ENABLE_FETK
 
 // have FEtk component PUNC
-// TODO: Rename this to HAVE_PUNC in source and ${APBS_ROOT}/CMakeLists.txt
-#cmakedefine HAVE_PUNC_H
+#cmakedefine HAVE_PUNC
 
 // have FEtk component MCX
-// TODO: Rename this to HAVE_MCX in source and ${APBS_ROOT}/CMakeLists.txt
-#cmakedefine HAVE_MCX_H
+#cmakedefine HAVE_MCX
 
 // have FEtk component MC
-// TODO: Rename this to HAVE_MC in source and ${APBS_ROOT}/CMakeLists.txt
-#cmakedefine HAVE_MC_H
+#cmakedefine HAVE_MC
 
 // have fetk component GAMER
-// TODO: Rename this to HAVE_GAMER in source and ${APBS_ROOT}/CMakeLists.txt
-#cmakedefine HAVE_BIOM_H
+#cmakedefine HAVE_GAMER
 
 #cmakedefine HAVE_MPI_H
 

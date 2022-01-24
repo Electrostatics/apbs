@@ -25,4 +25,4 @@ target_link_libraries(
   ${APBS_INTERNAL_LIBS}
   )
 
-install(TARGETS apbs_pybind LIBRARY DESTINATION lib)
+install(TARGETS apbs_pybind LIBRARY DESTINATION lib COMPONENT python)

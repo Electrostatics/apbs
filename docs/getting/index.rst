@@ -1,7 +1,6 @@
 .. _registering: http://eepurl.com/by4eQr
-.. _SourceForge: http://sourceforge.net/projects/apbs
 .. _GitHub releases: https://github.com/Electrostatics/apbs/releases
-.. _Visual C++ Redistributable Package:  https://aka.ms/vs/16/release/vc_redist.x64.exe
+.. _Visual C++ Redistributable Package:  https://aka.ms/vs/17/release/vc_redist.x86.exe
 
 ============
 Getting APBS
@@ -25,15 +24,20 @@ After `registering`_, please visit http://server.poissonboltzmann.org/ to access
 Installing from pre-compiled binaries
 -------------------------------------
 
-The best way to install APBS is via download of a pre-compiled binary from `SourceForge`_ or `GitHub releases`_ (after `registering`_, of course).
+The best way to install APBS is via download of a pre-compiled binary from `GitHub releases`_ (after `registering`_, of course).
 
-.. caution::
+^^^^^^^^^^^^
+Requirements
+^^^^^^^^^^^^
 
-  On Windows 10, if you get a popup error when running the APBS binaries, you will need to install the `Visual C++ Redistributable Package`_
+The pre-compiled binaries include nearly all dependencies, so the only requirement is Python:
+
+* All platforms
+  * Python 3 (tested with 3.9)
 
 .. caution:: 
 
-  On Linux and MacOS, you may need to set your LD_LIBRARY_PATH and PATH environment variables:
+  On Linux you may need to set your LD_LIBRARY_PATH and PATH environment variables:
   For example, in bash with APBS installed in $HOME/apbs, you would set the environment variables in your .bashrc like:
   .. code-block:: bash
 
@@ -48,20 +52,18 @@ The binary distributions typically provide the following contents:
 
 bin
   contains the main APBS executable
-share/apbs
-  contains additional APBS-related files
-doc
-  the APBS programmer guide
-examples
-  APBS examples
-tests
-  the APBS test suite
-tools
-  useful programs to help process APBS input and output
 include
   header files for building software that calls APBS
 lib
   libraries for building software that calls APBS
+share/apbs/docs
+  the APBS documentation
+share/apbs/examples
+  APBS examples
+share/apbs/tests
+  the APBS test suite
+share/apbs/tools
+  useful programs to help process APBS input and output
 
 
 ---------------------------
@@ -83,9 +85,9 @@ Current platform support
 | OS         | PYTHON  | GEOFLOW | BEM,       | FETK | PBSAM | PBAM | PYTHON  | SHARED_LIBS |
 |            | VERSION |         | NanoShaper |      |       |      | SUPPORT |             |
 +============+=========+=========+============+======+=======+======+=========+=============+
-| Ubuntu     | 3.7+    | Yes     | Yes        | Yes  | Yes   | Yes  | Yes     | Yes         |
+| Ubuntu     | 3.9     | Yes     | Yes        | Yes  | Yes   | Yes  | Yes     | No          |
 +------------+---------+---------+------------+------+-------+------+---------+-------------+
-| MacOSX     | 3.7+    | Yes     | Yes        | Yes  | Yes   | Yes  | Yes     | Yes         |
+| MacOSX     | 3.9     | Yes     | Yes        | Yes  | Yes   | Yes  | Yes     | No          |
 +------------+---------+---------+------------+------+-------+------+---------+-------------+
-| Windows 10 | 3.7+    | Yes     | Yes        | No   | No    | Yes  | No      | No          |
+| Windows 10 | 3.9     | Yes     | Yes        | Yes  | Yes   | Yes  | No      | No          |
 +------------+---------+---------+------------+------+-------+------+---------+-------------+

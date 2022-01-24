@@ -1,12 +1,9 @@
 /**
- * @defgroup  Header dependencies
- */
-
-/**
- *  @file    apbs.h
- *  @author  Nathan Baker
- *  @brief   Header file for header dependencies
- *  @ingroup  Frontend
+ *  @file    geoflow_wrap_apbs.c
+ *  @ingroup Frontend
+ *  @author  Elizabeth Jurrus
+ *  @brief   APBS-related Geoflow wrappers
+ *
  *  @version $Id$
  *  @attention
  *  @verbatim
@@ -23,7 +20,7 @@
  * Institute, Pacific Northwest Division for the U.S. Department of Energy.
  *
  * Portions Copyright (c) 2002-2010, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2010, Nathan A. Baker.
+ * Portions Copyright (c) 2002-2020, Nathan A. Baker.
  * Portions Copyright (c) 1999-2002, The Regents of the University of
  * California.
  * Portions Copyright (c) 1995, Michael Holst.
@@ -58,45 +55,48 @@
  * @endverbatim
  */
 
-#ifndef _APBSHEADERS_H_
-#define _APBSHEADERS_H_
+#include "geoflow_wrap_apbs.h"
 
-#include "apbscfg.h"
+#include "GeometricFlow.h"
 
-/* MALOC headers */
-#include "maloc/maloc.h"
+struct GeometricFlowOutput runGeometricFlowWrapAPBS
+    ( struct GeometricFlowInput* geoflowParams,
+    Valist* molecules )   // or Valist* molecules[]
+{
+    //cout << "boo from GeometricFlowWrap!" << endl; 
 
-/* Generic headers */
-#include "generic/nosh.h"
-#include "generic/mgparm.h"
-#include "generic/pbeparm.h"
-#include "generic/femparm.h"
-#include "generic/bemparm.h"
-#include "generic/geoflowparm.h"
-#include "generic/vacc.h"
-#include "generic/valist.h"
-#include "generic/vatom.h"
-#include "generic/vcap.h"
-#include "generic/vhal.h"
-#include "generic/vpbe.h"
-#include "generic/vstring.h"
-#include "generic/vunit.h"
-#include "generic/vparam.h"
-#include "generic/vgreen.h"
+    //
+    //  create the GeometricFlow object
+    //
+    geoflow::GeometricFlow GF( *geoflowParams );
 
-//#include "geoflow/cpbconcz2.h"
+    //
+    //
+    //cout << "converting atom list" << endl;
+    geoflow::AtomList atomList;
+    Vatom *atom;
+    unsigned int natoms = Valist_getNumberAtoms(molecules);
+    //cout << "natoms: " << natoms << endl;
+    for (unsigned int i=0; i < natoms; i++) 
+    {		
+        atom = Valist_getAtom(molecules, i);
+        //cout << "i: " << i << endl;
+        geoflow::Atom myAtom( 
+                GF.getFFModel(),
+            Vatom_getPosition(atom)[0],
+            Vatom_getPosition(atom)[1],		
+            Vatom_getPosition(atom)[2],		
+            Vatom_getRadius(atom) * GF.getRadExp(),
+            Vatom_getCharge(atom) );
+        atomList.add( myAtom );
+    }
+    //cout << "done with atom list" << endl;
+    //atomList.print();
 
-/* MG headers */
-#include "mg/vgrid.h"
-#include "mg/vmgrid.h"
-#include "mg/vopot.h"
-#include "mg/vpmg.h"
-#include "mg/vpmgp.h"
-
-/* FEM headers */
-#if defined(ENABLE_FETK)
-    #include "fem/vfetk.h"
-    #include "fem/vpee.h"
-#endif
-
-#endif /* _APBSHEADERS_H_ */
+    //
+    //  run Geoflow!
+    //
+    struct GeometricFlowOutput GFO = GF.run( atomList );
+    
+    return GFO;
+}

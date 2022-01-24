@@ -8,9 +8,15 @@ INCLUDE(${SWIG_USE_FILE})
 
 
 set(CMAKE_FIND_FRAMEWORK NEVER)
-find_package(Python3 COMPONENTS Interpreter Development)
-if(${Python3_FOUND})
-    message(STATUS "******* Python3 FOUND")
+#set (Python3_FIND_ABI "OFF" "ANY" "ANY")
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.19" AND DEFINED ${PYTHON_MAX_VERSION})
+	find_package(Python3 ${PYTHON_MIN_VERSION}...<${PYTHON_MAX_VERSION} REQUIRED COMPONENTS Interpreter Development)
+else()
+	find_package(Python3 ${PYTHON_MIN_VERSION} REQUIRED COMPONENTS Interpreter Development)
+	if(DEFINED ${PYTHON_MAX_VERSION} AND ${Python3_VERSION} VERSION_GREATER_EQUAL ${PYTHON_MAX_VERSION})
+		set(Python3_FOUND FALSE)
+		message(FATAL_ERROR "Python version ${Python3_VERSION} is too high; maximum is ${PYTHON_MAX_VERSION}")
+	endif()
 endif()
 
 INCLUDE_DIRECTORIES(${Python3_INCLUDE_DIRS})

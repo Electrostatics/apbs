@@ -12,4 +12,4 @@ add_items(
     vpee.h
 )
 
-add_sublibrary(fem)
+add_sublibrary(fem apbs_generic)

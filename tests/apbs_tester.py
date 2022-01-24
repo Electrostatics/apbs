@@ -203,75 +203,86 @@ def run_test(
         else:
             subprocess.call(setup.split())
 
+    error_count = 0
+
     for (base_name, expected_results) in test_files:
 
         # Get the name of the input file from the base name
         input_file = f"{base_name}.in"
 
         logger.message("-" * 80 + "\n")
-        # If the expected results is 'forces', do a forces test on the input
-        if expected_results == "forces":
-            logger.message(f"Testing forces from {input_file}\n\n")
-            logger.log(f"Testing forces from {input_file}\n")
-            start_time = datetime.datetime.now()
-            check_forces(input_file, "polarforces", "apolarforces", logger)
-        else:
-            logger.message(f"Testing input file {input_file}\n\n")
-            logger.log(f"Testing {input_file}\n")
 
-            # Record the start time before the test runs
-            start_time = datetime.datetime.now()
+        # Record the start time before the test runs
+        start_time = datetime.datetime.now()
 
-            computed_results = None
+        # top-level try-except to catch test errors
+        try:
 
-            # Determine if this is a parallel run
-            match = re.search(
-                r"\s*pdime((\s+\d+)+)", open(input_file, "r").read()
-            )
-
-            # If it is parallel, get the number of procs and do a parallel run
-            if match:
-                procs = reduce(
-                    operator.mul, [int(p) for p in match.group(1).split()]
-                )
-                computed_results = process_parallel(
-                    binary, input_file, procs, logger
-                )
-            # Otherwise, just do a serial run
+            # If the expected results is 'forces', do a forces test on the input
+            if expected_results == "forces":
+                logger.message(f"Testing forces from {input_file}\n\n")
+                logger.log(f"Testing forces from {input_file}\n")
+                start_time = datetime.datetime.now()
+                check_forces(input_file, "polarforces", "apolarforces", logger)
             else:
-                computed_results = process_serial(binary, input_file)
+                logger.message(f"Testing input file {input_file}\n\n")
+                logger.log(f"Testing {input_file}\n")
 
-            # Split the expected results into a list of text values
-            print(f"EXPECTED COMPUTED: {len(computed_results)}")
-            print(f"EXPECTED EXPECTED: {len(expected_results)}")
-            print(f"COMPUTED: {computed_results}")
-            print(f"EXPECTED: {expected_results}")
-            expected_results = expected_results.split()
-            for result in computed_results:
-                print(f"COMPUTED RESULT {result}")
-            for i in range(len(expected_results)):
-                # If the expected result is a star, it means ignore that result
-                if expected_results[i] == "*":
-                    continue
+                computed_results = None
 
-                # Compare the expected to computed results
-                computed_result = 0
-                try:
-                    computed_result = computed_results[i]
-                except IndexError as error:
-                    logger.message(
-                        f"Computed result for index, {i}, does not "
-                        + f"exist: {error}"
+                # Determine if this is a parallel run
+                match = re.search(
+                    r"\s*pdime((\s+\d+)+)", open(input_file, "r").read()
+                )
+
+                # If it is parallel, get the number of procs and do a parallel run
+                if match:
+                    procs = reduce(
+                        operator.mul, [int(p) for p in match.group(1).split()]
                     )
-                expected_result = float(expected_results[i])
-                logger.message(
-                    "Testing computed result against "
-                    + f"expected result ({computed_result:.12e}, "
-                    + f"{expected_result:.12e})\n"
-                )
-                check_results(
-                    computed_result, expected_result, input_file, logger, ocd
-                )
+                    computed_results = process_parallel(
+                        binary, input_file, procs, logger
+                    )
+                # Otherwise, just do a serial run
+                else:
+                    computed_results = process_serial(binary, input_file)
+
+                # Split the expected results into a list of text values
+                expected_results = expected_results.split()
+                print(f"EXPECTED COMPUTED: {len(computed_results)}")
+                print(f"EXPECTED EXPECTED: {len(expected_results)}")
+                print(f"COMPUTED: {computed_results}")
+                print(f"EXPECTED: {expected_results}")
+                for result in computed_results:
+                    print(f"COMPUTED RESULT {result}")
+                for i in range(len(expected_results)):
+                    # If the expected result is a star, it means ignore that result
+                    if expected_results[i] == "*":
+                        continue
+
+                    # Compare the expected to computed results
+                    computed_result = 0
+                    try:
+                        computed_result = computed_results[i]
+                    except IndexError as error:
+                        logger.message(
+                            f"Computed result for index, {i}, does not "
+                            + f"exist: {error}"
+                        )
+                        raise
+                    expected_result = float(expected_results[i])
+                    logger.message(
+                        "Testing computed result against "
+                        + f"expected result ({computed_result:.12e}, "
+                        + f"{expected_result:.12e})\n"
+                    )
+                    check_results(
+                        computed_result, expected_result, input_file, logger, ocd
+                    )
+        except Exception as error:
+            error_count += 1
+            logger.message(f"Test failed: {error}\n")
+            logger.log(f"Test failed: {error}\n")
 
         # Record the end time after the test
         end_time = datetime.datetime.now()
@@ -292,6 +303,9 @@ def run_test(
     logger.log(f"Time:           {stopwatch} seconds\n")
 
     os.chdir(save_current_directory)
+
+    if error_count != 0:
+        raise RuntimeError(f"Number of test failures: {error_count}")
 
 
 def main():
@@ -420,16 +434,20 @@ def main():
             pass
 
         # Run the test!
-        run_test(
-            binary,
-            config.items(test_name),
-            test_name,
-            test_directory,
-            test_setup,
-            logger,
-            options.ocd,
-        )
-
+        try:
+            run_test(
+                binary,
+                config.items(test_name),
+                test_name,
+                test_directory,
+                test_setup,
+                logger,
+                options.ocd,
+            )
+        except RuntimeError as error:
+            logger.message(f"Some tests failed:  {error}\n")
+            logger.log(f"Some tests failed:  {error}\n")
+            return 1
     return 0
 
 

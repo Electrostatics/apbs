@@ -1,16 +1,16 @@
-cmake_minimum_required (VERSION 3.12)
-
-project("APBSTESTS")
-
 include (CTest)
 enable_testing()
 
 message(STATUS "******* TESTING ADDED *****************")
-find_package(Python3 COMPONENTS Interpreter)
-if(${Python3_FOUND})
-    message(STATUS "******* Python3 FOUND ${Python3_EXECUTABLE}")
+#set (Python3_FIND_ABI "OFF" "ANY" "ANY")
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.19" AND DEFINED ${PYTHON_MAX_VERSION})
+    find_package(Python3 ${PYTHON_MIN_VERSION}...<${PYTHON_MAX_VERSION} REQUIRED COMPONENTS Interpreter)
 else()
-    message(FATAL  "******* Python3 NOT FOUND *****************")
+    find_package(Python3 ${PYTHON_MIN_VERSION} REQUIRED COMPONENTS Interpreter)
+    if(DEFINED ${PYTHON_MAX_VERSION} AND ${Python3_VERSION} VERSION_GREATER_EQUAL ${PYTHON_MAX_VERSION})
+        set(Python3_FOUND FALSE)
+        message(FATAL_ERROR "Python version ${Python3_VERSION} is too high; maximum is ${PYTHON_MAX_VERSION}")
+    endif()
 endif()
 
 set(APBS_BINARY "apbs")

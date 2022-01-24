@@ -223,6 +223,7 @@ def check_forces(input_file, polar_file, apolar_file, logger):
         f = open(input_file, "r")
     except IOError:
         sys.stderr.write(f"Couldn't read from forces file {input_file}")
+        raise
     input_lines = f.readlines()
 
     test_polar_force_dict = extract_forces(
@@ -236,6 +237,7 @@ def check_forces(input_file, polar_file, apolar_file, logger):
         f = open(polar_file, "r")
     except IOError:
         sys.stderr.write(f"Couldn't read from forces file {input_file}")
+        raise
     input_lines = f.readlines()
     true_polar_force_dict = parse_forces(PolarForce, input_lines)
 
@@ -243,6 +245,7 @@ def check_forces(input_file, polar_file, apolar_file, logger):
         f = open(apolar_file, "r")
     except IOError:
         sys.stderr.write(f"Couldn't read from forces file {input_file}")
+        raise
     input_lines = f.readlines()
     true_apolar_force_dict = parse_forces(ApolarForce, input_lines)
 

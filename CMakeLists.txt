@@ -11,37 +11,18 @@ list(GET _VERSION_LIST 2 MICRO_VERSION)
 
 set(CMAKE_PROJECT_VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION})
 
-
-###############################################################################
-##  From:
-##    https://cliutils.gitlab.io/modern-cmake/chapters/projects/submodule.html
-##
-##  Use git to add, initialize, and update submodules for the user
-###############################################################################
-find_package(Git QUIET)
-if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-    # Update submodules as needed
-    option(GIT_SUBMODULE "Check submodules during build" ON)
-    if(GIT_SUBMODULE)
-        message(STATUS "** Submodule update")
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
-        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-            message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
-        endif()
-    endif()
-endif()
-
 ################################################################################
 # TODO:  Add licensing and authorship information
 # TODO:  Test with FEtk build
 # TODO:  Handle special mac dependencies
 #        (configure.ac:1306)
 ################################################################################
-set(CMAKE_VERBOSE_MAKEFILE true)
-cmake_policy(SET CMP0054 OLD)
-cmake_policy(SET CMP0042 NEW)
+#set(CMAKE_VERBOSE_MAKEFILE false)
+cmake_policy(SET CMP0042 NEW) # MacOS RPATH on by default
+cmake_policy(SET CMP0048 NEW) # project() command manages the VERSION variables
+cmake_policy(SET CMP0054 NEW) # Only interpret if() arguments as variables or keywords when unquoted
+cmake_policy(SET CMP0077 NEW) # option() honors normal variables (i.e. does nothing if a normal variable with the same name exists)
+cmake_policy(SET CMP0091 NEW) # MSVC runtime library flags are selected by an abstraction (i.e. CMAKE_MSVC_RUNTIME_LIBRARY)
 set(CMAKE_MACOSX_RPATH 1)
 
 ################################################################################
@@ -50,6 +31,7 @@ set(CMAKE_MACOSX_RPATH 1)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(ExternalProject)
+include(FetchContent)
 include(FeatureSummary)
 include(InstallRequiredSystemLibraries)
 
@@ -87,6 +69,103 @@ set_package_properties(APBS PROPERTIES
              open-source APBS license ensures its accessibility to the entire \
              biomedical community.")
 
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+if(CMAKE_TOOLCHAIN_FILE)
+    message(STATUS "Toolchain file is set to <${CMAKE_TOOLCHAIN_FILE}>.  Including the file.")
+    include(${CMAKE_TOOLCHAIN_FILE})
+endif()
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Install prefix" FORCE)
+endif()
+message(STATUS "Install prefix: ${CMAKE_INSTALL_PREFIX}")
+
+set(CMAKE_INSTALL_DATAROOTDIR "share/apbs")
+include(GNUInstallDirs)
+
+set(APBS_ROOT ${PROJECT_SOURCE_DIR})
+set(APBS_BUILD ${PROJECT_BINARY_DIR})
+set(TOOLS_PATH ${APBS_BUILD}/tools)
+
+set(APBS_LIBS)
+set(APBS_LIB_DIRS)
+
+find_file(CONTRIB_PATH "contrib"
+          PATHS "${APBS_ROOT}"
+          DOC "The path to contributed modules for apbs")
+find_file(EXTERNALS_PATH "externals"
+          PATHS "${APBS_ROOT}"
+          DOC "The path to the external git submodules")
+
+set(SYS_LIBPATHS /usr/lib64)
+#list(APPEND SYS_LIBPATHS /usr/lib64)
+
+# If this option is true: static libraries will be built
+#                         static dependencies will be preferred
+#                         executables will be statically linked
+# If this option is false: dynamic libraries will be built
+#                          dynamic libraries of dependencies will be preferred
+#                          executables will be dynamically linked
+option(APBS_STATIC_BUILD "Flag to indicate whether a static build should be used (if false, will be dynamic)" ON)
+
+if(APBS_STATIC_BUILD)
+    set(FETK_STATIC_BUILD ON)
+    set(BLA_STATIC ON)
+    set(BUILD_SHARED_LIBS OFF)
+    set(CMAKE_SKIP_RPATH ON)
+    set(CMAKE_MACOSX_RPATH OFF)
+    #set(CMAKE_LINK_SEARCH_START_STATIC ON)
+    #set(CMAKE_LINK_SEARCH_END_STATIC ON)
+    if(WIN32)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .lib .a)
+    else()
+        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .a)
+    endif()
+else()
+    set(FETK_STATIC_BUILD OFF)
+    set(BLA_STATIC OFF)
+    set(BUILD_SHARED_LIBS ON)
+    set(CMAKE_SKIP_RPATH OFF)
+    set(CMAKE_MACOSX_RPATH ON)
+    #set(CMAKE_LINK_SEARCH_START_STATIC OFF)
+    #set(CMAKE_LINK_SEARCH_END_STATIC OFF)
+    if(WIN32)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL$<$<CONFIG:Debug>:Debug>")
+        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .dll)
+    elseif(APPLE)
+        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .dylib .so)
+    else()
+        list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .so)
+    endif()
+endif()
+
+message(STATUS "")
+message(STATUS "APBS Static build: ${APBS_STATIC_BUILD}")
+message(STATUS "Building shared libs: ${BUILD_SHARED_LIBS}")
+message(STATUS "Find-library suffixes: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
+message(STATUS "")
+
+################################################################################
+# Handle the Finite Element Toolkit
+#
+# To use a released version of FETK:
+#   - Set FETK_VERSION to the version number (e.g. 1.8.0)
+# In this case, the binary archive will be downloaded and used.
+#
+# To use a non-released version of FETK:
+#   - Set FETK_VERSION to the git branch or commit hash you want to use (e.g. main)
+################################################################################
+
+# FETK is currently required, and therefore this option is disabled
+#option(ENABLE_FETK "Enable the finite element solver" ON)
+
+set(FETK_VERSION "857a0cf6ae40410471ea10f0e67e370cbd8ed6a3" CACHE STRING "Version of FETK to use")
+include(ImportFETK)
+import_fetk(${FETK_VERSION})
+
+
 ###############################################################################
 ##  NOTE: For Debugging and generally nice information to have
 ###############################################################################
@@ -101,7 +180,6 @@ message(STATUS "** VERSION_DATA:  ${CMAKE_PROJECT_VERSION}")
 message(STATUS "** CURRENT_TIME:  ${COMPILE_TIME}")
 message(STATUS "** CURRENT_YEAR:  ${COMPILE_YEAR}")
 
-OPTION(BUILD_SHARED_LIBS "Build shared libraries." OFF)
 
 ################################################################################
 # Set project paths                                                            #
@@ -111,7 +189,8 @@ message(STATUS "Setting project paths")
 set(CMAKE_CXX_STANDARD 17)
 if(WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W4")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:100000000")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LARGEADDRESSAWARE /STACK:100000000")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /LARGEADDRESSAWARE")
 else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -fpermissive -fPIC")
@@ -119,31 +198,6 @@ endif()
 if(APPLE AND BUILD_SHARED_LIBS AND (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU"))
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -undefined dynamic_lookup")
 endif()
-
-set(APBS_ROOT ${PROJECT_SOURCE_DIR})
-set(APBS_BUILD ${PROJECT_BINARY_DIR})
-set(EXECUTABLE_OUTPUT_PATH ${APBS_BUILD}/bin)
-set(LIBRARY_OUTPUT_PATH ${APBS_BUILD}/lib)
-set(TOOLS_PATH ${APBS_BUILD}/tools)
-set(APBS_BINARY ${EXECUTABLE_OUTPUT_PATH}/apbs)
-
-set(LIBRARY_INSTALL_PATH lib)
-set(HEADER_INSTALL_PATH include/apbs)
-set(EXECUTABLE_INSTALL_PATH bin)
-set(SHARE_INSTALL_PATH share/apbs)
-
-set(APBS_LIBS)
-set(APBS_LIB_DIRS)
-
-find_file(CONTRIB_PATH "contrib"
-          PATHS "${APBS_ROOT}"
-          DOC "The path to contributed modules for apbs")
-find_file(EXTERNALS_PATH "externals"
-          PATHS "${APBS_ROOT}"
-          DOC "The path to the external git submodules")
-
-set(SYS_LIBPATHS /usr/lib64)
-#list(APPEND SYS_LIBPATHS /usr/lib64)
 
 
 ###############################################################################
@@ -178,7 +232,7 @@ set(SYS_LIBPATHS /usr/lib64)
 ################################################################################
 # Debian/Ubuntu hack                                                           #
 ################################################################################
-if(EXISTS "/etc/debian_version" AND
+if(EXISTS "/etc/os-release" AND
   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed")
 endif()
@@ -187,7 +241,8 @@ endif()
 ################################################################################
 # Set up temporary files and directories                                       #
 ################################################################################
-file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}/temp)
+set(TEMP_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/temp)
+file(MAKE_DIRECTORY ${TEMP_OUTPUT_DIR})
 
 
 ################################################################################
@@ -221,7 +276,7 @@ if(CHECK_EPSILON)
     try_run(
         FLOAT_EPSILON_COMPILED
         FLOAT_EPSILON_COMPUTED
-        ${EXECUTABLE_OUTPUT_PATH}/temp
+        ${TEMP_OUTPUT_DIR}
         ${APBS_ROOT}/src/.config/float_epsilon.c
         RUN_OUTPUT_VARIABLE FLOAT_EPSILON_OUTPUT
     )
@@ -236,7 +291,7 @@ if(CHECK_EPSILON)
     try_run(
         DOUBLE_EPSILON_COMPILED
         DOUBLE_EPSILON_COMPUTED
-        ${EXECUTABLE_OUTPUT_PATH}/temp
+        ${TEMP_OUTPUT_DIR}
         ${APBS_ROOT}/src/.config/double_epsilon.c
         RUN_OUTPUT_VARIABLE DOUBLE_EPSILON_OUTPUT
     )
@@ -276,26 +331,22 @@ endif()
 
 
 ################################################################################
-# Find some libraries; Windows finds these automatically                       #
+# Find some libraries                       #
 ################################################################################
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
     list(APPEND APBS_LIBS m stdc++)
 endif()
 
-
-################################################################################
-# Create APBS configuration file
-################################################################################
-configure_file(
-    src/.config/apbscfg.h.in
-    ${APBS_BUILD}/src/apbscfg.h
-    @ONLY
+find_package( UMFPACK REQUIRED )
+find_package( SuiteSparse REQUIRED )
+message(STATUS "UMFPack libraries: ${UMFPACK_LIBRARIES}")
+message(STATUS "SUITESPARSE_INCLUDE_DIRS: ${SUITESPARSE_INCLUDE_DIRS}")
+message(STATUS "SUITESPARSE_LIBRARIES: ${SUITESPARSE_LIBRARIES}")
+list(APPEND APBS_LIBS
+    ${UMFPACK_LIBRARIES}
+    ${SUITESPARSE_LIBRARIES}
 )
-#file(READ ${APBS_BUILD}/src/apbscfg.h APBS_CFG)
-#message(STATUS "** APBS_CFG")
-#message(FATAL_ERROR ${APBS_CFG})
-
 
 ################################################################################
 # Optionally copy NanoShaper executable                                        #
@@ -311,13 +362,43 @@ option(ENABLE_PYGBE "Boundary element method using PYGBE" OFF)
 if(ENABLE_PYGBE)
     message(STATUS "Building PYGBE")
     add_definitions(-DENABLE_PYGBE)
-    find_package(Python REQUIRED COMPONENTS Interpreter Development)
-    message(STATUS "******** PYTHON_INCLUDE_DIRS ${Python_INCLUDE_DIRS}")
-    message(STATUS "******** PYTHON_LIBRARIES ${Python_LIBRARIES}")
-    include_directories(${Python_INCLUDE_DIRS})
-    list(APPEND APBS_LIBS ${Python_LIBRARIES})
-    #FindPython(REQUIRED Interpreter Development)
+    if(PYTHON_MAX_VERSION)
+        message(STATUS "**evaluates TRUE**")
+    else()
+        message(STATUS "**evaluates FALSE")
+    endif()
+    message(STATUS "cmake version: ${CMAKE_VERSION}")
+    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.19")
+        message(STATUS "  version >= 3.19")
+    else()
+        message(STATUS "  version < 3.19")
+    endif()
+    #set (Python3_FIND_ABI "OFF" "ANY" "ANY")
+    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.19" AND PYTHON_MAX_VERSION)
+        find_package(Python3 ${PYTHON_MIN_VERSION}...<${PYTHON_MAX_VERSION} REQUIRED COMPONENTS Interpreter Development)
+    else()
+        find_package(Python3 ${PYTHON_MIN_VERSION} REQUIRED COMPONENTS Interpreter Development)
+        if(PYTHON_MAX_VERSION AND ${Python3_VERSION} VERSION_GREATER_EQUAL ${PYTHON_MAX_VERSION})
+            set(Python3_FOUND FALSE)
+            message(FATAL_ERROR "Python version ${Python3_VERSION} is too high; maximum is ${PYTHON_MAX_VERSION}")
+        endif()
+    endif()
+    message(STATUS "******** PYTHON_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
+    message(STATUS "******** PYTHON_LIBRARIES ${Python3_LIBRARIES}")
+    include_directories(${Python3_INCLUDE_DIRS})
+    list(APPEND APBS_LIBS ${Python3_LIBRARIES})
+
+    # make sure we have PYGBE
+    # detect virtualenv and set pip args accordingly
+    if(DEFINED ENV{VIRTUAL_ENV} OR DEFINED ENV{CONDA_PREFIX})
+        set(_pip_args)
+    else()
+        set(_pip_args "--user")
+    endif()
+    # then install PYGBE with pip
+    execute_process(COMMAND ${Python3_EXECUTABLE} -m pip install pygbe ${_pip_args})
 endif() # ENABLE_PYGBE
+
 
 ################################################################################
 # Optionally build BEM: TABI-PB method                                         #
@@ -326,41 +407,68 @@ option(ENABLE_BEM "Boundary element method using TABIPB" OFF)
 
 if(ENABLE_BEM)
     message(STATUS "Building TABIPB")
-    add_definitions(-DENABLE_BEM)
-    set(TABI bem)
-    set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
-
+    #set(TABI bem)
+    #set(TABI_PATH ${EXTERNALS_PATH}/${TABI})
     set(GET_NanoShaper ON) #CACHE BOOL "Grabbing NanoShaper path"
+    add_definitions(-DENABLE_BEM)
+    # We turn the TABIPB/APBS wrapper off and build here instead
+    set(ENABLE_TABIPB_APBS OFF CACHE BOOL "Turn off TABIPB/APBS wrapper" FORCE)
 
-    if(WIN32)
-        ExternalProject_add(${TABI}
-            SOURCE_DIR ${TABI_PATH}
-            CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-                       -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
-                       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target TABIPBlib
-            INSTALL_COMMAND "")
-    else()
-        ExternalProject_add(${TABI}
-            SOURCE_DIR ${TABI_PATH}
-            CMAKE_ARGS -DENABLE_TABIPB_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-                       -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}
-                       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target TABIPBlib
-            INSTALL_COMMAND "")
-    endif()
+    #add_subdirectory(${EXTERNALS_PATH}/${TABI})
+    FetchContent_Declare( tabi
+        GIT_REPOSITORY https://github.com/Treecodes/TABI-PB.git
+        GIT_TAG fe1c237b057418fed48535db125394607040d9de
+    )
+    FetchContent_MakeAvailable( tabi )
 
-    ExternalProject_Get_Property(${TABI} binary_dir)
-    list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
+    list(APPEND APBS_LIB_DIRS "${tabi_BINARY_DIR}/lib")
     list(APPEND APBS_LIBS TABIPBlib)
-    include_directories(${EXTERNALS_PATH}/${TABI})
-    include_directories(${EXTERNALS_PATH}/${TABI}/src)
-    include_directories(${EXTERNALS_PATH}/${TABI}/src/tabipb_wrap)
+    include_directories(${tabi_SOURCE_DIR}/src)
+    include_directories(${tabi_SOURCE_DIR}/src/tabipb_wrap)
+    add_definitions(-DTABIPB_APBS)
+  
+    set(TABIPB_LIBFILES
+        ${tabi_SOURCE_DIR}/src/params.cpp
+        ${tabi_SOURCE_DIR}/src/molecule.cpp
+        ${tabi_SOURCE_DIR}/src/particles.cpp
+        ${tabi_SOURCE_DIR}/src/tree.cpp
+        ${tabi_SOURCE_DIR}/src/clusters.cpp 
+        ${tabi_SOURCE_DIR}/src/interaction_list.cpp
+        ${tabi_SOURCE_DIR}/src/boundary_element.cpp 
+        ${tabi_SOURCE_DIR}/src/gmres.cpp 
+        ${tabi_SOURCE_DIR}/src/precondition.cpp 
+        ${tabi_SOURCE_DIR}/src/output.cpp
+        ${tabi_SOURCE_DIR}/src/tabipb_wrap/TABIPBWrap.cpp
+        ${tabi_SOURCE_DIR}/src/tabipb_wrap/params_apbs_ctor.cpp
+        ${tabi_SOURCE_DIR}/src/tabipb_wrap/molecule_apbs_ctor.cpp
+    )
 
-    if(BUILD_SHARED_LIBS)
-        install(FILES ${binary_dir}/lib/libTABIPBlib${CMAKE_SHARED_LIBRARY_SUFFIX}
-                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-    endif()
+    set(TABIPB_HEADERS
+        ${tabi_SOURCE_DIR}/src/boundary_element.h
+        ${tabi_SOURCE_DIR}/src/clusters.h
+        ${tabi_SOURCE_DIR}/src/constants.h
+        ${tabi_SOURCE_DIR}/src/interaction_list.h
+        ${tabi_SOURCE_DIR}/src/molecule.h
+        ${tabi_SOURCE_DIR}/src/output.h
+        ${tabi_SOURCE_DIR}/src/params.h
+        ${tabi_SOURCE_DIR}/src/particles.h
+        ${tabi_SOURCE_DIR}/src/partition.h
+        ${tabi_SOURCE_DIR}/src/tabipb_timers.h
+        ${tabi_SOURCE_DIR}/src/timer.h
+        ${tabi_SOURCE_DIR}/src/tree.h
+        ${tabi_SOURCE_DIR}/src/tabipb_wrap/TABIPBStruct.h
+        ${tabi_SOURCE_DIR}/src/tabipb_wrap/TABIPBWrap.h)
+  
+    set(TABIPB_LIBNAME TABIPBlib)
+    add_library(${TABIPB_LIBNAME} ${TABIPB_LIBFILES})
+    target_compile_features(${TABIPB_LIBNAME} PRIVATE cxx_std_11)
+    target_compile_options(${TABIPB_LIBNAME} PRIVATE 
+                           $<$<CONFIG:RELEASE>:-O3>
+                           $<$<CONFIG:RELWITHDEBINFO>:-O3>
+                           $<$<CONFIG:DEBUG>:-O0 -Wall>)
+    install(FILES ${TABIPB_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tabi COMPONENT headers)
+    install(TARGETS ${TABIPB_LIBNAME} DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries)
+                       
 endif() # ENABLE_BEM
 
 
@@ -382,14 +490,17 @@ if(GET_NanoShaper)
         set(NANOSHAPER_RAW_BINARY_NAME "NanoShaper.exe")
     endif()
 
-    if(NOT EXISTS "${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
-        file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME})
-        message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}")
+    if(NOT EXISTS "${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME}")
+        file(DOWNLOAD ${NANOSHAPER_FULL_URL_PATH} ${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME})
+        message(STATUS "NanoShaper Download: ${NANOSHAPER_FULL_URL_PATH} ${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME}")
     endif()
 
-    install(PROGRAMS ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME}
-            DESTINATION ${EXECUTABLE_INSTALL_PATH})
-    message(STATUS "NanoShaper install: ${EXECUTABLE_OUTPUT_PATH}/${NANOSHAPER_RAW_BINARY_NAME} ${EXECUTABLE_INSTALL_PATH}")
+    if(NOT ENABLE_BEM)
+        install(PROGRAMS ${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME}
+                DESTINATION ${CMAKE_INSTALL_BINDIR}
+                COMPONENT executables)
+        message(STATUS "NanoShaper install: ${TEMP_OUTPUT_DIR}/${NANOSHAPER_RAW_BINARY_NAME} ${CMAKE_INSTALL_BINDIR}")
+    endif()
 endif()
 
 
@@ -419,250 +530,86 @@ endif()
 
 
 ################################################################################
-# Handle the finite element solver dependencies                                #
-################################################################################
-option(ENABLE_FETK "Enable the finite element solver" OFF)
-
-
-#  HACK START - This used to be in tools/windows/configuration headers/*.h
-#file(COPY tools/apbscfg.h DESTINATION ${APBS_BUILD}/src)
-file(COPY tools/maloccf.h DESTINATION ${APBS_BUILD}/src)
-#  if should be done something like the following:
-#configure_file(
-#     ${EXTERNALS_PATH}/fetk/maloc/src/config/maloccf.h.in
-#     DESTINATION ${APBS_BUILD}/src/maloccf.h
-#)
-#  HACK END   - This used to be in tools/windows/configuration headers/*.h
-
-
-################################################################################
-# Deal with MALOC                                                              #
-# Note that we depend exclusively on the MALOC that is in our external FETK    #
-# repository.  Also note, that in order for this to work on Windows, we've had #
-# to add CMake support to MALOC, and that FETK has no such support, in general.#
-################################################################################
-# add_library(apbs_fetk_libraries INTERFACE)
-
-if(ENABLE_FETK)
-    if(WIN32)
-        message(FATAL_ERROR "FETK will not built on Windows because it uses autotools!")
-    else()
-        message(STATUS "Building FETK components.")
-        set(CONFIG_OPTS --prefix=<INSTALL_DIR> --without-doxygen --with-doxygen=no)
-
-        set(MPI_ENV "")
-        if(HAVE_MPI_H)
-            list(APPEND CONFIG_OPTS --enable-mpi)
-
-            # MALOC just cares about libmpi
-            foreach(LIB_PATH ${MPI_C_LIBRARIES})
-                get_filename_component(LIB ${LIB_PATH} NAME_WE)
-                if(LIB STREQUAL "libmpi")
-                    get_filename_component(MPI_LIB_DIR ${LIB_PATH} DIRECTORY)
-                endif()
-            endforeach()
-
-            set(MPI_ENV "FETK_MPI_INCLUDE=${MPI_C_INCLUDE_PATH}" "FETK_MPI_LIBRARY=${MPI_LIB_DIR}")
-        endif()
-
-        ExternalProject_Add(fetk-maloc
-            PREFIX fetk
-            SOURCE_DIR ${EXTERNALS_PATH}/fetk/maloc/src
-            CONFIGURE_COMMAND ${MPI_ENV} ${EXTERNALS_PATH}/fetk/maloc/configure ${CONFIG_OPTS}
-            BUILD_COMMAND ${MAKE})
-
-        ExternalProject_Add(fetk-punc
-            PREFIX fetk
-            DEPENDS fetk-maloc
-            SOURCE_DIR ${EXTERNALS_PATH}/fetk/punc/src
-            CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/punc/configure ${CONFIG_OPTS}
-            BUILD_COMMAND ${MAKE})
-
-        ExternalProject_Add(fetk-gamer
-            PREFIX fetk
-            DEPENDS fetk-maloc
-            SOURCE_DIR ${EXTERNALS_PATH}/fetk/gamer/src
-            CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/gamer/configure ${CONFIG_OPTS}
-            BUILD_COMMAND ${MAKE})
-
-        ExternalProject_Add(fetk-mc
-            PREFIX fetk
-            DEPENDS fetk-maloc fetk-punc
-            SOURCE_DIR ${EXTERNALS_PATH}/fetk/mc/src
-            CONFIGURE_COMMAND ${MPI_ENV} FETK_INCLUDE=<INSTALL_DIR>/include FETK_LIBRARY=<INSTALL_DIR>/lib ${EXTERNALS_PATH}/fetk/mc/configure ${CONFIG_OPTS}
-            BUILD_COMMAND ${MAKE})
-
-        set(FETK_ENABLED 1)
-
-        ExternalProject_Get_Property(fetk-maloc install_dir)
-        include_directories(${install_dir}/include)
-
-        list(APPEND APBS_LIB_DIRS "${install_dir}/lib")
-        # target_link_libraries(apbs_fetk_libraries INTERFACE maloc amd punc mc gamer superlu umfpack blas vf2c tetgen triangle readline)
-        list(APPEND APBS_LIBS
-                                  maloc
-                                  amd
-                                  punc
-                                  mc
-                                  gamer
-                                  superlu
-                                  umfpack
-                                  blas
-                                  vf2c
-                                  tetgen
-                                  triangle
-                                  readline
-                                  termcap)
-
-        if(BUILD_SHARED_LIBS)
-            install(DIRECTORY ${install_dir}/lib/
-                    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-        endif()
-
-        SET(HAVE_MC_H 1)
-        SET(HAVE_PUNC_H 1)
-        SET(HAVE_BIOM_H 1)
-    endif()
-else()
-    # We'll use autotools to build MALOC if FETK is enabled.
-    add_subdirectory(${EXTERNALS_PATH}/fetk/maloc)
-    include_directories(${EXTERNALS_PATH}/fetk/maloc/src/base
-                        ${EXTERNALS_PATH}/fetk/maloc/src/vsys
-                        ${EXTERNALS_PATH}/fetk/maloc/src/vsh
-                        ${EXTERNALS_PATH}/fetk/maloc/src/psh
-                        ${EXTERNALS_PATH}/fetk/mc/src/aaa_inc)
-    list(APPEND APBS_LIB_DIRS ${EXTERNALS_PATH}/fetk/maloc/lib)
-    list(APPEND APBS_LIBS maloc)
-    if (WIN32)
-      list(APPEND MALOC_LIBS wsock32 WS2_32)
-    endif()
-endif()
-
-
-################################################################################
 # Optionally build geoflow (git submodule)
 ################################################################################
 option(ENABLE_GEOFLOW "geoflow method" OFF)
 
 if(ENABLE_GEOFLOW)
     message(STATUS "Building GEOFLOW")
-    add_definitions(-DGEOFLOW_APBS)
+    #add_definitions(-DGEOFLOW_APBS)
+    #set(ENABLE_GEOFLOW_APBS ON CACHE BOOL "Enable the APBS-Geoflow connection")
 
-    if(WIN32)
-        ExternalProject_Add(geoflow
-            SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-            CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target GeometricFlowLib
-            INSTALL_COMMAND "")
-    else()
-        ExternalProject_Add(geoflow
-            SOURCE_DIR ${EXTERNALS_PATH}/geoflow_c
-            CMAKE_ARGS -DENABLE_GEOFLOW_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target GeometricFlowLib
-            INSTALL_COMMAND "")
-    endif()
+    #add_subdirectory(${EXTERNALS_PATH}/geoflow_c)
+    FetchContent_Declare( geoflow
+        GIT_REPOSITORY https://github.com/Electrostatics/geoflow_c.git
+        GIT_TAG 39d53269c084f1dc1caa71de95dca77f19da739e
+    )
+    FetchContent_MakeAvailable( geoflow )
 
-    ExternalProject_Get_Property(geoflow binary_dir)
     add_definitions(-DENABLE_GEOFLOW)
-    list(APPEND APBS_LIB_DIRS "${binary_dir}/lib")
     list(APPEND APBS_LIBS GeometricFlowLib)
-    include_directories(${EXTERNALS_PATH}/geoflow_c/src)
+    include_directories(${geoflow_SOURCE_DIR}/src)
 
-    if(BUILD_SHARED_LIBS)
-        install(FILES ${binary_dir}/lib/libGeometricFlowLib${CMAKE_SHARED_LIBRARY_SUFFIX}
-                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-    endif()
+    find_package(Eigen3 REQUIRED)
+    include_directories(${EIGEN3_INCLUDE_DIR})
 endif()
 
 
 ################################################################################
-# Optionally build pbam (git submodule)
+# Optionally build pbam and pbsam (git submodule)
 ################################################################################
 option(ENABLE_PBAM "pbam method" OFF)
-
-if(ENABLE_PBAM)
-    message(STATUS "Building PBAM")
-    add_definitions(-DPBAM_APBS)
-
-    if(WIN32)
-        ExternalProject_Add(pbam
-            SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-            CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBAMLib
-            INSTALL_COMMAND "")
-    else()
-        ExternalProject_Add(pbam
-            SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-            CMAKE_ARGS -DENABLE_PBAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBAMLib
-            INSTALL_COMMAND "")
-    endif()
-
-    ExternalProject_Get_Property(pbam binary_dir)
-    add_definitions(-DENABLE_PBAM)
-    list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src")
-    if (WIN32)
-        list(APPEND APBS_LIB_DIRS "${binary_dir}/pbam/src/${CMAKE_BUILD_TYPE}")
-    endif()
-    list(APPEND APBS_LIBS PBAMLib)
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pbam/src)
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
-
-    if(BUILD_SHARED_LIBS)
-        install(FILES ${binary_dir}/pbam/src/libPBAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
-                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-    endif()
-endif()
-
-
-################################################################################
-# Optionally build pbsam (git submodule)
-################################################################################
 option(ENABLE_PBSAM "pbsam method" OFF)
 
+if(ENABLE_PBAM OR ENABLE_PBSAM)
+    if(ENABLE_PBAM)
+        message(STATUS "Building PBAM")
+        set(ENABLE_PBAM_APBS ON CACHE BOOL "Enable the APBS-PBAM connection")
+
+        add_definitions(
+            -DENABLE_PBAM
+            -DPBAM_APBS
+        )
+        list(APPEND APBS_LIBS PBAMLib)
+    endif()
+
+    if(ENABLE_PBSAM)
+        message(STATUS "Building PBSAM")
+        set(ENABLE_PBSAM_APBS ON CACHE BOOL "Enable the APBS-PBSAM connection")
+
+        find_package(BLAS REQUIRED)
+
+        add_definitions(
+            -DENABLE_PBSAM
+            -DPBSAM_APBS
+        )
+        list(APPEND APBS_LIBS PBSAMLib)
+    endif()
+
+    FetchContent_Declare( pb_s_am
+        GIT_REPOSITORY https://github.com/Electrostatics/pb_solvers.git
+        GIT_TAG d3ba994d7ec2b2cad5b3e843784c7cb9f41ace37
+    )
+    #add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
+    FetchContent_MakeAvailable( pb_s_am )
+endif()
+
+if(ENABLE_PBAM)
+    include_directories(${pb_s_am_SOURCE_DIR}/pbam/src)
+endif()
+
 if(ENABLE_PBSAM)
-    message(STATUS "Building PBSAM")
-    add_definitions(-DPBSAM_APBS)
+    include_directories(${pb_s_am_SOURCE_DIR}/pbam/src)
+    if(ENABLE_PBAM)
+        include(${pb_s_am_SOURCE_DIR}/cmake/Utils.cmake)
+        include(${pb_s_am_SOURCE_DIR}/cmake/Dependencies.cmake)
+        include(${pb_s_am_SOURCE_DIR}/cmake/Summary.cmake)
+    endif()    
+endif()
 
-    list(APPEND CMAKE_MODULE_PATH ${EXTERNALS_PATH}/pb_s_am/cmake/modules)
-    include(${EXTERNALS_PATH}/pb_s_am/cmake/Utils.cmake)
-    include(${EXTERNALS_PATH}/pb_s_am/cmake/Dependencies.cmake)
-    include(${EXTERNALS_PATH}/pb_s_am/cmake/Summary.cmake)
-
-    if(WIN32)
-        ExternalProject_Add(pbsam
-            SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-            CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --config $<CONFIG> --target PBSAMLib
-            INSTALL_COMMAND "")
-    else()
-        ExternalProject_Add(pbsam
-            SOURCE_DIR ${EXTERNALS_PATH}/pb_s_am
-            CMAKE_ARGS -DENABLE_PBSAM_APBS=ON -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
-            BUILD_COMMAND "${CMAKE_COMMAND}" --build . --target PBSAMLib
-            INSTALL_COMMAND "")
-    endif()
-
-    ExternalProject_Get_Property(pbsam binary_dir)
-    add_definitions(-DENABLE_PBSAM)
-    list(APPEND APBS_LIB_DIRS "${binary_dir}/pbsam/src")
-
-    if(WIN32)
-        list(APPEND APBS_LIBS PBSAMLib ${PBSAM_LINKER_LIBS})
-    else()
-        list(APPEND APBS_LIBS stdc++ PBSAMLib ${PBSAM_LINKER_LIBS})
-    endif()
-
-    message(STATUS "Adding in " ${PBSAM_LINKER_LIBS} )
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pbsam/src)
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_shared/src)
-    include_directories(${EXTERNALS_PATH}/pb_s_am/pb_wrap/src)
-
-    if(BUILD_SHARED_LIBS)
-        install(FILES ${binary_dir}/pbsam/src/libPBSAMLib${CMAKE_SHARED_LIBRARY_SUFFIX}
-                DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-    endif()
+if(ENABLE_PBAM OR ENABLE_PBSAM)
+    include_directories(${pb_s_am_SOURCE_DIR}/pb_shared/src)
+    include_directories(${pb_s_am_SOURCE_DIR}/pb_wrap/src)
 endif()
 
 
@@ -674,17 +621,6 @@ option(ENABLE_FAST "Enable fast mode" OFF)
 if(ENABLE_FAST)
     set(APBS_FAST 1)
     message(STATUS "Fast mode enabled")
-endif()
-
-
-################################################################################
-# Handle conditional TINKER support                                            #
-################################################################################
-option(ENABLE_TINKER "Enable TINKER support" OFF)
-
-if(ENABLE_TINKER)
-    set(WITH_TINKER 1)
-    message(STATUS "Tinker enabled")
 endif()
 
 
@@ -777,6 +713,9 @@ if(ENABLE_OPENMP)
     else()
         message(WARNING "OpenMP may not be enabled in debugging mode")
     endif()
+    if(NOT BUILD_SHARED_LIBS)
+        message(FATAL_ERROR "OpenMP cannot be used with a static build")
+    endif()
 endif()
 
 
@@ -821,6 +760,40 @@ endif()
 
 
 ################################################################################
+# Create APBS configuration file
+################################################################################
+configure_file(
+    src/.config/apbscfg.h.in
+    ${APBS_BUILD}/src/apbscfg.h
+    @ONLY
+)
+if(ENABLE_iAPBS)
+    INSTALL(FILES ${APBS_BUILD}/src/apbscfg.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT headers)
+endif()
+
+
+################################################################################
+# Optionally build iAPBS interface                                             #
+#   Note that this requires apbscfg.h,                                         #
+#   and so must follow the APBS config file section                            #
+################################################################################
+option(ENABLE_iAPBS "Enable iAPBS" OFF)
+
+if(ENABLE_iAPBS)
+    message(STATUS "Building of iAPBS interface enabled")
+    set(iAPBS_LIBRARY iapbs)
+    include_directories(${APBS_BUILD}/src)
+    add_subdirectory(contrib/iapbs/src)
+    if(NOT TARGET ${iAPBS_LIBRARY})
+        message(FATAL_ERROR "iAPBS target does not exist: <${iAPBS_LIBRARY}>")
+    endif()
+    list(APPEND APBS_LIBS ${iAPBS_LIBRARY})
+else()
+    message(STATUS "Building of iAPBS interface disabled")
+endif()
+
+
+################################################################################
 # Build APBS sources                                                           #
 ################################################################################
 link_directories(${APBS_LIB_DIRS})
@@ -854,15 +827,19 @@ endif()
 # Set up additional directories to install                                     #
 ################################################################################
 install(DIRECTORY ${APBS_ROOT}/docs
-        DESTINATION ${SHARE_INSTALL_PATH}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}
+        COMPONENT docs
         PATTERN "programmer" EXCLUDE
         PATTERN "CMakeLists.txt" EXCLUDE)
 
 install(DIRECTORY ${APBS_ROOT}/examples
-        DESTINATION ${SHARE_INSTALL_PATH})
+        DESTINATION ${CMAKE_INSTALL_DATADIR}
+        USE_SOURCE_PERMISSIONS
+        COMPONENT examples)
 
 install(DIRECTORY ${APBS_ROOT}/tests
-        DESTINATION ${SHARE_INSTALL_PATH}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}
+        COMPONENT tests
         FILES_MATCHING
         PATTERN "*.py"
         PATTERN "*.cfg"
@@ -870,8 +847,9 @@ install(DIRECTORY ${APBS_ROOT}/tests
 
 if(BUILD_TOOLS)
     install(DIRECTORY ${APBS_ROOT}/tools
-            DESTINATION ${SHARE_INSTALL_PATH}
+            DESTINATION ${CMAKE_INSTALL_DATADIR}
             USE_SOURCE_PERMISSIONS
+            COMPONENT tools
             PATTERN "CMakeLists.txt"
             PATTERN "matlab"      EXCLUDE
             PATTERN "__pycache__" EXCLUDE
@@ -879,27 +857,11 @@ if(BUILD_TOOLS)
 
     if(NOT "${APBS_ROOT}" STREQUAL "${APBS_BUILD}")
     install(DIRECTORY ${APBS_BUILD}/tools/bin
-            DESTINATION ${SHARE_INSTALL_PATH}/tools
-            USE_SOURCE_PERMISSIONS)
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/tools
+            USE_SOURCE_PERMISSIONS
+            COMPONENT tools)
     endif()
 endif()
-
-################################################################################
-# Optionally build iAPBS interface                                             #
-################################################################################
-option(ENABLE_iAPBS "Enable iAPBS" OFF)
-
-if(ENABLE_iAPBS)
-    message(STATUS "Building of iAPBS interface enabled")
-    add_subdirectory(contrib/iapbs/src)
-    list(APPEND APBS_LIBS ${iAPBS_LIBRARY})
-endif()
-
-
-################################################################################
-# Clean up temporary files and directories                                     #
-################################################################################
-file(REMOVE_RECURSE ${EXECUTABLE_OUTPUT_PATH}/temp)
 
 
 ###############################################################################
@@ -947,10 +909,18 @@ set(CPACK_STRIP_FILES                   True)
 list(APPEND CPACK_GENERATOR            "ZIP")
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY    True)
 
+# Control which components get included in the package
+# Components in use are: executables, libraries, headers, docs, examples, tests, tools, python
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_COMPONENTS_GROUPING ALL_COMPONENTS_IN_ONE)
+get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
+#list(REMOVE_ITEM CPACK_COMPONENTS_ALL "libraries" "headers" "docs" )
+list(REMOVE_ITEM CPACK_COMPONENTS_ALL "docs" )
+
 if(CPACK_GENERATOR MATCHES "^(7Z|TBZ2|TGZ|TXZ|TZ|TZST|ZIP)$")
     set(CPACK_TOPLEVEL_TAG ${CPACK_PACKAGE_NAME})
     set(CPACK_SET_DESTDIR  False)
-    set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY False)
+    set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY True)
 endif()
 
 include (CPack)

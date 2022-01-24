@@ -8,3 +8,4 @@ if(ENABLE_PYTHON)
     add_subdirectory(python-pybind)
 endif(ENABLE_PYTHON)
 
+unset(EXECUTABLE_OUTPUT_PATH)

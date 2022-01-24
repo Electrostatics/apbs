@@ -594,18 +594,6 @@ VPUBLIC void Vpmg_fieldSpline4(
              double field[3] /**< The (returned) electric field */
              );
 
-/** @brief   Computes the permanent multipole electrostatic hydration
- *           energy (the polarization component of the hydration energy
- *           currently computed in TINKER).
- *  @ingroup Vpmg
- *  @author  Michael Schnieders
- *  @returns The permanent multipole electrostatic hydration energy
- */
-VEXTERNC double Vpmg_qfPermanentMultipoleEnergy(
-             Vpmg *thee,     /**< Vpmg object */
-             int atomID      /**< Atom index */
-             );
-
 /** @brief   Computes the q-Phi Force for permanent multipoles based on
  *           5th order B-splines
  *  @ingroup Vpmg
