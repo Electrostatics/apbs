@@ -232,7 +232,7 @@ endif()
 ################################################################################
 # Debian/Ubuntu hack                                                           #
 ################################################################################
-if(EXISTS "/etc/debian_version" AND
+if(EXISTS "/etc/os-release" AND
   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed")
 endif()
