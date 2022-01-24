@@ -30,7 +30,7 @@ There is a script that is used to build APBS in the Github Actions. You may want
 Import submodules
 -----------------
 
-*As of v3.3.0:* Submodules are only used for Pybind11, so this step is only required if building the Python interface.
+*As of v3.4.0:* Submodules are only used for Pybind11, so this step is only required if building the Python interface.
 
 We are using Git submodules to manage various pieces of code.  To build the master branch, after cloning it, you will need to do the following from within the top of the source directory:
 
@@ -130,7 +130,7 @@ That variable will be set to a working default if not manually set.
 .. code:: bash
 
    cd $APBS_BUILD_DIR
-   cmake -DENABLE_FETK_=v1.9.1
+   cmake -DENABLE_FETK_=ON -DFETK_VERSION=v1.9.2
 
 For advanced users, you can use a version of FETK other than a released version by setting ``FETK_VERSION``
 to the desired git commit hash instead of a version number:
@@ -138,7 +138,7 @@ to the desired git commit hash instead of a version number:
 .. code:: bash
 
    cd $APBS_BUILD_DIR
-   cmake -DENABLE_FETK=[git hash]
+   cmake -DENABLE_FETK=ON -DFETK_VERSION=[git hash]
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -195,6 +195,7 @@ Building the code - advanced
       -DENABLE_GEOFLOW=ON                       \
       -DENABLE_BEM=ON                           \
       -DENABLE_FETK=ON                          \
+      -DFETK_VERSION=[version]                  \
       -DENABLE_OPENMP=ON                        \
       -DENABLE_PBAM=ON                          \
       -DENABLE_PBSAM=ON                         \

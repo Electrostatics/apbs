@@ -15,7 +15,7 @@ New Features
 
 * Revamped build system
 * Most submodule switched to using CMake's FetchContent
-* FETK is now required; using v1.9.1
+* FETK is now required; currently using v1.9.2
 * Automatic release processes implemented
 * Cross-platform builds performed on GitHub Actions
 * Pre-compiled binaries posted to each Release
@@ -27,6 +27,8 @@ Known Bugs and Limitations
 
 * Automated build is only single threaded
 * pb_solvers has been disabled; requires further development for full integration
+* Support for the PYGBE solver is minimal so far; user needs to install PYGBE (e.g. via `pip install pygbe`)
+* Docker build was failing during tests and needs to be fixed
 
 ^^^^^
 Notes
