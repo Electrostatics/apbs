@@ -254,8 +254,8 @@ jobs:
 
 # For debugging
       - name: Setup tmate session
-        if: startsWith(matrix.os, 'windows') || ! success()
-#        if: ${{ ! success() }}
+#        if: startsWith(matrix.os, 'windows') || ! success()
+        if: ${{ ! success() }}
         uses: mxschmitt/action-tmate@v3
 
 
@@ -333,14 +333,6 @@ jobs:
           cd ${APBS_DIR}/share/apbs/examples
           ./run_selected_examples.sh
         shell: bash
-
-#      - name: Test container
-#        if: startsWith(matrix.os, 'windows')  # Windows only
-#        run: |
-#          docker pull mcr.microsoft.com/windows:1809
-#          docker run mcr.microsoft.com/windows:1809 pwd
-#        shell: bash
-#          docker run -v `pwd`:/c/apbs mcr.microsoft.com/windows:1809 ls
 
       - name: ldd
         if: ${{ ! success() && startsWith(matrix.os, 'windows') }}
