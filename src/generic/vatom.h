@@ -97,14 +97,6 @@ struct sVatom {
     char resName[VMAX_RECLEN]; /**< Residue name from PDB/PQR file */
     char atomName[VMAX_RECLEN]; /**< Atom name from PDB/PDR file */
 
-#if defined(WITH_TINKER)
-
-    double dipole[3];          /**< Permanent dipole */
-    double quadrupole[9];      /**< Permanent quadrupole */
-    double inducedDipole[3];   /**< Induced dipole */
-    double nlInducedDipole[3];  /**< Non-local induced dipole */
-
-#endif /* if defined(WITH_TINKER) */
 };
 
 /**
@@ -322,69 +314,5 @@ VEXTERNC void Vatom_copyTo(Vatom *thee, Vatom *dest);
  */
 VEXTERNC void Vatom_copyFrom(Vatom *thee, Vatom *src);
 
-#if defined(WITH_TINKER)
-
-/** @brief   Set the induced dipole moment
- *  @ingroup Vatom
- *  @author  Michael Schnieders
- *  @param   thee   Vatom object to be modified
- *  @param   inducedDipole Induced dipole moment (e*A)
- */
-VEXTERNC void   Vatom_setInducedDipole(Vatom *thee,
-                                       double inducedDipole[3]);
-
-/** @brief   Set the non-local induced dipole moment
- *  @ingroup Vatom
- *  @author  Michael Schnieders
- *  @param   thee   Vatom object to be modified
- *  @param   nlInducedDipole Induced dipole moment (e*A)
- */
-VEXTERNC void   Vatom_setNLInducedDipole(Vatom *thee,
-                                       double nlInducedDipole[3]);
-
-/** @brief   Set the permanent dipole moment
- *  @ingroup Vatom
- *  @author  Michael Schnieders
- *  @param   thee   Vatom object to be modified
- *  @param   dipole Permanent dipole moment
- */
-VEXTERNC void   Vatom_setDipole(Vatom *thee, double dipole[3]);
-
-/** @brief   Set the permanent quadrupole moment
- *  @ingroup Vatom
- *  @author  Michael Schnieders
- *  @param   thee   Vatom object to be modified
- *  @param   quadrupole Permanent quadrupole moment
- */
-VEXTERNC void   Vatom_setQuadrupole(Vatom *thee, double quadrupole[9]);
-
-/** @brief   Get permanent dipole
- *  @ingroup Vatom
- *  @author  Michael Schnieders
- *  @param   thee    Vatom object
- */
-VEXTERNC double*  Vatom_getDipole(Vatom *thee);
-
-/** @brief   Get permanent quadrupole
- *  @ingroup Vatom
- *  @author  Michael Schnieders
- *  @param   thee    Vatom object
- */
-VEXTERNC double*  Vatom_getQuadrupole(Vatom *thee);
-
-/** @brief   Get induced dipole
- *  @ingroup Vatom
- *  @author  Michael Schnieders
- *  @param   thee    Vatom object
- */
-VEXTERNC double*  Vatom_getInducedDipole(Vatom *thee);
-
-/** @brief   Get non-local induced dipole
- *  @ingroup Vatom
- *  @author  Michael Schnieders
- *  @param   thee    Vatom object
- */
-VEXTERNC double*  Vatom_getNLInducedDipole(Vatom *thee);
-#endif /* if defined(WITH_TINKER) */
 
 #endif /* ifndef _VATOM_H_ */

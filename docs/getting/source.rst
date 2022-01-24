@@ -26,15 +26,11 @@ Shortcut to build
 
 There is a script that is used to build APBS in the Github Actions. You may want to use the file, :file:`.build.sh`, as a template for building APBS.
 
-.. caution:: When using make, there can be race conditions with CMake, autoconf, downloading dependencies, and make. It is best to run 
-
-.. code:: bash
-
-   VERBOSE=1 make -j 1
-
 -----------------
 Import submodules
 -----------------
+
+*As of v3.4.0:* Submodules are only used for Pybind11, so this step is only required if building the Python interface.
 
 We are using Git submodules to manage various pieces of code.  To build the master branch, after cloning it, you will need to do the following from within the top of the source directory:
 
@@ -127,21 +123,23 @@ NanoShaper is a molecular surface mesh generation software package developed by 
 Using finite element support
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. warning::
-
-   Finite element methods are currently only supported on POSIX-like operating systems such as OS X or Linux.
-
-To enable finite element support, set the CMake :makevar:`ENABLE_FETK` variable to ``ON``.
-
-On Linux, the FETK shared libraries need to be locatable by the shared library loader.
-One way to do this is to update :makevar:`LD_LIBRARY_PATH` to point at :file:`<build-dir>/fetk/lib`, where ``<build-dir>`` is the location where APBS was built.
-In base, this can be accomplished with the command:
+*As of v3.4.0:* The Finite Element Toolkit, FETK, is required for building APBS.  
+You can set the version of FETK used with the CMake variable :makevar:`FETK_VERSION`.
+That variable will be set to a working default if not manually set.
 
 .. code:: bash
 
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<build-dir>/fetk/lib:<install-dir>/fetk/lib
    cd $APBS_BUILD_DIR
-   cmake -DENABLE_FETK=ON ..
+   cmake -DENABLE_FETK_=ON -DFETK_VERSION=v1.9.2
+
+For advanced users, you can use a version of FETK other than a released version by setting ``FETK_VERSION``
+to the desired git commit hash instead of a version number:
+
+.. code:: bash
+
+   cd $APBS_BUILD_DIR
+   cmake -DENABLE_FETK=ON -DFETK_VERSION=[git hash]
+
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Enabling APBS Python support
@@ -167,7 +165,7 @@ Assuming the Cmake command completed successfully, APBS can be built with
 
    cd $APBS_BUILD_DIR
    # Run cmake with the options you prefer:
-   VERBOSE=1 make -j 1
+   make -j
 
 ----------------------------
 Building the code - advanced
@@ -197,15 +195,15 @@ Building the code - advanced
       -DENABLE_GEOFLOW=ON                       \
       -DENABLE_BEM=ON                           \
       -DENABLE_FETK=ON                          \
+      -DFETK_VERSION=[version]                  \
       -DENABLE_OPENMP=ON                        \
       -DENABLE_PBAM=ON                          \
       -DENABLE_PBSAM=ON                         \
       -DENABLE_PYTHON=ON                        \
       -DENABLE_TESTS=ON                         \
-      -DENABLE_TINKER=OFF                       \
       -DBUILD_SHARED_LIBS=ON                    \
       ..
-   VERBOSE=1 make -j 1
+   make -j
 
 ------------
 Testing APBS
@@ -231,4 +229,4 @@ Installing APBS
       -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
       # NOTE: Add cmake options that you used during the Build APBS section
    ..
-   VERBOSE=1 make -j 1 install
+   make -j install

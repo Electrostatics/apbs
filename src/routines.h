@@ -63,21 +63,21 @@
 
 #include "apbs.h"
 
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
 #    include "mc/mc.h"
 #    include "fem/vfetk.h"
 #endif
-#ifdef HAVE_MCX_H
+#ifdef HAVE_MCX
 #    include "mcx/mcx.h"
 #endif
 
 #ifdef ENABLE_BEM
   #include "TABIPBWrap.h"
-#include "../externals/bem/src/tabipb_wrap/TABIPBWrap.h"
 #endif
 
 #ifdef ENABLE_GEOFLOW
   #include "GeometricFlowWrap.h"
+  #include "geoflow/geoflow_wrap_apbs.h"
 #endif
 
 #if defined(ENABLE_PBAM) || defined(ENABLE_PBSAM)
@@ -556,7 +556,7 @@ VEXTERNC int initAPOL(
                       );
 
 
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
 #include "fem/vfetk.h"
 
 /**

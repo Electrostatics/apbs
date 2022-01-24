@@ -4,60 +4,393 @@ name: Build APBS
 on:
   pull_request:
   push:
-    branches: [master]
+    branches: [main]
+    tags: ['*']
+
+env:
+  WIN_DEPENDENCIES_RELEASE: "v0.4.0"
+  WIN_TOOLCHAIN_FILE: '/c/vcpkg/scripts/buildsystems/vcpkg.cmake'
+  BUILD_DOC: ON
+  BUILD_TOOLS: ON
+  RELEASE_TYPE: Release
+  ENABLE_PYGBE: ON
+  ENABLE_BEM: ON
+  ENABLE_GEOFLOW: ON
+  ENABLE_FETK: ON
+#  FETK_VERSION: "1.9.2"
+  FETK_VERSION: 857a0cf6ae40410471ea10f0e67e370cbd8ed6a3
+  ENABLE_iAPBS: ON
+  ENABLE_PBAM: OFF
+  ENABLE_PBSAM: OFF
+  ENABLE_PYTHON: OFF
+  ENABLE_TESTS: ON
+  GET_NanoShaper: ON
 
 jobs:
+
   build:
     name: Compile Code
+
     runs-on: ${{ matrix.os }}
+
     if: "!contains(github.event.head_commit.message, 'noci')"
+
     strategy:
       fail-fast: false
       matrix:
-        # os: [ubuntu-latest]
-        # os: [macOS-latest]
-        os: [ubuntu-latest, macOS-latest]
-        # os: [ubuntu-latest, macOS-latest, windows-latest]
-        python-version: [3.8, 3.9]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        openmp: [OFF]
+        static-build: [ON]
+        python-min-version: ["3.9"]
+        include:
+          - os: ubuntu-latest
+            bla-vendor: OpenBLAS
+            create-package: true
+            python-min-version: "3.9"
+            python-max-version: "3.10"
+            architecture: x64
+          - os: macos-latest
+            bla-vendor: Apple
+            create-package: true
+            python-min-version: "3.9"
+            python-max-version: "3.10"
+            architecture: x64
+          - os: windows-latest
+            bla-vendor: OpenBLAS
+            create-package: true
+            python-min-version: "3.9"
+            python-max-version: "3.10"
+            architecture: x86
+
+    env:
+      BLA_VENDOR: ${{ matrix.bla-vendor }}
+      ENABLE_OPENMP: ${{ matrix.openmp }}
+      APBS_STATIC_BUILD: ${{matrix.static-build }}
+      PYTHON_MIN_VERSION: "${{ matrix.python-min-version }}"
+      PYTHON_MAX_VERSION: "${{ matrix.python-max-version }}"
+
+    outputs:
+      apbs-version: ${{ steps.extract-version.outputs.apbs-version }}
+      apbs-tag: ${{ steps.extract-version.outputs.apbs-tag }}
+      cpack-out-lin-zip: ${{ steps.cpack-ml.outputs.cpack-out-ubuntu-latest-zip }}
+      cpack-out-mac-zip: ${{ steps.cpack-ml.outputs.cpack-out-macos-latest-zip }}
+      cpack-out-win-zip: ${{ steps.cpack-w.outputs.cpack-out-windows-latest-zip }}
 
     steps:
+
+      - name: Add msbuild to PATH
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        uses: microsoft/setup-msbuild@v1.0.2
+
       - name: Checkout reposistory
         uses: actions/checkout@master
+        with:
+          submodules: recursive
 
-      - name: Checkout submodules
-        run: git submodule update --init --recursive
+      - name: Extract version
+        run: |
+          version="$(grep -E '^[0-9]+_[0-9]+_[0-9]+' VERSION | sed 's/_/./g')"
+          echo $version
+          echo ::set-output name=apbs-version::${version}
+          echo ::set-output name=apbs-tag::v${version}
+        shell: bash
+        id: extract-version
 
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-min-version }}
+          architecture: ${{ matrix.architecture }}
 
       - name: Mac Prereqs
-        if: matrix.os == 'macOS-latest'
+        if: startsWith(matrix.os, 'macos')  # Mac only
         run: |
-          brew install bison flex swig libomp lapack
-          brew upgrade gcc@9
+          brew install \
+            wget \
+            bison \
+            flex \
+            swig \
+            boost \
+            eigen \
+            arpack \
+            lapack \
+            suite-sparse
+          wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz
+          gunzip metis-5.1.0.tar.gz
+          tar -xf metis-5.1.0.tar
+          cd metis-5.1.0
+          make config prefix=/usr/local
+          make install
+#          brew upgrade gcc@9
 
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
-        if: matrix.os == 'ubuntu-latest'
+        if: startsWith(matrix.os, 'ubuntu')  # Linux only
         run: |
           for apt_file in `grep -lr microsoft /etc/apt/sources.list.d/`; do sudo rm $apt_file; done
-          sudo apt-get install -yq software-properties-common build-essential gcc-9 g++-9 bison flex swig libreadline-dev libomp5 libomp-dev
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
-          gcc --version
-          g++ --version
+          sudo apt-get install -yq \
+            software-properties-common \
+            build-essential \
+            wget \
+            bison \
+            flex \
+            swig \
+            libreadline-dev \
+            libeigen3-dev \
+            libboost-dev \
+            libopenblas-serial-dev \
+            libarpack2-dev \
+            liblapack-dev \
+            libsuitesparse-dev
+          wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz
+          gunzip metis-5.1.0.tar.gz
+          tar -xf metis-5.1.0.tar
+          cd metis-5.1.0
+          make config prefix=/usr/local
+          sudo make install
 
-      - name: Build and Install
+      - name: Install Window dependencies
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        run: |
+          choco install wget
+          wget https://github.com/Electrostatics/cache/releases/download/${WIN_DEPENDENCIES_RELEASE}/apbs_dependencies_vcpkg.zip
+          7z x apbs_dependencies_vcpkg.zip -aoa -o/c/vcpkg
+          ls /c/vcpkg
+          vcpkg integrate install
+          vcpkg list --triplet x86-windows
+        shell: bash
+
+      - name: Configure for Windows
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        env:
+          CMAKE_PREFIX_PATH: ${VCPKG_INSTALLATION_ROOT}/installed/x86-windows
+        run: |
+          mkdir -p build/${RELEASE_TYPE}
+          cd build
+          echo $CMAKE_PREFIX_PATH
+          cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=${RELEASE_TYPE} -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF -DBUILD_TESTING=${BUILD_TESTING} -DBUILD_TOOLS=${BUILD_TOOLS} -DCHECK_EPSILON=ON -DBLA_VENDOR=${BLA_VENDOR} -DENABLE_FETK=${ENABLE_FETK} -DENABLE_BEM=${ENABLE_BEM} -DENABLE_GEOFLOW=${ENABLE_GEOFLOW} -DENABLE_iAPBS=${ENABLE_iAPBS} -DENABLE_PYGBE=${ENABLE_PYGBE} -DPYTHON_MIN_VERSION="${PYTHON_MIN_VERSION}" -DPYTHON_MAX_VERSION="${PYTHON_MAX_VERSION}" -DENABLE_INLINE=ON -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PYTHON=${ENABLE_PYTHON} -DENABLE_TESTS=${ENABLE_TESTS} -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DENABLE_VERBOSE_DEBUG=OFF -DGET_NanoShaper=${GET_NanoShaper} -DFETK_VERSION=${FETK_VERSION} -G "Visual Studio 16 2019" -A Win32 ..
+          cat CMakeCache.txt
+        shell: bash
+
+      - name: Configure and Build for Mac
+        if: startsWith(matrix.os, 'macos')  # Mac only
+        env:
+          INSTALL_DIR: "./"
         run: |
           ./.build.sh
+
+      - name: Configure and Build for Linux
+        if: startsWith(matrix.os, 'ubuntu')  # Linux only
         env:
           # https://codecov.io/gh/Electrostatics/apbs
           CODECOV_TOKEN: "e3a1e24c-5598-4f47-9353-7fa0ac57f98e"
+          INSTALL_DIR: "./"
+        run: |
+          ./.build.sh
 
-      - name: Package
+      - name: Build on Windows
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        run: |
+          cd build
+          cmake --build . --config ${RELEASE_TYPE} --parallel 2 --target install
+        shell: bash
+
+      - name: Configure Pagefile on Windows
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        uses: al-cheb/configure-pagefile-action@v1.2
+        with:
+          minimum-size: 8GB
+          maximum-size: 16GB
+
+      - name: Run tests
+        # Path setting includes a windows-specific path, but this should just be ignored in linux/mac
+        run: |
+          cd build
+          export PATH=$(pwd)/bin:/c/vcpkg/installed/x86-windows/bin:$PATH
+          ctest -C ${RELEASE_TYPE} -VV --output-on-failure 
+        shell: bash
+
+      - name: Create package for Mac and Linux
+        if: matrix.create-package && startsWith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu') # Mac or Linux only
+        id: cpack-ml
+        run: |
+          cd build
+          cpack -C ${RELEASE_TYPE} -G ZIP
+          ZIP_CPACK_FILE=`ls APBS*.zip`
+          echo "ZIP_CPACK_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
+          echo "PATH_TO_PACKAGE=build/" >> $GITHUB_ENV
+          echo ::set-output name=cpack-out-${{ matrix.os }}-zip::${ZIP_CPACK_FILE}
+          echo "ZIP CPack file: $ZIP_CPACK_FILE"
+          unzip -l ${ZIP_CPACK_FILE}
+
+      - name: Create package for Windows
+        if: matrix.create-package && startsWith(matrix.os, 'windows')  # Windows only
+        id: cpack-w
+        run: |
+          cd build
+          /c/Program\ Files/CMake/bin/cpack.exe -C ${RELEASE_TYPE} -G ZIP -V
+          ZIP_CPACK_FILE=`ls APBS*.zip`
+          echo "Repackaging with extra dlls"
+          mkdir unzip
+          cp $ZIP_CPACK_FILE unzip
+          cd unzip
+          7z x $ZIP_CPACK_FILE
+          PACKAGE_DIR=${ZIP_CPACK_FILE%.*}
+          cp /c/vcpkg/installed/x86-windows/bin/{libumfpack.dll,libcholmod.dll,libamd.dll,openblas.dll,libcamd.dll,libcolamd.dll,libccolamd.dll,liblapack.dll,libgfortran-5.dll,libgcc_s_dw2-1.dll,libwinpthread-1.dll,libquadmath-0.dll} ./${PACKAGE_DIR}/bin
+          7z a -r $ZIP_CPACK_FILE $PACKAGE_DIR/bin/*.dll
+          echo "ZIP_CPACK_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
+          echo "PATH_TO_PACKAGE=build/unzip/" >> $GITHUB_ENV
+          echo ::set-output name=cpack-out-${{ matrix.os }}-zip::${ZIP_CPACK_FILE}
+          echo "ZIP CPack file: $ZIP_CPACK_FILE"
+          unzip -l ${ZIP_CPACK_FILE}
+        shell: bash
+
+      - name: Upload ZIP package to the action
+        if: matrix.create-package
         uses: actions/upload-artifact@v2
         with:
-          name: APBS-${{ matrix.os }}.zip
-          path: "~/**/artifacts/APBS*.zip"
+          name: ${{ env.ZIP_CPACK_FILE }}
+          path: ${{ env.PATH_TO_PACKAGE }}${{ env.ZIP_CPACK_FILE }}
           retention-days: 5
+
+# For debugging
+      - name: Setup tmate session
+#        if: startsWith(matrix.os, 'windows') || ! success()
+        if: ${{ ! success() }}
+        uses: mxschmitt/action-tmate@v3
+
+
+  test:
+    name: Test Usage
+
+    needs: build
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        cpack: [lin-zip, mac-zip, win-zip]
+        python-version: [3.9]
+        include:
+          - cpack: lin-zip
+            os: ubuntu-latest
+            package_file: ${{ needs.build.outputs.cpack-out-lin-zip }}
+            architecture: x64
+          - cpack: mac-zip
+            os: macOS-latest
+            package_file: ${{ needs.build.outputs.cpack-out-mac-zip }}
+            architecture: x64
+          - cpack: win-zip
+            os: windows-latest
+            package_file: ${{ needs.build.outputs.cpack-out-win-zip }}
+            architecture: x86
+
+    steps:
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.architecture }}
+
+#      - name: Linux Prereqs
+#        if: startsWith(matrix.os, 'ubuntu')  # Linux only
+#        run: |
+#          sudo apt-get install -yq \
+#            libsuitesparse-dev \
+#            libsuperlu-dev \
+#            libopenblas-dev \
+#            python3-dev
+
+#      - name: Mac Prereqs
+#        if: startsWith(matrix.os, 'macos')  # Mac only
+#        run: |
+#          brew install \
+#            suite-sparse \
+#            superlu \
+#            openblas
+
+      # We only need libumfpack.  For some reason it's still being linked into apbs.exe
+#      - name: Windows Prereqs
+#        if: startsWith(matrix.os, 'windows')  # Windows only
+#        run: |
+#          choco install wget
+#          wget https://github.com/Electrostatics/cache/releases/download/${WIN_DEPENDENCIES_RELEASE}/apbs_dependencies_vcpkg.zip
+#          7z x apbs_dependencies_vcpkg.zip -aoa -o/c/vcpkg
+#          echo "/c/vcpkg/installed/x86-windows/bin" >> $GITHUB_PATH
+#        shell: bash
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.package_file }}
+
+      - name: Run zipped examples
+        if: endsWith(matrix.cpack, 'zip')
+        run: |
+          unzip ${{ matrix.package_file }}
+          APBS_DIR=${RUNNER_WORKSPACE}/apbs/$(basename -- "$(ls ${{ matrix.package_file }})" .zip)
+          cd ${APBS_DIR}/share/apbs/examples
+          ./run_selected_examples.sh
+        shell: bash
+
+      - name: ldd
+        if: ${{ ! success() && startsWith(matrix.os, 'windows') }}
+        run: |
+          git clone https://github.com/LRN/ntldd.git
+          cd ntldd
+          ./makeldd.cmd
+          export PATH=/d/a/apbs/apbs/ntldd:$PATH
+          cd ../APBS-3.3.0.Windows/bin
+          ntldd.exe ./apbs.exe
+        shell: bash
+
+# For debugging
+      - name: Setup tmate session
+        if: ${{ ! success() }}
+#        if: startsWith(matrix.os, 'windows')
+        uses: mxschmitt/action-tmate@v3
+
+ 
+  release:
+    name: Publish Release Artifacts
+
+    needs: [build, test]
+
+    if: startswith(github.ref, 'refs/tags/')  # Tag/release only
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            package_file: ${{ needs.build.outputs.package-file-lin }}
+          - os: macOS-latest
+            package_file: ${{ needs.build.outputs.package-file-mac }}
+          - os: windows-latest
+            package_file: ${{ needs.build.outputs.package-file-win }}
+
+    steps:
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.package_file }}
+
+      - name: Release artifacts
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          files: |
+            ${{ matrix.package_file }}
+          fail_on_unmatched_files: true
+          tag_name: ${{ needs.build.outputs.apbs-tag }}
+
+# For debugging
+#      - name: Setup tmate session
+#        if: ${{ ! success() }}
+#        uses: mxschmitt/action-tmate@v3

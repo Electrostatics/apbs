@@ -67,9 +67,21 @@
 
 #ifdef ENABLE_PYGBE
     // NOTE: Placeholder for any custom PYGBE parameter structure
+#ifdef _WIN32
+    #include <stdlib.h>
+#else
     #include <libgen.h>
+#endif
     #define PY_SSIZE_T_CLEAN
+    #ifdef _DEBUG
+    #define _DEBUG_WAS_DEFINED
+    #undef _DEBUG
+    #endif
     #include <Python.h>
+    #ifdef _DEBUG_WAS_DEFINED
+    #define _DEBUG
+    #undef _DEBUG_WAS_DEFINED
+    #endif
 #endif
 
 #include <time.h>
@@ -123,7 +135,7 @@ int main(
     Vmem *mem = VNULL;
     Vcom *com = VNULL;
     Vio *sock = VNULL;
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
     Vfetk *fetk[NOSH_MAXCALC];
     Gem *gm[NOSH_MAXMOL];
     int isolve;
@@ -170,7 +182,7 @@ int main(
                                * calculation. */
 
     /* The real partition centers */
-    double realCenter[3];
+    double realCenter[3] = {0., 0., 0.};
 
     /* Instructions: */
     char header[] = {"\n\n\
@@ -268,6 +280,7 @@ int main(
     /* A bit of array/pointer initialization */
     mem = Vmem_ctor("MAIN");
     for (i=0; i<NOSH_MAXCALC; i++) {
+        fetk[i] = VNULL;
         pmg[i] = VNULL;
         pmgp[i] = VNULL;
         fetk[i] = VNULL;
@@ -276,11 +289,13 @@ int main(
         qmEnergy[i] = 0;
         dielEnergy[i] = 0;
         totEnergy[i] = 0;
+        atomEnergy[i] = VNULL;
         atomForce[i] = VNULL;
         nenergy[i] = 0;
         nforce[i] = 0;
     }
     for (i=0; i<NOSH_MAXMOL; i++) {
+        gm[i] = VNULL;
         alist[i] = VNULL;
         dielXMap[i] = VNULL;
         dielYMap[i] = VNULL;
@@ -302,12 +317,6 @@ int main(
 #endif
 
     Vnm_tprint( 1, "This executable compiled on %s at %s\n\n", __DATE__, __TIME__);
-
-#if defined(WITH_TINKER)
-    Vnm_tprint( 2, "This executable was compiled with TINKER support and is not intended for stand-alone execution.\n");
-    Vnm_tprint( 2, "Please compile another version without TINKER support.\n");
-    exit(2);
-#endif
 
     /* Process program arguments */
     i=0;
@@ -463,7 +472,7 @@ int main(
     Vnm_tprint( 1, "Preparing to run %d PBE calculations.\n",
                 nosh->ncalc);
 #ifdef ENABLE_PYGBE
-    if ((int)nosh->elec[0]->calctype == (int)NCT_PYGBE)
+    if (nosh->nelec != 0 && (int)nosh->elec[0]->calctype == (int)NCT_PYGBE)
     {
         /* PYGBE (pygbe) */
         Vnm_tprint( 1, "Processing PYGBE.\n");
@@ -482,8 +491,15 @@ int main(
 
 	    // Create parameters:
 	    StringList = PyList_New(1);
-        Vnm_tprint( 1, "  Processing file: %s\n", NOsh_getMolpath(nosh, 0));
-	    PyList_SetItem(StringList, 0, Py_BuildValue("s", dirname(NOsh_getMolpath(nosh, 0))));
+        char* molpath = NOsh_getMolpath(nosh, 0);
+        Vnm_tprint( 1, "  Processing file: %s\n", molpath);
+#ifdef _WIN32
+        char mol_dirname[_MAX_DIR];
+        _splitpath(molpath, NULL, mol_dirname, NULL, NULL);
+#else
+        char* mol_dirname = dirname(molpath);
+#endif
+	    PyList_SetItem(StringList, 0, Py_BuildValue("s",mol_dirname));
         ArgList = PyTuple_New(1);
         PyTuple_SetItem(ArgList, 0, StringList);
 	
@@ -587,7 +603,7 @@ int main(
 
                 /* ***** Do FEM calculation ***** */
             case NCT_FEM:
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
                 for (k=0; k<nosh->nelec; k++) {
                     if (nosh->elec2calc[k] >= i) break;
                 }
@@ -679,10 +695,10 @@ int main(
                 if (!writedataFE(rank, nosh, pbeparm, fetk[i])) {
                     Vnm_tprint(2, "  Error while writing FEM data!\n");
                 }
-#else /* ifdef HAVE_MC_H */
+#else /* ifdef HAVE_MC */
                     Vnm_print(2, "Error!  APBS not compiled with FEtk!\n");
                 exit(2);
-#endif /* ifdef HAVE_MC_H */
+#endif /* ifdef HAVE_MC */
                 break;
 
             /* Do an apolar calculation */
@@ -956,7 +972,7 @@ int main(
     killForce(mem, nosh, nforce, atomForce);
     killEnergy();
     killMG(nosh, pbe, pmgp, pmg);
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
     killFE(nosh, pbe, fetk, gm);
 #endif
     killChargeMaps(nosh, chargeMap);

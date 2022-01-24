@@ -1,16 +1,3 @@
-[submodule "externals/geoflow_c"]
-	path = externals/geoflow_c
-	url = https://github.com/Electrostatics/geoflow_c
-[submodule "externals/fetk"]
-	path = externals/fetk
-	url = https://github.com/Electrostatics/FETK.git
-	ignore = untracked
-[submodule "externals/pb_s_am"]
-	path = externals/pb_s_am
-	url = https://github.com/Electrostatics/pb_solvers
-[submodule "externals/bem"]
-	path = externals/bem
-	url = https://github.com/Treecodes/TABI-PB.git
 [submodule "externals/pybind11"]
 	path = externals/pybind11
 	url = https://github.com/pybind/pybind11

@@ -4059,7 +4059,7 @@ calculations %d and %d\n",
     return 1;
 }
 
-#ifdef HAVE_MC_H
+#ifdef HAVE_MC
 
 VPUBLIC void killFE(NOsh *nosh,
                     Vpbe *pbe[NOSH_MAXCALC],
@@ -4075,12 +4075,12 @@ VPUBLIC void killFE(NOsh *nosh,
 
     for (i = 0; i < nosh->ncalc; i++)
     {
-        Vpbe_dtor(&(pbe[i]));
-        Vfetk_dtor(&(fetk[i]));
+        if(pbe[i] != VNULL) Vpbe_dtor(&(pbe[i]));
+        if(fetk[i] != VNULL) Vfetk_dtor(&(fetk[i]));
     }
     for (i = 0; i < nosh->nmesh; i++)
     {
-        Gem_dtor(&(gm[i]));
+        if(gm[i] != VNULL) Gem_dtor(&(gm[i]));
     }
 }
 
@@ -4912,7 +4912,7 @@ VPUBLIC int writedataFE(int rank,         /**< Rank of processor (for parallel r
 
     return 1;
 }
-#endif /* ifdef HAVE_MCX_H */
+#endif /* ifdef HAVE_MCX */
 
 VPUBLIC int initAPOL(NOsh *nosh,            /**< Input parameter object */
                      Vmem *mem,             /**< Memory manager */
@@ -5643,7 +5643,7 @@ VPUBLIC int solveGeometricFlow(Valist *molecules[NOSH_MAXMOL],
 
     //printf("num mols: %i\n", nosh->nmol);
     struct GeometricFlowOutput geoflowOut =
-        runGeometricFlowWrapAPBS(geoflowIn, molecules[0]);
+        runGeometricFlowWrapAPBS(&geoflowIn, molecules[pbeparm->molid - 1]);
 
     Vnm_tprint(1, "  Global net energy = %1.12E\n", geoflowOut.m_totalSolvation);
     Vnm_tprint(1, "  Global net ELEC energy = %1.12E\n", geoflowOut.m_elecSolvation);
@@ -6129,43 +6129,36 @@ VPUBLIC void dump_options()
     puts("0");
 #endif
 
-    printf("WITH_TINKER:");
-#ifdef WITH_TINKER
-    puts("1");
-#else
-    puts("0");
-#endif
-
-    printf("FETK_ENABLED:");
-#ifdef FETK_ENABLED
+    printf("ENABLE_FETK:");
+#ifdef ENABLE_FETK
     printf("1");
 #else
     puts("0");
 #endif
 
-    printf("HAVE_PUNC_H:");
-#ifdef HAVE_PUNC_H
+    printf("HAVE_PUNC:");
+#ifdef HAVE_PUNC
     puts("1");
 #else
     printf("0");
 #endif
 
-    printf("HAVE_MCX_H:");
-#ifdef HAVE_MCX_H
+    printf("HAVE_MCX:");
+#ifdef HAVE_MCX
     puts("1");
 #else
     puts("0");
 #endif
 
-    printf("HAVE_MC_H:");
-#ifdef HAVE_MC_H
+    printf("HAVE_MC:");
+#ifdef HAVE_MC
     printf("1");
 #else
     puts("0");
 #endif
 
-    printf("HAVE_BIOM_H:");
-#ifdef HAVE_BIOM_H
+    printf("HAVE_GAMER:");
+#ifdef HAVE_GAMER
     puts("1");
 #else
     printf("0");
