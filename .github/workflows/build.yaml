@@ -370,11 +370,11 @@ jobs:
         os: [ubuntu-latest, macOS-latest, windows-latest]
         include:
           - os: ubuntu-latest
-            package_file: ${{ needs.build.outputs.package-file-lin }}
+            package_file: ${{ needs.build.outputs.cpack-out-lin-zip }}
           - os: macOS-latest
-            package_file: ${{ needs.build.outputs.package-file-mac }}
+            package_file: ${{ needs.build.outputs.cpack-out-mac-zip }}
           - os: windows-latest
-            package_file: ${{ needs.build.outputs.package-file-win }}
+            package_file: ${{ needs.build.outputs.cpack-out-win-zip }}
 
     steps:
 
