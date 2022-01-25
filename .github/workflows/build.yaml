@@ -6,6 +6,7 @@ on:
   push:
     branches: [main]
     tags: ['*']
+  workflow_dispatch:
 
 env:
   WIN_DEPENDENCIES_RELEASE: "v0.4.0"
