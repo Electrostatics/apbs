@@ -2,11 +2,13 @@
 name: Build APBS
 
 on:
-  pull_request:
   push:
     branches: [main]
     tags: ['*']
+  pull_request:
+
   workflow_dispatch:
+  
 
 env:
   WIN_DEPENDENCIES_RELEASE: "v0.4.0"
