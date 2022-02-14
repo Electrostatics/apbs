@@ -4,6 +4,45 @@ Release history
 
 
 ---------------------
+APBS X.X.X ()
+---------------------
+
+* Binary releases may be found in `GitHub releases <https://github.com/Electrostatics/apbs/releases>`_.
+
+^^^^^^^^^^^^
+New Features
+^^^^^^^^^^^^
+
+* 
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+Known Bugs and Limitations
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+(see v3.4.0)
+
+* 
+
+^^^^^^^^^^^^^
+Minor Updates
+^^^^^^^^^^^^^
+
+* Updated Windows build to Windows 2022; Visual Studio updated to v17, 2022
+* Specified Ubuntu build (20.04) and Mac build (11)
+
+^^^^^
+Notes
+^^^^^
+
+* The following are included in APBS:
+
+  * `Geometric Flow <https://github.com/Electrostatics/geoflow_c/tree/39d53269c084f1dc1caa71de95dca77f19da739e>`_
+  * `FETk <https://github.com/Electrostatics/FETK/tree/8c2b67fe587336ba73f77573f13e31ecb1a5a7f9>`_
+  * `PBAM/PBSAM <https://github.com/Electrostatics/pb_solvers/tree/d3ba994d7ec2b2cad5b3e843784c7cb9f41ace37>`_
+  * `TABI-PB <https://github.com/Treecodes/TABI-PB/tree/fe1c237b057418fed48535db125394607040d9de>`_
+
+
+---------------------
 APBS 3.4.0 (Jan 2022)
 ---------------------
 

@@ -41,24 +41,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        platform: [ubuntu, macOS, windows]
         openmp: [OFF]
         static-build: [ON]
         python-min-version: ["3.9"]
         include:
-          - os: ubuntu-latest
+          - platform: ubuntu
+            os: ubuntu-20.04
             bla-vendor: OpenBLAS
             create-package: true
             python-min-version: "3.9"
             python-max-version: "3.10"
             architecture: x64
-          - os: macos-latest
+          - platform: macos
+            os: macos-11
             bla-vendor: Apple
             create-package: true
             python-min-version: "3.9"
             python-max-version: "3.10"
             architecture: x64
-          - os: windows-latest
+          - platform: windows
+            os: windows-2022
             bla-vendor: OpenBLAS
             create-package: true
             python-min-version: "3.9"
@@ -75,9 +78,9 @@ jobs:
     outputs:
       apbs-version: ${{ steps.extract-version.outputs.apbs-version }}
       apbs-tag: ${{ steps.extract-version.outputs.apbs-tag }}
-      cpack-out-lin-zip: ${{ steps.cpack-ml.outputs.cpack-out-ubuntu-latest-zip }}
-      cpack-out-mac-zip: ${{ steps.cpack-ml.outputs.cpack-out-macos-latest-zip }}
-      cpack-out-win-zip: ${{ steps.cpack-w.outputs.cpack-out-windows-latest-zip }}
+      cpack-out-lin-zip: ${{ steps.cpack-ml.outputs.cpack-out-ubuntu-zip }}
+      cpack-out-mac-zip: ${{ steps.cpack-ml.outputs.cpack-out-macos-zip }}
+      cpack-out-win-zip: ${{ steps.cpack-w.outputs.cpack-out-windows-zip }}
 
     steps:
 
@@ -170,7 +173,7 @@ jobs:
           mkdir -p build/${RELEASE_TYPE}
           cd build
           echo $CMAKE_PREFIX_PATH
-          cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=${RELEASE_TYPE} -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF -DBUILD_TESTING=${BUILD_TESTING} -DBUILD_TOOLS=${BUILD_TOOLS} -DCHECK_EPSILON=ON -DBLA_VENDOR=${BLA_VENDOR} -DENABLE_FETK=${ENABLE_FETK} -DENABLE_BEM=${ENABLE_BEM} -DENABLE_GEOFLOW=${ENABLE_GEOFLOW} -DENABLE_iAPBS=${ENABLE_iAPBS} -DENABLE_PYGBE=${ENABLE_PYGBE} -DPYTHON_MIN_VERSION="${PYTHON_MIN_VERSION}" -DPYTHON_MAX_VERSION="${PYTHON_MAX_VERSION}" -DENABLE_INLINE=ON -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PYTHON=${ENABLE_PYTHON} -DENABLE_TESTS=${ENABLE_TESTS} -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DENABLE_VERBOSE_DEBUG=OFF -DGET_NanoShaper=${GET_NanoShaper} -DFETK_VERSION=${FETK_VERSION} -G "Visual Studio 16 2019" -A Win32 ..
+          cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=${RELEASE_TYPE} -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF -DBUILD_TESTING=${BUILD_TESTING} -DBUILD_TOOLS=${BUILD_TOOLS} -DCHECK_EPSILON=ON -DBLA_VENDOR=${BLA_VENDOR} -DENABLE_FETK=${ENABLE_FETK} -DENABLE_BEM=${ENABLE_BEM} -DENABLE_GEOFLOW=${ENABLE_GEOFLOW} -DENABLE_iAPBS=${ENABLE_iAPBS} -DENABLE_PYGBE=${ENABLE_PYGBE} -DPYTHON_MIN_VERSION="${PYTHON_MIN_VERSION}" -DPYTHON_MAX_VERSION="${PYTHON_MAX_VERSION}" -DENABLE_INLINE=ON -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PYTHON=${ENABLE_PYTHON} -DENABLE_TESTS=${ENABLE_TESTS} -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DENABLE_VERBOSE_DEBUG=OFF -DGET_NanoShaper=${GET_NanoShaper} -DFETK_VERSION=${FETK_VERSION} -G "Visual Studio 17 2022" -A Win32 ..
           cat CMakeCache.txt
         shell: bash
 
@@ -221,7 +224,7 @@ jobs:
           ZIP_CPACK_FILE=`ls APBS*.zip`
           echo "ZIP_CPACK_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
           echo "PATH_TO_PACKAGE=build/" >> $GITHUB_ENV
-          echo ::set-output name=cpack-out-${{ matrix.os }}-zip::${ZIP_CPACK_FILE}
+          echo ::set-output name=cpack-out-${{ matrix.platform }}-zip::${ZIP_CPACK_FILE}
           echo "ZIP CPack file: $ZIP_CPACK_FILE"
           unzip -l ${ZIP_CPACK_FILE}
 
@@ -242,7 +245,7 @@ jobs:
           7z a -r $ZIP_CPACK_FILE $PACKAGE_DIR/bin/*.dll
           echo "ZIP_CPACK_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
           echo "PATH_TO_PACKAGE=build/unzip/" >> $GITHUB_ENV
-          echo ::set-output name=cpack-out-${{ matrix.os }}-zip::${ZIP_CPACK_FILE}
+          echo ::set-output name=cpack-out-${{ matrix.platform }}-zip::${ZIP_CPACK_FILE}
           echo "ZIP CPack file: $ZIP_CPACK_FILE"
           unzip -l ${ZIP_CPACK_FILE}
         shell: bash
@@ -276,15 +279,15 @@ jobs:
         python-version: [3.9]
         include:
           - cpack: lin-zip
-            os: ubuntu-latest
+            os: ubuntu-20.04
             package_file: ${{ needs.build.outputs.cpack-out-lin-zip }}
             architecture: x64
           - cpack: mac-zip
-            os: macOS-latest
+            os: macOS-11
             package_file: ${{ needs.build.outputs.cpack-out-mac-zip }}
             architecture: x64
           - cpack: win-zip
-            os: windows-latest
+            os: windows-2022
             package_file: ${{ needs.build.outputs.cpack-out-win-zip }}
             architecture: x86
 
