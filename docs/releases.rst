@@ -29,6 +29,7 @@ Minor Updates
 
 * Updated Windows build to Windows 2022; Visual Studio updated to v17, 2022
 * Specified Ubuntu build (20.04) and Mac build (11)
+* Fixed CMake syntax error around Python detection
 
 ^^^^^
 Notes
