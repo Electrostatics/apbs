@@ -259,10 +259,10 @@ jobs:
           retention-days: 5
 
 # For debugging
-      - name: Setup tmate session
+#      - name: Setup tmate session
 #        if: startsWith(matrix.os, 'windows') || ! success()
-        if: ${{ ! success() }}
-        uses: mxschmitt/action-tmate@v3
+#        if: ${{ ! success() }}
+#        uses: mxschmitt/action-tmate@v3
 
 
   test:
@@ -352,10 +352,10 @@ jobs:
         shell: bash
 
 # For debugging
-      - name: Setup tmate session
-        if: ${{ ! success() }}
+#      - name: Setup tmate session
+#        if: ${{ ! success() }}
 #        if: startsWith(matrix.os, 'windows')
-        uses: mxschmitt/action-tmate@v3
+#        uses: mxschmitt/action-tmate@v3
 
  
   release:
