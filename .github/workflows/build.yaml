@@ -294,6 +294,7 @@ jobs:
     steps:
 
       - name: Set up Python
+        if: startsWith(matrix.os, 'windows') # Windows only (no static python libs in windows)
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
