@@ -337,7 +337,7 @@ endif()
 ################################################################################
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
-    list(APPEND APBS_LIBS m stdc++)
+    list(APPEND APBS_LIBS util dl m stdc++)
 endif()
 
 find_package( Threads REQUIRED )
