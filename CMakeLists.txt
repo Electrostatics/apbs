@@ -340,6 +340,9 @@ if(NOT WIN32)
     list(APPEND APBS_LIBS m stdc++)
 endif()
 
+find_package( Threads REQUIRED )
+list(APPEND APBS_LIBS ${CMAKE_THREAD_LIBS_INIT})
+
 find_package( UMFPACK REQUIRED )
 find_package( SuiteSparse REQUIRED )
 message(STATUS "UMFPack libraries: ${UMFPACK_LIBRARIES}")
