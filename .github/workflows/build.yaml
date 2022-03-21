@@ -353,10 +353,10 @@ jobs:
         shell: bash
 
 # For debugging
-#      - name: Setup tmate session
+      - name: Setup tmate session
 #        if: ${{ ! success() }}
-#        if: startsWith(matrix.os, 'windows')
-#        uses: mxschmitt/action-tmate@v3
+        if: startsWith(matrix.os, 'macOS')
+        uses: mxschmitt/action-tmate@v3
 
  
   release:
