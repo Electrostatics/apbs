@@ -147,7 +147,7 @@ cmake -S .. -B $BUILD_DIR                                 \
       ..                                                  || exit 1
  
 echo "==================================== BUILD =============================================== "
-make -j install                               || exit 1
+make VERBOSE=1 -j install                               || exit 1
 export PATH="$INSTALL_DIR/bin:$PATH"
 
 
