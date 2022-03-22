@@ -346,7 +346,7 @@ if(NOT WIN32)
         ${Intl_LIBRARIES}
     )
     if(Intl_INCLUDE_DIRS)
-        inclue_directories(${Intl_INCLUDE_DIRS})
+        include_directories(${Intl_INCLUDE_DIRS})
     endif()
 endif()
 
