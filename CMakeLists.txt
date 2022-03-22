@@ -337,7 +337,15 @@ endif()
 ################################################################################
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
-    list(APPEND APBS_LIBS util dl m stdc++)
+    find_package(Intl REQUIRED)
+    list(APPEND APBS_LIBS 
+        util 
+        dl 
+        m 
+        stdc++ 
+        ${Intl_LIBRARIES}
+    )
+    inclue_directories(${Intl_INCLUDE_DIRS})
 endif()
 
 find_package( Threads REQUIRED )
