@@ -345,7 +345,9 @@ if(NOT WIN32)
         stdc++ 
         ${Intl_LIBRARIES}
     )
-    inclue_directories(${Intl_INCLUDE_DIRS})
+    if(Intl_INCLUDE_DIRS)
+        inclue_directories(${Intl_INCLUDE_DIRS})
+    endif()
 endif()
 
 find_package( Threads REQUIRED )
