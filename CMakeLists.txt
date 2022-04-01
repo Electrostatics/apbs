@@ -338,16 +338,23 @@ endif()
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
     find_package(Intl REQUIRED)
+    find_package(Iconv REQUIRED)
     list(APPEND APBS_LIBS 
         util 
         dl 
         m 
         stdc++ 
         ${Intl_LIBRARIES}
+        ${Iconv_LIBRARIES}
     )
-    if(Intl_INCLUDE_DIRS)
-        include_directories(${Intl_INCLUDE_DIRS})
+    set(MORE_INCLUDE_DIRS
+        ${Intl_INCLUDE_DIRS}
+        ${Iconv_INCLUDE_DIRS}
+    )
+    if(MORE_INCLUDE_DIRS)
+        include_directories(${MORE_INCLUDE_DIRS})
     endif()
+    message(STATUS "()()()() Iconv_LIBRARIES: ${Iconv_LIBRARIES}")
 endif()
 
 find_package( Threads REQUIRED )
