@@ -354,7 +354,6 @@ if(NOT WIN32)
     if(MORE_INCLUDE_DIRS)
         include_directories(${MORE_INCLUDE_DIRS})
     endif()
-    message(STATUS "()()()() Iconv_LIBRARIES: ${Iconv_LIBRARIES}")
 endif()
 
 find_package( Threads REQUIRED )
