@@ -44,28 +44,28 @@ jobs:
         platform: [ubuntu, macOS, windows]
         openmp: [OFF]
         static-build: [ON]
-        python-min-version: ["3.10"]
+        python-min-version: ["3.9"]
         include:
           - platform: ubuntu
             os: ubuntu-20.04
             bla-vendor: OpenBLAS
             create-package: true
-            python-min-version: "3.10"
-            python-max-version: "3.11"
+            python-min-version: "3.9"
+            python-max-version: "3.10"
             architecture: x64
           - platform: macos
             os: macos-11
             bla-vendor: Apple
             create-package: true
-            python-min-version: "3.10"
-            python-max-version: "3.11"
+            python-min-version: "3.9"
+            python-max-version: "3.10"
             architecture: x64
           - platform: windows
             os: windows-2022
             bla-vendor: OpenBLAS
             create-package: true
-            python-min-version: "3.10"
-            python-max-version: "3.11"
+            python-min-version: "3.9"
+            python-max-version: "3.10"
             architecture: x86
 
     env:
@@ -290,7 +290,6 @@ jobs:
             os: windows-2022
             package_file: ${{ needs.build.outputs.cpack-out-win-zip }}
             architecture: x86
-            python-version: "3.10"
 
     steps:
 
