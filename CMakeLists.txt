@@ -123,6 +123,7 @@ if(APBS_STATIC_BUILD)
     else()
         list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .a)
     endif()
+    set(Python3_USE_STATIC_LIBS TRUE)
 else()
     set(FETK_STATIC_BUILD OFF)
     set(BLA_STATIC OFF)
@@ -139,6 +140,7 @@ else()
     else()
         list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .so)
     endif()
+    set(Python3_USE_STATIC_LIBS FALSE)
 endif()
 
 message(STATUS "")
@@ -335,8 +337,27 @@ endif()
 ################################################################################
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
-    list(APPEND APBS_LIBS m stdc++)
+    find_package(Intl REQUIRED)
+    find_package(Iconv REQUIRED)
+    list(APPEND APBS_LIBS 
+        util 
+        dl 
+        m 
+        stdc++ 
+        ${Intl_LIBRARIES}
+        ${Iconv_LIBRARIES}
+    )
+    set(MORE_INCLUDE_DIRS
+        ${Intl_INCLUDE_DIRS}
+        ${Iconv_INCLUDE_DIRS}
+    )
+    if(MORE_INCLUDE_DIRS)
+        include_directories(${MORE_INCLUDE_DIRS})
+    endif()
 endif()
+
+find_package( Threads REQUIRED )
+list(APPEND APBS_LIBS ${CMAKE_THREAD_LIBS_INIT})
 
 find_package( UMFPACK REQUIRED )
 find_package( SuiteSparse REQUIRED )

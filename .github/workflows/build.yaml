@@ -259,10 +259,10 @@ jobs:
           retention-days: 5
 
 # For debugging
-      - name: Setup tmate session
+#      - name: Setup tmate session
 #        if: startsWith(matrix.os, 'windows') || ! success()
-        if: ${{ ! success() }}
-        uses: mxschmitt/action-tmate@v3
+#        if: ${{ ! success() }}
+#        uses: mxschmitt/action-tmate@v3
 
 
   test:
@@ -276,7 +276,7 @@ jobs:
       fail-fast: false
       matrix:
         cpack: [lin-zip, mac-zip, win-zip]
-        python-version: [3.9]
+        python-version: ["3.9"]
         include:
           - cpack: lin-zip
             os: ubuntu-20.04
@@ -294,6 +294,7 @@ jobs:
     steps:
 
       - name: Set up Python
+        if: startsWith(matrix.os, 'windows') # Windows only (no static python libs in windows)
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
@@ -352,10 +353,10 @@ jobs:
         shell: bash
 
 # For debugging
-      - name: Setup tmate session
-        if: ${{ ! success() }}
-#        if: startsWith(matrix.os, 'windows')
-        uses: mxschmitt/action-tmate@v3
+#      - name: Setup tmate session
+#        if: ${{ ! success() }}
+#        if: startsWith(matrix.os, 'macOS')
+#        uses: mxschmitt/action-tmate@v3
 
  
   release:
