@@ -67,7 +67,7 @@ jobs:
       - name: Build and run
         run: |
           docker build \
-            -f ${DOCKERFILE}
+            -f ${DOCKERFILE} \
             --build-arg APBS_STATIC_BUILD=${APBS_STATIC_BUILD} \
             --build-arg BLA_VENDOR=${BLA_VENDOR} \
             --build-arg BUILD_DOC=${BUILD_DOC} \
