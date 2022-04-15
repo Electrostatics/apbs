@@ -17,7 +17,7 @@ RUN yum -y install \
         epel-release \
         centos-release-scl && \
     yum-config-manager --enable rhel-server-rhscl-7-rpms && \
-    yum install devtoolset-11 && \
+    yum -y install devtoolset-11 && \
     scl enable devtoolset-11 bash && \
     yum -y install \
         unzip \
