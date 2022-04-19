@@ -1,4 +1,7 @@
 # CentOS-based Docker build
+###########################
+
+## Notes ##
 
 # SCL is needed for devtoolset, so we can have a more advanced GCC than v4.8.5.
 # GCC 4.8.5 was unable to compile:
