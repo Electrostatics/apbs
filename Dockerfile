@@ -1,3 +1,13 @@
+# Ubuntu-based Docker build
+###########################
+
+## Notes ##
+
+# Attempting to do a static build of APBS has previously failed in this Docker image.
+# Errors were seen while linking `apbs` having to do with position-independent code.
+# This is possibly due to the flags used to build the static Python library.  
+# Therefore this file defaults to using a shared build (i.e. `APBS_STATIC_BUILD=OFF`).
+
 FROM ubuntu:20.04 AS apbs_base_ubuntu
 
 RUN apt-get update && \
@@ -34,7 +44,7 @@ FROM apbs_base_ubuntu
 
 ADD . /tmp_source
 
-ARG APBS_STATIC_BUILD=ON
+ARG APBS_STATIC_BUILD=OFF
 ARG BLA_VENDOR="OpenBLAS"
 ARG BUILD_DOC=ON
 ARG BUILD_TOOLS=ON
@@ -82,7 +92,3 @@ RUN cd /tmp_source && \
       .. && \
     make -j install && \
     /bin/true
-
-#RUN cd /tmp_source && \
-#    ./.build.sh && \
-#    /bin/true
