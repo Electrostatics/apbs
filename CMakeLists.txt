@@ -22,6 +22,7 @@ cmake_policy(SET CMP0042 NEW) # MacOS RPATH on by default
 cmake_policy(SET CMP0048 NEW) # project() command manages the VERSION variables
 cmake_policy(SET CMP0054 NEW) # Only interpret if() arguments as variables or keywords when unquoted
 cmake_policy(SET CMP0077 NEW) # option() honors normal variables (i.e. does nothing if a normal variable with the same name exists)
+cmake_policy(SET CMP0083 NEW) # Pass flags needed for position-independent executables
 cmake_policy(SET CMP0091 NEW) # MSVC runtime library flags are selected by an abstraction (i.e. CMAKE_MSVC_RUNTIME_LIBRARY)
 set(CMAKE_MACOSX_RPATH 1)
 
