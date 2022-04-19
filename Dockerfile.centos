@@ -1,4 +1,4 @@
-FROM centos:7 AS apbs_base
+FROM centos:7 AS apbs_base_centos
 
 # SCL is needed for devtoolset, so we can have a more advanced GCC than v4.8.5.
 # GCC 4.8.5 was unable to compile:
@@ -18,10 +18,11 @@ RUN yum -y install \
         centos-release-scl && \
     yum-config-manager --enable rhel-server-rhscl-7-rpms && \
     yum -y install devtoolset-11 && \
-    scl enable devtoolset-11 bash && \
+    source scl_source enable devtoolset-11 && \
     yum -y install \
         unzip \
         cmake3 \
+        git \
         wget \
         arpack-devel \
         arpack-static \
@@ -50,7 +51,7 @@ RUN yum -y install \
 
 #########################################
 
-FROM apbs_base
+FROM apbs_base_centos
 
 ADD . /tmp_source
 
@@ -78,7 +79,7 @@ ARG PYTHON_MAX_VERSION="3.7"
 ARG PYTHON3_INCLUDE_DIR="/usr/include/python3.6m"
 ARG PYTHON3_LIBRARY="/usr/lib64/libpython3.6m.so"
 
-RUN scl enable devtoolset-11 bash && \
+RUN source scl_source enable devtoolset-11 && \
     cd /tmp_source && \
     mkdir build && cd build && \
     cmake \

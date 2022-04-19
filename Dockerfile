@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 AS apbs_base
+FROM ubuntu:20.04 AS apbs_base_ubuntu
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -13,7 +13,7 @@ RUN apt-get update && \
         libf2c2-dev \
         libeigen3-dev \
         libboost-dev \
-        python3-dev \
+        python3.9-dev \
         python3-pip \
         libopenblas-serial-dev \
         liblapack-dev \
@@ -30,7 +30,7 @@ RUN apt-get update && \
 
 #########################################
 
-FROM apbs_base
+FROM apbs_base_ubuntu
 
 ADD . /tmp_source
 
