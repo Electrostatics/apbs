@@ -46,14 +46,18 @@ jobs:
       matrix:
         include:
           - dockerfile: Dockerfile.ubuntu
+            apbs-static-build: OFF
             python-min-version: "3.9"
             python-max-version: "3.10"
           - dockerfile: Dockerfile.centos
+            apbs-static-build: ON
             python-min-version: "3.6"
             python-max-version: "3.7"
 
     env:
+      # Override default environment variables with matrix values
       DOCKERFILE: ${{ matrix.dockerfile }}
+      APBS_STATIC_BUILD: ${{ matrix.apbs-static-build }}
       PYTHON_MIN_VERSION: ${{ matrix.python-min-version }}
       PYTHON_MAX_VERSION: ${{ matrix.python-max-version }}
 
