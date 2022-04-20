@@ -51,7 +51,6 @@ echo "Install dir: ${INSTALL_DIR}"
 : ${ENABLE_PYGBE:=ON}
 : ${ENABLE_BEM:=ON}
 : ${ENABLE_GEOFLOW:=ON}
-: ${ENABLE_FETK:=ON}
 : ${FETK_VERSION:="857a0cf6ae40410471ea10f0e67e370cbd8ed6a3"}
 : ${ENABLE_iAPBS:=ON}
 : ${ENABLE_OPENMP:=OFF}
@@ -134,7 +133,6 @@ cmake -S .. -B $BUILD_DIR                                 \
       -DENABLE_PYGBE=${ENABLE_PYGBE}                      \
       -DENABLE_BEM=${ENABLE_BEM}                          \
       -DENABLE_GEOFLOW=${ENABLE_GEOFLOW}                  \
-      -DENABLE_FETK=${ENABLE_FETK}                        \
       -DENABLE_iAPBS=${ENABLE_iAPBS}                      \
       -DENABLE_OPENMP=${ENABLE_OPENMP}                    \
       -DENABLE_PBAM=${ENABLE_PBAM}                        \

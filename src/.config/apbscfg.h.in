@@ -40,9 +40,6 @@
 
 
 
-// FEtk components is enabled
-#cmakedefine ENABLE_FETK
-
 // have FEtk component PUNC
 #cmakedefine HAVE_PUNC
 
