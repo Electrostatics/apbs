@@ -47,9 +47,7 @@ add_subdirectory(generic)
 add_subdirectory(pmgc)
 add_subdirectory(mg)
 
-if(ENABLE_FETK)
-   add_subdirectory(fem)
-endif(ENABLE_FETK)
+add_subdirectory(fem)
 
 if(ENABLE_GEOFLOW)
 #    add_items(SOURCES geoflow_wrap_apbs.c)

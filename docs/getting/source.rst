@@ -130,7 +130,7 @@ That variable will be set to a working default if not manually set.
 .. code:: bash
 
    cd $APBS_BUILD_DIR
-   cmake -DENABLE_FETK_=ON -DFETK_VERSION=v1.9.2
+   cmake -DFETK_VERSION=v1.9.2
 
 For advanced users, you can use a version of FETK other than a released version by setting ``FETK_VERSION``
 to the desired git commit hash instead of a version number:
@@ -138,7 +138,7 @@ to the desired git commit hash instead of a version number:
 .. code:: bash
 
    cd $APBS_BUILD_DIR
-   cmake -DENABLE_FETK=ON -DFETK_VERSION=[git hash]
+   cmake -DFETK_VERSION=[git hash]
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -194,7 +194,6 @@ Building the code - advanced
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE          \
       -DENABLE_GEOFLOW=ON                       \
       -DENABLE_BEM=ON                           \
-      -DENABLE_FETK=ON                          \
       -DFETK_VERSION=[version]                  \
       -DENABLE_OPENMP=ON                        \
       -DENABLE_PBAM=ON                          \
