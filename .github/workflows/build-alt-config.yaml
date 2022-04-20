@@ -1,0 +1,287 @@
+---
+name: Build APBS with an Alternate Configuration
+
+on:
+  #push:
+  #  branches: [main]
+  #  tags: ['*']
+  pull_request:
+
+  workflow_dispatch:
+  
+
+env:
+  WIN_DEPENDENCIES_RELEASE: "v0.4.0"
+  WIN_TOOLCHAIN_FILE: '/c/vcpkg/scripts/buildsystems/vcpkg.cmake'
+  APBS_STATIC_BUILD: ON
+  BLA_VENDOR: OpenBLAS
+  BUILD_DOC: ON
+  BUILD_TOOLS: ON
+  RELEASE_TYPE: Release
+  ENABLE_PYGBE: ON
+  ENABLE_BEM: ON
+  ENABLE_GEOFLOW: ON
+  ENABLE_FETK: ON
+#  FETK_VERSION: "1.9.2"
+  FETK_VERSION: 857a0cf6ae40410471ea10f0e67e370cbd8ed6a3
+  ENABLE_iAPBS: ON
+  ENABLE_OPENMP: OFF
+  ENABLE_PBAM: OFF
+  ENABLE_PBSAM: OFF
+  ENABLE_PYTHON: OFF
+  ENABLE_TESTS: ON
+  GET_NanoShaper: ON
+  PYTHON_MIN_VERSION: "3.9"
+  PYTHON_MAX_VERSION: "3.10"
+
+jobs:
+
+  build-docker:
+    name: Build and Test Docker Images
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dockerfile: Dockerfile.ubuntu
+            apbs-static-build: OFF
+            python-min-version: "3.9"
+            python-max-version: "3.10"
+          - dockerfile: Dockerfile.centos
+            apbs-static-build: ON
+            python-min-version: "3.6"
+            python-max-version: "3.7"
+
+    env:
+      # Override default environment variables with matrix values
+      DOCKERFILE: ${{ matrix.dockerfile }}
+      APBS_STATIC_BUILD: ${{ matrix.apbs-static-build }}
+      PYTHON_MIN_VERSION: ${{ matrix.python-min-version }}
+      PYTHON_MAX_VERSION: ${{ matrix.python-max-version }}
+
+    steps:
+
+      - name: Checkout the repo 
+        uses: actions/checkout@master
+        with:
+          submodules: recursive
+
+      - name: Build and run
+        run: |
+          docker build \
+            -f ${DOCKERFILE} \
+            --build-arg APBS_STATIC_BUILD=${APBS_STATIC_BUILD} \
+            --build-arg BLA_VENDOR=${BLA_VENDOR} \
+            --build-arg BUILD_DOC=${BUILD_DOC} \
+            --build-arg BUILD_TOOLS=${BUILD_TOOLS} \
+            --build-arg RELEASE_TYPE=${RELEASE_TYPE} \
+            --build-arg ENABLE_PYGBE=${ENABLE_PYGBE} \
+            --build-arg ENABLE_BEM=${ENABLE_BEM} \
+            --build-arg ENABLE_GEOFLOW=${ENABLE_GEOFLOW} \
+            --build-arg ENABLE_FETK=${ENABLE_FETK} \
+            --build-arg FETK_VERSION=${FETK_VERSION} \
+            --build-arg ENABLE_iAPBS=${ENABLE_iAPBS} \
+            --build-arg ENABLE_OPENMP=${ENABLE_OPENMP} \
+            --build-arg ENABLE_PBAM=${ENABLE_PBAM} \
+            --build-arg ENABLE_PBSAM=${ENABLE_PBSAM} \
+            --build-arg ENABLE_PYTHON=${ENABLE_PYTHON} \
+            --build-arg ENABLE_TESTS=${ENABLE_TESTS} \
+            --build-arg GET_NanoShaper=${GET_NanoShaper} \
+            --build-arg PYTHON_MIN_VERSION=${PYTHON_MIN_VERSION} \
+            --build-arg PYTHON_MAX_VERSION=${PYTHON_MAX_VERSION} \
+            .
+          ctest -C ${RELEASE_TYPE} -VV --output-on-failure 
+
+  build:
+    name: Compile Code
+
+    if: false
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu, macOS, windows]
+        openmp: [OFF]
+        static-build: [ON]
+        python-min-version: ["3.9"]
+        include:
+          - platform: ubuntu
+            os: ubuntu-20.04
+            bla-vendor: OpenBLAS
+            create-package: true
+            python-min-version: "3.9"
+            python-max-version: "3.10"
+            architecture: x64
+          - platform: macos
+            os: macos-11
+            bla-vendor: Apple
+            create-package: true
+            python-min-version: "3.9"
+            python-max-version: "3.10"
+            architecture: x64
+          - platform: windows
+            os: windows-2022
+            bla-vendor: OpenBLAS
+            create-package: true
+            python-min-version: "3.9"
+            python-max-version: "3.10"
+            architecture: x86
+
+    env:
+      BLA_VENDOR: ${{ matrix.bla-vendor }}
+      ENABLE_OPENMP: ${{ matrix.openmp }}
+      APBS_STATIC_BUILD: ${{matrix.static-build }}
+      PYTHON_MIN_VERSION: "${{ matrix.python-min-version }}"
+#      PYTHON_MAX_VERSION: "${{ matrix.python-max-version }}"
+
+    outputs:
+      apbs-version: ${{ steps.extract-version.outputs.apbs-version }}
+      apbs-tag: ${{ steps.extract-version.outputs.apbs-tag }}
+      cpack-out-lin-zip: ${{ steps.cpack-ml.outputs.cpack-out-ubuntu-zip }}
+      cpack-out-mac-zip: ${{ steps.cpack-ml.outputs.cpack-out-macos-zip }}
+      cpack-out-win-zip: ${{ steps.cpack-w.outputs.cpack-out-windows-zip }}
+
+    steps:
+
+      - name: Add msbuild to PATH
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Checkout reposistory
+        uses: actions/checkout@master
+        with:
+          submodules: recursive
+
+      - name: Extract version
+        run: |
+          version="$(grep -E '^[0-9]+_[0-9]+_[0-9]+' VERSION | sed 's/_/./g')"
+          echo $version
+          echo ::set-output name=apbs-version::${version}
+          echo ::set-output name=apbs-tag::v${version}
+        shell: bash
+        id: extract-version
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-min-version }}
+          architecture: ${{ matrix.architecture }}
+
+      - name: Mac Prereqs
+        if: startsWith(matrix.os, 'macos')  # Mac only
+        run: |
+          brew install \
+            wget \
+            bison \
+            flex \
+            swig \
+            boost \
+            eigen \
+            arpack \
+            lapack \
+            suite-sparse
+          wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz
+          gunzip metis-5.1.0.tar.gz
+          tar -xf metis-5.1.0.tar
+          cd metis-5.1.0
+          make config prefix=/usr/local
+          make install
+#          brew upgrade gcc@9
+
+      - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
+        if: startsWith(matrix.os, 'ubuntu')  # Linux only
+        run: |
+          for apt_file in `grep -lr microsoft /etc/apt/sources.list.d/`; do sudo rm $apt_file; done
+          sudo apt-get install -yq \
+            software-properties-common \
+            build-essential \
+            wget \
+            bison \
+            flex \
+            swig \
+            libreadline-dev \
+            libeigen3-dev \
+            libboost-dev \
+            libopenblas-serial-dev \
+            libarpack2-dev \
+            liblapack-dev \
+            libsuitesparse-dev
+          wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz
+          gunzip metis-5.1.0.tar.gz
+          tar -xf metis-5.1.0.tar
+          cd metis-5.1.0
+          make config prefix=/usr/local
+          sudo make install
+
+      - name: Install Window dependencies
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        run: |
+          choco install wget
+          wget https://github.com/Electrostatics/cache/releases/download/${WIN_DEPENDENCIES_RELEASE}/apbs_dependencies_vcpkg.zip
+          7z x apbs_dependencies_vcpkg.zip -aoa -o/c/vcpkg
+          ls /c/vcpkg
+          vcpkg integrate install
+          vcpkg list --triplet x86-windows
+        shell: bash
+
+      - name: Configure for Windows
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        env:
+          CMAKE_PREFIX_PATH: ${VCPKG_INSTALLATION_ROOT}/installed/x86-windows
+        run: |
+          mkdir -p build/${RELEASE_TYPE}
+          cd build
+          echo $CMAKE_PREFIX_PATH
+          cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=${RELEASE_TYPE} -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF -DBUILD_TESTING=${BUILD_TESTING} -DBUILD_TOOLS=${BUILD_TOOLS} -DCHECK_EPSILON=ON -DBLA_VENDOR=${BLA_VENDOR} -DENABLE_FETK=${ENABLE_FETK} -DENABLE_BEM=${ENABLE_BEM} -DENABLE_GEOFLOW=${ENABLE_GEOFLOW} -DENABLE_iAPBS=${ENABLE_iAPBS} -DENABLE_PYGBE=${ENABLE_PYGBE} -DPYTHON_MIN_VERSION="${PYTHON_MIN_VERSION}" -DENABLE_INLINE=ON -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PYTHON=${ENABLE_PYTHON} -DENABLE_TESTS=${ENABLE_TESTS} -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DENABLE_VERBOSE_DEBUG=OFF -DGET_NanoShaper=${GET_NanoShaper} -DFETK_VERSION=${FETK_VERSION} -G "Visual Studio 17 2022" -A Win32 ..
+          cat CMakeCache.txt
+        shell: bash
+#          cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=${RELEASE_TYPE} -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF -DBUILD_TESTING=${BUILD_TESTING} -DBUILD_TOOLS=${BUILD_TOOLS} -DCHECK_EPSILON=ON -DBLA_VENDOR=${BLA_VENDOR} -DENABLE_FETK=${ENABLE_FETK} -DENABLE_BEM=${ENABLE_BEM} -DENABLE_GEOFLOW=${ENABLE_GEOFLOW} -DENABLE_iAPBS=${ENABLE_iAPBS} -DENABLE_PYGBE=${ENABLE_PYGBE} -DPYTHON_MIN_VERSION="${PYTHON_MIN_VERSION}" -DPYTHON_MAX_VERSION="${PYTHON_MAX_VERSION}" -DENABLE_INLINE=ON -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PYTHON=${ENABLE_PYTHON} -DENABLE_TESTS=${ENABLE_TESTS} -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DENABLE_VERBOSE_DEBUG=OFF -DGET_NanoShaper=${GET_NanoShaper} -DFETK_VERSION=${FETK_VERSION} -G "Visual Studio 17 2022" -A Win32 ..
+
+      - name: Configure and Build for Mac
+        if: startsWith(matrix.os, 'macos')  # Mac only
+        env:
+          INSTALL_DIR: "./"
+        run: |
+          ./.build.sh
+
+      - name: Configure and Build for Linux
+        if: startsWith(matrix.os, 'ubuntu')  # Linux only
+        env:
+          # https://codecov.io/gh/Electrostatics/apbs
+          CODECOV_TOKEN: "e3a1e24c-5598-4f47-9353-7fa0ac57f98e"
+          INSTALL_DIR: "./"
+        run: |
+          ./.build.sh
+
+      - name: Build on Windows
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        run: |
+          cd build
+          cmake --build . --config ${RELEASE_TYPE} --parallel 2 --target install
+        shell: bash
+
+      - name: Configure Pagefile on Windows
+        if: startsWith(matrix.os, 'windows')  # Windows only
+        uses: al-cheb/configure-pagefile-action@v1.2
+        with:
+          minimum-size: 8GB
+          maximum-size: 16GB
+
+      - name: Run tests
+        # Path setting includes a windows-specific path, but this should just be ignored in linux/mac
+        run: |
+          cd build
+          export PATH=$(pwd)/bin:/c/vcpkg/installed/x86-windows/bin:$PATH
+          ctest -C ${RELEASE_TYPE} -VV --output-on-failure 
+        shell: bash
+
+
+# For debugging
+      - name: Setup tmate session
+#        if: startsWith(matrix.os, 'windows') || ! success()
+        if: ${{ ! success() }}
+        uses: mxschmitt/action-tmate@v3
