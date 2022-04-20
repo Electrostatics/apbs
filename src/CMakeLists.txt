@@ -68,9 +68,15 @@ message(STATUS "APBS Libraries: ${APBS_LIBS}")
 message(STATUS "Internal Libraries: ${APBS_INTERNAL_LIBS}")
 message(STATUS " ")
 
+# Use position-independent code for apbs
+set_property(TARGET apbs PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+
 #add_dependencies(apbs ${BEM_LIB})
 #target_include_directories(apbs PRIVATE apbs.h routines.h)
 target_link_libraries(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS})
+if(APPLE)
+    target_link_libraries(apbs "-framework CoreFoundation")
+endif()
 #add_dependencies(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
 
 

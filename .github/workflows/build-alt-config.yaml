@@ -13,6 +13,8 @@ on:
 env:
   WIN_DEPENDENCIES_RELEASE: "v0.4.0"
   WIN_TOOLCHAIN_FILE: '/c/vcpkg/scripts/buildsystems/vcpkg.cmake'
+  APBS_STATIC_BUILD: ON
+  BLA_VENDOR: OpenBLAS
   BUILD_DOC: ON
   BUILD_TOOLS: ON
   RELEASE_TYPE: Release
@@ -23,57 +25,110 @@ env:
 #  FETK_VERSION: "1.9.2"
   FETK_VERSION: 857a0cf6ae40410471ea10f0e67e370cbd8ed6a3
   ENABLE_iAPBS: ON
+  ENABLE_OPENMP: OFF
   ENABLE_PBAM: OFF
   ENABLE_PBSAM: OFF
   ENABLE_PYTHON: OFF
   ENABLE_TESTS: ON
   GET_NanoShaper: ON
+  PYTHON_MIN_VERSION: "3.9"
+  PYTHON_MAX_VERSION: "3.10"
 
 jobs:
+
+  build-docker:
+    name: Build and Test Docker Images
+
+    if: false
+    
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dockerfile: Dockerfile.ubuntu
+            apbs-static-build: OFF
+            python-min-version: "3.9"
+            python-max-version: "3.10"
+          - dockerfile: Dockerfile.centos
+            apbs-static-build: ON
+            python-min-version: "3.6"
+            python-max-version: "3.7"
+
+    env:
+      # Override default environment variables with matrix values
+      DOCKERFILE: ${{ matrix.dockerfile }}
+      APBS_STATIC_BUILD: ${{ matrix.apbs-static-build }}
+      PYTHON_MIN_VERSION: ${{ matrix.python-min-version }}
+      PYTHON_MAX_VERSION: ${{ matrix.python-max-version }}
+
+    steps:
+
+      - name: Checkout the repo 
+        uses: actions/checkout@master
+        with:
+          submodules: recursive
+
+      - name: Build and run
+        run: |
+          docker build \
+            -f ${DOCKERFILE} \
+            --build-arg APBS_STATIC_BUILD=${APBS_STATIC_BUILD} \
+            --build-arg BLA_VENDOR=${BLA_VENDOR} \
+            --build-arg BUILD_DOC=${BUILD_DOC} \
+            --build-arg BUILD_TOOLS=${BUILD_TOOLS} \
+            --build-arg RELEASE_TYPE=${RELEASE_TYPE} \
+            --build-arg ENABLE_PYGBE=${ENABLE_PYGBE} \
+            --build-arg ENABLE_BEM=${ENABLE_BEM} \
+            --build-arg ENABLE_GEOFLOW=${ENABLE_GEOFLOW} \
+            --build-arg ENABLE_FETK=${ENABLE_FETK} \
+            --build-arg FETK_VERSION=${FETK_VERSION} \
+            --build-arg ENABLE_iAPBS=${ENABLE_iAPBS} \
+            --build-arg ENABLE_OPENMP=${ENABLE_OPENMP} \
+            --build-arg ENABLE_PBAM=${ENABLE_PBAM} \
+            --build-arg ENABLE_PBSAM=${ENABLE_PBSAM} \
+            --build-arg ENABLE_PYTHON=${ENABLE_PYTHON} \
+            --build-arg ENABLE_TESTS=${ENABLE_TESTS} \
+            --build-arg GET_NanoShaper=${GET_NanoShaper} \
+            --build-arg PYTHON_MIN_VERSION=${PYTHON_MIN_VERSION} \
+            --build-arg PYTHON_MAX_VERSION=${PYTHON_MAX_VERSION} \
+            .
+          ctest -C ${RELEASE_TYPE} -VV --output-on-failure 
 
   build:
     name: Compile Code
 
     runs-on: ${{ matrix.os }}
 
-    if: "!contains(github.event.head_commit.message, 'noci')"
-
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu, macOS, windows]
-        openmp: [OFF]
-        static-build: [ON]
-        python-min-version: ["3.9"]
         include:
           - platform: ubuntu
             os: ubuntu-20.04
             bla-vendor: OpenBLAS
-            create-package: true
             python-min-version: "3.9"
             python-max-version: "3.10"
             architecture: x64
           - platform: macos
             os: macos-11
             bla-vendor: Apple
-            create-package: true
             python-min-version: "3.9"
             python-max-version: "3.10"
             architecture: x64
           - platform: windows
             os: windows-2022
             bla-vendor: OpenBLAS
-            create-package: true
             python-min-version: "3.9"
             python-max-version: "3.10"
             architecture: x86
 
     env:
       BLA_VENDOR: ${{ matrix.bla-vendor }}
-      ENABLE_OPENMP: ${{ matrix.openmp }}
       APBS_STATIC_BUILD: ${{matrix.static-build }}
       PYTHON_MIN_VERSION: "${{ matrix.python-min-version }}"
-#      PYTHON_MAX_VERSION: "${{ matrix.python-max-version }}"
+      PYTHON_MAX_VERSION: "${{ matrix.python-max-version }}"
 
     outputs:
       apbs-version: ${{ steps.extract-version.outputs.apbs-version }}

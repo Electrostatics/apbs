@@ -22,6 +22,7 @@ cmake_policy(SET CMP0042 NEW) # MacOS RPATH on by default
 cmake_policy(SET CMP0048 NEW) # project() command manages the VERSION variables
 cmake_policy(SET CMP0054 NEW) # Only interpret if() arguments as variables or keywords when unquoted
 cmake_policy(SET CMP0077 NEW) # option() honors normal variables (i.e. does nothing if a normal variable with the same name exists)
+cmake_policy(SET CMP0083 NEW) # Pass flags needed for position-independent executables
 cmake_policy(SET CMP0091 NEW) # MSVC runtime library flags are selected by an abstraction (i.e. CMAKE_MSVC_RUNTIME_LIBRARY)
 set(CMAKE_MACOSX_RPATH 1)
 
@@ -123,6 +124,7 @@ if(APBS_STATIC_BUILD)
     else()
         list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .a)
     endif()
+    set(Python3_USE_STATIC_LIBS TRUE)
 else()
     set(FETK_STATIC_BUILD OFF)
     set(BLA_STATIC OFF)
@@ -139,6 +141,7 @@ else()
     else()
         list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .so)
     endif()
+    set(Python3_USE_STATIC_LIBS FALSE)
 endif()
 
 message(STATUS "")
@@ -335,8 +338,27 @@ endif()
 ################################################################################
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
-    list(APPEND APBS_LIBS m stdc++)
+    find_package(Intl REQUIRED)
+    find_package(Iconv REQUIRED)
+    list(APPEND APBS_LIBS 
+        util 
+        dl 
+        m 
+        stdc++ 
+        ${Intl_LIBRARIES}
+        ${Iconv_LIBRARIES}
+    )
+    set(MORE_INCLUDE_DIRS
+        ${Intl_INCLUDE_DIRS}
+        ${Iconv_INCLUDE_DIRS}
+    )
+    if(MORE_INCLUDE_DIRS)
+        include_directories(${MORE_INCLUDE_DIRS})
+    endif()
 endif()
+
+find_package( Threads REQUIRED )
+list(APPEND APBS_LIBS ${CMAKE_THREAD_LIBS_INIT})
 
 find_package( UMFPACK REQUIRED )
 find_package( SuiteSparse REQUIRED )

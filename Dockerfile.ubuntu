@@ -1,4 +1,14 @@
-FROM ubuntu:20.04 AS apbs_base
+# Ubuntu-based Docker build
+###########################
+
+## Notes ##
+
+# Attempting to do a static build of APBS has previously failed in this Docker image.
+# Errors were seen while linking `apbs` having to do with position-independent code.
+# This is possibly due to the flags used to build the static Python library.  
+# Therefore this file defaults to using a shared build (i.e. `APBS_STATIC_BUILD=OFF`).
+
+FROM ubuntu:20.04 AS apbs_base_ubuntu
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -13,7 +23,7 @@ RUN apt-get update && \
         libf2c2-dev \
         libeigen3-dev \
         libboost-dev \
-        python3-dev \
+        python3.9-dev \
         python3-pip \
         libopenblas-serial-dev \
         liblapack-dev \
@@ -30,13 +40,13 @@ RUN apt-get update && \
 
 #########################################
 
-FROM apbs_base
+FROM apbs_base_ubuntu
 
 ADD . /tmp_source
 
+ARG APBS_STATIC_BUILD=OFF
 ARG BLA_VENDOR="OpenBLAS"
 ARG BUILD_DOC=ON
-ARG BUILD_SHARED_LIBS=OFF
 ARG BUILD_TOOLS=ON
 ARG INSTALL_DIR=/usr/local
 ARG RELEASE_TYPE=Debug
@@ -61,7 +71,7 @@ RUN cd /tmp_source && \
     cmake \
       -DCMAKE_INSTALL_INCLUDEDIR="include" \
       -DBUILD_DOC=${BUILD_DOC} \
-      -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}  \
+      -DAPBS_STATIC_BUILD=${APBS_STATIC_BUILD}  \
       -DBUILD_TOOLS=O${BUILD_TOOLS} \
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE \
       -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
@@ -82,7 +92,3 @@ RUN cd /tmp_source && \
       .. && \
     make -j install && \
     /bin/true
-
-#RUN cd /tmp_source && \
-#    ./.build.sh && \
-#    /bin/true
