@@ -28,6 +28,7 @@ RUN apt-get update && \
         libopenblas-serial-dev \
         liblapack-dev \
         libsuitesparse-dev \
+        libsuperlu-dev \
         && \
     wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz && \
     gunzip metis-5.1.0.tar.gz && \
