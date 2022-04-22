@@ -443,8 +443,6 @@ if(ENABLE_BEM)
     )
     FetchContent_MakeAvailable( tabi )
 
-    list(APPEND APBS_LIB_DIRS "${tabi_BINARY_DIR}/lib")
-    list(APPEND APBS_LIBS TABIPBlib)
     include_directories(${tabi_SOURCE_DIR}/src)
     include_directories(${tabi_SOURCE_DIR}/src/tabipb_wrap)
     add_definitions(-DTABIPB_APBS)
@@ -483,6 +481,7 @@ if(ENABLE_BEM)
   
     set(TABIPB_LIBNAME TABIPBlib)
     add_library(${TABIPB_LIBNAME} ${TABIPB_LIBFILES})
+    target_link_libraries(${TABIPB_LIBNAME} ${APBS_LIBS})
     target_compile_features(${TABIPB_LIBNAME} PRIVATE cxx_std_11)
     target_compile_options(${TABIPB_LIBNAME} PRIVATE 
                            $<$<CONFIG:RELEASE>:-O3>
@@ -490,7 +489,10 @@ if(ENABLE_BEM)
                            $<$<CONFIG:DEBUG>:-O0 -Wall>)
     install(FILES ${TABIPB_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tabi COMPONENT headers)
     install(TARGETS ${TABIPB_LIBNAME} DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries)
-                       
+
+    list(APPEND APBS_LIB_DIRS "${tabi_BINARY_DIR}/lib")
+    list(APPEND APBS_LIBS TABIPBlib)
+
 endif() # ENABLE_BEM
 
 
