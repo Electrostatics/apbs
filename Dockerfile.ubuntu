@@ -64,6 +64,7 @@ ARG ENABLE_TESTS=ON
 ARG GET_NanoShaper=ON
 ARG PYTHON_MIN_VERSION="3.9"
 ARG PYTHON_MAX_VERSION="3.10"
+ARG MAKEJOBS="-j"
 
 RUN cd /tmp_source && \
     mkdir build && cd build && \
@@ -88,5 +89,5 @@ RUN cd /tmp_source && \
       -DPYTHON_MIN_VERSION="${PYTHON_MIN_VERSION}" \
       -DPYTHON_MAX_VERSION="${PYTHON_MAX_VERSION}" \
       .. && \
-    make -j install && \
+    make ${MAKEJOBS} install && \
     /bin/true
