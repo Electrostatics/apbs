@@ -31,6 +31,8 @@ Minor Updates
 * Specified Ubuntu build (20.04) and Mac build (11)
 * Fixed CMake syntax error around Python detection
 * Statically link Python in the Mac and Ubuntu builds
+* Build arpack manually in the Mac build to get the static library
+* Updated FETK to v...
 
 ^^^^^
 Notes
