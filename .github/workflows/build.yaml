@@ -124,14 +124,14 @@ jobs:
           tar -xf metis-5.1.0.tar
           cd metis-5.1.0
           make config prefix=/usr/local
-          make -j install
+          make install
           git clone https://github.com/opencollab/arpack-ng.git
           cd arpack-ng
           git fetch --all --tags
           git checkout tags/3.8.0 -b latest
           mkdir build && cd build
           cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release -DEXAMPLES=OFF -DMPI=OFF -DBUILD_SHARED_LIBS=OFF  ..
-          sudo make -j install
+          make install
 #          brew upgrade gcc@9
 
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
