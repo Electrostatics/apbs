@@ -149,7 +149,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-min-version }}
+          python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
 
       - name: Mac Prereqs
