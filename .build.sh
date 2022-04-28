@@ -60,7 +60,7 @@ echo "Install dir: ${INSTALL_DIR}"
 : ${ENABLE_TESTS:=ON}
 : ${GET_NanoShaper:=ON}
 : ${PYTHON_MIN_VERSION:="3.9"}
-: ${PYTHON_MAX_VERSION:="3.10"}
+#: ${PYTHON_MAX_VERSION:="3.10"}
  
 echo "==================================== WHERE AM I ==================================== "
 pwd
@@ -141,7 +141,6 @@ cmake -S .. -B $BUILD_DIR                                 \
       -DENABLE_TESTS=${ENABLE_TESTS}                      \
       -DFETK_VERSION="${FETK_VERSION}"                    \
       -DPYTHON_MIN_VERSION="${PYTHON_MIN_VERSION}"        \
-      -DPYTHON_MAX_VERSION="${PYTHON_MAX_VERSION}"        \
       ..                                                  || exit 1
  
 echo "==================================== BUILD =============================================== "
