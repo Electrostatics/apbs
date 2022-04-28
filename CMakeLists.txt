@@ -92,6 +92,8 @@ set(TOOLS_PATH ${APBS_BUILD}/tools)
 set(APBS_LIBS)
 set(APBS_LIB_DIRS)
 
+set(PYTHON_VERSION 3.6 CACHE STRING "Python version to be used (or compatible)") # Python 3.6 is the lowest version tested so far
+
 find_file(CONTRIB_PATH "contrib"
           PATHS "${APBS_ROOT}"
           DOC "The path to contributed modules for apbs")
