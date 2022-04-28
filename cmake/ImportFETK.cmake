@@ -37,6 +37,9 @@ macro(import_fetk FETK_IMPORT_VERSION)
 
         else()
 
+            # PMG is turned off because of some missing symbols: dc_vec__, dc_scal__, rand_, c_vec__, tsecnd_, and c_scal__
+            set(BUILD_PMG OFF)
+        
             message(STATUS "Building FETK from commit ${FETK_IMPORT_VERSION}")
             FetchContent_Declare( fetk
                 GIT_REPOSITORY https://github.com/Electrostatics/FETK.git
@@ -45,51 +48,13 @@ macro(import_fetk FETK_IMPORT_VERSION)
             FetchContent_MakeAvailable( fetk )
 
             list(APPEND CMAKE_MODULE_PATH ${fetk_SOURCE_DIR}/cmake)
-            include_directories(
-                ${fetk_SOURCE_DIR}/maloc/src/base
-                ${fetk_SOURCE_DIR}/maloc/src/psh
-                ${fetk_SOURCE_DIR}/maloc/src/vsh
-                ${fetk_SOURCE_DIR}/maloc/src/vsys
-                ${fetk_SOURCE_DIR}/mc/src/aprx
-                ${fetk_SOURCE_DIR}/mc/src/bam
-                ${fetk_SOURCE_DIR}/mc/src/base
-                ${fetk_SOURCE_DIR}/mc/src/dyn
-                ${fetk_SOURCE_DIR}/mc/src/gem
-                ${fetk_SOURCE_DIR}/mc/src/mcsh
-                ${fetk_SOURCE_DIR}/mc/src/nam
-                ${fetk_SOURCE_DIR}/mc/src/pde
-                ${fetk_SOURCE_DIR}/mc/src/whb
-                ${fetk_SOURCE_DIR}/punc/src/base
-            )
 
         endif()
 
+        # Only need to link to mc because mc depends on the others
         list(APPEND APBS_LIBS
-            maloc
-            punc
             mc
-            gamer
-            superlu
-            vf2c
         )
-
-    #    find_package( BLAS REQUIRED )
-    #    find_package( UMFPACK REQUIRED )
-    #    list(APPEND APBS_LIBS
-    #        ${UMFPACK_LIBRARIES}
-    #        ${BLAS_LIBRARIES}
-    #    )
-
-    #    find_package( SuperLU )
-    #    if(SuperLU_FOUND)
-    #        # include from find_package variables
-    #        list(APPEND APBS_LIBS
-    #            ${SUPERLU_LIBRARIES}
-    #        )
-    #    else()
-    #        # library built with FETK
-    #        list(APPEND APBS_LIBS superlu)
-    #    endif()
 
         SET(HAVE_MC 1)
         SET(HAVE_PUNC 1)

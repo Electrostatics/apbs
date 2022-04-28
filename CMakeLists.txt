@@ -164,7 +164,7 @@ message(STATUS "")
 # FETK is currently required, and therefore this option is disabled
 #option(ENABLE_FETK "Enable the finite element solver" ON)
 
-set(FETK_VERSION "857a0cf6ae40410471ea10f0e67e370cbd8ed6a3" CACHE STRING "Version of FETK to use")
+set(FETK_VERSION "57195e55351e04ce6ee0ef56a143c996a9aee7e2" CACHE STRING "Version of FETK to use")
 include(ImportFETK)
 import_fetk(${FETK_VERSION})
 
@@ -443,8 +443,6 @@ if(ENABLE_BEM)
     )
     FetchContent_MakeAvailable( tabi )
 
-    list(APPEND APBS_LIB_DIRS "${tabi_BINARY_DIR}/lib")
-    list(APPEND APBS_LIBS TABIPBlib)
     include_directories(${tabi_SOURCE_DIR}/src)
     include_directories(${tabi_SOURCE_DIR}/src/tabipb_wrap)
     add_definitions(-DTABIPB_APBS)
@@ -483,6 +481,7 @@ if(ENABLE_BEM)
   
     set(TABIPB_LIBNAME TABIPBlib)
     add_library(${TABIPB_LIBNAME} ${TABIPB_LIBFILES})
+    target_link_libraries(${TABIPB_LIBNAME} ${APBS_LIBS})
     target_compile_features(${TABIPB_LIBNAME} PRIVATE cxx_std_11)
     target_compile_options(${TABIPB_LIBNAME} PRIVATE 
                            $<$<CONFIG:RELEASE>:-O3>
@@ -490,7 +489,10 @@ if(ENABLE_BEM)
                            $<$<CONFIG:DEBUG>:-O0 -Wall>)
     install(FILES ${TABIPB_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tabi COMPONENT headers)
     install(TARGETS ${TABIPB_LIBNAME} DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries)
-                       
+
+    list(APPEND APBS_LIB_DIRS "${tabi_BINARY_DIR}/lib")
+    list(APPEND APBS_LIBS TABIPBlib)
+
 endif() # ENABLE_BEM
 
 

@@ -55,7 +55,7 @@ if(ENABLE_GEOFLOW)
 endif(ENABLE_GEOFLOW)
 
 add_items(SOURCES routines.c)
-add_sublibrary(routines ${APBS_INTERNAL_LIBS})
+add_sublibrary(routines ${APBS_LIBS} ${APBS_INTERNAL_LIBS})
 
 message(STATUS "External Headers: ${EXTERNAL_HEADERS}")
 

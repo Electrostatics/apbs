@@ -70,7 +70,7 @@ ARG ENABLE_PYGBE=ON
 ARG ENABLE_BEM=ON
 ARG ENABLE_GEOFLOW=ON
 #ARG FETK_VERSION="1.9.1"
-ARG FETK_VERSION=857a0cf6ae40410471ea10f0e67e370cbd8ed6a3
+ARG FETK_VERSION=57195e55351e04ce6ee0ef56a143c996a9aee7e2
 ARG ENABLE_iAPBS=ON
 ARG ENABLE_OPENMP=OFF
 ARG ENABLE_PBAM=OFF
@@ -82,6 +82,7 @@ ARG PYTHON_MIN_VERSION="3.6"
 ARG PYTHON_MAX_VERSION="3.7"
 ARG PYTHON3_INCLUDE_DIR="/usr/include/python3.6m"
 ARG PYTHON3_LIBRARY="/usr/lib64/libpython3.6m.so"
+ARG MAKEJOBS="-j"
 
 RUN source scl_source enable devtoolset-11 && \
     cd /tmp_source && \
@@ -109,5 +110,5 @@ RUN source scl_source enable devtoolset-11 && \
       -DPython3_INCLUDE_DIR=${PYTHON3_INCLUDE_DIR} \
       -DPython3_LIBRARY=${PYTHON3_LIBRARY} \
       .. && \
-    make -j install && \
+    make ${MAKEJOBS} install && \
     /bin/true

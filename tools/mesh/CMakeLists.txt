@@ -1,10 +1,12 @@
 message(STATUS "Building mesh")
 
-set(LIBS "")
-list(APPEND LIBS "apbs_generic")
-list(APPEND LIBS "apbs_mg")
-list(APPEND LIBS "apbs_pmgc")
-list(APPEND LIBS "apbs_fem")
+set( LIBS 
+    apbs_generic
+    apbs_mg
+    apbs_pmgc
+    apbs_fem
+    apbs_routines
+)
 
 message(STATUS "libraries: ${LIBS}")
 

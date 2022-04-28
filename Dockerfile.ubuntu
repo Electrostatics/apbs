@@ -28,6 +28,7 @@ RUN apt-get update && \
         libopenblas-serial-dev \
         liblapack-dev \
         libsuitesparse-dev \
+        libsuperlu-dev \
         && \
     wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz && \
     gunzip metis-5.1.0.tar.gz && \
@@ -54,7 +55,7 @@ ARG ENABLE_PYGBE=ON
 ARG ENABLE_BEM=ON
 ARG ENABLE_GEOFLOW=ON
 #ARG FETK_VERSION="1.9.1"
-ARG FETK_VERSION=857a0cf6ae40410471ea10f0e67e370cbd8ed6a3
+ARG FETK_VERSION=57195e55351e04ce6ee0ef56a143c996a9aee7e2
 ARG ENABLE_iAPBS=ON
 ARG ENABLE_OPENMP=OFF
 ARG ENABLE_PBAM=OFF
@@ -64,6 +65,7 @@ ARG ENABLE_TESTS=ON
 ARG GET_NanoShaper=ON
 ARG PYTHON_MIN_VERSION="3.9"
 ARG PYTHON_MAX_VERSION="3.10"
+ARG MAKEJOBS="-j"
 
 RUN cd /tmp_source && \
     mkdir build && cd build && \
@@ -88,5 +90,5 @@ RUN cd /tmp_source && \
       -DPYTHON_MIN_VERSION="${PYTHON_MIN_VERSION}" \
       -DPYTHON_MAX_VERSION="${PYTHON_MAX_VERSION}" \
       .. && \
-    make -j install && \
+    make ${MAKEJOBS} install && \
     /bin/true
