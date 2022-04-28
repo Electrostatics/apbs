@@ -63,8 +63,7 @@ ARG ENABLE_PBSAM=OFF
 ARG ENABLE_PYTHON=OFF
 ARG ENABLE_TESTS=ON
 ARG GET_NanoShaper=ON
-ARG PYTHON_MIN_VERSION="3.9"
-ARG PYTHON_MAX_VERSION="3.10"
+ARG PYTHON_VERSION="3.9"
 ARG MAKEJOBS="-j"
 
 RUN cd /tmp_source && \
@@ -87,8 +86,7 @@ RUN cd /tmp_source && \
       -DENABLE_TESTS=${ENABLE_TESTS} \
       -DFETK_VERSION=${FETK_VERSION} \
       -DGET_NanoShaper=${GET_NanoShaper} \
-      -DPYTHON_MIN_VERSION="${PYTHON_MIN_VERSION}" \
-      -DPYTHON_MAX_VERSION="${PYTHON_MAX_VERSION}" \
+      -DPYTHON_VERSION="${PYTHON_VERSION}" \
       .. && \
     make ${MAKEJOBS} install && \
     /bin/true
