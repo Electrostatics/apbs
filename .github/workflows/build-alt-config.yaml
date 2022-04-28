@@ -30,8 +30,7 @@ env:
   ENABLE_PYTHON: OFF
   ENABLE_TESTS: ON
   GET_NanoShaper: ON
-  PYTHON_MIN_VERSION: "3.9"
-  PYTHON_MAX_VERSION: "3.10"
+  PYTHON_VERSION: "3.9"
 
 jobs:
 
@@ -46,19 +45,16 @@ jobs:
         include:
           - dockerfile: Dockerfile.ubuntu
             apbs-static-build: OFF
-            python-min-version: "3.9"
-            python-max-version: "3.10"
+            python-version: "3.9"
           - dockerfile: Dockerfile.centos
             apbs-static-build: ON
-            python-min-version: "3.6"
-            python-max-version: "3.7"
+            python-version: "3.6"
 
     env:
       # Override default environment variables with matrix values
       DOCKERFILE: ${{ matrix.dockerfile }}
       APBS_STATIC_BUILD: ${{ matrix.apbs-static-build }}
-      PYTHON_MIN_VERSION: ${{ matrix.python-min-version }}
-      PYTHON_MAX_VERSION: ${{ matrix.python-max-version }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
 
     steps:
 
@@ -87,15 +83,12 @@ jobs:
             --build-arg ENABLE_PYTHON=${ENABLE_PYTHON} \
             --build-arg ENABLE_TESTS=${ENABLE_TESTS} \
             --build-arg GET_NanoShaper=${GET_NanoShaper} \
-            --build-arg PYTHON_MIN_VERSION=${PYTHON_MIN_VERSION} \
-            --build-arg PYTHON_MAX_VERSION=${PYTHON_MAX_VERSION} \
+            --build-arg PYTHON_VERSION=${PYTHON_VERSION} \
             .
           ctest -C ${RELEASE_TYPE} -VV --output-on-failure 
 
   build:
     name: Compile Code
-
-    if: false
 
     runs-on: ${{ matrix.os }}
 
@@ -105,36 +98,26 @@ jobs:
         platform: [ubuntu, macOS, windows]
         openmp: [OFF]
         static-build: [ON]
-        python-min-version: ["3.9"]
+        python-version: ["3.9"]
         include:
           - platform: ubuntu
             os: ubuntu-20.04
             bla-vendor: OpenBLAS
-            create-package: true
-            python-min-version: "3.9"
-            python-max-version: "3.10"
             architecture: x64
           - platform: macos
             os: macos-11
             bla-vendor: Apple
-            create-package: true
-            python-min-version: "3.9"
-            python-max-version: "3.10"
             architecture: x64
           - platform: windows
             os: windows-2022
             bla-vendor: OpenBLAS
-            create-package: true
-            python-min-version: "3.9"
-            python-max-version: "3.10"
             architecture: x86
 
     env:
       BLA_VENDOR: ${{ matrix.bla-vendor }}
       ENABLE_OPENMP: ${{ matrix.openmp }}
       APBS_STATIC_BUILD: ${{matrix.static-build }}
-      PYTHON_MIN_VERSION: "${{ matrix.python-min-version }}"
-#      PYTHON_MAX_VERSION: "${{ matrix.python-max-version }}"
+      PYTHON_VERSION: "${{ matrix.python-version }}"
 
     outputs:
       apbs-version: ${{ steps.extract-version.outputs.apbs-version }}
@@ -166,7 +149,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-min-version }}
+          python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
 
       - name: Mac Prereqs
@@ -179,7 +162,6 @@ jobs:
             swig \
             boost \
             eigen \
-            arpack \
             lapack \
             suite-sparse
           wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz
@@ -187,6 +169,14 @@ jobs:
           tar -xf metis-5.1.0.tar
           cd metis-5.1.0
           make config prefix=/usr/local
+          make install
+          cd ..
+          git clone https://github.com/opencollab/arpack-ng.git
+          cd arpack-ng
+          git fetch --all --tags
+          git checkout tags/3.8.0 -b latest
+          mkdir build && cd build
+          cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=$(which gfortran-11) -DEXAMPLES=OFF -DMPI=OFF -DBUILD_SHARED_LIBS=OFF  ..
           make install
 #          brew upgrade gcc@9
 
@@ -234,10 +224,9 @@ jobs:
           mkdir -p build/${RELEASE_TYPE}
           cd build
           echo $CMAKE_PREFIX_PATH
-          cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=${RELEASE_TYPE} -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF -DBUILD_TESTING=${BUILD_TESTING} -DBUILD_TOOLS=${BUILD_TOOLS} -DCHECK_EPSILON=ON -DBLA_VENDOR=${BLA_VENDOR} -DENABLE_BEM=${ENABLE_BEM} -DENABLE_GEOFLOW=${ENABLE_GEOFLOW} -DENABLE_iAPBS=${ENABLE_iAPBS} -DENABLE_PYGBE=${ENABLE_PYGBE} -DPYTHON_MIN_VERSION="${PYTHON_MIN_VERSION}" -DENABLE_INLINE=ON -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PYTHON=${ENABLE_PYTHON} -DENABLE_TESTS=${ENABLE_TESTS} -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DENABLE_VERBOSE_DEBUG=OFF -DGET_NanoShaper=${GET_NanoShaper} -DFETK_VERSION=${FETK_VERSION} -G "Visual Studio 17 2022" -A Win32 ..
+          cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=${RELEASE_TYPE} -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF -DBUILD_TESTING=${BUILD_TESTING} -DBUILD_TOOLS=${BUILD_TOOLS} -DCHECK_EPSILON=ON -DBLA_VENDOR=${BLA_VENDOR} -DENABLE_BEM=${ENABLE_BEM} -DENABLE_GEOFLOW=${ENABLE_GEOFLOW} -DENABLE_iAPBS=${ENABLE_iAPBS} -DENABLE_PYGBE=${ENABLE_PYGBE} -DPYTHON_VERSION="${PYTHON_VERSION}" -DENABLE_INLINE=ON -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PYTHON=${ENABLE_PYTHON} -DENABLE_TESTS=${ENABLE_TESTS} -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DENABLE_VERBOSE_DEBUG=OFF -DGET_NanoShaper=${GET_NanoShaper} -DFETK_VERSION=${FETK_VERSION} -G "Visual Studio 17 2022" -A Win32 ..
           cat CMakeCache.txt
         shell: bash
-#          cmake -DCMAKE_TOOLCHAIN_FILE=${WIN_TOOLCHAIN_FILE} -DVCPKG_TARGET_TRIPLET=x86-windows -DCMAKE_INSTALL_INCLUDEDIR=include -DCMAKE_BUILD_TYPE=${RELEASE_TYPE} -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF -DBUILD_TESTING=${BUILD_TESTING} -DBUILD_TOOLS=${BUILD_TOOLS} -DCHECK_EPSILON=ON -DBLA_VENDOR=${BLA_VENDOR} -DENABLE_BEM=${ENABLE_BEM} -DENABLE_GEOFLOW=${ENABLE_GEOFLOW} -DENABLE_iAPBS=${ENABLE_iAPBS} -DENABLE_PYGBE=${ENABLE_PYGBE} -DPYTHON_MIN_VERSION="${PYTHON_MIN_VERSION}" -DPYTHON_MAX_VERSION="${PYTHON_MAX_VERSION}" -DENABLE_INLINE=ON -DENABLE_PBAM=${ENABLE_PBAM} -DENABLE_PBSAM=${ENABLE_PBSAM} -DENABLE_PYTHON=${ENABLE_PYTHON} -DENABLE_TESTS=${ENABLE_TESTS} -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} -DENABLE_VERBOSE_DEBUG=OFF -DGET_NanoShaper=${GET_NanoShaper} -DFETK_VERSION=${FETK_VERSION} -G "Visual Studio 17 2022" -A Win32 ..
 
       - name: Configure and Build for Mac
         if: startsWith(matrix.os, 'macos')  # Mac only
@@ -277,9 +266,52 @@ jobs:
           ctest -C ${RELEASE_TYPE} -VV --output-on-failure 
         shell: bash
 
+#      - name: Create package for Mac and Linux
+#        if: matrix.create-package && startsWith(matrix.os, 'macos') || startswith(matrix.os, 'ubuntu') # Mac or Linux only
+#        id: cpack-ml
+#        run: |
+#          cd build
+#          cpack -C ${RELEASE_TYPE} -G ZIP
+#          ZIP_CPACK_FILE=`ls APBS*.zip`
+#          echo "ZIP_CPACK_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
+#          echo "PATH_TO_PACKAGE=build/" >> $GITHUB_ENV
+#          echo ::set-output name=cpack-out-${{ matrix.platform }}-zip::${ZIP_CPACK_FILE}
+#          echo "ZIP CPack file: $ZIP_CPACK_FILE"
+#          unzip -l ${ZIP_CPACK_FILE}
+
+#      - name: Create package for Windows
+#        if: matrix.create-package && startsWith(matrix.os, 'windows')  # Windows only
+#        id: cpack-w
+#        run: |
+#          cd build
+#          /c/Program\ Files/CMake/bin/cpack.exe -C ${RELEASE_TYPE} -G ZIP -V
+#          ZIP_CPACK_FILE=`ls APBS*.zip`
+#          echo "Repackaging with extra dlls"
+#          mkdir unzip
+#          cp $ZIP_CPACK_FILE unzip
+#          cd unzip
+#          7z x $ZIP_CPACK_FILE
+#          PACKAGE_DIR=${ZIP_CPACK_FILE%.*}
+#          cp /c/vcpkg/installed/x86-windows/bin/{libumfpack.dll,libcholmod.dll,libamd.dll,openblas.dll,libcamd.dll,libcolamd.dll,libccolamd.dll,liblapack.dll,libgfortran-5.dll,libgcc_s_dw2-1.dll,libwinpthread-1.dll,libquadmath-0.dll} ./${PACKAGE_DIR}/bin
+#          7z a -r $ZIP_CPACK_FILE $PACKAGE_DIR/bin/*.dll
+#          echo "ZIP_CPACK_FILE=${ZIP_CPACK_FILE}" >> $GITHUB_ENV
+#          echo "PATH_TO_PACKAGE=build/unzip/" >> $GITHUB_ENV
+#          echo ::set-output name=cpack-out-${{ matrix.platform }}-zip::${ZIP_CPACK_FILE}
+#          echo "ZIP CPack file: $ZIP_CPACK_FILE"
+#          unzip -l ${ZIP_CPACK_FILE}
+#        shell: bash
+
+#      - name: Upload ZIP package to the action
+#        if: matrix.create-package
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: ${{ env.ZIP_CPACK_FILE }}
+#          path: ${{ env.PATH_TO_PACKAGE }}${{ env.ZIP_CPACK_FILE }}
+#          retention-days: 5
 
 # For debugging
-      - name: Setup tmate session
+#      - name: Setup tmate session
+#        if: startsWith(matrix.os, 'macos') || ! success()
 #        if: startsWith(matrix.os, 'windows') || ! success()
-        if: ${{ ! success() }}
-        uses: mxschmitt/action-tmate@v3
+#        if: ${{ ! success() }}
+#        uses: mxschmitt/action-tmate@v3
