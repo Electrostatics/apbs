@@ -4,24 +4,18 @@ Release history
 
 
 ---------------------
-APBS X.X.X ()
+APBS 3.4.1 (Apr 2022)
 ---------------------
 
 * Binary releases may be found in `GitHub releases <https://github.com/Electrostatics/apbs/releases>`_.
-
-^^^^^^^^^^^^
-New Features
-^^^^^^^^^^^^
-
-* 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 Known Bugs and Limitations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-(see v3.4.0)
-
-* 
+* Automated build is only single threaded
+* pb_solvers has been disabled; requires further development for full integration
+* Support for the PYGBE solver is minimal so far; user needs to install PYGBE (e.g. via `pip install pygbe`)
 
 ^^^^^^^^^^^^^
 Minor Updates
@@ -34,6 +28,7 @@ Minor Updates
 * Build arpack manually in the Mac build to get the static library
 * Updated FETK to v1.9.3
 * Updated installation documentation
+* Added a CentOS Dockerfile; updated the Ubuntu Dockerfile
 
 ^^^^^
 Notes
