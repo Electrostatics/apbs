@@ -7,7 +7,7 @@ How to build APBS from source
 
 These instructions assume that you have downloaded the source code from `GitHub releases`_.
 
-.. caution:: We do not recommend cloning directly from the head of the master branch because it is typically under development and could be unstable. Unless you really know what you are doing, we advise you to skip the next step.
+.. caution:: We do not recommend cloning directly from the head of the `main` branch because it is typically under development and could be unstable. Unless you really know what you are doing, we advise you to skip the next step.
 
 -------------------------------
 Get source directly from Github
@@ -81,7 +81,7 @@ If you want to use the Poisson-Boltzmann Analytical Method developed by the Tere
 
 .. warning::
 
-   PB-AM currently runs on OS X or Linux only.
+   PB-AM is not currently fully integrated with APBS and its use is not recommended.
 
 .. code:: bash
 
@@ -196,8 +196,8 @@ Building the code - advanced
       -DENABLE_BEM=ON                           \
       -DFETK_VERSION=[version]                  \
       -DENABLE_OPENMP=ON                        \
-      -DENABLE_PBAM=ON                          \
-      -DENABLE_PBSAM=ON                         \
+      -DENABLE_PBAM=OFF                         \
+      -DENABLE_PBSAM=OFF                        \
       -DENABLE_PYTHON=ON                        \
       -DENABLE_TESTS=ON                         \
       -DBUILD_SHARED_LIBS=ON                    \

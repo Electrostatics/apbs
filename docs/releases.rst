@@ -33,6 +33,7 @@ Minor Updates
 * Statically link Python in the Mac and Ubuntu builds
 * Build arpack manually in the Mac build to get the static library
 * Updated FETK to v1.9.3
+* Updated installation documentation
 
 ^^^^^
 Notes
