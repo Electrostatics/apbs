@@ -7,7 +7,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${APBS_ROOT}/src)
 LINK_DIRECTORIES(${APBS_ROOT_PATH}/lib)
 
 #ADD_LIBRARY(iapbs SHARED apbs_driver.c apbs_driver.h)
-ADD_LIBRARY(iapbs STATIC apbs_driver.c apbs_driver.h)
+ADD_LIBRARY(iapbs apbs_driver.c apbs_driver.h)
+target_link_libraries(iapbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS})
 
 option(BUILD_iAPBS_FORTRAN_WRAPPER "Optionally build iAPBS Fortran wrapper" OFF)
 if(BUILD_iAPBS_FORTRAN_WRAPPER)

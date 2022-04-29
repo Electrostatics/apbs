@@ -1,0 +1,112 @@
+# CentOS-based Docker build
+###########################
+
+## Notes ##
+
+# SCL is needed for devtoolset, so we can have a more advanced GCC than v4.8.5.
+# GCC 4.8.5 was unable to compile:
+#   - GoogleTest
+#   - Some C99 for-loop convention used in routines.c
+
+# Note that because SCL's devtoolset is used:
+#   - LD_LIBRARY_PATH is set to only include devtoolset paths; if you install APBS in e.g. /usr/local, 
+#     then you'll need to add /usr/local/lib64 and /usr/local/lib to LD_LIBRARY_PATH *after* the current contents:
+#     > export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib64:/usr/local/lib
+
+# Note that this build is rather sensitive to the Python3 version
+# In particular, the include directory and library are explicitly specified and version dependent.
+
+FROM centos:7 AS apbs_base_centos
+
+RUN yum -y install \
+        epel-release \
+        centos-release-scl && \
+    yum-config-manager --enable rhel-server-rhscl-7-rpms && \
+    yum -y install devtoolset-11 && \
+    source scl_source enable devtoolset-11 && \
+    yum -y install \
+        unzip \
+        cmake3 \
+        git \
+        wget \
+        arpack-devel \
+        arpack-static \
+        f2c \
+        eigen3-devel \
+        boost-devel \
+        python3-pip \
+        python3-devel \
+        openblas-serial64 \
+        openblas-static \
+        openblas-devel \
+        lapack64-devel \
+        lapack64-static \
+        suitesparse-devel \
+        suitesparse-static \
+        && \
+    ln -s /usr/bin/cmake3 /usr/local/bin/cmake && \
+    wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz && \
+    gunzip metis-5.1.0.tar.gz && \
+    tar -xf metis-5.1.0.tar && \
+    cd metis-5.1.0 && \
+    make config prefix=/usr/local && \
+    make install && \
+    /bin/true
+
+
+#########################################
+
+FROM apbs_base_centos
+
+ADD . /tmp_source
+
+ARG BLA_VENDOR="OpenBLAS"
+ARG BUILD_DOC=ON
+ARG APBS_STATIC_BUILD=ON
+ARG BUILD_TOOLS=ON
+ARG INSTALL_DIR=/usr/local
+ARG RELEASE_TYPE=Debug
+ARG ENABLE_PYGBE=ON
+ARG ENABLE_BEM=ON
+ARG ENABLE_GEOFLOW=ON
+#ARG FETK_VERSION="1.9.1"
+ARG FETK_VERSION=57195e55351e04ce6ee0ef56a143c996a9aee7e2
+ARG ENABLE_iAPBS=ON
+ARG ENABLE_OPENMP=OFF
+ARG ENABLE_PBAM=OFF
+ARG ENABLE_PBSAM=OFF
+ARG ENABLE_PYTHON=OFF
+ARG ENABLE_TESTS=ON
+ARG GET_NanoShaper=ON
+ARG PYTHON_VERSION="3.6"
+ARG PYTHON3_INCLUDE_DIR="/usr/include/python3.6m"
+ARG PYTHON3_LIBRARY="/usr/lib64/libpython3.6m.so"
+ARG MAKEJOBS="-j"
+
+RUN source scl_source enable devtoolset-11 && \
+    cd /tmp_source && \
+    mkdir build && cd build && \
+    cmake \
+      -DCMAKE_INSTALL_INCLUDEDIR="include" \
+      -DBUILD_DOC=${BUILD_DOC} \
+      -DAPBS_STATIC_BUILD=${APBS_STATIC_BUILD}  \
+      -DBUILD_TOOLS=O${BUILD_TOOLS} \
+      -DCMAKE_BUILD_TYPE=$RELEASE_TYPE \
+      -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
+      -DENABLE_PYGBE=${ENABLE_PYGBE} \
+      -DENABLE_BEM=${ENABLE_BEM} \
+      -DENABLE_iAPBS=${ENABLE_iAPBS} \
+      -DENABLE_GEOFLOW=${ENABLE_GEOFLOW} \
+      -DENABLE_OPENMP=${ENABLE_OPENMP} \
+      -DENABLE_PBAM=${ENABLE_PBAM} \
+      -DENABLE_PBSAM=${ENABLE_PBSAM} \
+      -DENABLE_PYTHON=${ENABLE_PYTHON} \
+      -DENABLE_TESTS=${ENABLE_TESTS} \
+      -DFETK_VERSION=${FETK_VERSION} \
+      -DGET_NanoShaper=${GET_NanoShaper} \
+      -DPYTHON_VERSION="${PYTHON_VERSION}" \
+      -DPython3_INCLUDE_DIR=${PYTHON3_INCLUDE_DIR} \
+      -DPython3_LIBRARY=${PYTHON3_LIBRARY} \
+      .. && \
+    make ${MAKEJOBS} install && \
+    /bin/true

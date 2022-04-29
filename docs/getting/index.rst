@@ -30,10 +30,17 @@ The best way to install APBS is via download of a pre-compiled binary from `GitH
 Requirements
 ^^^^^^^^^^^^
 
-The pre-compiled binaries include nearly all dependencies, so the only requirement is Python:
+The pre-compiled binaries include nearly all dependencies.  There are a few items to be aware of:
 
-* All platforms
-  * Python 3 (tested with 3.9)
+* Windows
+  * Python 3.9
+
+* Linux
+  * Ubuntu or compatible flavor of Linux
+  * Compatible glibc
+    * Binaries were built with Ubuntu 20.04 with glibc version 2.31
+    * Binaries have been tested *successfully* under Ubuntu 20.04, 21.10, and 22.04
+    * Binaries have been tested *unsuccessfully* under Ubuntu 18.04
 
 .. caution:: 
 
@@ -85,9 +92,9 @@ Current platform support
 | OS         | PYTHON  | GEOFLOW | BEM,       | FETK | PBSAM | PBAM | PYTHON  | SHARED_LIBS |
 |            | VERSION |         | NanoShaper |      |       |      | SUPPORT |             |
 +============+=========+=========+============+======+=======+======+=========+=============+
-| Ubuntu     | 3.9     | Yes     | Yes        | Yes  | Yes   | Yes  | Yes     | No          |
+| Ubuntu     | 3.9     | Yes     | Yes        | Yes  | No    | No   | Yes     | No          |
 +------------+---------+---------+------------+------+-------+------+---------+-------------+
-| MacOSX     | 3.9     | Yes     | Yes        | Yes  | Yes   | Yes  | Yes     | No          |
+| MacOSX     | 3.9     | Yes     | Yes        | Yes  | No    | No   | Yes     | No          |
 +------------+---------+---------+------------+------+-------+------+---------+-------------+
-| Windows 10 | 3.9     | Yes     | Yes        | Yes  | Yes   | Yes  | No      | No          |
+| Windows 10 | 3.9     | Yes     | Yes        | Yes  | No    | No   | Yes     | No          |
 +------------+---------+---------+------------+------+-------+------+---------+-------------+

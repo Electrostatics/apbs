@@ -22,6 +22,7 @@ cmake_policy(SET CMP0042 NEW) # MacOS RPATH on by default
 cmake_policy(SET CMP0048 NEW) # project() command manages the VERSION variables
 cmake_policy(SET CMP0054 NEW) # Only interpret if() arguments as variables or keywords when unquoted
 cmake_policy(SET CMP0077 NEW) # option() honors normal variables (i.e. does nothing if a normal variable with the same name exists)
+cmake_policy(SET CMP0083 NEW) # Pass flags needed for position-independent executables
 cmake_policy(SET CMP0091 NEW) # MSVC runtime library flags are selected by an abstraction (i.e. CMAKE_MSVC_RUNTIME_LIBRARY)
 set(CMAKE_MACOSX_RPATH 1)
 
@@ -91,6 +92,8 @@ set(TOOLS_PATH ${APBS_BUILD}/tools)
 set(APBS_LIBS)
 set(APBS_LIB_DIRS)
 
+set(PYTHON_VERSION 3.6 CACHE STRING "Python version to be used (or compatible)") # Python 3.6 is the lowest version tested so far
+
 find_file(CONTRIB_PATH "contrib"
           PATHS "${APBS_ROOT}"
           DOC "The path to contributed modules for apbs")
@@ -123,6 +126,7 @@ if(APBS_STATIC_BUILD)
     else()
         list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .a)
     endif()
+    set(Python3_USE_STATIC_LIBS TRUE)
 else()
     set(FETK_STATIC_BUILD OFF)
     set(BLA_STATIC OFF)
@@ -139,6 +143,7 @@ else()
     else()
         list(PREPEND CMAKE_FIND_LIBRARY_SUFFIXES .so)
     endif()
+    set(Python3_USE_STATIC_LIBS FALSE)
 endif()
 
 message(STATUS "")
@@ -161,7 +166,7 @@ message(STATUS "")
 # FETK is currently required, and therefore this option is disabled
 #option(ENABLE_FETK "Enable the finite element solver" ON)
 
-set(FETK_VERSION "857a0cf6ae40410471ea10f0e67e370cbd8ed6a3" CACHE STRING "Version of FETK to use")
+set(FETK_VERSION "57195e55351e04ce6ee0ef56a143c996a9aee7e2" CACHE STRING "Version of FETK to use")
 include(ImportFETK)
 import_fetk(${FETK_VERSION})
 
@@ -335,8 +340,27 @@ endif()
 ################################################################################
 if(NOT WIN32)
     find_library(MATH_LIBRARY "m")
-    list(APPEND APBS_LIBS m stdc++)
+    find_package(Intl REQUIRED)
+    find_package(Iconv REQUIRED)
+    list(APPEND APBS_LIBS 
+        util 
+        dl 
+        m 
+        stdc++ 
+        ${Intl_LIBRARIES}
+        ${Iconv_LIBRARIES}
+    )
+    set(MORE_INCLUDE_DIRS
+        ${Intl_INCLUDE_DIRS}
+        ${Iconv_INCLUDE_DIRS}
+    )
+    if(MORE_INCLUDE_DIRS)
+        include_directories(${MORE_INCLUDE_DIRS})
+    endif()
 endif()
+
+find_package( Threads REQUIRED )
+list(APPEND APBS_LIBS ${CMAKE_THREAD_LIBS_INIT})
 
 find_package( UMFPACK REQUIRED )
 find_package( SuiteSparse REQUIRED )
@@ -362,27 +386,9 @@ option(ENABLE_PYGBE "Boundary element method using PYGBE" OFF)
 if(ENABLE_PYGBE)
     message(STATUS "Building PYGBE")
     add_definitions(-DENABLE_PYGBE)
-    if(PYTHON_MAX_VERSION)
-        message(STATUS "**evaluates TRUE**")
-    else()
-        message(STATUS "**evaluates FALSE")
-    endif()
-    message(STATUS "cmake version: ${CMAKE_VERSION}")
-    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.19")
-        message(STATUS "  version >= 3.19")
-    else()
-        message(STATUS "  version < 3.19")
-    endif()
     #set (Python3_FIND_ABI "OFF" "ANY" "ANY")
-    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.19" AND PYTHON_MAX_VERSION)
-        find_package(Python3 ${PYTHON_MIN_VERSION}...<${PYTHON_MAX_VERSION} REQUIRED COMPONENTS Interpreter Development)
-    else()
-        find_package(Python3 ${PYTHON_MIN_VERSION} REQUIRED COMPONENTS Interpreter Development)
-        if(PYTHON_MAX_VERSION AND ${Python3_VERSION} VERSION_GREATER_EQUAL ${PYTHON_MAX_VERSION})
-            set(Python3_FOUND FALSE)
-            message(FATAL_ERROR "Python version ${Python3_VERSION} is too high; maximum is ${PYTHON_MAX_VERSION}")
-        endif()
-    endif()
+    find_package(Python3 ${PYTHON_VERSION} EXACT REQUIRED COMPONENTS Interpreter Development)
+    message(STATUS "******** PYTHON3_VERSION ${Python3_VERSION}")
     message(STATUS "******** PYTHON_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
     message(STATUS "******** PYTHON_LIBRARIES ${Python3_LIBRARIES}")
     include_directories(${Python3_INCLUDE_DIRS})
@@ -421,8 +427,6 @@ if(ENABLE_BEM)
     )
     FetchContent_MakeAvailable( tabi )
 
-    list(APPEND APBS_LIB_DIRS "${tabi_BINARY_DIR}/lib")
-    list(APPEND APBS_LIBS TABIPBlib)
     include_directories(${tabi_SOURCE_DIR}/src)
     include_directories(${tabi_SOURCE_DIR}/src/tabipb_wrap)
     add_definitions(-DTABIPB_APBS)
@@ -461,6 +465,7 @@ if(ENABLE_BEM)
   
     set(TABIPB_LIBNAME TABIPBlib)
     add_library(${TABIPB_LIBNAME} ${TABIPB_LIBFILES})
+    target_link_libraries(${TABIPB_LIBNAME} ${APBS_LIBS})
     target_compile_features(${TABIPB_LIBNAME} PRIVATE cxx_std_11)
     target_compile_options(${TABIPB_LIBNAME} PRIVATE 
                            $<$<CONFIG:RELEASE>:-O3>
@@ -468,7 +473,10 @@ if(ENABLE_BEM)
                            $<$<CONFIG:DEBUG>:-O0 -Wall>)
     install(FILES ${TABIPB_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tabi COMPONENT headers)
     install(TARGETS ${TABIPB_LIBNAME} DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries)
-                       
+
+    list(APPEND APBS_LIB_DIRS "${tabi_BINARY_DIR}/lib")
+    list(APPEND APBS_LIBS TABIPBlib)
+
 endif() # ENABLE_BEM
 
 

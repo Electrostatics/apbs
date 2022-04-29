@@ -47,9 +47,7 @@ add_subdirectory(generic)
 add_subdirectory(pmgc)
 add_subdirectory(mg)
 
-if(ENABLE_FETK)
-   add_subdirectory(fem)
-endif(ENABLE_FETK)
+add_subdirectory(fem)
 
 if(ENABLE_GEOFLOW)
 #    add_items(SOURCES geoflow_wrap_apbs.c)
@@ -57,7 +55,7 @@ if(ENABLE_GEOFLOW)
 endif(ENABLE_GEOFLOW)
 
 add_items(SOURCES routines.c)
-add_sublibrary(routines ${APBS_INTERNAL_LIBS})
+add_sublibrary(routines ${APBS_LIBS} ${APBS_INTERNAL_LIBS})
 
 message(STATUS "External Headers: ${EXTERNAL_HEADERS}")
 
@@ -68,9 +66,15 @@ message(STATUS "APBS Libraries: ${APBS_LIBS}")
 message(STATUS "Internal Libraries: ${APBS_INTERNAL_LIBS}")
 message(STATUS " ")
 
+# Use position-independent code for apbs
+set_property(TARGET apbs PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+
 #add_dependencies(apbs ${BEM_LIB})
 #target_include_directories(apbs PRIVATE apbs.h routines.h)
 target_link_libraries(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS})
+if(APPLE)
+    target_link_libraries(apbs "-framework CoreFoundation")
+endif()
 #add_dependencies(apbs ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${APBS_LIBS})
 
 

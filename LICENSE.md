@@ -5,7 +5,7 @@ APBS -- Adaptive Poisson-Boltzmann Solver
 
   Additional contributing authors listed in the code documentation.
 
-Copyright (c) 2010-2020 Battelle Memorial Institute.
+Copyright (c) 2010-2022 Battelle Memorial Institute.
 Developed at the Pacific Northwest National Laboratory, operated by Battelle Memorial Institute, Pacific Northwest Division for the U.S. Department of Energy.
 
 Portions Copyright (c) 2002-2010, Washington University in St. Louis.

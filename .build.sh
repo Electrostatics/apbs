@@ -51,8 +51,7 @@ echo "Install dir: ${INSTALL_DIR}"
 : ${ENABLE_PYGBE:=ON}
 : ${ENABLE_BEM:=ON}
 : ${ENABLE_GEOFLOW:=ON}
-: ${ENABLE_FETK:=ON}
-: ${FETK_VERSION:="857a0cf6ae40410471ea10f0e67e370cbd8ed6a3"}
+: ${FETK_VERSION:="57195e55351e04ce6ee0ef56a143c996a9aee7e2"}
 : ${ENABLE_iAPBS:=ON}
 : ${ENABLE_OPENMP:=OFF}
 : ${ENABLE_PBAM:=OFF}
@@ -60,8 +59,7 @@ echo "Install dir: ${INSTALL_DIR}"
 : ${ENABLE_PYTHON:=OFF}
 : ${ENABLE_TESTS:=ON}
 : ${GET_NanoShaper:=ON}
-: ${PYTHON_MIN_VERSION:="3.9"}
-: ${PYTHON_MAX_VERSION:="3.10"}
+: ${PYTHON_VERSION:="3.9"}
  
 echo "==================================== WHERE AM I ==================================== "
 pwd
@@ -134,7 +132,6 @@ cmake -S .. -B $BUILD_DIR                                 \
       -DENABLE_PYGBE=${ENABLE_PYGBE}                      \
       -DENABLE_BEM=${ENABLE_BEM}                          \
       -DENABLE_GEOFLOW=${ENABLE_GEOFLOW}                  \
-      -DENABLE_FETK=${ENABLE_FETK}                        \
       -DENABLE_iAPBS=${ENABLE_iAPBS}                      \
       -DENABLE_OPENMP=${ENABLE_OPENMP}                    \
       -DENABLE_PBAM=${ENABLE_PBAM}                        \
@@ -142,8 +139,7 @@ cmake -S .. -B $BUILD_DIR                                 \
       -DENABLE_PYTHON=${ENABLE_PYBIND}                    \
       -DENABLE_TESTS=${ENABLE_TESTS}                      \
       -DFETK_VERSION="${FETK_VERSION}"                    \
-      -DPYTHON_MIN_VERSION="${PYTHON_MIN_VERSION}"        \
-      -DPYTHON_MAX_VERSION="${PYTHON_MAX_VERSION}"        \
+      -DPYTHON_VERSION="${PYTHON_VERSION}"                \
       ..                                                  || exit 1
  
 echo "==================================== BUILD =============================================== "

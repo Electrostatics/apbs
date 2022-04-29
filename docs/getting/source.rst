@@ -7,7 +7,7 @@ How to build APBS from source
 
 These instructions assume that you have downloaded the source code from `GitHub releases`_.
 
-.. caution:: We do not recommend cloning directly from the head of the master branch because it is typically under development and could be unstable. Unless you really know what you are doing, we advise you to skip the next step.
+.. caution:: We do not recommend cloning directly from the head of the `main` branch because it is typically under development and could be unstable. Unless you really know what you are doing, we advise you to skip the next step.
 
 -------------------------------
 Get source directly from Github
@@ -81,7 +81,7 @@ If you want to use the Poisson-Boltzmann Analytical Method developed by the Tere
 
 .. warning::
 
-   PB-AM currently runs on OS X or Linux only.
+   PB-AM is not currently fully integrated with APBS and its use is not recommended.
 
 .. code:: bash
 
@@ -130,7 +130,7 @@ That variable will be set to a working default if not manually set.
 .. code:: bash
 
    cd $APBS_BUILD_DIR
-   cmake -DENABLE_FETK_=ON -DFETK_VERSION=v1.9.2
+   cmake -DFETK_VERSION=v1.9.2
 
 For advanced users, you can use a version of FETK other than a released version by setting ``FETK_VERSION``
 to the desired git commit hash instead of a version number:
@@ -138,7 +138,7 @@ to the desired git commit hash instead of a version number:
 .. code:: bash
 
    cd $APBS_BUILD_DIR
-   cmake -DENABLE_FETK=ON -DFETK_VERSION=[git hash]
+   cmake -DFETK_VERSION=[git hash]
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -194,11 +194,10 @@ Building the code - advanced
       -DCMAKE_BUILD_TYPE=$RELEASE_TYPE          \
       -DENABLE_GEOFLOW=ON                       \
       -DENABLE_BEM=ON                           \
-      -DENABLE_FETK=ON                          \
       -DFETK_VERSION=[version]                  \
       -DENABLE_OPENMP=ON                        \
-      -DENABLE_PBAM=ON                          \
-      -DENABLE_PBSAM=ON                         \
+      -DENABLE_PBAM=OFF                         \
+      -DENABLE_PBSAM=OFF                        \
       -DENABLE_PYTHON=ON                        \
       -DENABLE_TESTS=ON                         \
       -DBUILD_SHARED_LIBS=ON                    \
