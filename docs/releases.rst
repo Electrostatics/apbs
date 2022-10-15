@@ -2,6 +2,15 @@
 Release history
 ===============
 
+----------------------------
+Current version (unreleased)
+----------------------------
+
+^^^^^^^^^^^^^
+Minor Updates
+^^^^^^^^^^^^^
+
+* Added `Spack <https://spack.io/>`_` configuration file to ``tools/spack`` directory.  See `#191 <https://github.com/Electrostatics/apbs/issues/191>_` for more information.
 
 ---------------------
 APBS 3.4.1 (Apr 2022)
