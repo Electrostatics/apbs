@@ -49,6 +49,14 @@ benchmark
 Benchmark file I/O for reading/writing scalar data.
 Found in :file:`tools/mesh`
 
+^^^^^
+spack
+^^^^^
+
+`Spack <https://spack.io/>`_` configuration files for APBS, PROPKA, and PDB2PQR.
+See `#191 <https://github.com/Electrostatics/apbs/issues/191>_` for more information.
+Found in :file:`tools/spack`
+
 ^^^^^^^^^^^^
 uhbd_asc2bin
 ^^^^^^^^^^^^
