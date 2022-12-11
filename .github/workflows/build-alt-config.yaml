@@ -156,7 +156,6 @@ jobs:
         if: startsWith(matrix.os, 'macos')  # Mac only
         run: |
           brew install \
-            wget \
             bison \
             flex \
             swig \
@@ -164,9 +163,7 @@ jobs:
             eigen \
             lapack \
             suite-sparse
-          wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz
-          gunzip metis-5.1.0.tar.gz
-          tar -xf metis-5.1.0.tar
+          git clone https://github.com/Electrostatics/metis-fork.git metis-5.1.0
           cd metis-5.1.0
           make config prefix=/usr/local
           make install
@@ -187,7 +184,6 @@ jobs:
           sudo apt-get install -yq \
             software-properties-common \
             build-essential \
-            wget \
             bison \
             flex \
             swig \
@@ -198,9 +194,7 @@ jobs:
             libarpack2-dev \
             liblapack-dev \
             libsuitesparse-dev
-          wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.1.0.tar.gz
-          gunzip metis-5.1.0.tar.gz
-          tar -xf metis-5.1.0.tar
+          git clone https://github.com/Electrostatics/metis-fork.git metis-5.1.0
           cd metis-5.1.0
           make config prefix=/usr/local
           sudo make install
