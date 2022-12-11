@@ -12,7 +12,7 @@
 # Install base OS
 ###########################
 
-FROM ubuntu:20.04 AS apbs_base_ubuntu
+FROM ubuntu:22.04 AS apbs_base_ubuntu
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -26,7 +26,8 @@ RUN apt-get update && \
         libf2c2-dev \
         libeigen3-dev \
         libboost-dev \
-        python3.9-dev \
+        python3-all \
+        python3-all-dev \
         python3-pip \
         libopenblas-serial-dev \
         liblapack-dev \
@@ -70,7 +71,7 @@ ARG ENABLE_PBSAM=OFF
 ARG ENABLE_PYTHON=OFF
 ARG ENABLE_TESTS=ON
 ARG GET_NanoShaper=ON
-ARG PYTHON_VERSION="3.9"
+ARG PYTHON_VERSION="3.10"
 ARG MAKEJOBS="-j"
 
 RUN cd /tmp_source && \

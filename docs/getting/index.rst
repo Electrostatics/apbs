@@ -38,7 +38,7 @@ The pre-compiled binaries include nearly all dependencies.  There are a few item
 * Linux
   * Ubuntu or compatible flavor of Linux
   * Compatible glibc
-    * Binaries were built with Ubuntu 20.04 with glibc version 2.31
+    * Binaries were built with Ubuntu 22.04 with glibc version 2.35
     * Binaries have been tested *successfully* under Ubuntu 20.04, 21.10, and 22.04
     * Binaries have been tested *unsuccessfully* under Ubuntu 18.04
 

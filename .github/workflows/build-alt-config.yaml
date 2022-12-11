@@ -101,7 +101,7 @@ jobs:
         python-version: ["3.9"]
         include:
           - platform: ubuntu
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             bla-vendor: OpenBLAS
             architecture: x64
           - platform: macos
