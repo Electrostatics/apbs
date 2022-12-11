@@ -42,8 +42,7 @@ FROM apbs_base_ubuntu
 RUN git clone https://github.com/Electrostatics/metis-fork.git metis-5.1.0 && \
     cd metis-5.1.0 && \
     make config prefix=/usr/local && \
-    make install && \
-    /bin/true
+    make install
 
 ###########################
 # Install APBS
@@ -96,5 +95,5 @@ RUN cd /tmp_source && \
       -DGET_NanoShaper=${GET_NanoShaper} \
       -DPYTHON_VERSION="${PYTHON_VERSION}" \
       .. && \
-    make ${MAKEJOBS} install && \
-    /bin/true
+    make ${MAKEJOBS} install
+    
