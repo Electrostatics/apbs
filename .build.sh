@@ -59,7 +59,7 @@ echo "Install dir: ${INSTALL_DIR}"
 : ${ENABLE_PYTHON:=OFF}
 : ${ENABLE_TESTS:=ON}
 : ${GET_NanoShaper:=ON}
-: ${PYTHON_VERSION:="3.9"}
+: ${PYTHON_VERSION:="3.10"}
  
 echo "==================================== WHERE AM I ==================================== "
 pwd

@@ -43,7 +43,7 @@ jobs:
         platform: [ubuntu, macOS, windows]
         openmp: [OFF]
         static-build: [ON]
-        python-version: ["3.9"]
+        python-version: ["3.10"]
         include:
           - platform: ubuntu
             os: ubuntu-22.04
@@ -270,7 +270,7 @@ jobs:
       fail-fast: false
       matrix:
         cpack: [lin-zip, mac-zip, win-zip]
-        python-version: ["3.9"]
+        python-version: ["3.10"]
         include:
           - cpack: lin-zip
             os: ubuntu-22.04
