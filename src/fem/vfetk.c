@@ -1877,23 +1877,13 @@ VPUBLIC void Vfetk_PDE_u_D(PDE *thee, int type, int chart, double txq[],
 
 }
 
-/**
- * The signature here doesn't match what's in mc's src/pde/mc/pde.h, which
- * g++ seems to dislike for GAMer integration.  Trying a change of function
- * signature to match to see if that makes g++ happy.  Also see vfetk.h for
- * similar signature change. - P. Ellis 11-8-2011
- */
 VPUBLIC void Vfetk_PDE_u_T(PDE *thee, int type, int chart, double txq[],
-  double F[]) {
-/*VPUBLIC void Vfetk_PDE_u_T(sPDE *thee,
-                           int type,
-                           int chart,
-                           double txq[],
-                           double F[],
-                           double dF[][3]
-                          ) { */
+    double F[], double dF[][3]) {
+
+    int i;
 
     F[0] = 0.0;
+    for (i = 0; i < thee->dim; i++) dF[0][i] = 0.0;
     var.u_T = F[0];
 
 }

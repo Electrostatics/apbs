@@ -751,7 +751,8 @@ VEXTERNC void Vfetk_PDE_u_T(
         int type, /**< Point type */
         int chart, /**< Chart for point coordinates */
         double txq[], /**< Point coordinates */
-        double F[] /**< Set to value at point */
+        double F[], /**< Set to value at point */
+        double dF[][3] /**< Set to derivative at point */
         );
 
 /**

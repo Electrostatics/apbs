@@ -376,6 +376,14 @@ list(APPEND APBS_LIBS
     ${SUITESPARSE_LIBRARIES}
 )
 
+if(APPLE AND NOT BUILD_SHARED_LIBS)
+    find_library(APBS_OPENMP_RUNTIME_LIBRARY NAMES omp
+        HINTS /opt/homebrew/opt/libomp/lib /usr/local/opt/libomp/lib)
+    if(APBS_OPENMP_RUNTIME_LIBRARY)
+        list(APPEND APBS_LIBS ${APBS_OPENMP_RUNTIME_LIBRARY})
+    endif()
+endif()
+
 ################################################################################
 # Optionally copy NanoShaper executable                                        #
 # the actual grab is later for BEM enable                                      #
