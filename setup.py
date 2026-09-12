@@ -29,7 +29,7 @@ setup(
     url="https://www.poissonboltzmann.org",
     packages=find_packages(),
     package_data={"": ["*.yaml"]},
-    install_requires=["numpy", "pyyaml"],
+    install_requires=["numpy", "pyparsing", "pyyaml"],
     tests_require=["pytest", "requests"],
     keywords="science chemistry biophysics biochemistry",
     classifiers=[
