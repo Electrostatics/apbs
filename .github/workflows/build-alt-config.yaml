@@ -8,6 +8,7 @@ permissions:
   contents: read
 
 env:
+  CMAKE_POLICY_VERSION_MINIMUM: "3.5"
   WIN_DEPENDENCIES_RELEASE: "v0.4.0"
   WIN_TOOLCHAIN_FILE: '/c/vcpkg/scripts/buildsystems/vcpkg.cmake'
   APBS_STATIC_BUILD: ON
