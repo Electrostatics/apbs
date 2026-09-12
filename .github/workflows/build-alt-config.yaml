@@ -236,7 +236,7 @@ jobs:
 
       - name: Configure Pagefile on Windows
         if: startsWith(matrix.os, 'windows')  # Windows only
-        uses: al-cheb/configure-pagefile-action@v1.2
+        uses: al-cheb/configure-pagefile-action@v1.5
         with:
           minimum-size: 8GB
           maximum-size: 16GB
