@@ -554,6 +554,10 @@ if(ENABLE_GEOFLOW)
     )
     FetchContent_MakeAvailable( geoflow )
 
+    if(TARGET eigen3)
+        add_dependencies(GeometricFlowLib eigen3)
+    endif()
+
     add_definitions(-DENABLE_GEOFLOW)
     list(APPEND APBS_LIBS GeometricFlowLib)
     include_directories(${geoflow_SOURCE_DIR}/src)
