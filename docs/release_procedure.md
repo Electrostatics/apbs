@@ -1,44 +1,45 @@
-APBS Release Procedure
------------------------
- 1. Change Version Number
-	 - [ ] Edit [VERSION]([https://github.com/Electrostatics/apbs/blob/main/apbs/VERSION)
-		Increment the value after the comment block, which is in the form
-	     M_m_u
-	     Where:
-		 - M is the Major version - increment if there are breaking changes or dropping support for previous features
-		 - m is the Minor version - increment for new features added
-		 - u is the Micro version - increment for adding small changes like new tests or fixing small bugs
+# APBS release procedure
 
- 2. Update the Releases document
-	 - [ ] Edit [docs/releases.rst]([https://github.com/Electrostatics/apbs/blob/main/apbs/docs/releases.rst)
-	   - Document major/minor changes for this release
-   
- 3. Update License info
-	   - [ ] Update license dates and information in source files
-	   - In apbs/src edit all .c source files and all .h header files, update dates
-  
- 4. Create a Pull Request (PR)
-     - [ ] Create a new [Pull Request](https://github.com/Electrostatics/apbs/pulls)
-		 - Base branch should be `release`
-		 - Source branch should be `main`
-		 - Briefly describe the changes included
+## 1. Prepare the release
 
- 5. Check tests
-     - Go to the [Actions](https://github.com/Electrostatics/apbs/actions) tab in GitHub
-     - Tests are performed for three target platforms:
-       - Ubuntu
-	   - MacOSX
-	   - Windows
-     - [ ] Ensure that the builds and associated tests were successful
-	 - [ ] Ensure that the use tests were successful
-	 - [ ] Ensure that the build artifacts were uploaded to the action
+- Update `VERSION`. The value uses `MAJOR_MINOR_PATCH` format.
+- Add the release notes to `docs/releases.rst` under a heading matching the new
+  version.
+- Update copyright or license dates only where they are no longer accurate.
+- Open and merge a pull request into `main`.
 
- 6. Merge the PR
-	 - [ ] Ensure that the [Release](https://github.com/Electrostatics/apbs/releases) is correctly created
-	 - [ ] Ensure that the builds and associated tests were successful
-	 - [ ] Ensure that the use tests were successful
-	 - [ ] Ensure that the build artifacts were uploaded to the Release
+## 2. Run a package dry run
 
- 7. Update http://www.poissonboltzmann.org/apbs/release-history with new release information.
+- Open the **Build APBS** workflow in GitHub Actions.
+- Select **Run workflow** on `main`.
+- Confirm that all compile, CTest, package, and packaged-example jobs pass for
+  Ubuntu, macOS, and Windows.
+- Confirm that **Validate Release Inputs** succeeds.
+- Download the `release-candidate` artifact and inspect its release notes and
+  three ZIP packages.
 
- 8. Pat yourself on the back for a job well done!
+Manual workflow runs never publish a GitHub release.
+
+## 3. Publish the release
+
+After the package dry run passes, create an annotated tag at the tested `main`
+commit. The tag must match `VERSION`; for example, `VERSION` value `3_5_0`
+requires tag `v3.5.0`.
+
+```shell
+git switch main
+git pull --ff-only
+git tag -a v3.5.0 -m "APBS 3.5.0"
+git push origin v3.5.0
+```
+
+The tag starts the same three-platform build, test, package, and packaged-example
+jobs. After they pass, the workflow creates the GitHub release, converts the
+matching section of `docs/releases.rst` to Markdown, and attaches all three ZIP
+packages.
+
+## 4. Verify publication
+
+- Confirm that the GitHub release notes and all three ZIP assets are present.
+- Download and inspect each published archive.
+- Update the APBS release history on `www.poissonboltzmann.org`.
