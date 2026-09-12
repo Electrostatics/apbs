@@ -170,6 +170,10 @@ set(FETK_VERSION "57195e55351e04ce6ee0ef56a143c996a9aee7e2" CACHE STRING "Versio
 include(ImportFETK)
 import_fetk(${FETK_VERSION})
 
+if(APPLE AND CMAKE_C_COMPILER_ID MATCHES "AppleClang|Clang" AND TARGET vf2c)
+    target_compile_options(vf2c PRIVATE -Wno-error=implicit-int)
+endif()
+
 
 ###############################################################################
 ##  NOTE: For Debugging and generally nice information to have
@@ -372,6 +376,14 @@ list(APPEND APBS_LIBS
     ${SUITESPARSE_LIBRARIES}
 )
 
+if(APPLE AND NOT BUILD_SHARED_LIBS)
+    find_library(APBS_OPENMP_RUNTIME_LIBRARY NAMES omp
+        HINTS /opt/homebrew/opt/libomp/lib /usr/local/opt/libomp/lib)
+    if(APBS_OPENMP_RUNTIME_LIBRARY)
+        list(APPEND APBS_LIBS ${APBS_OPENMP_RUNTIME_LIBRARY})
+    endif()
+endif()
+
 ################################################################################
 # Optionally copy NanoShaper executable                                        #
 # the actual grab is later for BEM enable                                      #
@@ -553,6 +565,10 @@ if(ENABLE_GEOFLOW)
         GIT_TAG 39d53269c084f1dc1caa71de95dca77f19da739e
     )
     FetchContent_MakeAvailable( geoflow )
+
+    if(TARGET eigen3)
+        add_dependencies(GeometricFlowLib eigen3)
+    endif()
 
     add_definitions(-DENABLE_GEOFLOW)
     list(APPEND APBS_LIBS GeometricFlowLib)

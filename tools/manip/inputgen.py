@@ -311,7 +311,7 @@ def split_input(filename):
                        file (string)
     """
     nproc = 0
-    file = open(filename, "rU")
+    file = open(filename, "r")
     text = ""
     while 1:
         line = file.readline()

@@ -2,15 +2,13 @@
 name: Build APBS with an Alternate Configuration
 
 on:
-  #push:
-  #  branches: [main]
-  #  tags: ['*']
-  pull_request:
-
   workflow_dispatch:
-  
+
+permissions:
+  contents: read
 
 env:
+  CMAKE_POLICY_VERSION_MINIMUM: "3.5"
   WIN_DEPENDENCIES_RELEASE: "v0.4.0"
   WIN_TOOLCHAIN_FILE: '/c/vcpkg/scripts/buildsystems/vcpkg.cmake'
   APBS_STATIC_BUILD: ON
@@ -59,7 +57,7 @@ jobs:
     steps:
 
       - name: Checkout the repo 
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -105,7 +103,7 @@ jobs:
             bla-vendor: OpenBLAS
             architecture: x64
           - platform: macos
-            os: macos-11
+            os: macos-15-intel
             bla-vendor: Apple
             architecture: x64
           - platform: windows
@@ -119,21 +117,14 @@ jobs:
       APBS_STATIC_BUILD: ${{matrix.static-build }}
       PYTHON_VERSION: "${{ matrix.python-version }}"
 
-    outputs:
-      apbs-version: ${{ steps.extract-version.outputs.apbs-version }}
-      apbs-tag: ${{ steps.extract-version.outputs.apbs-tag }}
-      cpack-out-lin-zip: ${{ steps.cpack-ml.outputs.cpack-out-ubuntu-zip }}
-      cpack-out-mac-zip: ${{ steps.cpack-ml.outputs.cpack-out-macos-zip }}
-      cpack-out-win-zip: ${{ steps.cpack-w.outputs.cpack-out-windows-zip }}
-
     steps:
 
       - name: Add msbuild to PATH
         if: startsWith(matrix.os, 'windows')  # Windows only
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v2
 
       - name: Checkout reposistory
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -141,13 +132,13 @@ jobs:
         run: |
           version="$(grep -E '^[0-9]+_[0-9]+_[0-9]+' VERSION | sed 's/_/./g')"
           echo $version
-          echo ::set-output name=apbs-version::${version}
-          echo ::set-output name=apbs-tag::v${version}
+          echo "apbs-version=${version}" >> "$GITHUB_OUTPUT"
+          echo "apbs-tag=v${version}" >> "$GITHUB_OUTPUT"
         shell: bash
         id: extract-version
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
@@ -173,7 +164,7 @@ jobs:
           git fetch --all --tags
           git checkout tags/3.8.0 -b latest
           mkdir build && cd build
-          cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=$(which gfortran-11) -DEXAMPLES=OFF -DMPI=OFF -DBUILD_SHARED_LIBS=OFF  ..
+          cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=$(which gfortran) -DEXAMPLES=OFF -DMPI=OFF -DBUILD_SHARED_LIBS=OFF  ..
           make install
 #          brew upgrade gcc@9
 
@@ -232,8 +223,6 @@ jobs:
       - name: Configure and Build for Linux
         if: startsWith(matrix.os, 'ubuntu')  # Linux only
         env:
-          # https://codecov.io/gh/Electrostatics/apbs
-          CODECOV_TOKEN: "e3a1e24c-5598-4f47-9353-7fa0ac57f98e"
           INSTALL_DIR: "./"
         run: |
           ./.build.sh

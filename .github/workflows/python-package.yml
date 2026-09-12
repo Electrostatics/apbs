@@ -1,56 +1,58 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
 name: Python package
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: python-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
+  test:
+    name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, 'noci')"
+    timeout-minutes: 15
     strategy:
+      fail-fast: false
       matrix:
-        python-version: [3.10]
+        python-version: ["3.10", "3.14"]
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out repository
+        uses: actions/checkout@v4
+
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install black flake8 pytest coverage
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install -e .
-      - name: Lint with flake8
+          python -m pip install --editable .
+          python -m pip install coverage flake8 pytest
+
+      - name: Check for Python errors
+        run: flake8 apbs --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Run tests with coverage
         run: |
-          # until we get rid of Python 3.6, this will fail
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 apbs --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings.
-          flake8 apbs --count --exit-zero --statistics
-          #echo "Skipping flake8"
-      - name: Test with pytest and coverage
-        run: |
-          coverage run --source=apbs -m pytest test
-          coverage report -m | tee coverage.txt
-          coverage html
-      - name: Upload coverage results
-        run: bash <(curl -s https://codecov.io/bash)
-      - name: Store coverage text results
-        uses: actions/upload-artifact@v2
+          python -m coverage run --source=apbs -m pytest test
+          python -m coverage report --show-missing | tee coverage.txt
+          python -m coverage xml
+
+      - name: Store coverage results
+        uses: actions/upload-artifact@v4
         with:
-          name: coverage-text
-          path: coverage.txt
-      - name: Store coverage HTML results
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage-html
-          path: htmlcov/*
+          name: python-${{ matrix.python-version }}-coverage
+          path: |
+            coverage.txt
+            coverage.xml

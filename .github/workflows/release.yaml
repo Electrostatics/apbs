@@ -6,6 +6,8 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: read
 
 jobs:
 
@@ -16,14 +18,14 @@ jobs:
     steps:
 
       - name: Checkout the repo 
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Extract version
         run: |
           version="$(grep -E '^[0-9]+_[0-9]+_[0-9]+' VERSION | sed 's/_/./g')"
           echo $version
-          echo ::set-output name=apbs-version::${version}
-          echo ::set-output name=apbs-tag::v${version}
+          echo "apbs-version=${version}" >> "$GITHUB_OUTPUT"
+          echo "apbs-tag=v${version}" >> "$GITHUB_OUTPUT"
           ./.extract_section.sh -v ${version} -f docs/releases.rst > this_release.rst
           cat this_release.rst
         shell: bash
@@ -49,7 +51,7 @@ jobs:
           tag: ${{ steps.extract-version.outputs.apbs-tag }}
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
