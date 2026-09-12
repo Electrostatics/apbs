@@ -50,7 +50,7 @@ jobs:
           python -m coverage xml
 
       - name: Store coverage results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: python-${{ matrix.python-version }}-coverage
           path: |
