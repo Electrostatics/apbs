@@ -252,7 +252,7 @@ jobs:
 
       - name: Upload ZIP package to the action
         if: matrix.create-package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.ZIP_CPACK_FILE }}
           path: ${{ env.PATH_TO_PACKAGE }}${{ env.ZIP_CPACK_FILE }}
