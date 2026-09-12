@@ -1,17 +1,18 @@
 #include "bind_nosh.hpp"
 #include "bind_valist.hpp"
 
-int parseInputFromString(NOsh *nosh, std::string str)
+int parseInputFromString(NOsh *nosh, const std::string& str)
 {
   int ret, bufsize;
   Vio *sock;
 
   startVio();
 
-  VASSERT( bufsize <= VMAX_BUFSIZE );
+  VASSERT( str.size() <= VMAX_BUFSIZE );
+  bufsize = static_cast<int>(str.size());
   sock = Vio_ctor("BUFF","ASC",VNULL,"0","r");
 
-  Vio_bufTake(sock, const_cast<char*>(str.c_str()), str.size());
+  Vio_bufTake(sock, const_cast<char*>(str.c_str()), bufsize);
 
   ret = NOsh_parseInput(nosh, sock); 
   sock->VIObuffer = VNULL;
@@ -59,20 +60,7 @@ void bind_nosh(py::module& m)
     .def("parseInputFromString",
         [] (NOsh& self, std::string str) -> int
         {
-          int ret, bufsize;
-          Vio *sock;
-
-          startVio();
-
-          VASSERT( bufsize <= VMAX_BUFSIZE );
-          sock = Vio_ctor("BUFF","ASC",VNULL,"0","r");
-
-          Vio_bufTake(sock, const_cast<char*>(str.c_str()), str.size());
-
-          ret = NOsh_parseInput(&self, sock); 
-          sock->VIObuffer = VNULL;
-          Vio_dtor(&sock);
-          return ret;
+          return parseInputFromString(&self, str);
         })
     .def("__del__",
         [] (NOsh* self)

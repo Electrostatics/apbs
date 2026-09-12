@@ -170,6 +170,16 @@ set(FETK_VERSION "57195e55351e04ce6ee0ef56a143c996a9aee7e2" CACHE STRING "Versio
 include(ImportFETK)
 import_fetk(${FETK_VERSION})
 
+if(NOT APBS_STATIC_BUILD)
+    find_package(BLAS REQUIRED)
+    if(TARGET cgcode)
+        target_link_libraries(cgcode PRIVATE vf2c BLAS::BLAS)
+    endif()
+    if(TARGET superlu)
+        target_link_libraries(superlu PRIVATE BLAS::BLAS)
+    endif()
+endif()
+
 if(APPLE AND CMAKE_C_COMPILER_ID MATCHES "AppleClang|Clang" AND TARGET vf2c)
     target_compile_options(vf2c PRIVATE -Wno-error=implicit-int)
 endif()
