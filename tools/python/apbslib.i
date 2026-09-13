@@ -272,18 +272,18 @@ void set_entry(double *array, int i, double val){
 
 %inline %{
 
-int parseInputFromString(NOsh *nosh, PyObject *string){
+int parseInputFromString(NOsh *nosh, const char *string){
 
     int ret, bufsize;
     Vio *sock;
 
     startVio();
-    bufsize = PyString_Size(string);
+  bufsize = strlen(string);
 
     VASSERT( bufsize <= VMAX_BUFSIZE );
     sock = Vio_ctor("BUFF","ASC",VNULL,"0","r");
 
-    Vio_bufTake(sock, PyString_AsString(string), bufsize);
+    Vio_bufTake(sock, (char *)string, bufsize);
 
     ret = NOsh_parseInput(nosh, sock);
     sock->VIObuffer = VNULL;
@@ -441,9 +441,9 @@ PyObject *getForces(AtomForce **atomForce, Valist *alist){
     dbholder = PyList_New(3);
     ibholder = PyList_New(3);
 
-    qf = PyString_FromString("qf");
-    db = PyString_FromString("db");
-    ib = PyString_FromString("ib");
+    qf = PyUnicode_FromString("qf");
+    db = PyUnicode_FromString("db");
+    ib = PyUnicode_FromString("ib");
 
     for (i=0;i<Valist_getNumberAtoms(alist);i++){
         for (j=0;j<3;j++){

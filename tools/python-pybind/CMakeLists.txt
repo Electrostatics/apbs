@@ -1,5 +1,17 @@
 
-find_package(pybind11 REQUIRED)
+set(PYBIND11_FINDPYTHON ON)
+find_package(pybind11 CONFIG QUIET)
+if(NOT TARGET pybind11::module)
+  if(NOT EXISTS ${CMAKE_SOURCE_DIR}/externals/pybind11/CMakeLists.txt)
+    message(FATAL_ERROR "pybind11 was not found and its submodule is unavailable")
+  endif()
+  add_subdirectory(
+    ${CMAKE_SOURCE_DIR}/externals/pybind11
+    ${CMAKE_BINARY_DIR}/externals/pybind11
+    EXCLUDE_FROM_ALL
+    )
+endif()
+
 add_library(apbs_pybind
   MODULE
   module.cpp

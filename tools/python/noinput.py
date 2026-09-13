@@ -94,11 +94,9 @@ from apbslib import (
     wrap_forceMG,
     writedataMG,
     writematMG,
-    xrange,
 )
 import sys
 import time
-import string
 import re
 from sys import stdout, stderr
 
@@ -317,7 +315,7 @@ def printResults(energyList, potList, forceList):
 
     factor = getUnitConversion()
 
-    for i in xrange(len(potList)):
+    for i in range(len(potList)):
         list = potList[i]
         print(f"\nPer-atom potentials from calculation {i}")
         for j in range(len(list)):
@@ -384,7 +382,7 @@ def runAPBS(PQR, INPUT):
     atomforce = new_atomforcelist(NOSH_MAXCALC)
 
     # Start the main timer
-    main_timer_start = time.clock()
+    main_timer_start = time.perf_counter()
 
     # Parse the input file
     nosh = NOsh_ctor(rank, size)
@@ -400,7 +398,7 @@ def runAPBS(PQR, INPUT):
     # the need for an actual PQR file from stdin
 
     alist = new_valist(NOSH_MAXMOL)
-    atoms = string.split(PQR, "\n")
+    atoms = PQR.split("\n")
     for i in range(len(atoms)):
         atom = atoms[i]
         if not (atom.startswith("ATOM") or atom.startswith("HETATM")):
@@ -413,7 +411,7 @@ def runAPBS(PQR, INPUT):
         if re.compile(r"( [A-Z]{3} [A-Z]{1} *\d+)").findall(atom) != []:
             haschain = 1
 
-        params = string.split(atom)
+        params = atom.split()
         x.append(float(params[5 + haschain]))
         y.append(float(params[6 + haschain]))
         z.append(float(params[7 + haschain]))
@@ -576,7 +574,7 @@ def runAPBS(PQR, INPUT):
     if nosh.nprint > 0:
         stdout.write("---------------------------------------------\n")
         stdout.write("PRINT STATEMENTS\n")
-    for iprint in xrange(nosh.nprint):
+    for iprint in range(nosh.nprint):
         if NOsh_printWhat(nosh, iprint) == NPT_ENERGY:
             printEnergy(com, nosh, totEnergy, iprint)
         elif NOsh_printWhat(nosh, iprint) == NPT_FORCE:
@@ -621,7 +619,7 @@ def runAPBS(PQR, INPUT):
     stdout.write("Thanks for using APBS!\n\n")
 
     # Stop the main timer
-    main_timer_stop = time.clock()
+    main_timer_stop = time.perf_counter()
     stdout.write(
         "Total execution time:  %1.6e sec\n"
         % (main_timer_stop - main_timer_start)

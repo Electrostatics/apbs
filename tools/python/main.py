@@ -77,7 +77,6 @@ from apbslib import (
     Vcom_rank,
     Vcom_size,
     Vmem_ctor,
-    atomForce,
     delete_Com,
     delete_Mem,
     delete_Nosh,
@@ -126,7 +125,6 @@ from apbslib import (
     wrap_forceMG,
     writedataMG,
     writematMG,
-    xrange,
 )
 import sys
 import time
@@ -271,7 +269,7 @@ def main():
     atomforce = new_atomforcelist(NOSH_MAXCALC)
 
     # Start the main timer
-    main_timer_start = time.clock()
+    main_timer_start = time.perf_counter()
 
     # Check invocation
     stdout.write(getHeader())
@@ -324,10 +322,10 @@ def main():
 
     stdout.write("Preparing to run %d PBE calculations. \n" % nosh.ncalc)
 
-    for icalc in xrange(nosh.ncalc):
+    for icalc in range(nosh.ncalc):
         totEnergy.append(0.0)
 
-    for icalc in xrange(nosh.ncalc):
+    for icalc in range(nosh.ncalc):
         stdout.write("---------------------------------------------\n")
         calc = NOsh_getCalc(nosh, icalc)
         mgparm = calc.mgparm
@@ -419,7 +417,7 @@ def main():
     if nosh.nprint > 0:
         stdout.write("---------------------------------------------\n")
         stdout.write("PRINT STATEMENTS\n")
-    for iprint in xrange(nosh.nprint):
+    for iprint in range(nosh.nprint):
         if NOsh_printWhat(nosh, iprint) == NPT_ENERGY:
             printEnergy(com, nosh, totEnergy, iprint)
         elif NOsh_printWhat(nosh, iprint) == NPT_FORCE:
@@ -427,11 +425,11 @@ def main():
         elif NOsh_printWhat(nosh, iprint) == NPT_ELECENERGY:
             printElecEnergy(com, nosh, totEnergy, iprint)
         elif NOsh_printWhat(nosh, iprint) == NPT_ELECFORCE:
-            printElecForce(com, nosh, nforce, atomForce, iprint)
+            printElecForce(com, nosh, nforce, atomforce, iprint)
         elif NOsh_printWhat(nosh, iprint) == NPT_APOLENERGY:
             printApolEnergy(nosh, iprint)
         elif NOsh_printWhat(nosh, iprint) == NPT_APOLFORCE:
-            printApolForce(com, nosh, nforce, atomForce, iprint)
+            printApolForce(com, nosh, nforce, atomforce, iprint)
         else:
             stdout.write("Undefined PRINT keyword!\n")
             break
@@ -472,7 +470,7 @@ def main():
     stdout.write("Thanks for using APBS!\n\n")
 
     # Stop the main timer
-    main_timer_stop = time.clock()
+    main_timer_stop = time.perf_counter()
     stdout.write(
         "Total execution time:  %1.6e sec\n"
         % (main_timer_stop - main_timer_start)

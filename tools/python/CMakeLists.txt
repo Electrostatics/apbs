@@ -3,7 +3,7 @@ if (${CMAKE_VERSION} VERSION_GREATER "3.13")
 	CMAKE_POLICY(SET CMP0086 OLD)
 endif()
 
-FIND_PACKAGE(SWIG REQUIRED)
+FIND_PACKAGE(SWIG 4.0 REQUIRED)
 INCLUDE(${SWIG_USE_FILE})
 
 
@@ -36,18 +36,9 @@ endif(APPLE)
 
 SWIG_LINK_LIBRARIES(apbslib ${APBS_LIBS} ${APBS_INTERNAL_LIBS} ${Python3_LIBRARIES})
 
-if(WIN32)
-	add_custom_command(TARGET _apbslib POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E
-			copy ${CMAKE_CURRENT_BINARY_DIR}/apbslib.py ${CMAKE_SOURCE_DIR}/../pdb2pqr/pdb2pka
-		COMMAND ${CMAKE_COMMAND} -E
-			copy ${LIBRARY_OUTPUT_PATH}/$<CONFIG>/_apbslib.pyd ${CMAKE_SOURCE_DIR}/../pdb2pqr/pdb2pka
-		)
-else()
-	add_custom_command(TARGET _apbslib POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E
-			copy ${CMAKE_CURRENT_BINARY_DIR}/apbslib.py ${CMAKE_SOURCE_DIR}/../pdb2pqr/pdb2pka
-		COMMAND ${CMAKE_COMMAND} -E
-			copy ${LIBRARY_OUTPUT_PATH}/_apbslib${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_SOURCE_DIR}/../pdb2pqr/pdb2pka
-	)
-endif()
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/apbslib.py
+        DESTINATION lib
+        COMPONENT python)
+install(TARGETS ${SWIG_MODULE_apbslib_REAL_NAME}
+	LIBRARY DESTINATION lib COMPONENT python
+	RUNTIME DESTINATION lib COMPONENT python)

@@ -56,3 +56,70 @@ jobs:
           path: |
             coverage.txt
             coverage.xml
+
+  bindings:
+    name: Python bindings
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: "3.5"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            bison \
+            build-essential \
+            flex \
+            libboost-dev \
+            libeigen3-dev \
+            liblapack-dev \
+            libopenblas-serial-dev \
+            libreadline-dev \
+            libsuitesparse-dev \
+            swig
+          git clone --depth 1 https://github.com/Electrostatics/metis-fork.git /tmp/metis
+          cd /tmp/metis
+          make config prefix=/usr/local
+          sudo make install
+
+      - name: Configure Python bindings
+        run: |
+          cmake -S . -B build-bindings \
+            -DAPBS_STATIC_BUILD=OFF \
+            -DBLA_VENDOR=OpenBLAS \
+            -DBUILD_DOC=OFF \
+            -DBUILD_SHARED_LIBS=ON \
+            -DBUILD_TOOLS=ON \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$PWD/build-bindings/install" \
+            -DENABLE_BEM=OFF \
+            -DENABLE_GEOFLOW=OFF \
+            -DENABLE_iAPBS=OFF \
+            -DENABLE_PBAM=OFF \
+            -DENABLE_PBSAM=OFF \
+            -DENABLE_PYGBE=OFF \
+            -DENABLE_PYTHON=ON \
+            -DENABLE_TESTS=OFF \
+            -DGET_NanoShaper=OFF \
+            -DPYTHON_VERSION=3.14
+
+      - name: Build and install Python bindings
+        run: cmake --build build-bindings --parallel 2 --target install
+
+      - name: Test Python bindings
+        run: |
+          cd /tmp
+          PYTHONPATH="$GITHUB_WORKSPACE/build-bindings/install/lib" \
+            python "$GITHUB_WORKSPACE/tools/python/test_bindings.py"
