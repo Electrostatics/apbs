@@ -57,7 +57,7 @@ jobs:
     steps:
 
       - name: Checkout the repo 
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -124,7 +124,7 @@ jobs:
         uses: microsoft/setup-msbuild@v3
 
       - name: Checkout reposistory
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
