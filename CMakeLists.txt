@@ -626,6 +626,13 @@ if(ENABLE_PBAM OR ENABLE_PBSAM)
     )
     #add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
     FetchContent_MakeAvailable( pb_s_am )
+
+    if(ENABLE_PBAM)
+        target_link_libraries(PBAMLib mc)
+    endif()
+    if(ENABLE_PBSAM)
+        target_link_libraries(PBSAMLib mc)
+    endif()
 endif()
 
 if(ENABLE_PBAM)
