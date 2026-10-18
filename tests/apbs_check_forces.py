@@ -149,6 +149,10 @@ def extract_forces(force_class, lines, start_pattern):
             if not re.search(force_class.pattern, line_text):
                 end_line = line_number
                 break
+    if start_line < 0:
+        raise ValueError(f"No force results found after {start_pattern!r}")
+    if end_line < 0:
+        end_line = len(lines)
     return parse_forces(force_class, lines[start_line:end_line])
 
 
@@ -159,7 +163,13 @@ def parse_forces(force_class, lines):
     force_dict = {}
     for line in lines:
         force_item = force_class(line)
-        force_dict[force_item.label] = force_item
+        key = (
+            (force_item.label, force_item.atom)
+            if isinstance(force_item, ApolarForce) else force_item.label
+        )
+        if key in force_dict:
+            raise ValueError(f"Duplicate force result: {key}")
+        force_dict[key] = force_item
     return force_dict
 
 
@@ -168,6 +178,9 @@ def compare_force_dicts(test_force_dict, true_force_dict, logger):
     Compares force dictionaries
     """
 
+    if not true_force_dict or test_force_dict.keys() != true_force_dict.keys():
+        raise ValueError("Computed and reference force components differ")
+    failures = []
     for force_key in test_force_dict.keys():
         test_force = test_force_dict[force_key]
         true_force = true_force_dict[force_key]
@@ -210,6 +223,9 @@ def compare_force_dicts(test_force_dict, true_force_dict, logger):
                     f"Comparison {test_force.short()} in {diff_key} "
                     + f"FAILED ({test_value}; expected {true_value})"
                 )
+                failures.append(f"{force_key} {diff_key}")
+    if failures:
+        raise RuntimeError("Force mismatches: " + ", ".join(failures))
 
 
 def check_forces(input_file, polar_file, apolar_file, logger):
