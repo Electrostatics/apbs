@@ -42,6 +42,10 @@ The syntax is:
 
   ``atompot``
     Write out the electrostatic potential at each atom location in units of k\ :sub:`b` T e\ :sub:`c`\ :sup:`-1` (multigrid and finite element).
+    For multigrid calculations with ``flat`` output, values follow the atom order
+    of the molecule selected by ``mol``, regardless of its position in the
+    ``read`` block. Atoms outside the current calculation grid receive zero;
+    this is an out-of-grid marker, not a calculated potential.
   ``smol``
     Write out the solvent accessibility defined by the molecular surface definition (see :ref:`elecsrfm` ``smol``).
     Values are unitless and range from 0 (inaccessible) to 1 (accessible). (multigrid and finite element).
