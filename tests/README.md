@@ -28,6 +28,29 @@ centered spherical ion's polar force components against analytic zero using
 the existing absolute force tolerance of `1e-6` kJ/mol/Angstrom, and compares
 all apolar components against the unchanged `apolarforces` reference. It
 receives the exact built executable from CMake, without depending on `PATH`.
+It also runs the apolar and three finite-element Born inputs without changing
+their scientific settings. In temporary copies, finite-element output stems
+are prefixed with the calculation name so the solvent and vacuum-reference
+maps do not overwrite each other:
+
+* Apolar area is checked against `4*pi*r^2` at `1e-6` relative tolerance;
+  volume is checked against `4*pi*r^3/3` at 1% relative tolerance to allow
+  finite-grid integration error. Here `r=2` Angstrom because `parm.dat`
+  overrides the PQR radius; unit gamma/pressure make the printed energies
+  numerically equal to area/volume.
+* Finite-element energies use the historical APBS 1.4.1 results documented
+  in [the Born README](../examples/born/README.md), with the existing harness's
+  `1e-4` relative energy tolerance. The external-mesh input uses the same
+  molecular surface and cube domain as the internal-mesh calculation, so
+  it shares that historical reference, not a newly generated baseline.
+* Every solvent and reference finite-element output map must contain complete,
+  finite-valued vertex, tetrahedral-connectivity, and scalar arrays, with valid vertex
+  indices and one scalar per vertex. Accessibility must vary within [0, 1]
+  (allowing `1e-6` roundoff), and potential must be nonconstant. Internal-
+  and external-mesh energies and all map arrays must agree within `1e-6`
+  absolute tolerance. This checks mesh-read equivalence for this cube,
+  not general adaptive-mesh convergence or arbitrary OpenDX formats.
+
 The older group harness still needs that executable on `PATH` or supplied via
 `apbs_tester.py -e /absolute/path/to/apbs`.
 
@@ -47,8 +70,9 @@ There are 72 inputs, with 41 entries in 17 active configured groups across
 22 directories. Input counts are not assertion coverage: some files are
 templates/supporting inputs, and some groups are optional. The configured
 BEM-pKa filenames match exact case; the harness must preserve option case.
-The Born force input is covered separately by `born_regression_test`, bringing
-the total explicitly exercised input files to 42.
+The Born force, apolar, and three finite-element inputs are covered separately
+by `born_regression_test`, bringing the total explicitly exercised input files
+to 46.
 
 | Directory | Registered / tracked inputs | Remaining disposition |
 | --- | --- | --- |
@@ -58,7 +82,7 @@ the total explicitly exercised input files to 42.
 | bem | 2 / 4 | Both `1a63_NanoShaper_*` inputs need meshing/runtime validation (#213). |
 | bem-binding-energy | 3 / 3 | Optional BEM group registered. |
 | bem-pKa | 3 / 6 | ASP66 variants are unregistered; validate against documented reference calculations. |
-| born | 4 / 9, plus 1 regression | Apolar and three finite-element inputs unregistered; forces covered by the convergence-controlled regression. |
+| born | 4 / 9, plus 5 regression inputs | All nine inputs exercised; forces use the convergence-controlled regression. |
 | geoflow | 1 / 3 | `1a63.in` and `glycerol.in` need scientific baseline review. |
 | hca-bind | 2 / 2 | Registered. |
 | helix | 0 / 3 | Two templates and one dummy input; establish generation workflow before registration. |
@@ -100,7 +124,7 @@ Known limitations and follow-up (#314)
   tolerance), plus a stricter `1e-6` kJ/mol translation-invariance check.
 * Remaining work includes validating unregistered assets, expanding map and
   solver-specific assertions, and introducing documented slow/optional CI
-  lanes. This first tranche does not complete #314 or reinstate disabled tests.
+  lanes. The Born follow-up does not complete #314 or reinstate disabled tests.
 * Atom-potential work is paused separately on `fix/atom-potential-293`,
   commit `267fab0`; return to it after this harness work, reconciling any
   overlapping test-registration changes.
