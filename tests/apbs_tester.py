@@ -11,17 +11,19 @@ import pathlib
 import datetime
 import operator
 import subprocess
+import shutil
+import tempfile
 from optparse import OptionParser
 from configparser import ConfigParser, NoOptionError
 from functools import reduce
-from sys import executable
 from apbs_check_forces import check_forces
 from apbs_check_results import check_results
 from apbs_check_intermediate_energies import check_energies
 from apbs_logger import Logger
 
 # The inputgen utility needs to be accessible, so we add its path
-sys.path.insert(0, "../tools/manip")
+TOOLS = pathlib.Path(__file__).resolve().parents[1] / "tools/manip"
+sys.path.insert(0, str(TOOLS))
 from inputgen import split_input  # noqa E402
 
 SEARCH_PATH = os.environ.get("PATH").split(os.pathsep)
@@ -94,35 +96,33 @@ def test_binary(binary_name, logger):
         return ""
 
 
-def process_serial(binary, input_file):
+def process_serial(binary, input_file, timeout=600):
     """
     Runs the apbs binary on a given input file
     """
 
     # First extract the name of the input file's base name
-    base_name = input_file.split(".")[0]
+    base_name = str(pathlib.Path(input_file).with_suffix(""))
 
     # The output file should have the same basename
     output_name = f"{base_name}.out"
 
     # Ensure that there are sufficient permissions to write to the output file
-    output_file = open(output_name, "w")
-
     # Construct the system command and make the call
     command = [r"{}".format(binary), input_file]
     print(f"BINARY:  {binary}")
     print(f"INPUT:   {input_file}")
     print(f"COMMAND: {command}")
-    with subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-    ) as proc:
-        line = str(proc.stdout.read(), "utf-8")
-        sys.stdout.write(line)
-        output_file.write(line)
-
-    # Look for the results in the output file
-    output_file = open(output_name, "r")
-    output_text = output_file.read()
+    try:
+        with open(output_name, "w") as output_file:
+            process = subprocess.run(
+                command, stdout=output_file, stderr=subprocess.STDOUT,
+                timeout=timeout, check=False,
+            )
+    finally:
+        output_text = pathlib.Path(output_name).read_text()
+        sys.stdout.write(output_text)
+    process.check_returncode()
 
     # Look for intermidiate energy results
     output_results = check_energies(output_name)
@@ -138,7 +138,7 @@ def process_serial(binary, input_file):
     return output_results
 
 
-def process_parallel(binary, input_file, procs, logger):
+def process_parallel(binary, input_file, procs, logger, timeout=600):
     """
     Performs parallel apbs runs of the input file
     """
@@ -149,7 +149,7 @@ def process_parallel(binary, input_file, procs, logger):
     )
 
     # Get the base name, and split the input file using inputgen's split_input
-    base_name = input_file.split(".")[0]
+    base_name = str(pathlib.Path(input_file).with_suffix(""))
     split_input(input_file)
 
     results = None
@@ -157,7 +157,7 @@ def process_parallel(binary, input_file, procs, logger):
 
         # Process each paralle input file and capture the results from each
         proc_input_file = f"{base_name}-PE{proc}.in"
-        proc_results = process_serial(binary, proc_input_file)
+        proc_results = process_serial(binary, proc_input_file, timeout)
 
         # Log the results from each parallel run
         logger.message(f"Processor {proc} results:\n")
@@ -169,6 +169,11 @@ def process_parallel(binary, input_file, procs, logger):
         if results is None:
             results = proc_results
         else:
+            if len(results) != len(proc_results):
+                raise RuntimeError(
+                    f"Inconsistent result counts for {proc_input_file}: "
+                    f"{len(proc_results)} != {len(results)}"
+                )
             results = [r + p for (r, p) in zip(results, proc_results)]
 
     # Return the aggregated results from the parllel run
@@ -176,7 +181,26 @@ def process_parallel(binary, input_file, procs, logger):
 
 
 def run_test(
-    binary, test_files, test_name, test_directory, setup, logger, ocd
+    binary, test_files, test_name, test_directory, setup, logger, ocd,
+    timeout=600,
+):
+    source = pathlib.Path(test_directory).resolve()
+    binary = str(pathlib.Path(binary).resolve())
+    original_directory = pathlib.Path.cwd()
+    with tempfile.TemporaryDirectory(prefix="apbs-test-") as directory:
+        work = pathlib.Path(directory) / source.name
+        shutil.copytree(source, work)
+        try:
+            _run_test(
+                binary, test_files, test_name, work, setup, logger, ocd,
+                timeout,
+            )
+        finally:
+            os.chdir(original_directory)
+
+
+def _run_test(
+    binary, test_files, test_name, test_directory, setup, logger, ocd, timeout
 ):
     """
     Runs a given test from the test cases file
@@ -199,9 +223,9 @@ def run_test(
         if re.match("^python", setup, flags=re.IGNORECASE):
             call_args = [sys.executable, *setup.split()[1:]]
             print(call_args)
-            subprocess.call(call_args)
+            subprocess.run(call_args, check=True, timeout=timeout)
         else:
-            subprocess.call(setup.split())
+            subprocess.run(setup.split(), check=True, timeout=timeout)
 
     error_count = 0
 
@@ -218,12 +242,15 @@ def run_test(
         # top-level try-except to catch test errors
         try:
 
-            # If the expected results is 'forces', do a forces test on the input
             if expected_results == "forces":
                 logger.message(f"Testing forces from {input_file}\n\n")
                 logger.log(f"Testing forces from {input_file}\n")
                 start_time = datetime.datetime.now()
-                check_forces(input_file, "polarforces", "apolarforces", logger)
+                process_serial(binary, input_file, timeout)
+                check_forces(
+                    str(pathlib.Path(input_file).with_suffix(".out")),
+                    "polarforces", "apolarforces", logger,
+                )
             else:
                 logger.message(f"Testing input file {input_file}\n\n")
                 logger.log(f"Testing {input_file}\n")
@@ -235,20 +262,26 @@ def run_test(
                     r"\s*pdime((\s+\d+)+)", open(input_file, "r").read()
                 )
 
-                # If it is parallel, get the number of procs and do a parallel run
                 if match:
                     procs = reduce(
                         operator.mul, [int(p) for p in match.group(1).split()]
                     )
                     computed_results = process_parallel(
-                        binary, input_file, procs, logger
+                        binary, input_file, procs, logger, timeout
                     )
                 # Otherwise, just do a serial run
                 else:
-                    computed_results = process_serial(binary, input_file)
+                    computed_results = process_serial(
+                        binary, input_file, timeout
+                    )
 
                 # Split the expected results into a list of text values
                 expected_results = expected_results.split()
+                if len(computed_results) != len(expected_results):
+                    raise RuntimeError(
+                        f"{input_file}: expected {len(expected_results)} "
+                        f"results, got {len(computed_results)}"
+                    )
                 print(f"EXPECTED COMPUTED: {len(computed_results)}")
                 print(f"EXPECTED EXPECTED: {len(expected_results)}")
                 print(f"COMPUTED: {computed_results}")
@@ -256,7 +289,6 @@ def run_test(
                 for result in computed_results:
                     print(f"COMPUTED RESULT {result}")
                 for i in range(len(expected_results)):
-                    # If the expected result is a star, it means ignore that result
                     if expected_results[i] == "*":
                         continue
 
@@ -277,7 +309,8 @@ def run_test(
                         + f"{expected_result:.12e})\n"
                     )
                     check_results(
-                        computed_result, expected_result, input_file, logger, ocd
+                        computed_result, expected_result, input_file,
+                        logger, ocd,
                     )
         except Exception as error:
             error_count += 1
@@ -348,6 +381,13 @@ def main():
     )
 
     parser.add_option(
+        "--timeout",
+        type="int",
+        default=600,
+        help="Maximum seconds per APBS invocation/setup command (default 600)",
+    )
+
+    parser.add_option(
         "-o",
         "--ocd",
         action="store_true",
@@ -376,6 +416,8 @@ def main():
 
     # Parse the command line and extract option values
     (options, args) = parser.parse_args()
+    if options.timeout <= 0:
+        parser.error("--timeout must be positive")
 
     # Messages will go to stdout, log messages will go to the supplied log file
     message_fd = sys.stderr
@@ -443,8 +485,9 @@ def main():
                 test_setup,
                 logger,
                 options.ocd,
+                options.timeout,
             )
-        except RuntimeError as error:
+        except (RuntimeError, subprocess.SubprocessError) as error:
             logger.message(f"Some tests failed:  {error}\n")
             logger.log(f"Some tests failed:  {error}\n")
             return 1
