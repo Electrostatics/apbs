@@ -104,6 +104,12 @@ to 46.
 Known limitations and follow-up (#314)
 -------------------------------------
 
+The FETK dependency is pinned to merge commit
+`6f22d337bdfac8054a399932102e91cc1e688cad`, which fixes Windows integer overflow
+in mesh-edge tie-breaking (Electrostatics/FETK#75). The finite-element Born
+checks exposed this defect; their historical references and tolerances were
+not changed to accommodate it.
+
 * The old force branch compared the input file instead of executing APBS;
   empty force dictionaries and numerical mismatches could pass silently.
   Correct execution revealed a Born polar-force mismatch against the historical
