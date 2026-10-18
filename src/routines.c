@@ -2627,6 +2627,7 @@ VPUBLIC int writedataMG(int rank,
     char outpath[VMAX_ARGLEN];
     char title[72];
     int i,
+        iatom,
         nx,
         ny,
         nz,
@@ -2980,9 +2981,11 @@ uniform meshes yet!\n");
             Vio_printf(sock, "# \n");
             Vio_printf(sock, "# %s\n", title);
             Vio_printf(sock, "# \n");
-            natoms = pmg->pbe->alist[pbeparm->molid - 1].number;
-            for (i = 0; i < natoms; i++)
-                Vio_printf(sock, "%12.6e\n", pmg->rwork[i]);
+            natoms = Valist_getNumberAtoms(pmg->pbe->alist);
+            for (iatom = 0; iatom < natoms; iatom++)
+                Vio_printf(sock, "%12.6e\n", pmg->rwork[iatom]);
+            Vio_connectFree(sock);
+            Vio_dtor(&sock);
             break;
         default:
             Vnm_tprint(2, "Bogus data format (%d)!\n",

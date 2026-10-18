@@ -54,6 +54,17 @@ maps do not overwrite each other:
 The older group harness still needs that executable on `PATH` or supplied via
 `apbs_tester.py -e /absolute/path/to/apbs`.
 
+The independently registered `atom_potentials_test` also receives the exact
+built executable. It checks multigrid atom-potential output for molecules
+selected in different read orders, successive selections of three molecules,
+manual/automatic grids, multiple write directives, and all six exact/outside
+grid faces. Interior values are checked against independent trilinear
+interpolation of the same calculation's OpenDX potential map, accounting for
+the text output precision. Out-of-grid zeros are markers, not calculated
+potentials. The suite covers the reproduced #288 molecule-selection defect
+and #246 boundary indexing defect; it does not establish that the original
+#293 Ubuntu crash or #246 focusing-convergence question is resolved.
+
 Example groups run in temporary copies of their input directories. Inputs and
 reference values in the source tree are not overwritten. APBS output is emitted
 to the test log, including on executable failure or timeout. Temporary copies
@@ -133,6 +144,3 @@ not changed to accommodate it.
 * Remaining work includes validating unregistered assets, expanding map and
   solver-specific assertions, and introducing documented slow/optional CI
   lanes. The Born follow-up does not complete #314 or reinstate disabled tests.
-* Atom-potential work is paused separately on `fix/atom-potential-293`,
-  commit `267fab0`; return to it after this harness work, reconciling any
-  overlapping test-registration changes.

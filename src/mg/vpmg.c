@@ -955,10 +955,10 @@ VPUBLIC int Vpmg_fillArray(Vpmg *thee, double *vec, Vdata_Type type,
 
         case VDT_ATOMPOT:
             alist = thee->pbe->alist;
-            atoms = alist[pbeparm->molid-1].atoms;
+            atoms = Valist_getAtomList(alist);
             grid = Vgrid_ctor(nx, ny, nz, hx, hy,
                               hzed, xmin, ymin, zmin,thee->u);
-            for (i=0; i<alist[pbeparm->molid-1].number;i++) {
+            for (i=0; i<Valist_getNumberAtoms(alist);i++) {
                 position[0] = atoms[i].position[0];
                 position[1] = atoms[i].position[1];
                 position[2] = atoms[i].position[2];
