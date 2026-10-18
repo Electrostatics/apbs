@@ -15,7 +15,12 @@ set(TESTS_CFG_FILE ${CMAKE_SOURCE_DIR}/tests/test_cases.cfg)
 add_test(NAME atom_potentials_test
     COMMAND ${Python3_EXECUTABLE}
         ${CMAKE_CURRENT_SOURCE_DIR}/test_atom_potentials.py $<TARGET_FILE:apbs>)
-set_tests_properties(atom_potentials_test PROPERTIES TIMEOUT 180)
+set_tests_properties(atom_potentials_test PROPERTIES TIMEOUT 180 LABELS regression)
+
+add_test(NAME born_regression_test
+    COMMAND ${Python3_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_born_regression.py $<TARGET_FILE:apbs>)
+set_tests_properties(born_regression_test PROPERTIES TIMEOUT 300 LABELS regression)
 
 if(EXISTS ${TESTS_CFG_FILE})
     file(READ ${TESTS_CFG_FILE} TEST_CASES_FILE)

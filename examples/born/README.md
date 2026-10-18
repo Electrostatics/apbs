@@ -79,8 +79,17 @@ Input File|Description|APBS Version|Results (kJ/mol)|Analytical (kJ/mol)
 |||0.2.2|-226.2276
 |||0.2.0|-226.228
 |||0.1.8|-226.23
-[apbs-smol-parallel.in](apbs-mol-fem.in)|Finite Element Method, 3 A sphere, 3-level focusing to 0.188 A, srfm mol|**1.4.1-binary**|**-231.9550**|-230.62
-[apbs-smol-parallel.in](apbs-smol-fem.in)|Finite Element Method, 3 A sphere, 3-level focusing to 0.188 A, srfm smol|**1.4.1-binary**|**-230.9760**|-230.62
+[apbs-mol-fem.in](apbs-mol-fem.in)|Finite Element Method, 3 A sphere, srfm mol|**1.4.1-binary**|**-231.9550**|-230.62
+[apbs-smol-fem.in](apbs-smol-fem.in)|Finite Element Method, 3 A sphere, srfm smol|**1.4.1-binary**|**-230.9760**|-230.62
+
+The native `born_regression_test` checks both finite-element energies against
+these historical results. It also runs
+[apbs-mol-fem-extmesh.in](apbs-mol-fem-extmesh.in) with the supplied cube
+[mesh.m](mesh.m), checking energy and map equivalence to the internal mesh.
+[apbs-apolar.in](apbs-apolar.in) is checked against the analytic area and volume
+of a 2 Angstrom sphere: [parm.dat](parm.dat) overrides the PQR radius for this
+input. See [test documentation](../../tests/README.md) for tolerances and
+structural assertions. No scientific input or reference file is rewritten.
 
 <a name=1></a><sup>1</sup> The discrepancy in values between versions 0.4.0 and 0.3.2 is most likely due to three factors:
 
@@ -99,5 +108,4 @@ Input File|Description|APBS Version|Results (kJ/mol)|Analytical (kJ/mol)
 <a name=4></a><sup>4</sup> The discrepancy in the result between versions 1.4 and 1.4.1-binary is most likely due to a reporting error.
 
 Please see the ChangeLog or the [APBS website](http://www.poissonboltzmann.org/) for more information.
-
 
