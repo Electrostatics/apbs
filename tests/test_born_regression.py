@@ -48,6 +48,8 @@ class BornRegressionTests(unittest.TestCase):
                 [APBS, name + ".in"], cwd=work, capture_output=True,
                 text=True, timeout=180,
             )
+            print(f"\n=== {name} ===\n{process.stdout}{process.stderr}",
+                  flush=True)
             self.assertEqual(
                 process.returncode, 0, process.stdout + process.stderr
             )
@@ -95,6 +97,12 @@ class BornRegressionTests(unittest.TestCase):
                     for value in arrays[2][2]
                 ), path.name)
                 maps[path.name] = arrays
+                print(
+                    f"{path.name}: vertices={arrays[1][0]}, "
+                    f"tetrahedra={arrays[2][0]}, "
+                    f"range=[{min(arrays[3][2])}, {max(arrays[3][2])}]",
+                    flush=True,
+                )
             return energies, maps
 
     def test_apolar_sphere_area_and_volume(self):

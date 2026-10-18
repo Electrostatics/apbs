@@ -61,6 +61,8 @@ are removed after the group finishes. Use CTest's output-on-failure option to
 view failures. `apbs_tester.py --timeout SECONDS` controls the per-invocation
 and setup-command limit (default: 600 seconds). Increase it explicitly for slow
 cases; a timeout is a failure, not a skip.
+The extracted Born example checks also emit solver output and finite-element
+map sizes/ranges, so numerical failures retain mesh and convergence diagnostics.
 
 Coverage inventory
 ------------------
