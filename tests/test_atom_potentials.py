@@ -8,6 +8,11 @@ import tempfile
 import unittest
 
 
+APBS = None
+
+
+@unittest.skipIf(APBS is None and __name__ != "__main__",
+                 "Use CTest to supply the built APBS executable")
 class AtomPotentialTests(unittest.TestCase):
     def check_grid_values(self, path, positions, values):
         lines = path.read_text().splitlines()
