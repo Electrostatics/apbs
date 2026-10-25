@@ -622,10 +622,19 @@ if(ENABLE_PBAM OR ENABLE_PBSAM)
 
     FetchContent_Declare( pb_s_am
         GIT_REPOSITORY https://github.com/Electrostatics/pb_solvers.git
-        GIT_TAG d3ba994d7ec2b2cad5b3e843784c7cb9f41ace37
+        GIT_TAG bb9298fbf618703c1a379c39796f29e7eafe431b
     )
     #add_subdirectory(${EXTERNALS_PATH}/pb_s_am)
     FetchContent_MakeAvailable( pb_s_am )
+
+    # The pb_solvers APBS wrappers include APBS headers that need FETK headers.
+    if(TARGET mc)
+        foreach(_pb_lib PBAMLib PBSAMLib)
+            if(TARGET ${_pb_lib})
+                target_link_libraries(${_pb_lib} mc)
+            endif()
+        endforeach()
+    endif()
 endif()
 
 if(ENABLE_PBAM)
