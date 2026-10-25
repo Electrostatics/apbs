@@ -13,6 +13,9 @@ Minor Updates
 * Added `Spack <https://spack.io/>`_` configuration file to ``tools/spack`` directory.  See `#191 <https://github.com/Electrostatics/apbs/issues/191>_` for more information.
 * Changed Docker builds to use Git-based METIS source code.
 * Updated containers to Ubuntu 22.04.
+* Updated the pinned FETK revision to include TEC export buffer fixes and
+  bundled TetGen allocation-size validation. CMake, CI, and container defaults
+  use the same revision.
 
 ---------------------
 APBS 3.4.1 (Apr 2022)
@@ -1008,4 +1011,3 @@ Once there, please follow the instructions to download and install APBS.
 If you are not interested in trying out this early release, but would like to stay informed about subsequent versions of APBS, please consider subscribing to the APBS announcements mailing list by sending the message "subscribe apbs-announce" to majordomo@mccammon.ucsd.edu.
 
 Thank you for your time and interest in the APBS software.
-

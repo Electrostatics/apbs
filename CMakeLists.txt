@@ -166,7 +166,7 @@ message(STATUS "")
 # FETK is currently required, and therefore this option is disabled
 #option(ENABLE_FETK "Enable the finite element solver" ON)
 
-set(FETK_VERSION "6f22d337bdfac8054a399932102e91cc1e688cad" CACHE STRING "Version of FETK to use")
+set(FETK_VERSION "9e803a3893ae267b8e0a5a2a3aaf49e0845ccc25" CACHE STRING "Version of FETK to use")
 include(ImportFETK)
 import_fetk(${FETK_VERSION})
 
