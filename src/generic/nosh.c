@@ -3148,13 +3148,15 @@ VPUBLIC int NOsh_parsePBAM(
     }
 
 	//This is also a hacky fix for issue 488
-	if (pbeparm->writefmt[pbeparm->numwrite - 1] == VDF_DX) {
-		strncpy(parm->dxname, pbeparm->writestem[pbeparm->numwrite -1], CHR_MAXLEN);
-		parm->setdxname = 1;
-	}
-	else {
-		Vnm_print(2, "NOsh: PBAM only prints in dx format!\n");
-		return 0;
+	if (pbeparm->numwrite > 0) {
+		if (pbeparm->writefmt[pbeparm->numwrite - 1] == VDF_DX) {
+			strncpy(parm->dxname, pbeparm->writestem[pbeparm->numwrite - 1], CHR_MAXLEN);
+			parm->setdxname = 1;
+		}
+		else {
+			Vnm_print(2, "NOsh: PBAM only prints in dx format!\n");
+			return 0;
+		}
 	}
 
 	//Another hacky fix for issue 482
@@ -3277,13 +3279,15 @@ VPUBLIC int NOsh_parsePBSAM(
 	}
 
 	//This is also a hacky fix for issue 488
-	if (pbeparm->writefmt[pbeparm->numwrite - 1] == VDF_DX) {
-		strncpy(parm->dxname, pbeparm->writestem[pbeparm->numwrite - 1], CHR_MAXLEN);
-		parm->setdxname = 1;
-	}
-	else {
-		Vnm_print(2, "NOsh: PBSAM only prints in dx format!\n");
-		return 0;
+	if (pbeparm->numwrite > 0) {
+		if (pbeparm->writefmt[pbeparm->numwrite - 1] == VDF_DX) {
+			strncpy(parm->dxname, pbeparm->writestem[pbeparm->numwrite - 1], CHR_MAXLEN);
+			parm->setdxname = 1;
+		}
+		else {
+			Vnm_print(2, "NOsh: PBSAM only prints in dx format!\n");
+			return 0;
+		}
 	}
 
 

@@ -22,7 +22,8 @@ Minor Updates
   concentrations, replaced the obsolete ``pbsam-auto`` keyword with ``pbsam``,
   and updated the PBSAM reference energies for the solvent-dielectric energy
   scaling introduced in pb_solvers in 2017. A PR-triggered CI job now builds
-  and tests PBAM and PBSAM. See
+  and tests PBAM and PBSAM. Fixed an out-of-bounds read when PBAM or PBSAM
+  inputs have no ``write`` statement. See
   `#321 <https://github.com/Electrostatics/apbs/issues/321>`_.
 
 ---------------------
