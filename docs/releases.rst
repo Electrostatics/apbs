@@ -16,6 +16,8 @@ Minor Updates
 * Updated the pinned FETK revision to include TEC export buffer fixes and
   bundled TetGen allocation-size validation. CMake, CI, and container defaults
   use the same revision.
+* Updated the pinned pb_solvers revision to include container-size overflow
+  fixes, and fixed PBAM/PBSAM builds that use a source-built FETK.
 
 ---------------------
 APBS 3.4.1 (Apr 2022)
