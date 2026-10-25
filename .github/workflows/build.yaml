@@ -39,6 +39,68 @@ env:
 
 jobs:
 
+  pb-solvers:
+    name: Build and Test PBAM/PBSAM
+
+    runs-on: ubuntu-22.04
+
+    if: "!contains(github.event.head_commit.message, 'noci')"
+
+    env:
+      BLA_VENDOR: OpenBLAS
+      BUILD_DOC: OFF
+      BUILD_TOOLS: OFF
+      ENABLE_PYGBE: OFF
+      ENABLE_BEM: OFF
+      ENABLE_GEOFLOW: OFF
+      ENABLE_iAPBS: OFF
+      ENABLE_PBAM: ON
+      ENABLE_PBSAM: ON
+      GET_NanoShaper: OFF
+      PYTHON_VERSION: "3.10"
+      INSTALL_DIR: "./"
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install prerequisites
+        run: |
+          for apt_file in `grep -lr microsoft /etc/apt/sources.list.d/`; do sudo rm $apt_file; done
+          sudo apt-get install -yq \
+            build-essential \
+            bison \
+            flex \
+            swig \
+            libreadline-dev \
+            libeigen3-dev \
+            libboost-dev \
+            libopenblas-serial-dev \
+            libarpack2-dev \
+            liblapack-dev \
+            libsuitesparse-dev
+          git clone https://github.com/Electrostatics/metis-fork.git metis-5.1.0
+          cd metis-5.1.0
+          make config prefix=/usr/local
+          sudo make install
+
+      - name: Configure and build
+        run: ./.build.sh
+
+      - name: Run PBAM and PBSAM tests
+        run: |
+          cd build
+          export PATH=$(pwd)/bin:$PATH
+          ctest -C ${RELEASE_TYPE} -R "^(pbam|pbsam)_test$" --no-tests=error --output-on-failure
+
   build:
     name: Compile Code
 
