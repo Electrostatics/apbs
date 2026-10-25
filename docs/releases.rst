@@ -23,7 +23,8 @@ Minor Updates
   and updated the PBSAM reference energies for the solvent-dielectric energy
   scaling introduced in pb_solvers in 2017. A PR-triggered CI job now builds
   and tests PBAM and PBSAM. Fixed an out-of-bounds read when PBAM or PBSAM
-  inputs have no ``write`` statement. See
+  inputs have no ``write`` statement. Updated the pinned pb_solvers revision to fix a heap
+  overflow that corrupted PBSAM results. See
   `#321 <https://github.com/Electrostatics/apbs/issues/321>`_.
 
 ---------------------
