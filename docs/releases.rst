@@ -26,6 +26,9 @@ Minor Updates
   inputs have no ``write`` statement. Updated the pinned pb_solvers revision to fix a heap
   overflow and an OpenBLAS matrix-multiply no-op that corrupted PBSAM results. See
   `#321 <https://github.com/Electrostatics/apbs/issues/321>`_.
+* Fixed PBSAM input setup: the PBAM parameters passed to PBSAM are now fully
+  initialized, the default grid-point count is always used, and PBSAM ``surf``
+  files are no longer ignored.
 
 ---------------------
 APBS 3.4.1 (Apr 2022)

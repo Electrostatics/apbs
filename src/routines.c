@@ -5864,7 +5864,7 @@ VPUBLIC int solvePBSAM(Valist *molecules[NOSH_MAXMOL],
     int i, j, k, ierr;
     Vnm_tstart(APBS_TIMER_SOLVER, "Solver timer");
     PBSAMInput pbsamIn = getPBSAMParams();
-    PBAMInput pbamIn; // = getPBAMParams();
+    PBAMInput pbamIn = {0};
 
     pbamIn.nmol_ = nosh->nmol;
 
@@ -5896,8 +5896,7 @@ VPUBLIC int solvePBSAM(Valist *molecules[NOSH_MAXMOL],
     pbamIn.pbcType_ = parm->setpbcs;
 
     // Electrostatic stuff
-    if (parm->setgridpt)
-        pbamIn.gridPts_ = parm->gridpt;
+    pbamIn.gridPts_ = parm->gridpt;
     strncpy(pbamIn.map3D_, parm->map3dname, CHR_MAXLEN);
     pbamIn.grid2Dct_ = parm->grid2Dct;
     for (i = 0; i < pbamIn.grid2Dct_; i++)
@@ -5960,6 +5959,7 @@ VPUBLIC int solvePBSAM(Valist *molecules[NOSH_MAXMOL],
     }
 
     // SAM details
+    pbsamIn.surfct_ = samparm->surfct;
     pbsamIn.tolsp_ = samparm->tolsp;
     pbsamIn.imatct_ = samparm->imatct;
     pbsamIn.expct_ = samparm->expct;
