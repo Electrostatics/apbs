@@ -29,6 +29,12 @@ Minor Updates
 * Fixed PBSAM input setup: the PBAM parameters passed to PBSAM are now fully
   initialized, the default grid-point count is always used, and PBSAM ``surf``
   files are no longer ignored.
+* Fixed ``psize.py`` failing with a ``TypeError`` when the memory ceiling forced
+  a parallel decomposition, and kept the reduced grid dimensions integral. See
+  `#62 <https://github.com/Electrostatics/apbs/issues/62>`_ and
+  `#290 <https://github.com/Electrostatics/apbs/issues/290>`_.
+* The Python package version is now read from the ``VERSION`` file used by
+  CMake. See `#234 <https://github.com/Electrostatics/apbs/issues/234>`_.
 
 ---------------------
 APBS 3.4.1 (Apr 2022)

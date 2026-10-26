@@ -1,13 +1,11 @@
 """Set up the APBS package."""
+from runpy import run_path
 from sys import version_info
 from setuptools import find_packages, setup
 
-# NOTE: The following reads the version number and makes
-#       if available to the packaging tools before installation.
-#       REF: https://stackoverflow.com/questions/458550/standard-way-to-embed-version-into-python-package  # noqa: E501
-#       This makes __version__ valid below
-with open("apbs/_version.py") as fobj:
-    exec(fobj.read())
+# NOTE: Read the version from the VERSION file shared with CMake without
+#       importing the apbs package or its dependencies.
+__version__ = run_path("apbs/_version.py")["read_version_file"]()
 
 # NOTE: The reason for version 3.7 vs. 3.8 is that ReadTheDocs
 #       is running version 3.7 so setting this to 3.8 causes
@@ -20,7 +18,7 @@ with open("README.md", "r") as fobj:
 
 setup(
     name="apbs",
-    version=__version__,  # noqa: F821
+    version=__version__,
     description="APBS biomolecular solvation software",
     long_description=LONG_DESCRIPTION,
     python_requires=">=3.7",
