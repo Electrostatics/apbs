@@ -35,6 +35,11 @@ Minor Updates
   `#290 <https://github.com/Electrostatics/apbs/issues/290>`_.
 * The Python package version is now read from the ``VERSION`` file used by
   CMake. See `#234 <https://github.com/Electrostatics/apbs/issues/234>`_.
+* Linux and macOS release binaries include PBAM and PBSAM again; Windows
+  binaries do not. Release builds now also include an Apple Silicon (arm64)
+  macOS package, and macOS package names include the architecture
+  (``Darwin-x86_64`` or ``Darwin-arm64``). See
+  `#289 <https://github.com/Electrostatics/apbs/issues/289>`_.
 
 ---------------------
 APBS 3.4.1 (Apr 2022)

@@ -121,28 +121,43 @@ jobs:
             bla-vendor: OpenBLAS
             create-package: true
             architecture: x64
+            pb-solvers: ON
           - platform: macos
             os: macos-15-intel
             bla-vendor: Apple
             create-package: true
             architecture: x64
+            pb-solvers: ON
+          - platform: macos-arm64
+            os: macos-15
+            openmp: OFF
+            static-build: ON
+            python-version: "3.10"
+            bla-vendor: Apple
+            create-package: true
+            architecture: arm64
+            pb-solvers: ON
           - platform: windows
             os: windows-2022
             bla-vendor: OpenBLAS
             create-package: true
             architecture: x86
+            pb-solvers: OFF
 
     env:
       BLA_VENDOR: ${{ matrix.bla-vendor }}
       ENABLE_OPENMP: ${{ matrix.openmp }}
       APBS_STATIC_BUILD: ${{matrix.static-build }}
       PYTHON_VERSION: "${{ matrix.python-version }}"
+      ENABLE_PBAM: ${{ matrix.pb-solvers }}
+      ENABLE_PBSAM: ${{ matrix.pb-solvers }}
 
     outputs:
       apbs-version: ${{ steps.extract-version.outputs.apbs-version }}
       apbs-tag: ${{ steps.extract-version.outputs.apbs-tag }}
       cpack-out-lin-zip: ${{ steps.cpack-ml.outputs.cpack-out-ubuntu-zip }}
       cpack-out-mac-zip: ${{ steps.cpack-ml.outputs.cpack-out-macos-zip }}
+      cpack-out-mac-arm64-zip: ${{ steps.cpack-ml.outputs.cpack-out-macos-arm64-zip }}
       cpack-out-win-zip: ${{ steps.cpack-w.outputs.cpack-out-windows-zip }}
 
     steps:
@@ -180,12 +195,13 @@ jobs:
             swig \
             boost \
             eigen \
+            gcc \
             lapack \
             suite-sparse
           git clone https://github.com/Electrostatics/metis-fork.git metis-5.1.0
           cd metis-5.1.0
           make config prefix=/usr/local
-          make install
+          sudo make install
           cd ..
           git clone https://github.com/opencollab/arpack-ng.git
           cd arpack-ng
@@ -193,7 +209,7 @@ jobs:
           git checkout tags/3.8.0 -b latest
           mkdir build && cd build
           cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release -DCMAKE_Fortran_COMPILER=$(which gfortran) -DEXAMPLES=OFF -DMPI=OFF -DBUILD_SHARED_LIBS=OFF  ..
-          make install
+          sudo make install
 #          brew upgrade gcc@9
 
       - name: Linux Prereqs and Remove broken apt repos [Ubuntu]
@@ -338,7 +354,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cpack: [lin-zip, mac-zip, win-zip]
+        cpack: [lin-zip, mac-zip, mac-arm64-zip, win-zip]
         python-version: ["3.10"]
         include:
           - cpack: lin-zip
@@ -349,6 +365,10 @@ jobs:
             os: macos-15-intel
             package_file: ${{ needs.build.outputs.cpack-out-mac-zip }}
             architecture: x64
+          - cpack: mac-arm64-zip
+            os: macos-15
+            package_file: ${{ needs.build.outputs.cpack-out-mac-arm64-zip }}
+            architecture: arm64
           - cpack: win-zip
             os: windows-2022
             package_file: ${{ needs.build.outputs.cpack-out-win-zip }}
@@ -468,8 +488,8 @@ jobs:
       - name: Verify release artifacts
         run: |
           artifact_count="$(find release-artifacts -maxdepth 1 -name 'APBS-*.zip' | wc -l | tr -d ' ')"
-          if [[ "${artifact_count}" != "3" ]]; then
-            echo "Expected 3 release ZIP files, found ${artifact_count}." >&2
+          if [[ "${artifact_count}" != "4" ]]; then
+            echo "Expected 4 release ZIP files, found ${artifact_count}." >&2
             find release-artifacts -maxdepth 2 -type f -print
             exit 1
           fi
