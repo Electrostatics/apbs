@@ -18,6 +18,14 @@ Minor Updates
   use the same revision.
 * Updated the pinned pb_solvers revision to include container-size overflow
   fixes, and fixed PBAM/PBSAM builds that use a source-built FETK.
+* Fixed the PBAM and PBSAM regression examples: restored their salt
+  concentrations, replaced the obsolete ``pbsam-auto`` keyword with ``pbsam``,
+  and updated the PBSAM reference energies for the solvent-dielectric energy
+  scaling introduced in pb_solvers in 2017. A PR-triggered CI job now builds
+  and tests PBAM and PBSAM. Fixed an out-of-bounds read when PBAM or PBSAM
+  inputs have no ``write`` statement. Updated the pinned pb_solvers revision to fix a heap
+  overflow and an OpenBLAS matrix-multiply no-op that corrupted PBSAM results. See
+  `#321 <https://github.com/Electrostatics/apbs/issues/321>`_.
 
 ---------------------
 APBS 3.4.1 (Apr 2022)
