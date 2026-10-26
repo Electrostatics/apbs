@@ -146,6 +146,8 @@ jobs:
             create-package: true
             architecture: x86
             pb-solvers: OFF
+            # PyGBe would make apbs.exe import an unbundled pythonXY.dll.
+            pygbe: OFF
 
     env:
       BLA_VENDOR: ${{ matrix.bla-vendor }}
@@ -379,13 +381,6 @@ jobs:
             architecture: x86
 
     steps:
-
-      - name: Set up Python
-        if: startsWith(matrix.os, 'windows') # Windows only (no static python libs in windows)
-        uses: actions/setup-python@v7
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: ${{ matrix.architecture }}
 
 #      - name: Linux Prereqs
 #        if: startsWith(matrix.os, 'ubuntu')  # Linux only

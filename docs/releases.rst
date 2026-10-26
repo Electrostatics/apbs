@@ -41,6 +41,9 @@ Minor Updates
   (``Darwin-x86_64`` or ``Darwin-arm64``). The Apple Silicon package does not
   include PyGBe support. See
   `#289 <https://github.com/Electrostatics/apbs/issues/289>`_.
+* The Windows release package no longer requires a separately installed Python
+  DLL (for example, ``python39.dll``) to start; it no longer includes PyGBe
+  support. See `#301 <https://github.com/Electrostatics/apbs/issues/301>`_.
 
 ---------------------
 APBS 3.4.1 (Apr 2022)
