@@ -946,7 +946,12 @@ set(CPACK_PACKAGE_VERSION_PATCH        "${CMAKE_MICRO_VERSION}")
 # set(FULL_PACKAGE_NAME                  "${PACKAGE_NAME}-${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_VERSION}")
 set(CPACK_PACKAGE_VENDOR               "PNNL")
 set(CPACK_PACKAGE_CONTACT              "APBS - https://github.com/Electrostatics/apbs")
-set(CPACK_PACKAGE_FILE_NAME            "${PACKAGE_NAME}-${APBS_VERSION}.${CMAKE_HOST_SYSTEM_NAME}")
+set(APBS_PACKAGE_SYSTEM_NAME           "${CMAKE_HOST_SYSTEM_NAME}")
+if(APPLE)
+    # Distinguish Intel and Apple Silicon macOS packages.
+    string(APPEND APBS_PACKAGE_SYSTEM_NAME "-${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+set(CPACK_PACKAGE_FILE_NAME            "${PACKAGE_NAME}-${APBS_VERSION}.${APBS_PACKAGE_SYSTEM_NAME}")
 set(CPACK_STRIP_FILES                   True)
 
 list(APPEND CPACK_GENERATOR            "ZIP")
