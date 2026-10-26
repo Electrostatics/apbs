@@ -31,7 +31,7 @@ header="APBS[[:space:]]${version}"
 
 foundTitle=false
 foundFirstHyphens=false
-while read line; do
+while IFS= read -r line; do
     if [ "$foundTitle" == false ]; then
         if [[ "$line" =~ ^${header} ]]; then
             foundTitle=true
