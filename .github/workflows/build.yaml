@@ -102,7 +102,7 @@ jobs:
           ctest -C ${RELEASE_TYPE} -R "^(pbam|pbsam)_test$" --no-tests=error --output-on-failure
 
   build:
-    name: Compile Code
+    name: Compile Code (${{ matrix.platform }}, ${{ matrix.openmp }}, ${{ matrix.static-build }}, ${{ matrix.python-version }})
 
     runs-on: ${{ matrix.os }}
 
@@ -137,6 +137,9 @@ jobs:
             create-package: true
             architecture: arm64
             pb-solvers: ON
+            # No static libpython is available on arm64 runners, and the
+            # framework fallback makes the binary depend on the runner Python.
+            pygbe: OFF
           - platform: windows
             os: windows-2022
             bla-vendor: OpenBLAS
@@ -151,6 +154,7 @@ jobs:
       PYTHON_VERSION: "${{ matrix.python-version }}"
       ENABLE_PBAM: ${{ matrix.pb-solvers }}
       ENABLE_PBSAM: ${{ matrix.pb-solvers }}
+      ENABLE_PYGBE: ${{ matrix.pygbe || 'ON' }}
 
     outputs:
       apbs-version: ${{ steps.extract-version.outputs.apbs-version }}

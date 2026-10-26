@@ -38,7 +38,8 @@ Minor Updates
 * Linux and macOS release binaries include PBAM and PBSAM again; Windows
   binaries do not. Release builds now also include an Apple Silicon (arm64)
   macOS package, and macOS package names include the architecture
-  (``Darwin-x86_64`` or ``Darwin-arm64``). See
+  (``Darwin-x86_64`` or ``Darwin-arm64``). The Apple Silicon package does not
+  include PyGBe support. See
   `#289 <https://github.com/Electrostatics/apbs/issues/289>`_.
 
 ---------------------
