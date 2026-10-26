@@ -471,7 +471,7 @@ jobs:
         uses: docker://pandoc/core:2.16.2
         with:
           args: >-
-            --standalone
+            --shift-heading-level-by=1
             --from rst
             --to markdown
             --output=this_release.md
