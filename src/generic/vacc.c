@@ -75,11 +75,12 @@ VPUBLIC unsigned long int Vacc_memChk(Vacc *thee) {
  *          otherwise
  * @author  Nathan Baker
  */
-VPRIVATE int ivdwAccExclus(
+VPRIVATE int ivdwAccExclusCache(
                            Vacc *thee,  /** Accessibility object */
                            double center[3],  /** Position to test */
                            double radius,  /** Radius of probe */
-                           int atomID  /** ID of atom to ignore */
+                           int atomID,  /** ID of atom to ignore */
+                           Vatom **last_hit  /** Cached occluding neighbor */
                            ) {
 
     int iatom;
@@ -96,6 +97,17 @@ VPRIVATE int ivdwAccExclus(
                   "Vacc_ivdwAcc: got radius (%g) bigger than max radius (%g)\n",
                   radius, Vclist_maxRadius(thee->clist));
         VASSERT(0);
+    }
+
+    /* Re-test last occluding neighbor (stored only for id != atomID) */
+    if (last_hit != VNULL && *last_hit != VNULL) {
+        atom = *last_hit;
+        apos = atom->position;
+        dist2 = VSQR(center[0]-apos[0]) + VSQR(center[1]-apos[1])
+                        + VSQR(center[2]-apos[2]);
+        if (dist2 < VSQR(atom->radius+radius)) {
+            return 0;
+        }
     }
 
     /* Get the relevant cell from the cell list */
@@ -118,6 +130,7 @@ VPRIVATE int ivdwAccExclus(
         dist2 = VSQR(center[0]-apos[0]) + VSQR(center[1]-apos[1])
                         + VSQR(center[2]-apos[2]);
         if (dist2 < VSQR(atom->radius+radius)){
+            if (last_hit != VNULL) *last_hit = atom;
             return 0;
         }
     }
@@ -125,6 +138,11 @@ VPRIVATE int ivdwAccExclus(
     /* If we're still here, then the point is accessible */
     return 1;
 
+}
+
+VPRIVATE int ivdwAccExclus(Vacc *thee, double center[3], double radius,
+                           int atomID) {
+    return ivdwAccExclusCache(thee, center, radius, atomID, VNULL);
 }
 
 VPUBLIC Vacc* Vacc_ctor(Valist *alist,
@@ -870,6 +888,7 @@ VPUBLIC VaccSurf* Vacc_atomSurf(Vacc *thee, Vatom *atom,
 	size_t i, j, npts;
     int atomID;
     double arad, rad, pos[3], *apos;
+    Vatom *last_hit = VNULL;
 
     /* Get atom information */
     arad = Vatom_getRadius(atom);
@@ -889,7 +908,7 @@ VPUBLIC VaccSurf* Vacc_atomSurf(Vacc *thee, Vatom *atom,
         pos[0] = rad*(ref->xpts[i]) + apos[0];
         pos[1] = rad*(ref->ypts[i]) + apos[1];
         pos[2] = rad*(ref->zpts[i]) + apos[2];
-        if (ivdwAccExclus(thee, pos, prad, atomID)) {
+        if (ivdwAccExclusCache(thee, pos, prad, atomID, &last_hit)) {
             npts++;
             ref->bpts[i] = (ref->bpts[i] << 1) + 1;
         } else {
