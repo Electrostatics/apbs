@@ -802,7 +802,7 @@ VPUBLIC VaccSurf* VaccSurf_ctor(Vmem *mem, double probe_radius, int nsphere) {
     VaccSurf *thee;
 
     //thee = Vmem_malloc(mem, 1, sizeof(Vacc) );
-    thee = (VaccSurf*)calloc(1,sizeof(Vacc));
+    thee = (VaccSurf*)calloc(1,sizeof(VaccSurf));
     VASSERT( VaccSurf_ctor2(thee, mem, probe_radius, nsphere) );
 
     return thee;
