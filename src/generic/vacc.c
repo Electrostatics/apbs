@@ -99,6 +99,12 @@ VPRIVATE int ivdwAccExclusCache(
         VASSERT(0);
     }
 
+    /* Only automatic domains guarantee that any point overlapping a cached
+     * neighbor also lies inside the Vclist lookup grid */
+    if (thee->clist->mode != CLIST_AUTO_DOMAIN) {
+        last_hit = VNULL;
+    }
+
     /* Re-test last occluding neighbor (stored only for id != atomID) */
     if (last_hit != VNULL && *last_hit != VNULL) {
         atom = *last_hit;
