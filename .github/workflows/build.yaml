@@ -410,7 +410,7 @@ jobs:
 #        shell: bash
 
       - name: Download artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8.0.2
         with:
           name: ${{ matrix.package_file }}
 
@@ -478,7 +478,7 @@ jobs:
             this_release.rst
 
       - name: Download artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8.0.2
         with:
           pattern: APBS-*
           path: release-artifacts
@@ -518,7 +518,7 @@ jobs:
     steps:
 
       - name: Download release candidate
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8.0.2
         with:
           name: release-candidate
           path: release-candidate
