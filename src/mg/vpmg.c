@@ -4507,8 +4507,7 @@ VPRIVATE void fillcoCoefMolDielSmooth(Vpmg *thee) {
      this function assumes that the non-smoothed values were placed in the
      dielectric arrays by the fillcoCoefMolDielNoSmooth function.*/
 
-    Vpbe *pbe;
-    double frac, epsw;
+    double frac;
     int i, j, k, nx, ny, nz, numpts;
 
     /* Mesh info */
@@ -4516,108 +4515,102 @@ VPRIVATE void fillcoCoefMolDielSmooth(Vpmg *thee) {
     ny = thee->pmgp->ny;
     nz = thee->pmgp->nz;
 
-    pbe = thee->pbe;
-    epsw = Vpbe_getSolventDiel(pbe);
-
-    /* Copy the existing diel arrays to work arrays */
+    /* Store reciprocal dielectric values in work arrays */
     for (i=0; i<(nx*ny*nz); i++) {
-        thee->a1cf[i] = thee->epsx[i];
-        thee->a2cf[i] = thee->epsy[i];
-        thee->a3cf[i] = thee->epsz[i];
-        thee->epsx[i] = epsw;
-        thee->epsy[i] = epsw;
-        thee->epsz[i] = epsw;
+        thee->a1cf[i] = 1.0/thee->epsx[i];
+        thee->a2cf[i] = 1.0/thee->epsy[i];
+        thee->a3cf[i] = 1.0/thee->epsz[i];
     }
 
-    /* Smooth the dielectric values */
-    for (i=0; i<nx; i++) {
+    /* Smooth the dielectric values in unit-stride (k, j, i) order */
+    for (k=0; k<nz; k++) {
         for (j=0; j<ny; j++) {
-            for (k=0; k<nz; k++) {
+            for (i=0; i<nx; i++) {
 
                 /* Get the 8 points that are 1/sqrt(2) grid spacings away */
 
                 /* Points for the X-shifted array */
-                frac = 1.0/thee->a1cf[IJK(i,j,k)];
-                frac += 1.0/thee->a2cf[IJK(i,j,k)];
-                frac += 1.0/thee->a3cf[IJK(i,j,k)];
+                frac = thee->a1cf[IJK(i,j,k)];
+                frac += thee->a2cf[IJK(i,j,k)];
+                frac += thee->a3cf[IJK(i,j,k)];
                 numpts = 3;
 
                 if (j > 0) {
-                    frac += 1.0/thee->a2cf[IJK(i,j-1,k)];
+                    frac += thee->a2cf[IJK(i,j-1,k)];
                     numpts += 1;
                 }
                 if (k > 0) {
-                    frac += 1.0/thee->a3cf[IJK(i,j,k-1)];
+                    frac += thee->a3cf[IJK(i,j,k-1)];
                     numpts += 1;
                 }
                 if (i < (nx-1)){
-                    frac += 1.0/thee->a2cf[IJK(i+1,j,k)];
-                    frac += 1.0/thee->a3cf[IJK(i+1,j,k)];
+                    frac += thee->a2cf[IJK(i+1,j,k)];
+                    frac += thee->a3cf[IJK(i+1,j,k)];
                     numpts += 2;
                     if (j > 0) {
-                        frac += 1.0/thee->a2cf[IJK(i+1,j-1,k)];
+                        frac += thee->a2cf[IJK(i+1,j-1,k)];
                         numpts += 1;
                     }
                     if (k > 0) {
-                        frac += 1.0/thee->a3cf[IJK(i+1,j,k-1)];
+                        frac += thee->a3cf[IJK(i+1,j,k-1)];
                         numpts += 1;
                     }
                 }
                 thee->epsx[IJK(i,j,k)] = numpts/frac;
 
                 /* Points for the Y-shifted array */
-                frac = 1.0/thee->a2cf[IJK(i,j,k)];
-                frac += 1.0/thee->a1cf[IJK(i,j,k)];
-                frac += 1.0/thee->a3cf[IJK(i,j,k)];
+                frac = thee->a2cf[IJK(i,j,k)];
+                frac += thee->a1cf[IJK(i,j,k)];
+                frac += thee->a3cf[IJK(i,j,k)];
                 numpts = 3;
 
                 if (i > 0) {
-                    frac += 1.0/thee->a1cf[IJK(i-1,j,k)];
+                    frac += thee->a1cf[IJK(i-1,j,k)];
                     numpts += 1;
                 }
                 if (k > 0) {
-                    frac += 1.0/thee->a3cf[IJK(i,j,k-1)];
+                    frac += thee->a3cf[IJK(i,j,k-1)];
                     numpts += 1;
                 }
                 if (j < (ny-1)){
-                    frac += 1.0/thee->a1cf[IJK(i,j+1,k)];
-                    frac += 1.0/thee->a3cf[IJK(i,j+1,k)];
+                    frac += thee->a1cf[IJK(i,j+1,k)];
+                    frac += thee->a3cf[IJK(i,j+1,k)];
                     numpts += 2;
                     if (i > 0) {
-                        frac += 1.0/thee->a1cf[IJK(i-1,j+1,k)];
+                        frac += thee->a1cf[IJK(i-1,j+1,k)];
                         numpts += 1;
                     }
                     if (k > 0) {
-                        frac += 1.0/thee->a3cf[IJK(i,j+1,k-1)];
+                        frac += thee->a3cf[IJK(i,j+1,k-1)];
                         numpts += 1;
                     }
                 }
                 thee->epsy[IJK(i,j,k)] = numpts/frac;
 
                 /* Points for the Z-shifted array */
-                frac = 1.0/thee->a3cf[IJK(i,j,k)];
-                frac += 1.0/thee->a1cf[IJK(i,j,k)];
-                frac += 1.0/thee->a2cf[IJK(i,j,k)];
+                frac = thee->a3cf[IJK(i,j,k)];
+                frac += thee->a1cf[IJK(i,j,k)];
+                frac += thee->a2cf[IJK(i,j,k)];
                 numpts = 3;
 
                 if (i > 0) {
-                    frac += 1.0/thee->a1cf[IJK(i-1,j,k)];
+                    frac += thee->a1cf[IJK(i-1,j,k)];
                     numpts += 1;
                 }
                 if (j > 0) {
-                    frac += 1.0/thee->a2cf[IJK(i,j-1,k)];
+                    frac += thee->a2cf[IJK(i,j-1,k)];
                     numpts += 1;
                 }
                 if (k < (nz-1)){
-                    frac += 1.0/thee->a1cf[IJK(i,j,k+1)];
-                    frac += 1.0/thee->a2cf[IJK(i,j,k+1)];
+                    frac += thee->a1cf[IJK(i,j,k+1)];
+                    frac += thee->a2cf[IJK(i,j,k+1)];
                     numpts += 2;
                     if (i > 0) {
-                        frac += 1.0/thee->a1cf[IJK(i-1,j,k+1)];
+                        frac += thee->a1cf[IJK(i-1,j,k+1)];
                         numpts += 1;
                     }
                     if (j > 0) {
-                        frac += 1.0/thee->a2cf[IJK(i,j-1,k+1)];
+                        frac += thee->a2cf[IJK(i,j-1,k+1)];
                         numpts += 1;
                     }
                 }
@@ -6448,40 +6441,44 @@ VPRIVATE void markSphere(double rtot, double *tpos,
                          double *array, double markVal) {
 
     int i, j, k;
-    double fi,fj,fk;
+    double fi, fj, fk;
     int imin, imax;
     int jmin, jmax;
     int kmin, kmax;
     double dx2, dy2, dz2;
-    double xrange, yrange, zrange;
     double rtot2, posx, posy, posz;
 
     /* Convert to grid reference frame */
-    posx = tpos[0] - xmin;
-    posy = tpos[1] - ymin;
     posz = tpos[2] - zmin;
-
     rtot2 = VSQR(rtot);
 
-    xrange = rtot + 0.5 * hx;
-    yrange = rtot + 0.5 * hy;
-    zrange = rtot + 0.5 * hz;
+    kmin = VMAX2(0, (int)ceil((posz - rtot)/hz));
+    if ((kmin > 0) && (kmin <= nz) && (VSQR(posz - hz*(double)(kmin - 1)) <= rtot2)) kmin--;
+    kmax = VMIN2(nz-1, (int)floor((posz + rtot)/hz));
+    if ((kmax >= -1) && (kmax < nz-1) && (VSQR(posz - hz*(double)(kmax + 1)) <= rtot2)) kmax++;
+    if (kmin > kmax) return;
 
-    imin = VMAX2(0, (int)ceil((posx - xrange)/hx));
-    jmin = VMAX2(0, (int)ceil((posy - yrange)/hy));
-    kmin = VMAX2(0, (int)ceil((posz - zrange)/hz));
+    posy = tpos[1] - ymin;
+    jmin = VMAX2(0, (int)ceil((posy - rtot)/hy));
+    if ((jmin > 0) && (jmin <= ny) && (VSQR(posy - hy*(double)(jmin - 1)) <= rtot2)) jmin--;
+    jmax = VMIN2(ny-1, (int)floor((posy + rtot)/hy));
+    if ((jmax >= -1) && (jmax < ny-1) && (VSQR(posy - hy*(double)(jmax + 1)) <= rtot2)) jmax++;
+    if (jmin > jmax) return;
 
-    imax = VMIN2(nx-1, (int)floor((posx + xrange)/hx));
-    jmax = VMIN2(ny-1, (int)floor((posy + yrange)/hy));
-    kmax = VMIN2(nz-1, (int)floor((posz + zrange)/hz));
+    posx = tpos[0] - xmin;
+    imin = VMAX2(0, (int)ceil((posx - rtot)/hx));
+    if ((imin > 0) && (imin <= nx) && (VSQR(posx - hx*(double)(imin - 1)) <= rtot2)) imin--;
+    imax = VMIN2(nx-1, (int)floor((posx + rtot)/hx));
+    if ((imax >= -1) && (imax < nx-1) && (VSQR(posx - hx*(double)(imax + 1)) <= rtot2)) imax++;
+    if (imin > imax) return;
 
-    for (i=imin,fi=imin; i<=imax; i++, fi+=1.) {
-        dx2 = VSQR(posx - hx*fi);
-        for (j=jmin,fj=jmin; j<=jmax; j++, fj+=1.) {
+    for (k=kmin, fk=kmin; k<=kmax; k++, fk+=1.) {
+        dz2 = VSQR(posz - hz*fk);
+        for (j=jmin, fj=jmin; j<=jmax; j++, fj+=1.) {
             dy2 = VSQR(posy - hy*fj);
-            if((dx2 + dy2) > rtot2) continue;
-            for (k=kmin, fk=kmin; k<=kmax; k++, fk+=1.) {
-                dz2 = VSQR(posz - hz*fk);
+            if ((dz2 + dy2) > rtot2) continue;
+            for (i=imin, fi=imin; i<=imax; i++, fi+=1.) {
+                dx2 = VSQR(posx - hx*fi);
                 if ((dz2 + dy2 + dx2) <= rtot2) {
                     array[IJK(i,j,k)] = markVal;
                 }
