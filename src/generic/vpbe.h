@@ -414,6 +414,33 @@ VEXTERNC Vpbe*   Vpbe_ctor(
                             double V /**< Transmembrane potential (V) */
                             );
 
+/** @brief   Construct Vpbe object, reusing Vclist and Vacc from reuseFrom when compatible
+ *  @ingroup Vpbe
+ *  @note    When reuseFrom is non-NULL and shares the same Valist, automatic Vclist
+ *           domain, solvent probe radius, maximum ion radius, and Vacc sphere density,
+ *           ownership of clist and acc transfers from reuseFrom to the new Vpbe object
+ *           and reuseFrom->clist and reuseFrom->acc are set to VNULL.
+ *  @return  Pointer to newly allocated Vpbe object
+ */
+VEXTERNC Vpbe*   Vpbe_ctorReuse(
+                            Valist *alist, /**< Atom list */
+                            int ionNum, /**< Number of counterion species */
+                            double *ionConc, /**< Array containing counterion concentrations (M) */
+                            double *ionRadii, /**< Array containing counterion radii (A) */
+                            double *ionQ, /**< Array containing counterion charges (e) */
+                            double T, /**< Temperature for Boltzmann distribution (K) */
+                            double soluteDiel, /**< Solute internal dielectric constant */
+                            double solventDiel,  /**< Solvent dielectric constant */
+                            double solventRadius, /**< Solvent probe radius for surfaces that use it (A) */
+                            int focusFlag, /**< 1 if focusing operation, 0 otherwise */
+                            double sdens,  /**< Vacc sphere density */
+                            double z_mem, /**< Membrane location (A) */
+                            double L, /**< Membrane thickness (A) */
+                            double membraneDiel, /**< Membrane dielectric constant */
+                            double V, /**< Transmembrane potential (V) */
+                            Vpbe *reuseFrom /**< Previous Vpbe from which to transfer clist/acc, or VNULL */
+                            );
+
 /** @brief   FORTRAN stub to construct Vpbe objct
  *  @ingroup Vpbe
  *  @author  Nathan Baker and Mike Holst and Michael Grabe
