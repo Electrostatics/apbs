@@ -779,11 +779,85 @@ VPUBLIC void Vnmresid27_1s(int *nx, int *ny, int *nz,
 
 
 
+VPRIVATE void restrc_trilin(int *nxf, int *nyf, int *nzf,
+        int *nxc, int *nyc, int *nzc,
+        double *xin, double *xout) {
+
+    int i, j, k;
+    int ii, jj, kk;
+    double tmpO, tmpU, tmpD;
+
+    MAT3(xin, *nxf, *nyf, *nzf);
+    MAT3(xout, *nxc, *nyc, *nzc);
+    (void)dz_xin;
+    (void)dz_xout;
+
+    VfboundPMG00(nxf, nyf, nzf, xin);
+
+#ifdef _OPENMP
+    #pragma omp parallel for private(k, kk, j, jj, i, ii, tmpO, tmpU, tmpD)
+#endif
+    for (k=2; k<=*nzc-1; k++) {
+        kk = (k - 1) * 2 + 1;
+
+        for (j=2; j<=*nyc-1; j++) {
+            jj = (j - 1) * 2 + 1;
+
+            for (i=2; i<=*nxc-1; i++) {
+                ii = (i - 1) * 2 + 1;
+
+                tmpO =
+                     + 1.0   * VAT3(xin,   ii,   jj,   kk)
+                     + 0.5   * VAT3(xin,   ii, jj+1,   kk)
+                     + 0.5   * VAT3(xin,   ii, jj-1,   kk)
+                     + 0.5   * VAT3(xin, ii+1,   jj,   kk)
+                     + 0.5   * VAT3(xin, ii-1,   jj,   kk)
+                     + 0.25  * VAT3(xin, ii+1, jj+1,   kk)
+                     + 0.25  * VAT3(xin, ii-1, jj+1,   kk)
+                     + 0.25  * VAT3(xin, ii+1, jj-1,   kk)
+                     + 0.25  * VAT3(xin, ii-1, jj-1,   kk);
+
+                tmpU =
+                     + 0.5   * VAT3(xin,   ii,   jj, kk+1)
+                     + 0.25  * VAT3(xin,   ii, jj+1, kk+1)
+                     + 0.25  * VAT3(xin,   ii, jj-1, kk+1)
+                     + 0.25  * VAT3(xin, ii+1,   jj, kk+1)
+                     + 0.25  * VAT3(xin, ii-1,   jj, kk+1)
+                     + 0.125 * VAT3(xin, ii+1, jj+1, kk+1)
+                     + 0.125 * VAT3(xin, ii-1, jj+1, kk+1)
+                     + 0.125 * VAT3(xin, ii+1, jj-1, kk+1)
+                     + 0.125 * VAT3(xin, ii-1, jj-1, kk+1);
+
+                tmpD =
+                     + 0.5   * VAT3(xin,   ii,   jj, kk-1)
+                     + 0.25  * VAT3(xin,   ii, jj+1, kk-1)
+                     + 0.25  * VAT3(xin,   ii, jj-1, kk-1)
+                     + 0.25  * VAT3(xin, ii+1,   jj, kk-1)
+                     + 0.25  * VAT3(xin, ii-1,   jj, kk-1)
+                     + 0.125 * VAT3(xin, ii+1, jj+1, kk-1)
+                     + 0.125 * VAT3(xin, ii-1, jj+1, kk-1)
+                     + 0.125 * VAT3(xin, ii+1, jj-1, kk-1)
+                     + 0.125 * VAT3(xin, ii-1, jj-1, kk-1);
+
+                VAT3(xout, i, j, k) = tmpO + tmpU + tmpD;
+            }
+        }
+    }
+
+    VfboundPMG00(nxc, nyc, nzc, xout);
+}
+
 VPUBLIC void Vrestrc(int *nxf, int *nyf, int *nzf,
         int *nxc, int *nyc, int *nzc,
         double *xin, double *xout, double *pc) {
 
     MAT2(pc, *nxc * *nyc * *nzc, 1 );
+
+    /* oPC[0] == -1.0 marks constant-weight trilinear prolongation (buildPd.c). */
+    if (pc[0] == -1.0) {
+        restrc_trilin(nxf, nyf, nzf, nxc, nyc, nzc, xin, xout);
+        return;
+    }
 
     Vrestrc2(nxf, nyf, nzf,
             nxc, nyc, nzc,
@@ -912,12 +986,71 @@ VEXTERNC void Vrestrc2(int *nxf, int *nyf, int *nzf,
 
 
 
+VPRIVATE void interp_trilin(int *nxc, int *nyc, int *nzc,
+        int *nxf, int *nyf, int *nzf,
+        double *xin, double *xout) {
+
+    int i, j, k;
+    int ii, jj, kk;
+    double x000, x100, x010, x110, x001, x101, x011, x111;
+
+    MAT3( xin, *nxc, *nyc, *nzc);
+    MAT3(xout, *nxf, *nyf, *nzf);
+    (void)dz_xin;
+    (void)dz_xout;
+
+    VfboundPMG00(nxc, nyc, nzc, xin);
+
+    for (k=1; k<=*nzf-2; k+=2) {
+        kk = (k - 1) / 2 + 1;
+
+        for (j=1; j<=*nyf-2; j+=2) {
+            jj = (j - 1) / 2 + 1;
+
+            for (i=1; i<=*nxf-2; i+=2) {
+                ii = (i - 1) / 2 + 1;
+
+                x000 = VAT3(xin,   ii,   jj,   kk);
+                x100 = VAT3(xin, ii+1,   jj,   kk);
+                x010 = VAT3(xin,   ii, jj+1,   kk);
+                x110 = VAT3(xin, ii+1, jj+1,   kk);
+                x001 = VAT3(xin,   ii,   jj, kk+1);
+                x101 = VAT3(xin, ii+1,   jj, kk+1);
+                x011 = VAT3(xin,   ii, jj+1, kk+1);
+                x111 = VAT3(xin, ii+1, jj+1, kk+1);
+
+                VAT3(xout, i, j, k) = x000;
+                VAT3(xout, i+1, j, k) = 0.5 * x000 + 0.5 * x100;
+                VAT3(xout, i, j+1, k) = 0.5 * x000 + 0.5 * x010;
+                VAT3(xout, i, j, k+1) = 0.5 * x000 + 0.5 * x001;
+                VAT3(xout, i+1, j+1, k) = 0.25 * x000 + 0.25 * x100
+                                  + 0.25 * x010 + 0.25 * x110;
+                VAT3(xout, i+1, j, k+1) = 0.25 * x000 + 0.25 * x100
+                                  + 0.25 * x001 + 0.25 * x101;
+                VAT3(xout, i, j+1, k+1) = 0.25 * x000 + 0.25 * x010
+                                  + 0.25 * x001 + 0.25 * x011;
+                VAT3(xout, i+1, j+1, k+1) =
+                     + 0.125 * x000 + 0.125 * x100 + 0.125 * x010 + 0.125 * x110
+                     + 0.125 * x001 + 0.125 * x101 + 0.125 * x011 + 0.125 * x111;
+            }
+        }
+    }
+
+    VfboundPMG00(nxf, nyf, nzf, xout);
+}
+
 VPUBLIC void VinterpPMG(int *nxc, int *nyc, int *nzc,
         int *nxf, int *nyf, int *nzf,
         double *xin, double *xout,
         double *pc) {
 
     MAT2(pc, *nxc * *nyc * *nzc, 1);
+
+    /* oPC[0] == -1.0 marks constant-weight trilinear prolongation (buildPd.c). */
+    if (pc[0] == -1.0) {
+        interp_trilin(nxc, nyc, nzc, nxf, nyf, nzf, xin, xout);
+        return;
+    }
 
     VinterpPMG2(nxc, nyc, nzc,
             nxf, nyf, nzf,
