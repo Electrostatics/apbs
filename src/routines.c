@@ -1343,6 +1343,7 @@ VPUBLIC int initMG(int icalc,
           *thePotMap = VNULL,
           *theChargeMap = VNULL;
     Valist *myalist = VNULL;
+    Vpbe *reusePbe = VNULL;
 
     Vnm_tstart(APBS_TIMER_SETUP, "Setup timer");
 
@@ -1398,13 +1399,21 @@ VPUBLIC int initMG(int icalc,
         focusFlag = 0;
     }
 
+    if ((icalc > 0) &&
+        ((nosh == VNULL) ||
+         ((nosh->calc[icalc - 1] != VNULL) &&
+          (nosh->calc[icalc - 1]->calctype == NCT_MG))))
+    {
+        reusePbe = pbe[icalc - 1];
+    }
+
     // Construct Vpbe object
-    pbe[icalc] = Vpbe_ctor(myalist, pbeparm->nion,
-                           pbeparm->ionc, pbeparm->ionr, pbeparm->ionq,
-                           pbeparm->temp, pbeparm->pdie,
-                           pbeparm->sdie, sparm, focusFlag, pbeparm->sdens,
-                           pbeparm->zmem, pbeparm->Lmem, pbeparm->mdie,
-                           pbeparm->memv);
+    pbe[icalc] = Vpbe_ctorReuse(myalist, pbeparm->nion,
+                                pbeparm->ionc, pbeparm->ionr, pbeparm->ionq,
+                                pbeparm->temp, pbeparm->pdie,
+                                pbeparm->sdie, sparm, focusFlag, pbeparm->sdens,
+                                pbeparm->zmem, pbeparm->Lmem, pbeparm->mdie,
+                                pbeparm->memv, reusePbe);
 
     /* Set up PDE object */
     Vnm_tprint(0, "Setting up PDE object...\n");
