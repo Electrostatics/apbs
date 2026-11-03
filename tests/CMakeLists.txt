@@ -43,3 +43,18 @@ if(EXISTS ${TESTS_CFG_FILE})
 else()
     message(FATAL  "******* MISSING Test Config (${TESTS_CFG_FILE})")
 endif()
+
+add_executable(vacc_surf_test vacc_surf_test.c)
+target_link_libraries(vacc_surf_test
+    apbs_generic
+    apbs_mg
+    apbs_pmgc
+    apbs_fem
+    apbs_routines
+    ${APBS_LIBS}
+)
+if(APPLE)
+    target_link_libraries(vacc_surf_test "-framework CoreFoundation")
+endif()
+add_test(NAME vacc_surf_test COMMAND $<TARGET_FILE:vacc_surf_test>)
+set_tests_properties(vacc_surf_test PROPERTIES TIMEOUT 60 LABELS unit)
