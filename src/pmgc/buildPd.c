@@ -162,6 +162,9 @@ VEXTERNC void VbuildPb_trilin(int *nxf, int *nyf, int *nzf,
     MAT3(dPSE, *nxc, *nyc, *nzc);
     MAT3(dPSW, *nxc, *nyc, *nzc);
 
+    /* Boundary slot oPC(1,1,1) is unread by interior stencils; tag trilinear pc. */
+    oPC[0] = -1.0;
+
 for(k=2; k<=*nzc-1; k++) {
     for(j=2; j<=*nyc-1; j++) {
             for(i=2; i<=*nxc-1; i++) {
@@ -295,6 +298,8 @@ VPUBLIC void VbuildPb_op7(int *nxf, int *nyf, int *nzf,
     eighth  =  1.0 /  8.0;
 
     //fprintf(data, "%s\n", PRINT_FUNC);
+
+    oPC[0] = 0.0;
 
     for (kk = 2; kk < *nzc - 1; kk++) {
         k = 2 * kk - 1;
@@ -826,6 +831,8 @@ VPUBLIC void VbuildPb_op27(int *nxf, int *nyf, int *nzf,
       eighth  = 1.0 / 8.0;
 
       //fprintf(data, "%s\n", PRINT_FUNC);
+
+      oPC[0] = 0.0;
 
       for (kk = 2; kk <= *nzc - 1; kk++) {
           k = 2 * kk - 1;
