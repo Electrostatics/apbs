@@ -55,6 +55,8 @@
  */
 
 #include "vgrid.h"
+#include <fenv.h>
+#include <locale.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -93,6 +95,30 @@ VPRIVATE const double dx_pow10[206] = {
 VPRIVATE int fallbackDXExp12_6(char *dst, size_t cap, double val) {
   int n = snprintf(dst, cap, "%12.6e ", val);
   return (n <= 0 || (size_t)n >= cap) ? 0 : n;
+}
+
+VPRIVATE int canUseFastDXFormat(void) {
+  const struct lconv *lc;
+  char probe[32];
+#ifdef FE_TONEAREST
+  if (fegetround() != FE_TONEAREST) return 0;
+#else
+  return 0;
+#endif
+  lc = localeconv();
+  if (lc == NULL || lc->decimal_point == NULL ||
+      lc->decimal_point[0] != '.' || lc->decimal_point[1] != '\0') {
+    return 0;
+  }
+  if (snprintf(probe, sizeof(probe), "%12.6e ", 1.23456789) != 13 ||
+      memcmp(probe, "1.234568e+00 ", 13) != 0) {
+    return 0;
+  }
+  if (snprintf(probe, sizeof(probe), "%12.6e ", -1.23456789) != 14 ||
+      memcmp(probe, "-1.234568e+00 ", 14) != 0) {
+    return 0;
+  }
+  return 1;
 }
 
 VPRIVATE int formatDXExp12_6(char *dst, size_t cap, double val) {
@@ -167,6 +193,7 @@ VPRIVATE void writeDXData(Vio *sock, const double *data, const double *pvec,
     int nx, int ny, int nz) {
   size_t icol = 0, i, j, k, u;
   int dxpos = 0;
+  int fast_ok;
   char dxbuf[65536];
   /* In maloc vio.c, FILE/SDIO/BUFF ASC sockets pass straight through to
    * Vio_write, whereas UNIX/INET buffer headers in putBuffer and XDR encodes
@@ -187,13 +214,17 @@ VPRIVATE void writeDXData(Vio *sock, const double *data, const double *pvec,
     if (icol != 0) Vio_printf(sock, "\n");
     return;
   }
+  fast_ok = canUseFastDXFormat();
   for (i = 0; i < (size_t)nx; i++) {
     for (j = 0; j < (size_t)ny; j++) {
       for (k = 0; k < (size_t)nz; k++) {
         u = k * (size_t)nx * (size_t)ny + j * (size_t)nx + i;
         if (pvec != VNULL && !(pvec[u] > 0.0)) continue;
-        dxpos += formatDXExp12_6(dxbuf + dxpos, sizeof(dxbuf) - (size_t)dxpos,
-            data[u]);
+        dxpos += fast_ok
+            ? formatDXExp12_6(dxbuf + dxpos, sizeof(dxbuf) - (size_t)dxpos,
+                data[u])
+            : fallbackDXExp12_6(dxbuf + dxpos, sizeof(dxbuf) - (size_t)dxpos,
+                data[u]);
         if (++icol == 3) {
           icol = 0;
           dxbuf[dxpos++] = '\n';

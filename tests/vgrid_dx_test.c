@@ -3,7 +3,9 @@
  * @brief   Unit tests for buffered OpenDX formatting in Vgrid_writeDX
  */
 
+#include <fenv.h>
 #include <float.h>
+#include <locale.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -30,6 +32,19 @@ static double rand_u01(void) {
     return (double)(xorshift64() >> 11) * (1.0 / 9007199254740992.0);
 }
 
+static size_t normalize_crlf(char *buf, size_t len) {
+    size_t r;
+    size_t w = 0;
+    for (r = 0; r < len; r++) {
+        if (buf[r] == '\r' && r + 1 < len && buf[r + 1] == '\n') {
+            continue;
+        }
+        buf[w++] = buf[r];
+    }
+    buf[w] = '\0';
+    return w;
+}
+
 static char* extract_dx_payload(const char *path, size_t *out_len) {
     FILE *fp;
     long sz;
@@ -50,6 +65,7 @@ static char* extract_dx_payload(const char *path, size_t *out_len) {
     nread = fread(buf, 1, (size_t)sz, fp);
     fclose(fp);
     buf[nread] = '\0';
+    nread = normalize_crlf(buf, nread);
 
     marker = strstr(buf, "data follows\n");
     if (marker == NULL) { free(buf); return NULL; }
@@ -250,11 +266,227 @@ static int test_pvec_nan_and_mask(void) {
     return 1;
 }
 
+static int test_crlf_extraction(void) {
+    const char *crlf_file = "vgrid_dx_test_crlf.dx";
+    const char *raw_crlf =
+        "# header\r\n"
+        "object 3 class array type double rank 0 items 4 data follows\r\n"
+        "1.000000e+00 -2.500000e+00 0.000000e+00 \r\n"
+        "3.125000e-01 \r\n"
+        "attribute \"dep\" string \"positions\"\r\n";
+    const char *expected_lf =
+        "1.000000e+00 -2.500000e+00 0.000000e+00 \n"
+        "3.125000e-01 \n";
+    FILE *fp;
+    size_t got_len = 0;
+    size_t exp_len = strlen(expected_lf);
+    char *got_payload;
+
+    fp = fopen(crlf_file, "wb");
+    if (fp == NULL) return 0;
+    fwrite(raw_crlf, 1, strlen(raw_crlf), fp);
+    fclose(fp);
+
+    got_payload = extract_dx_payload(crlf_file, &got_len);
+    remove(crlf_file);
+    if (got_payload == NULL || got_len != exp_len ||
+        memcmp(got_payload, expected_lf, exp_len) != 0) {
+        fprintf(stderr, "FAIL: CRLF payload extraction/comparison mismatch\n");
+        free(got_payload);
+        return 0;
+    }
+    free(got_payload);
+    return 1;
+}
+
+static void fill_edge_grid24(double data[24]) {
+    data[0] = 1.23456789;
+    data[1] = -1.23456789;
+    data[2] = 1.23456712;
+    data[3] = -1.23456712;
+    data[4] = 9.9999999;
+    data[5] = -9.9999999;
+    data[6] = 9.999995;
+    data[7] = -9.999995;
+    data[8] = 1.0078125;
+    data[9] = -1.0078125;
+    data[10] = 0.0;
+    data[11] = -0.0;
+    data[12] = DBL_MIN;
+    data[13] = -DBL_MIN;
+    data[14] = DBL_MAX;
+    data[15] = -DBL_MAX;
+    data[16] = 1.0e-102;
+    data[17] = -1.0e-102;
+    data[18] = ldexp(1.0, -1074);
+    data[19] = -ldexp(1.0, -1074);
+    data[20] = NAN;
+    data[21] = INFINITY;
+    data[22] = -INFINITY;
+    data[23] = -42.5;
+}
+
+static int test_rounding_modes(void) {
+    const int nx = 4, ny = 3, nz = 2;
+    double data[24];
+    int modes[4];
+    int nmodes = 0;
+    int m;
+    int orig_round;
+    const char *dx_file = "vgrid_dx_test_round.dx";
+
+    fill_edge_grid24(data);
+    orig_round = fegetround();
+
+#ifdef FE_DOWNWARD
+    modes[nmodes++] = FE_DOWNWARD;
+#endif
+#ifdef FE_UPWARD
+    modes[nmodes++] = FE_UPWARD;
+#endif
+#ifdef FE_TOWARDZERO
+    modes[nmodes++] = FE_TOWARDZERO;
+#endif
+#ifdef FE_TONEAREST
+    modes[nmodes++] = FE_TONEAREST;
+#endif
+
+    for (m = 0; m < nmodes; m++) {
+        Vgrid *grid;
+        char title[32];
+        size_t got_len = 0, exp_len = 0;
+        char *got_payload;
+        char *exp_payload;
+        char first_tok[32];
+        int nfirst;
+
+        if (fesetround(modes[m]) != 0) {
+            continue;
+        }
+        strcpy(title, "vgrid_round_test");
+        grid = Vgrid_ctor(nx, ny, nz, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, data);
+        Vgrid_writeDX(grid, "FILE", "ASC", VNULL, dx_file, title, VNULL);
+        Vgrid_dtor(&grid);
+
+        exp_payload = format_expected_dx(data, NULL, nx, ny, nz, &exp_len);
+        nfirst = snprintf(first_tok, sizeof(first_tok), "%12.6e ", data[0]);
+
+        if (orig_round >= 0) {
+            fesetround(orig_round);
+        }
+
+        got_payload = extract_dx_payload(dx_file, &got_len);
+        remove(dx_file);
+
+        if (got_payload == NULL || exp_payload == NULL ||
+            got_len != exp_len || memcmp(got_payload, exp_payload, exp_len) != 0 ||
+            nfirst <= 0 || strncmp(got_payload, first_tok, (size_t)nfirst) != 0) {
+            fprintf(stderr, "FAIL: rounding mode %d DX payload mismatch\n", modes[m]);
+            free(got_payload);
+            free(exp_payload);
+            return 0;
+        }
+        free(got_payload);
+        free(exp_payload);
+    }
+
+    if (orig_round >= 0) {
+        fesetround(orig_round);
+    }
+    return 1;
+}
+
+static int test_non_c_locale(void) {
+    static const char *const locales[] = {
+        "de_DE.UTF-8",
+        "de_DE.utf8",
+        "de_DE",
+        "fr_FR.UTF-8",
+        "fr_FR.utf8",
+        "es_ES.UTF-8",
+        "es_ES.utf8",
+        "de-DE",
+        "fr-FR",
+        "German_Germany.1252",
+        "French_France.1252"
+    };
+    const int nx = 4, ny = 3, nz = 2;
+    double data[24];
+    char saved_locale[128];
+    const char *cur;
+    size_t i;
+    int found = 0;
+    Vgrid *grid;
+    char title[32];
+    const char *dx_file = "vgrid_dx_test_locale.dx";
+    size_t got_len = 0, exp_len = 0;
+    char *got_payload;
+    char *exp_payload;
+
+    fill_edge_grid24(data);
+    cur = setlocale(LC_NUMERIC, NULL);
+    if (cur != NULL && strlen(cur) < sizeof(saved_locale)) {
+        strcpy(saved_locale, cur);
+    } else {
+        strcpy(saved_locale, "C");
+    }
+
+    for (i = 0; i < sizeof(locales) / sizeof(locales[0]); i++) {
+        if (setlocale(LC_NUMERIC, locales[i]) != NULL) {
+            const struct lconv *lc = localeconv();
+            if (lc != NULL && lc->decimal_point != NULL &&
+                lc->decimal_point[0] == ',' && lc->decimal_point[1] == '\0') {
+                found = 1;
+                break;
+            }
+        }
+    }
+
+    if (!found) {
+        setlocale(LC_NUMERIC, saved_locale);
+        return 1;
+    }
+
+    strcpy(title, "vgrid_locale_test");
+    grid = Vgrid_ctor(nx, ny, nz, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0, data);
+    Vgrid_writeDX(grid, "FILE", "ASC", VNULL, dx_file, title, VNULL);
+    Vgrid_dtor(&grid);
+
+    exp_payload = format_expected_dx(data, NULL, nx, ny, nz, &exp_len);
+    setlocale(LC_NUMERIC, saved_locale);
+
+    got_payload = extract_dx_payload(dx_file, &got_len);
+    remove(dx_file);
+
+    if (got_payload == NULL || exp_payload == NULL ||
+        got_len != exp_len || memcmp(got_payload, exp_payload, exp_len) != 0) {
+        fprintf(stderr, "FAIL: non-C numeric locale DX payload mismatch\n");
+        free(got_payload);
+        free(exp_payload);
+        return 0;
+    }
+    /* Both normal values and fallback values must use comma, with no '.' mixed in. */
+    if (strstr(got_payload, "1,234568e+00 ") == NULL ||
+        strchr(got_payload, '.') != NULL) {
+        fprintf(stderr, "FAIL: inconsistent decimal separator under comma locale\n");
+        free(got_payload);
+        free(exp_payload);
+        return 0;
+    }
+
+    free(got_payload);
+    free(exp_payload);
+    return 1;
+}
+
 int main(void) {
     Vio_start();
     Vnm_redirect(1);
     if (!test_full_260k_values()) { Vio_stop(); return 1; }
     if (!test_pvec_nan_and_mask()) { Vio_stop(); return 1; }
+    if (!test_crlf_extraction()) { Vio_stop(); return 1; }
+    if (!test_rounding_modes()) { Vio_stop(); return 1; }
+    if (!test_non_c_locale()) { Vio_stop(); return 1; }
     Vio_stop();
     remove("io.mc");
     printf("vgrid_dx_test: ALL PASSED\n");
