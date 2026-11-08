@@ -5254,15 +5254,7 @@ VPUBLIC int forceAPOL(Vacc *acc,
     ts = clock();
     if (acc->surf == VNULL)
     {
-        acc->surf = (VaccSurf **)Vmem_malloc(acc->mem, natom, sizeof(VaccSurf *));
-        for (i = 0; i < natom; i++)
-        {
-            atom = Valist_getAtom(acc->alist, i);
-            //apos = Vatom_getPosition(atom); // apos never referenced? - Peter
-            /* NOTE:  RIGHT NOW WE DO THIS FOR THE ENTIRE MOLECULE WHICH IS
-             * INCREDIBLY INEFFICIENT, PARTICULARLY DURING FOCUSING!!! */
-            acc->surf[i] = Vacc_atomSurf(acc, atom, acc->refSphere, srad);
-        }
+        Vacc_SASA(acc, srad);
     }
     Vnm_print(0, "forceAPOL: atom surf: Time elapsed: %f\n", ((double)clock() - ts) / CLOCKS_PER_SEC);
 
