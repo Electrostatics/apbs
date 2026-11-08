@@ -5124,6 +5124,7 @@ VPUBLIC int initAPOL(NOsh *nosh,            /**< Input parameter object */
         /* wcaEnergy integral code */
         if (VABS(apolparm->bconc) > VSMALL)
         {
+            double tenergy = 0.0;
             /* wcaEnergy for each atom */
             for (i = 0; i < len; i++)
             {
@@ -5134,14 +5135,9 @@ VPUBLIC int initAPOL(NOsh *nosh,            /**< Input parameter object */
                     return 0;
                 }
                 atomwcaEnergy[i] = energy;
+                tenergy += energy;
             }
-            /* Total WCA Energy */
-            rc = Vacc_wcaEnergy(acc, apolparm, alist, clist);
-            if (rc == 0)
-            {
-                Vnm_print(2, "Error in apolar energy calculation!\n");
-                return 0;
-            }
+            apolparm->wcaEnergy = tenergy;
         }
         else
         {
