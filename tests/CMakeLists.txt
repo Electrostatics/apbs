@@ -59,6 +59,21 @@ endif()
 add_test(NAME vacc_surf_test COMMAND $<TARGET_FILE:vacc_surf_test>)
 set_tests_properties(vacc_surf_test PROPERTIES TIMEOUT 60 LABELS unit)
 
+add_executable(vpbe_reuse_test vpbe_reuse_test.c)
+target_link_libraries(vpbe_reuse_test
+    apbs_generic
+    apbs_mg
+    apbs_pmgc
+    apbs_fem
+    apbs_routines
+    ${APBS_LIBS}
+)
+if(APPLE)
+    target_link_libraries(vpbe_reuse_test "-framework CoreFoundation")
+endif()
+add_test(NAME vpbe_reuse_test COMMAND $<TARGET_FILE:vpbe_reuse_test>)
+set_tests_properties(vpbe_reuse_test PROPERTIES TIMEOUT 60 LABELS unit)
+
 add_executable(vpmg_fill_test vpmg_fill_test.c)
 target_link_libraries(vpmg_fill_test
     apbs_generic

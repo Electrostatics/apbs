@@ -61,6 +61,14 @@
 /////////////////////////////////////////////////////////////////////////// */
 #define MAX_SPLINE_WINDOW 0.5
 
+VPRIVATE int vpbeCtor2Impl(Vpbe *thee, Valist *alist, int ionNum,
+                           double *ionConc, double *ionRadii,
+                           double *ionQ, double T, double soluteDiel,
+                           double solventDiel, double solventRadius,
+                           int focusFlag, double sdens, double z_mem,
+                           double L, double membraneDiel, double V,
+                           Vpbe *reuseFrom);
+
 /* ///////////////////////////////////////////////////////////////////////////
 // Class Vpbe: Inlineable methods
 /////////////////////////////////////////////////////////////////////////// */
@@ -249,13 +257,26 @@ VPUBLIC Vpbe* Vpbe_ctor(Valist *alist, int ionNum, double *ionConc,
                         double solventRadius, int focusFlag, double sdens,
                         double z_mem, double L, double membraneDiel, double V ) {
 
+    return Vpbe_ctorReuse(alist, ionNum, ionConc, ionRadii, ionQ,
+                          T, soluteDiel, solventDiel, solventRadius, focusFlag,
+                          sdens, z_mem, L, membraneDiel, V, VNULL);
+}
+
+
+VPUBLIC Vpbe* Vpbe_ctorReuse(Valist *alist, int ionNum, double *ionConc,
+                             double *ionRadii, double *ionQ, double T,
+                             double soluteDiel, double solventDiel,
+                             double solventRadius, int focusFlag, double sdens,
+                             double z_mem, double L, double membraneDiel,
+                             double V, Vpbe *reuseFrom) {
+
     /* Set up the structure */
     Vpbe *thee = VNULL;
     thee = (Vpbe*)Vmem_malloc(VNULL, 1, sizeof(Vpbe) );
     VASSERT( thee != VNULL);
-    VASSERT( Vpbe_ctor2(thee, alist, ionNum, ionConc, ionRadii, ionQ,
-                        T, soluteDiel, solventDiel, solventRadius, focusFlag, sdens,
-                        z_mem, L, membraneDiel, V) );
+    VASSERT( vpbeCtor2Impl(thee, alist, ionNum, ionConc, ionRadii, ionQ,
+                           T, soluteDiel, solventDiel, solventRadius, focusFlag,
+                           sdens, z_mem, L, membraneDiel, V, reuseFrom) );
 
     return thee;
 }
@@ -267,6 +288,20 @@ VPUBLIC int Vpbe_ctor2(Vpbe *thee, Valist *alist, int ionNum,
                        double solventDiel, double solventRadius, int focusFlag,
                        double sdens, double z_mem, double L, double membraneDiel,
                        double V) {
+
+    return vpbeCtor2Impl(thee, alist, ionNum, ionConc, ionRadii, ionQ,
+                         T, soluteDiel, solventDiel, solventRadius, focusFlag,
+                         sdens, z_mem, L, membraneDiel, V, VNULL);
+}
+
+
+VPRIVATE int vpbeCtor2Impl(Vpbe *thee, Valist *alist, int ionNum,
+                           double *ionConc, double *ionRadii,
+                           double *ionQ, double T, double soluteDiel,
+                           double solventDiel, double solventRadius,
+                           int focusFlag, double sdens, double z_mem,
+                           double L, double membraneDiel, double V,
+                           Vpbe *reuseFrom) {
 
     int i, iatom, inhash[3];
     double atomRadius;
@@ -281,6 +316,8 @@ VPUBLIC int Vpbe_ctor2(Vpbe *thee, Valist *alist, int ionNum,
     const double e_c = 4.803242384e-10;
     const double k_B = 1.380662000e-16;
     const double pi  = 4. * VATAN(1.);
+
+    (void)focusFlag;
 
     /* Set up memory management object */
     thee->vmem = Vmem_ctor("APBS::VPBE");
@@ -429,16 +466,32 @@ function\n", thee->maxIonRadius);
         if (inhash[i] < 3) inhash[i] = 3;
         if (inhash[i] > MAX_HASH_DIM) inhash[i] = MAX_HASH_DIM;
     }
-    Vnm_print(0, "Vpbe_ctor2:  Constructing Vclist with %d x %d x %d table\n",
-            inhash[0], inhash[1], inhash[2]);
+    if ((reuseFrom != VNULL) &&
+        (reuseFrom->clist != VNULL) && (reuseFrom->acc != VNULL) &&
+        (reuseFrom->clist->mode == CLIST_AUTO_DOMAIN) &&
+        (reuseFrom->alist == thee->alist) &&
+        (reuseFrom->solventRadius == thee->solventRadius) &&
+        (reuseFrom->maxIonRadius == thee->maxIonRadius) &&
+        (Vclist_maxRadius(reuseFrom->clist) == radius) &&
+        (reuseFrom->acc->alist == thee->alist) &&
+        (reuseFrom->acc->clist == reuseFrom->clist) &&
+        (reuseFrom->acc->surf_density == sdens)) {
+        thee->clist = reuseFrom->clist;
+        thee->acc = reuseFrom->acc;
+        reuseFrom->clist = VNULL;
+        reuseFrom->acc = VNULL;
+    } else {
+        Vnm_print(0, "Vpbe_ctor2:  Constructing Vclist with %d x %d x %d table\n",
+                inhash[0], inhash[1], inhash[2]);
 
-    thee->clist = Vclist_ctor(thee->alist, radius, inhash,
-            CLIST_AUTO_DOMAIN, lower_corner, upper_corner);
+        thee->clist = Vclist_ctor(thee->alist, radius, inhash,
+                CLIST_AUTO_DOMAIN, lower_corner, upper_corner);
 
-    VASSERT(thee->clist != VNULL);
-    thee->acc = Vacc_ctor(thee->alist, thee->clist, sdens);
+        VASSERT(thee->clist != VNULL);
+        thee->acc = Vacc_ctor(thee->alist, thee->clist, sdens);
 
-    VASSERT(thee->acc != VNULL);
+        VASSERT(thee->acc != VNULL);
+    }
 
     /* SMPBE Added */
     thee->smsize = 0.0;
