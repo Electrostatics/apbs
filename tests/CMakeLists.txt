@@ -73,3 +73,18 @@ if(APPLE)
 endif()
 add_test(NAME pmg_trilin_test COMMAND $<TARGET_FILE:pmg_trilin_test>)
 set_tests_properties(pmg_trilin_test PROPERTIES TIMEOUT 60 LABELS unit)
+
+add_executable(vpmg_fill_test vpmg_fill_test.c)
+target_link_libraries(vpmg_fill_test
+    apbs_generic
+    apbs_mg
+    apbs_pmgc
+    apbs_fem
+    apbs_routines
+    ${APBS_LIBS}
+)
+if(APPLE)
+    target_link_libraries(vpmg_fill_test "-framework CoreFoundation")
+endif()
+add_test(NAME vpmg_fill_test COMMAND $<TARGET_FILE:vpmg_fill_test>)
+set_tests_properties(vpmg_fill_test PROPERTIES TIMEOUT 60 LABELS unit)
