@@ -1600,12 +1600,14 @@ VPUBLIC double Vacc_totalSAV(Vacc *thee, Vclist *clist, APOLparm *apolparm, doub
     return sav;
 }
 
+#define VACC_WCA_CUTOFF 14.0
+
 int Vacc_wcaEnergyAtom(Vacc *thee, APOLparm *apolparm, Valist *alist,
                                  Vclist *clist, int iatom, double *value) {
 
     int i;
     int npts[3];
-    int pad = 14;
+    int pad = (int)VACC_WCA_CUTOFF;
 
         int xmin, ymin, zmin;
         int xmax, ymax, zmax;
@@ -1686,7 +1688,10 @@ int Vacc_wcaEnergyAtom(Vacc *thee, APOLparm *apolparm, Valist *alist,
             wx = 1.0;
         }
         vec[0] = x;
+        x2 = VSQR(x - pos[0]);
         for (y=ymin; y<=ymax; y=y+spacs[1]) {
+            y2 = VSQR(y - pos[1]);
+            if (x2 + y2 > VSQR(VACC_WCA_CUTOFF)) continue;
             if ( VABS(y - ymin) < VSMALL) {
                 wy = 0.5;
             } else if ( VABS(y - ymax) < VSMALL) {
@@ -1696,6 +1701,8 @@ int Vacc_wcaEnergyAtom(Vacc *thee, APOLparm *apolparm, Valist *alist,
             }
             vec[1] = y;
             for (z=zmin; z<=zmax; z=z+spacs[2]) {
+                z2 = VSQR(z - pos[2]);
+                if (x2 + y2 + z2 > VSQR(VACC_WCA_CUTOFF)) continue;
                 if ( VABS(z - zmin) < VSMALL) {
                     wz = 0.5;
                 } else if ( VABS(z - zmax) < VSMALL) {
@@ -1710,24 +1717,16 @@ int Vacc_wcaEnergyAtom(Vacc *thee, APOLparm *apolparm, Valist *alist,
                 chi = Vacc_ivdwAcc(thee, vec, srad);
 
                 if (VABS(chi) > VSMALL) {
-
-                    x2 = VSQR(vec[0]-pos[0]);
-                    y2 = VSQR(vec[1]-pos[1]);
-                    z2 = VSQR(vec[2]-pos[2]);
                     r = VSQRT(x2+y2+z2);
-
-                    if (r <= 14 && r >= sigma) {
+                    if (r <= VACC_WCA_CUTOFF && r >= sigma) {
                         eni = chi*rho*epsilon*(-2.0*sigma6/VPOW(r,6)+sigma12/VPOW(r,12));
-                    }else if (r <= 14){
+                    } else if (r <= VACC_WCA_CUTOFF) {
                         eni = -1.0*epsilon*chi*rho;
-                    }else{
+                    } else {
                         eni = 0.0;
                     }
-                }else{
-                    eni = 0.0;
+                    energy += eni*w;
                 }
-
-                energy += eni*w;
 
             } /* z loop */
         } /* y loop */
@@ -1785,7 +1784,7 @@ VPUBLIC int Vacc_wcaForceAtom(Vacc *thee,
     int i,
         si,
         npts[3],
-        pad = 14,
+        pad = (int)VACC_WCA_CUTOFF,
         xmin,
         ymin,
         zmin,
@@ -1894,7 +1893,10 @@ VPUBLIC int Vacc_wcaForceAtom(Vacc *thee,
             wx = 1.0;
         }
         vec[0] = x;
+        x2 = VSQR(x - pos[0]);
         for (y=ymin; y<=ymax; y=y+spacs[1]) {
+            y2 = VSQR(y - pos[1]);
+            if (x2 + y2 > VSQR(VACC_WCA_CUTOFF)) continue;
             if ( VABS(y - ymin) < VSMALL) {
                 wy = 0.5;
             } else if ( VABS(y - ymax) < VSMALL) {
@@ -1904,6 +1906,8 @@ VPUBLIC int Vacc_wcaForceAtom(Vacc *thee,
             }
             vec[1] = y;
             for (z=zmin; z<=zmax; z=z+spacs[2]) {
+                z2 = VSQR(z - pos[2]);
+                if (x2 + y2 + z2 > VSQR(VACC_WCA_CUTOFF)) continue;
                 if ( VABS(z - zmin) < VSMALL) {
                     wz = 0.5;
                 } else if ( VABS(z - zmax) < VSMALL) {
@@ -1918,13 +1922,8 @@ VPUBLIC int Vacc_wcaForceAtom(Vacc *thee,
                 chi = Vacc_ivdwAcc(thee, vec, srad);
 
                 if (chi != 0.0) {
-
-                    x2 = VSQR(vec[0]-pos[0]);
-                    y2 = VSQR(vec[1]-pos[1]);
-                    z2 = VSQR(vec[2]-pos[2]);
                     r = VSQRT(x2+y2+z2);
-
-                    if (r <= 14 && r >= sigma){
+                    if (r <= VACC_WCA_CUTOFF && r >= sigma){
 
                         fo = 12.0*chi*rho*epsilon*(sigma6/VPOW(r,7)-sigma12/VPOW(r,13));
 
