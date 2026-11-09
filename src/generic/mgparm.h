@@ -185,6 +185,7 @@ struct sMGparm {
     int setofrac;  /**< Flag, @see ofrac */
     int async; /**< Processor ID for asynchronous calculation */
     int setasync; /**< Flag, @see asynch */
+    int partRank; /**< Partition rank for in-process mg-para (-1 if none) */
 
     int nonlintype; /**< Linearity Type Method to be used */
     int setnonlintype; /**< Flag, @see nonlintype */

@@ -1442,7 +1442,7 @@ map is used!\n");
                         mgparm->ccenter[i] = mymol->center[i];
                     }
                 }
-                NOsh_setupCalcMG(thee, elec);
+                if (!NOsh_setupCalcMG(thee, elec)) return 0;
                 break;
             case NCT_FEM:
                 NOsh_setupCalcFEM(thee, elec);
@@ -1912,6 +1912,10 @@ coarse grids = %g, %g, %g\n", __FILE__, __LINE__, d[0], d[1], d[2]);
     if (nfocus > (NOSH_MAXCALC-(thee->ncalc))) {
         Vnm_print(2, "NOsh:  Require more calculations than max (%d)!\n",
                   NOSH_MAXCALC);
+        if (elec->mgparm->type == MCT_PARALLEL) {
+            Vnm_print(2, "NOsh:  mg-para expands pdime * focusing levels; "
+                      "reduce pdime or use 'async N'.\n");
+        }
         return 0;
     }
 
@@ -2099,6 +2103,35 @@ fixing mesh max violation (%g in %d-direction).\n", __FILE__, __LINE__, ifocus,
     return 1;
 }
 
+#ifndef HAVE_MPI_H
+VPRIVATE int NOsh_setupCalcMGPARAShared(NOsh *thee, NOsh_calc *elec, int nproc) {
+    int p, saved_ispara, saved_rank;
+    NOsh_calc *part;
+
+    Vnm_tprint(1, "mg-para: no MPI; running all %d partitions in this process "
+               "(use 'async N' for one partition)\n", nproc);
+    saved_ispara = thee->ispara;
+    saved_rank = thee->proc_rank;
+    for (p = 0; p < nproc; p++) {
+        part = NOsh_calc_ctor(NCT_MG);
+        NOsh_calc_copy(part, elec);
+        part->mgparm->setasync = 1;
+        part->mgparm->async = p;
+        part->mgparm->partRank = p;
+        if (!NOsh_setupCalcMGPARA(thee, part)) {
+            NOsh_calc_dtor(&part);
+            thee->ispara = saved_ispara;
+            thee->proc_rank = saved_rank;
+            return 0;
+        }
+        NOsh_calc_dtor(&part);
+    }
+    thee->ispara = saved_ispara;
+    thee->proc_rank = saved_rank;
+    return 1;
+}
+#endif
+
 /* Author:   Nathan Baker and Todd Dolinsky */
 VPUBLIC int NOsh_setupCalcMGPARA(
                                  NOsh *thee,
@@ -2143,17 +2176,7 @@ VPUBLIC int NOsh_setupCalcMGPARA(
     if (mgparm->setasync == 0) {
 
 #ifndef HAVE_MPI_H
-
-        Vnm_tprint(2, "NOsh_setupCalcMGPARA:  Oops!  You're trying to perform \
-an 'mg-para' (parallel) calculation\n");
-        Vnm_tprint(2, "NOsh_setupCalcMGPARA:  with a version of APBS that wasn't \
-compiled with MPI!\n");
-        Vnm_tprint(2, "NOsh_setupCalcMGPARA:  Perhaps you meant to use the \
-'async' flag?\n");
-        Vnm_tprint(2, "NOsh_setupCalcMGPARA:  Bailing out!\n");
-
-        return 0;
-
+        return NOsh_setupCalcMGPARAShared(thee, elec, nproc);
 #endif
 
         rank = thee->proc_rank;
