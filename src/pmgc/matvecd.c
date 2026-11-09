@@ -630,30 +630,22 @@ VPUBLIC void Vnmresid7(int *nx, int *ny, int *nz,
             x, r, w1);
 }
 
-VPUBLIC void Vnmresid7_1s(int *nx, int *ny, int *nz,
-        int *ipc, double *rpc,
-        double *oC, double *cc, double *fc,
+VPRIVATE void nmresid7_kernel(int *nx, int *ny, int *nz,
+        double *oC, double *fc,
         double *oE, double *oN, double *uC,
         double *x, double *r, double *w1) {
 
     int i, j, k;
-    int ipkey;
 
     MAT3(oE, *nx, *ny, *nz);
     MAT3(oN, *nx, *ny, *nz);
     MAT3(uC, *nx, *ny, *nz);
-    MAT3(cc, *nx, *ny, *nz);
     MAT3(fc, *nx, *ny, *nz);
     MAT3(oC, *nx, *ny, *nz);
     MAT3( x, *nx, *ny, *nz);
     MAT3( r, *nx, *ny, *nz);
     MAT3(w1, *nx, *ny, *nz);
 
-    // First get vector nonlinear term to avoid subroutine calls
-    ipkey = VAT(ipc, 10);
-    Vc_vec(cc, x, w1, nx, ny, nz, &ipkey);
-
-    // The residual
     for (k=2; k<=*nz-1; k++) {
         for (j=2; j<=*ny-1; j++) {
             for (i=2; i<=*nx-1; i++) {
@@ -669,6 +661,20 @@ VPUBLIC void Vnmresid7_1s(int *nx, int *ny, int *nz,
             }
         }
     }
+}
+
+VPUBLIC void Vnmresid7_1s(int *nx, int *ny, int *nz,
+        int *ipc, double *rpc,
+        double *oC, double *cc, double *fc,
+        double *oE, double *oN, double *uC,
+        double *x, double *r, double *w1) {
+
+    int ipkey;
+
+    (void)rpc;
+    ipkey = VAT(ipc, 10);
+    Vc_vec(cc, x, w1, nx, ny, nz, &ipkey);
+    nmresid7_kernel(nx, ny, nz, oC, fc, oE, oN, uC, x, r, w1);
 }
 
 
@@ -1239,4 +1245,23 @@ VPUBLIC void Vextrac(int *nxf, int *nyf, int *nzf,
 
     // Verify correctness of the output boundary points
     VfboundPMG00(nxc, nyc, nzc, xout);
+}
+
+VPUBLIC int Vnmresid_dc(int *nx, int *ny, int *nz,
+        int *ipc, double *rpc,
+        double *ac, double *cc, double *fc,
+        double *x, double *r, double *w1, double *dc) {
+    int ipkey = VAT(ipc, 10);
+    MAT2(ac, *nx * *ny * *nz, 4);
+    (void)dy_ac;
+    if (dc == VNULL || VAT(ipc, 11) != 7 || ipkey != 0) {
+        Vnmresid(nx, ny, nz, ipc, rpc, ac, cc, fc, x, r, w1);
+        return 0;
+    }
+    Vc_dc_vecpmg(cc, x, w1, dc, nx, ny, nz, &ipkey);
+    nmresid7_kernel(nx, ny, nz,
+            RAT2(ac, 1, 1), fc,
+            RAT2(ac, 1, 2), RAT2(ac, 1, 3), RAT2(ac, 1, 4),
+            x, r, w1);
+    return 1;
 }

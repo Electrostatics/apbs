@@ -118,3 +118,18 @@ if(APPLE)
 endif()
 add_test(NAME vgrid_dx_test COMMAND $<TARGET_FILE:vgrid_dx_test>)
 set_tests_properties(vgrid_dx_test PROPERTIES TIMEOUT 60 LABELS unit)
+
+add_executable(npbe_boltzmann_test npbe_boltzmann_test.c)
+target_link_libraries(npbe_boltzmann_test
+    apbs_generic
+    apbs_mg
+    apbs_pmgc
+    apbs_fem
+    apbs_routines
+    ${APBS_LIBS}
+)
+if(APPLE)
+    target_link_libraries(npbe_boltzmann_test "-framework CoreFoundation")
+endif()
+add_test(NAME npbe_boltzmann_test COMMAND $<TARGET_FILE:npbe_boltzmann_test>)
+set_tests_properties(npbe_boltzmann_test PROPERTIES TIMEOUT 60 LABELS unit)

@@ -55,6 +55,11 @@
 
 #include "newtond.h"
 
+VPRIVATE void getjac_cached(int *nx, int *ny, int *nz,
+        int *nlev_real, int *iz, int *lev, int *ipkey,
+        double *x, double *r, double *cprime, double *rhs,
+        double *cc, double *pc, int skip_fine_dc);
+
 VPUBLIC void Vfnewton(int *nx,int *ny,int *nz,
         double *x, int *iz,
         double *w0, double *w1, double *w2, double *w3,
@@ -178,7 +183,7 @@ VPUBLIC void Vnewton(int *nx, int *ny, int *nz,
 
     double xnorm_old, xnorm_new, damp, xnorm_med, xnorm_den;
     double rho_max, rho_min, rho_max_mod, rho_min_mod, errtol_p;
-    int iter_d, itmax_d, mode, idamp, ipkey;
+    int iter_d, itmax_d, mode, idamp, ipkey, cache_cprime, cprime_valid, dc_probed;
     int itmax_p, iters_p, iok_p, iinfo_p;
 
     // Utility and temproary parameters
@@ -260,11 +265,14 @@ VPUBLIC void Vnewton(int *nx, int *ny, int *nz,
 
     // Now compute residual with the initial guess
 
-    Vnmresid(nx, ny, nz,
+    /* Preserve cprime on the final solved Jacobian when *iinfo > 2 runs
+     * Vpower/Vipower condition analysis after the Newton loop exits. */
+    cache_cprime = (*iinfo <= 2);
+    cprime_valid = Vnmresid_dc(nx, ny, nz,
             RAT(ipc, VAT2(iz, 5, lev)), RAT(rpc, VAT2(iz, 6, lev)),
             RAT( ac, VAT2(iz, 7, lev)), RAT( cc, VAT2(iz, 1, lev)),
             RAT( fc, VAT2(iz, 1, lev)), RAT(  x, VAT2(iz, 1, lev)),
-            w0, w2);
+            w0, w2, cache_cprime ? RAT(cprime, VAT2(iz, 1, lev)) : VNULL);
     xnorm_old = Vxnrm1(nx, ny, nz, w0);
     if (*iok != 0) {
         xnorm_den = rsden;
@@ -296,8 +304,9 @@ VPUBLIC void Vnewton(int *nx, int *ny, int *nz,
 
         // Compute the current jacobian system and rhs
         ipkey = VAT(ipc, 10);
-        Vgetjac(nx, ny, nz, nlev_real, iz, ilev, &ipkey,
-                x, w0, cprime, rhs, cc, pc);
+        getjac_cached(nx, ny, nz, nlev_real, iz, ilev, &ipkey,
+                x, w0, cprime, rhs, cc, pc, cprime_valid);
+        cprime_valid = 0;
 
         // Determine number of correct digits in current residual
         // Algorithm 5.3 in the thesis, test version (1')
@@ -356,12 +365,13 @@ VPUBLIC void Vnewton(int *nx, int *ny, int *nz,
             damp = 1.0;
             Vxaxpy(nx, ny, nz, &damp, RAT(xtmp, VAT2(iz, 1, lev)), w1);
 
-            Vnmresid(nx, ny, nz,
+            dc_probed = Vnmresid_dc(nx, ny, nz,
                     RAT(ipc, VAT2(iz, 5, lev)), RAT(rpc, VAT2(iz, 6, lev)),
                     RAT( ac, VAT2(iz, 7, lev)), RAT( cc, VAT2(iz, 1, lev)),
                     RAT( fc, VAT2(iz, 1, lev)),
                     w1, w0,
-                    RAT(rhs, VAT2(iz, 1, lev)));
+                    RAT(rhs, VAT2(iz, 1, lev)),
+                    cache_cprime ? RAT(cprime, VAT2(iz, 1, lev)) : VNULL);
             xnorm_new = Vxnrm1(nx, ny, nz, w0);
 
             // Damping is still enabled -- doit
@@ -414,6 +424,11 @@ VPUBLIC void Vnewton(int *nx, int *ny, int *nz,
 
             VMESSAGE1("Damping accepted, relres = %f", xnorm_new / xnorm_den);
 
+            /* cprime holds dc(x + xtmp) from the full step above; it remains
+             * valid iff dc_probed succeeded and the half-step probe increased
+             * residual (iter_d == 1) so x = w2 kept the full step. */
+            cprime_valid = (dc_probed && iter_d == 1);
+
             // Determine whether or not to disable damping
             if ((iter_d - 1) == 0) {
                 VMESSAGE0("Damping disabled");
@@ -427,12 +442,13 @@ VPUBLIC void Vnewton(int *nx, int *ny, int *nz,
             Vxaxpy(nx, ny, nz, &damp,
                     RAT(xtmp, VAT2(iz, 1, lev)), RAT(x, VAT2(iz, 1, lev)));
 
-            Vnmresid(nx, ny, nz,
+            cprime_valid = Vnmresid_dc(nx, ny, nz,
                     RAT(ipc, VAT2(iz, 5, lev)), RAT(rpc, VAT2(iz, 6, lev)),
                     RAT( ac, VAT2(iz, 7, lev)), RAT( cc, VAT2(iz, 1, lev)),
                     RAT( fc, VAT2(iz, 1, lev)), RAT(  x, VAT2(iz, 1, lev)),
                     w0,
-                    RAT(rhs, VAT2(iz, 1, lev)));
+                    RAT(rhs, VAT2(iz, 1, lev)),
+                    cache_cprime ? RAT(cprime, VAT2(iz, 1, lev)) : VNULL);
 
             xnorm_new = Vxnrm1(nx, ny, nz, w0);
             xnorm_old = xnorm_new;
@@ -547,11 +563,11 @@ VPUBLIC void Vnewton(int *nx, int *ny, int *nz,
 
 
 
-VPUBLIC void Vgetjac(int *nx, int *ny, int *nz,
+VPRIVATE void getjac_cached(int *nx, int *ny, int *nz,
         int *nlev_real, int *iz, int *lev, int *ipkey,
         double *x, double *r,
         double *cprime, double *rhs,
-        double *cc, double *pc) {
+        double *cc, double *pc, int skip_fine_dc) {
 
     int   nxx,   nyy,   nzz;
     int nxold, nyold, nzold;
@@ -568,9 +584,15 @@ VPUBLIC void Vgetjac(int *nx, int *ny, int *nz,
     Vxcopy(nx, ny, nz, r, RAT(rhs, VAT2(iz, 1,*lev)));
 
     // Get nonlinear part of the jacobian operator
-    Vdc_vec(RAT(cc, VAT2(iz, 1,*lev)), RAT(x, VAT2(iz, 1,*lev)),
-              RAT(cprime, VAT2(iz, 1,*lev)),
-            nx, ny, nz, ipkey);
+    /* When skip_fine_dc is set, cprime came from w1 (updated on interior
+     * nodes 2..n-1 by Vxcopy/Vxaxpy); stale fine-boundary entries are safe
+     * because Vrestrc zeroes boundaries via VfboundPMG00 and smoothers and
+     * matvecs read interior nodes 2..n-1 only. */
+    if (!skip_fine_dc) {
+        Vdc_vec(RAT(cc, VAT2(iz, 1,*lev)), RAT(x, VAT2(iz, 1,*lev)),
+                  RAT(cprime, VAT2(iz, 1,*lev)),
+                nx, ny, nz, ipkey);
+    }
 
     // Build the (nlev-1) level operators
     for (level=*lev+1; level<=*nlev_real; level++) {
@@ -595,4 +617,13 @@ VPUBLIC void Vgetjac(int *nx, int *ny, int *nz,
                 RAT(cprime, VAT2(iz,  1, level  )),
                 RAT(    pc, VAT2(iz, 11, level-1)));
     }
+}
+
+VPUBLIC void Vgetjac(int *nx, int *ny, int *nz,
+        int *nlev_real, int *iz, int *lev, int *ipkey,
+        double *x, double *r,
+        double *cprime, double *rhs,
+        double *cc, double *pc) {
+    getjac_cached(nx, ny, nz, nlev_real, iz, lev, ipkey,
+            x, r, cprime, rhs, cc, pc, 0);
 }
