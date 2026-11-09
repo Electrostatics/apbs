@@ -55,7 +55,190 @@
  */
 
 #include "vgrid.h"
+#include <fenv.h>
+#include <locale.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <string.h>
+
+VPRIVATE const char dx_digits2[201] =
+    "0001020304050607080910111213141516171819"
+    "2021222324252627282930313233343536373839"
+    "4041424344454647484950515253545556575859"
+    "6061626364656667686970717273747576777879"
+    "8081828384858687888990919293949596979899";
+
+VPRIVATE const double dx_pow10[206] = {
+    1e-99, 1e-98, 1e-97, 1e-96, 1e-95, 1e-94, 1e-93, 1e-92, 1e-91, 1e-90,
+    1e-89, 1e-88, 1e-87, 1e-86, 1e-85, 1e-84, 1e-83, 1e-82, 1e-81, 1e-80,
+    1e-79, 1e-78, 1e-77, 1e-76, 1e-75, 1e-74, 1e-73, 1e-72, 1e-71, 1e-70,
+    1e-69, 1e-68, 1e-67, 1e-66, 1e-65, 1e-64, 1e-63, 1e-62, 1e-61, 1e-60,
+    1e-59, 1e-58, 1e-57, 1e-56, 1e-55, 1e-54, 1e-53, 1e-52, 1e-51, 1e-50,
+    1e-49, 1e-48, 1e-47, 1e-46, 1e-45, 1e-44, 1e-43, 1e-42, 1e-41, 1e-40,
+    1e-39, 1e-38, 1e-37, 1e-36, 1e-35, 1e-34, 1e-33, 1e-32, 1e-31, 1e-30,
+    1e-29, 1e-28, 1e-27, 1e-26, 1e-25, 1e-24, 1e-23, 1e-22, 1e-21, 1e-20,
+    1e-19, 1e-18, 1e-17, 1e-16, 1e-15, 1e-14, 1e-13, 1e-12, 1e-11, 1e-10,
+    1e-09, 1e-08, 1e-07, 1e-06, 1e-05, 1e-04, 1e-03, 1e-02, 1e-01, 1e+00,
+    1e+01, 1e+02, 1e+03, 1e+04, 1e+05, 1e+06, 1e+07, 1e+08, 1e+09, 1e+10,
+    1e+11, 1e+12, 1e+13, 1e+14, 1e+15, 1e+16, 1e+17, 1e+18, 1e+19, 1e+20,
+    1e+21, 1e+22, 1e+23, 1e+24, 1e+25, 1e+26, 1e+27, 1e+28, 1e+29, 1e+30,
+    1e+31, 1e+32, 1e+33, 1e+34, 1e+35, 1e+36, 1e+37, 1e+38, 1e+39, 1e+40,
+    1e+41, 1e+42, 1e+43, 1e+44, 1e+45, 1e+46, 1e+47, 1e+48, 1e+49, 1e+50,
+    1e+51, 1e+52, 1e+53, 1e+54, 1e+55, 1e+56, 1e+57, 1e+58, 1e+59, 1e+60,
+    1e+61, 1e+62, 1e+63, 1e+64, 1e+65, 1e+66, 1e+67, 1e+68, 1e+69, 1e+70,
+    1e+71, 1e+72, 1e+73, 1e+74, 1e+75, 1e+76, 1e+77, 1e+78, 1e+79, 1e+80,
+    1e+81, 1e+82, 1e+83, 1e+84, 1e+85, 1e+86, 1e+87, 1e+88, 1e+89, 1e+90,
+    1e+91, 1e+92, 1e+93, 1e+94, 1e+95, 1e+96, 1e+97, 1e+98, 1e+99, 1e+100,
+    1e+101, 1e+102, 1e+103, 1e+104, 1e+105, 1e+106
+};
+
+VPRIVATE int fallbackDXExp12_6(char *dst, size_t cap, double val) {
+  int n = snprintf(dst, cap, "%12.6e ", val);
+  return (n <= 0 || (size_t)n >= cap) ? 0 : n;
+}
+
+VPRIVATE int canUseFastDXFormat(void) {
+  const struct lconv *lc;
+  char probe[32];
+#ifdef FE_TONEAREST
+  if (fegetround() != FE_TONEAREST) return 0;
+#else
+  return 0;
+#endif
+  lc = localeconv();
+  if (lc == NULL || lc->decimal_point == NULL ||
+      lc->decimal_point[0] != '.' || lc->decimal_point[1] != '\0') {
+    return 0;
+  }
+  if (snprintf(probe, sizeof(probe), "%12.6e ", 1.23456789) != 13 ||
+      memcmp(probe, "1.234568e+00 ", 13) != 0) {
+    return 0;
+  }
+  if (snprintf(probe, sizeof(probe), "%12.6e ", -1.23456789) != 14 ||
+      memcmp(probe, "-1.234568e+00 ", 14) != 0) {
+    return 0;
+  }
+  return 1;
+}
+
+VPRIVATE int formatDXExp12_6(char *dst, size_t cap, double val) {
+  uint64_t bits, abs_bits;
+  int sign, exp2, e10, aexp, pos;
+  double aval, m, diff;
+  uint32_t k, d0, r, p1, p2, p3;
+
+  memcpy(&bits, &val, sizeof(bits));
+  abs_bits = bits & 0x7fffffffffffffffULL;
+  sign = (int)(bits >> 63);
+  if (abs_bits == 0) {
+    if (sign) {
+      memcpy(dst, "-0.000000e+00 ", 14);
+      return 14;
+    }
+    memcpy(dst, "0.000000e+00 ", 13);
+    return 13;
+  }
+
+  exp2 = (int)(abs_bits >> 52) - 1023;
+  memcpy(&aval, &abs_bits, sizeof(aval));
+  /* Two's-complement arithmetic right shift approximates floor(exp2 * log10(2)). */
+  e10 = (exp2 * 78913) >> 18;
+  if (e10 < -99 || e10 > 99) return fallbackDXExp12_6(dst, cap, val);
+  if (aval >= dx_pow10[99 + e10 + 1]) {
+    if (++e10 > 99) return fallbackDXExp12_6(dst, cap, val);
+  } else if (aval < dx_pow10[99 + e10]) {
+    if (--e10 < -99) return fallbackDXExp12_6(dst, cap, val);
+  }
+
+  m = (e10 <= 6) ? (aval * dx_pow10[99 + 6 - e10])
+                 : (aval / dx_pow10[99 + e10 - 6]);
+  k = (uint32_t)(m + 0.5);
+  diff = VABS(m - (double)k);
+  if (diff >= 0.49999) return fallbackDXExp12_6(dst, cap, val);
+  if (k == 10000000U) {
+    k = 1000000U;
+    if (++e10 > 99) return fallbackDXExp12_6(dst, cap, val);
+  } else if (k < 1000000U || k > 10000000U) {
+    return fallbackDXExp12_6(dst, cap, val);
+  }
+
+  pos = 0;
+  if (sign) dst[pos++] = '-';
+  d0 = k / 1000000U;
+  r = k % 1000000U;
+  p1 = r / 10000U;
+  r = r % 10000U;
+  p2 = r / 100U;
+  p3 = r % 100U;
+
+  dst[pos] = (char)('0' + d0);
+  dst[pos + 1] = '.';
+  memcpy(dst + pos + 2, dx_digits2 + 2 * p1, 2);
+  memcpy(dst + pos + 4, dx_digits2 + 2 * p2, 2);
+  memcpy(dst + pos + 6, dx_digits2 + 2 * p3, 2);
+  dst[pos + 8] = 'e';
+  if (e10 < 0) {
+    dst[pos + 9] = '-';
+    aexp = -e10;
+  } else {
+    dst[pos + 9] = '+';
+    aexp = e10;
+  }
+  memcpy(dst + pos + 10, dx_digits2 + 2 * aexp, 2);
+  dst[pos + 12] = ' ';
+  return pos + 13;
+}
+
+VPRIVATE void writeDXData(Vio *sock, const double *data, const double *pvec,
+    int nx, int ny, int nz) {
+  size_t icol = 0, i, j, k, u;
+  int dxpos = 0;
+  int fast_ok;
+  char dxbuf[65536];
+  /* In maloc vio.c, FILE/SDIO/BUFF ASC sockets pass straight through to
+   * Vio_write, whereas UNIX/INET buffer headers in putBuffer and XDR encodes
+   * binary floats. */
+  if (sock->frmt != VIO_ASC || (sock->type != VIO_FILE
+      && sock->type != VIO_SDIO && sock->type != VIO_BUFF)) {
+    for (i = 0; i < (size_t)nx; i++) {
+      for (j = 0; j < (size_t)ny; j++) {
+        for (k = 0; k < (size_t)nz; k++) {
+          u = k * (size_t)nx * (size_t)ny + j * (size_t)nx + i;
+          if (pvec == VNULL || pvec[u] > 0.0) {
+            Vio_printf(sock, "%12.6e ", data[u]);
+            if (++icol == 3) { icol = 0; Vio_printf(sock, "\n"); }
+          }
+        }
+      }
+    }
+    if (icol != 0) Vio_printf(sock, "\n");
+    return;
+  }
+  fast_ok = canUseFastDXFormat();
+  for (i = 0; i < (size_t)nx; i++) {
+    for (j = 0; j < (size_t)ny; j++) {
+      for (k = 0; k < (size_t)nz; k++) {
+        u = k * (size_t)nx * (size_t)ny + j * (size_t)nx + i;
+        if (pvec != VNULL && !(pvec[u] > 0.0)) continue;
+        dxpos += fast_ok
+            ? formatDXExp12_6(dxbuf + dxpos, sizeof(dxbuf) - (size_t)dxpos,
+                data[u])
+            : fallbackDXExp12_6(dxbuf + dxpos, sizeof(dxbuf) - (size_t)dxpos,
+                data[u]);
+        if (++icol == 3) {
+          icol = 0;
+          dxbuf[dxpos++] = '\n';
+        }
+        if (dxpos > (int)sizeof(dxbuf) - 64) {
+          Vio_write(sock, dxbuf, dxpos);
+          dxpos = 0;
+        }
+      }
+    }
+  }
+  if (icol != 0) dxbuf[dxpos++] = '\n';
+  if (dxpos > 0) Vio_write(sock, dxbuf, dxpos);
+}
 
 VEMBED(rcsid="$Id$")
 
@@ -1208,7 +1391,7 @@ VPUBLIC void Vgrid_writeDX(Vgrid *thee, const char *iodev, const char *iofmt,
   double xmin, ymin, zmin, hx, hy, hzed;
   int nx, ny, nz, nxPART, nyPART, nzPART;
   int usepart, gotit;
-  size_t icol, i, j, k, u;
+  size_t i, j, k;
   double x, y, z, xminPART, yminPART, zminPART;
   Vio *sock;
   char precFormat[VMAX_BUFSIZE];
@@ -1358,24 +1541,7 @@ VPUBLIC void Vgrid_writeDX(Vgrid *thee, const char *iodev, const char *iofmt,
     /* Write off the DX data */
     Vio_printf(sock, "object 3 class array type double rank 0 items %lu \
         data follows\n", (nxPART*nyPART*nzPART));
-    icol = 0;
-    for (i=0; i<nx; i++) {
-      for (j=0; j<ny; j++) {
-        for (k=0; k<nz; k++) {
-          u = k*(nx)*(ny)+j*(nx)+i;
-          if (pvec[u] > 0.0) {
-            Vio_printf(sock, "%12.6e ", thee->data[u]);
-            icol++;
-            if (icol == 3) {
-              icol = 0;
-              Vio_printf(sock, "\n");
-            }
-          }
-        }
-      }
-    }
-
-    if (icol != 0) Vio_printf(sock, "\n");
+    writeDXData(sock, thee->data, pvec, nx, ny, nz);
 
     /* Create the field */
     Vio_printf(sock, "attribute \"dep\" string \"positions\"\n");
@@ -1419,21 +1585,7 @@ VPUBLIC void Vgrid_writeDX(Vgrid *thee, const char *iodev, const char *iofmt,
     /* Write off the DX data */
     Vio_printf(sock, "object 3 class array type double rank 0 items %lu \
         data follows\n", (nx*ny*nz));
-    icol = 0;
-    for (i=0; i<nx; i++) {
-      for (j=0; j<ny; j++) {
-        for (k=0; k<nz; k++) {
-          u = k*(nx)*(ny)+j*(nx)+i;
-          Vio_printf(sock, "%12.6e ", thee->data[u]);
-          icol++;
-          if (icol == 3) {
-            icol = 0;
-            Vio_printf(sock, "\n");
-          }
-        }
-      }
-    }
-    if (icol != 0) Vio_printf(sock, "\n");
+    writeDXData(sock, thee->data, VNULL, nx, ny, nz);
 
     /* Create the field */
     Vio_printf(sock, "attribute \"dep\" string \"positions\"\n");
