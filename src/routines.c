@@ -1976,6 +1976,24 @@ VPUBLIC void killForce(Vmem *mem, NOsh *nosh, int nforce[NOSH_MAXCALC],
     }
 }
 
+#ifndef HAVE_MPI_H
+VPRIVATE int partStemRank(NOsh *nosh, PBEparm *pbeparm)
+{
+    int i;
+
+    for (i = 0; i < nosh->ncalc; i++)
+    {
+        if (nosh->calc[i] != VNULL && nosh->calc[i]->pbeparm == pbeparm &&
+            nosh->calc[i]->calctype == NCT_MG &&
+            nosh->calc[i]->mgparm->partRank >= 0)
+        {
+            return nosh->calc[i]->mgparm->partRank;
+        }
+    }
+    return (nosh->ispara == 1) ? nosh->proc_rank : -1;
+}
+#endif
+
 VPUBLIC int writematMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg)
 {
 
@@ -1983,6 +2001,9 @@ VPUBLIC int writematMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg)
     char outpath[VMAX_ARGLEN];
     char mxtype[3];
     int strlenmax;
+#ifndef HAVE_MPI_H
+    int prank;
+#endif
 
     if (nosh->bogus)
         return 1;
@@ -1998,7 +2019,8 @@ VPUBLIC int writematMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg)
     }
     sprintf(writematstem, "%s-PE%d", pbeparm->writematstem, rank);
 #else
-    strlenmax = (int)(VMAX_ARGLEN)-1;
+    prank = partStemRank(nosh, pbeparm);
+    strlenmax = (prank >= 0) ? (int)(VMAX_ARGLEN)-14 : (int)(VMAX_ARGLEN)-1;
     if ((int)strlen(pbeparm->writematstem) > strlenmax)
     {
         Vnm_tprint(2, "  Matrix name (%s) too long (%d char max)!\n",
@@ -2006,9 +2028,9 @@ VPUBLIC int writematMG(int rank, NOsh *nosh, PBEparm *pbeparm, Vpmg *pmg)
         Vnm_tprint(2, "  Not writing matrix!\n");
         return 0;
     }
-    if (nosh->ispara == 1)
+    if (prank >= 0)
     {
-        sprintf(writematstem, "%s-PE%d", pbeparm->writematstem, nosh->proc_rank);
+        sprintf(writematstem, "%s-PE%d", pbeparm->writematstem, prank);
     }
     else
     {
@@ -2078,6 +2100,81 @@ VPUBLIC void storeAtomEnergy(Vpmg *pmg, int icalc, double **atomEnergy,
     {
         atom = Valist_getAtom(alist, i);
         (*atomEnergy)[i] = Vpmg_qfAtomEnergy(pmg, atom);
+    }
+}
+
+VPUBLIC void foldParaPartitions(
+    NOsh *nosh, double totEnergy[NOSH_MAXCALC], double qfEnergy[NOSH_MAXCALC],
+    double qmEnergy[NOSH_MAXCALC], double dielEnergy[NOSH_MAXCALC],
+    int nenergy[NOSH_MAXCALC], double *atomEnergy[NOSH_MAXCALC],
+    int nforce[NOSH_MAXCALC], AtomForce *atomForce[NOSH_MAXCALC])
+{
+    int ielec, min_start, start, last, j, p, k, c, nf, finest[NOSH_MAXCALC];
+    double s, fq, fi, fd;
+    PBEparm *pbeparm;
+
+    if (nosh == VNULL || nosh->bogus) return;
+    for (ielec = 0; ielec < nosh->nelec; ielec++) {
+        last = nosh->elec2calc[ielec];
+        if (last < 0 || last >= nosh->ncalc || nosh->calc[last] == VNULL ||
+            nosh->calc[last]->calctype != NCT_MG ||
+            nosh->calc[last]->mgparm->partRank < 0) continue;
+        min_start = (ielec > 0) ? (nosh->elec2calc[ielec - 1] + 1) : 0;
+        start = last;
+        while (start > min_start && nosh->calc[start - 1] != VNULL &&
+               nosh->calc[start - 1]->calctype == NCT_MG &&
+               nosh->calc[start - 1]->mgparm->partRank >= 0) start--;
+        nf = 0;
+        for (j = start; j <= last; j++) {
+            if (j == last || nosh->calc[j + 1]->mgparm->partRank !=
+                             nosh->calc[j]->mgparm->partRank) finest[nf++] = j;
+        }
+        if (nf <= 1) continue;
+        pbeparm = nosh->calc[last]->pbeparm;
+        if (pbeparm->calcenergy != PCE_NO && totEnergy != VNULL) {
+            s = totEnergy[finest[0]];
+            for (p = 1; p < nf; p++) s += totEnergy[finest[p]];
+            totEnergy[last] = s;
+        }
+        if (pbeparm->calcenergy == PCE_COMPS) {
+            if (qfEnergy != VNULL && qmEnergy != VNULL && dielEnergy != VNULL) {
+                s = qfEnergy[finest[0]];
+                for (p = 1; p < nf; p++) s += qfEnergy[finest[p]];
+                qfEnergy[last] = s;
+                s = qmEnergy[finest[0]];
+                for (p = 1; p < nf; p++) s += qmEnergy[finest[p]];
+                qmEnergy[last] = s;
+                s = dielEnergy[finest[0]];
+                for (p = 1; p < nf; p++) s += dielEnergy[finest[p]];
+                dielEnergy[last] = s;
+            }
+            if (nenergy != VNULL && atomEnergy != VNULL &&
+                nenergy[last] > 0 && atomEnergy[last] != VNULL) {
+                for (k = 0; k < nenergy[last]; k++) {
+                    s = atomEnergy[finest[0]][k];
+                    for (p = 1; p < nf; p++) s += atomEnergy[finest[p]][k];
+                    atomEnergy[last][k] = s;
+                }
+            }
+        }
+        if (pbeparm->calcforce != PCF_NO && nforce != VNULL &&
+            atomForce != VNULL && nforce[last] > 0 && atomForce[last] != VNULL) {
+            for (k = 0; k < nforce[last]; k++) {
+                for (c = 0; c < 3; c++) {
+                    fq = atomForce[finest[0]][k].qfForce[c];
+                    fi = atomForce[finest[0]][k].ibForce[c];
+                    fd = atomForce[finest[0]][k].dbForce[c];
+                    for (p = 1; p < nf; p++) {
+                        fq += atomForce[finest[p]][k].qfForce[c];
+                        fi += atomForce[finest[p]][k].ibForce[c];
+                        fd += atomForce[finest[p]][k].dbForce[c];
+                    }
+                    atomForce[last][k].qfForce[c] = fq;
+                    atomForce[last][k].ibForce[c] = fi;
+                    atomForce[last][k].dbForce[c] = fd;
+                }
+            }
+        }
     }
 }
 
@@ -2653,9 +2750,16 @@ VPUBLIC int writedataMG(int rank,
 
     Vgrid *grid;
     Vio *sock;
+#ifndef HAVE_MPI_H
+    int prank;
+#endif
 
     if (nosh->bogus)
         return 1;
+
+#ifndef HAVE_MPI_H
+    prank = partStemRank(nosh, pbeparm);
+#endif
 
     for (i = 0; i < pbeparm->numwrite; i++)
     {
@@ -2902,9 +3006,9 @@ VPUBLIC int writedataMG(int rank,
 #ifdef HAVE_MPI_H
         sprintf(writestem, "%s-PE%d", pbeparm->writestem[i], rank);
 #else
-        if (nosh->ispara)
+        if (prank >= 0)
         {
-            sprintf(writestem, "%s-PE%d", pbeparm->writestem[i], nosh->proc_rank);
+            sprintf(writestem, "%s-PE%d", pbeparm->writestem[i], prank);
         }
         else
         {

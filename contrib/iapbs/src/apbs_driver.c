@@ -387,7 +387,7 @@ int apbsdrv_(
 			&(nenergy[i]), &(totEnergy[i]), &(qfEnergy[i]), 
 			&(qmEnergy[i]), &(dielEnergy[i]));
 		esenergy[0] = 0.0;
-		esenergy[0] = getElecEnergy(com, nosh, totEnergy, i);
+		esenergy[0] = getElecEnergy(com, nosh, totEnergy, (i < NOSH_MAXPRINT) ? i : 0);
 		
 		//		if(debug>3) printElecEnergy(com, nosh, totEnergy, i);
 
@@ -476,7 +476,7 @@ int apbsdrv_(
 		}
 		/* Write grid-dimensioned data to file if that's what user wants*/
 		if( is_grid2file ) {
-		  writedataMG(rank, nosh, pbeparm, pmg[i]);
+		  writedataMG((mgparm->partRank >= 0) ? mgparm->partRank : rank, nosh, pbeparm, pmg[i]);
 		}
 		/* Return in-memeory instead */
 		else {		
@@ -548,7 +548,7 @@ int apbsdrv_(
 		  }
 		}
 		/* Write matrix */
-		writematMG(rank, nosh, pbeparm, pmg[i]);
+		writematMG((mgparm->partRank >= 0) ? mgparm->partRank : rank, nosh, pbeparm, pmg[i]);
 
 		/* If needed, cache atom energies */				
 		nenergy[i] = 0;
@@ -695,6 +695,53 @@ int apbsdrv_(
 			   nosh->calc[i]->calctype);
 		exit(2);
 	}
+    }
+
+    foldParaPartitions(nosh, totEnergy, qfEnergy, qmEnergy, dielEnergy,
+                       nenergy, atomEnergy, nforce, atomForce);
+    if (nosh->nelec > 0) {
+        k = nosh->elec2calc[nosh->nelec - 1];
+        if (k >= 0 && k < nosh->ncalc && nosh->calc[k] != VNULL &&
+            nosh->calc[k]->calctype == NCT_MG &&
+            nosh->calc[k]->mgparm->partRank >= 0) {
+            pbeparm = nosh->calc[k]->pbeparm;
+            esenergy[0] = getElecEnergy(com, nosh, totEnergy, 0);
+            if (pbeparm->calcforce == PCF_TOTAL && nforce[k] > 0 && atomForce[k] != VNULL) {
+                apbsdx[0] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na *
+                    (atomForce[k][0].qfForce[0] + atomForce[k][0].ibForce[0] + atomForce[k][0].dbForce[0]);
+                apbsdy[0] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na *
+                    (atomForce[k][0].qfForce[1] + atomForce[k][0].ibForce[1] + atomForce[k][0].dbForce[1]);
+                apbsdz[0] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na *
+                    (atomForce[k][0].qfForce[2] + atomForce[k][0].ibForce[2] + atomForce[k][0].dbForce[2]);
+                apbsqfx[0] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][0].qfForce[0];
+                apbsqfy[0] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][0].qfForce[1];
+                apbsqfz[0] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][0].qfForce[2];
+                apbsibx[0] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][0].ibForce[0];
+                apbsiby[0] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][0].ibForce[1];
+                apbsibz[0] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][0].ibForce[2];
+                apbsdbx[0] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][0].dbForce[0];
+                apbsdby[0] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][0].dbForce[1];
+                apbsdbz[0] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][0].dbForce[2];
+            } else if (pbeparm->calcforce == PCF_COMPS && nforce[k] > 0 && atomForce[k] != VNULL) {
+                for (j = 0; j < natom; j++) {
+                    apbsdx[j] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na *
+                        (atomForce[k][j].qfForce[0] + atomForce[k][j].ibForce[0] + atomForce[k][j].dbForce[0]);
+                    apbsdy[j] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na *
+                        (atomForce[k][j].qfForce[1] + atomForce[k][j].ibForce[1] + atomForce[k][j].dbForce[1]);
+                    apbsdz[j] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na *
+                        (atomForce[k][j].qfForce[2] + atomForce[k][j].ibForce[2] + atomForce[k][j].dbForce[2]);
+                    apbsqfx[j] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][j].qfForce[0];
+                    apbsqfy[j] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][j].qfForce[1];
+                    apbsqfz[j] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][j].qfForce[2];
+                    apbsibx[j] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][j].ibForce[0];
+                    apbsiby[j] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][j].ibForce[1];
+                    apbsibz[j] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][j].ibForce[2];
+                    apbsdbx[j] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][j].dbForce[0];
+                    apbsdby[j] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][j].dbForce[1];
+                    apbsdbz[j] = Vunit_kb*pbeparm->temp*(1e-3)*Vunit_Na * atomForce[k][j].dbForce[2];
+                }
+            }
+        }
     }
 
     //Clear out the parameter file memory

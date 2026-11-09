@@ -232,6 +232,47 @@ class BornRegressionTests(unittest.TestCase):
             )
             compare_force_dicts(apolar, reference, logger)
 
+    def test_mg_para_without_mpi(self):
+        source = ROOT / "examples/born"
+        apbs_dir = Path(APBS).resolve().parent
+        cfg = apbs_dir / "apbscfg.h"
+        if not cfg.exists():
+            cfg = apbs_dir.parent / "src/apbscfg.h"
+        has_mpi = cfg.exists() and "#define HAVE_MPI_H" in cfg.read_text()
+        with tempfile.TemporaryDirectory(prefix="apbs-mgpara-") as directory:
+            work = Path(directory)
+            shutil.copyfile(source / "ion.pqr", work / "ion.pqr")
+            shutil.copyfile(
+                source / "apbs-mol-parallel.in", work / "apbs-mol-parallel.in"
+            )
+            process = subprocess.run(
+                [APBS, "apbs-mol-parallel.in"], cwd=work,
+                capture_output=True, text=True, timeout=180,
+            )
+            if has_mpi:
+                self.assertNotEqual(process.returncode, 0)
+                self.assertIn(
+                    "too few processors", process.stderr + process.stdout
+                )
+                return
+            self.assertEqual(
+                process.returncode, 0, process.stdout + process.stderr
+            )
+            self.assertIn(
+                "mg-para: no MPI; running all 4 partitions in this process",
+                process.stdout,
+            )
+            energies = [
+                float(value) for value in re.findall(
+                    r"Global net ELEC energy\s*=\s*([+-]?\d+\.\d+E[+-]\d+)",
+                    process.stdout,
+                )
+            ]
+            self.assertEqual(len(energies), 1, process.stdout)
+            self.assertAlmostEqual(
+                energies[0], -2.304918086635E+02, delta=0.023
+            )
+
 
 if __name__ == "__main__":
     APBS = str(Path(sys.argv.pop(1)).resolve())

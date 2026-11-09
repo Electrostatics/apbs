@@ -351,6 +351,15 @@ VEXTERNC void storeAtomEnergy(
         );
 
 /**
+ * @brief Sum finest-level observables across in-process mg-para partitions
+ * @ingroup Frontend */
+VEXTERNC void foldParaPartitions(NOsh *nosh,
+  double totEnergy[NOSH_MAXCALC], double qfEnergy[NOSH_MAXCALC],
+  double qmEnergy[NOSH_MAXCALC], double dielEnergy[NOSH_MAXCALC],
+  int nenergy[NOSH_MAXCALC], double *atomEnergy[NOSH_MAXCALC],
+  int nforce[NOSH_MAXCALC], AtomForce *atomForce[NOSH_MAXCALC]);
+
+/**
  * @brief Write out information to a flat file
  * @ingroup Frontend
  * @author  Todd Dolinsky

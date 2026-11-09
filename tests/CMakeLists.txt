@@ -118,3 +118,18 @@ if(APPLE)
 endif()
 add_test(NAME vgrid_dx_test COMMAND $<TARGET_FILE:vgrid_dx_test>)
 set_tests_properties(vgrid_dx_test PROPERTIES TIMEOUT 60 LABELS unit)
+
+add_executable(mg_para_test mg_para_test.c)
+target_link_libraries(mg_para_test
+    apbs_generic
+    apbs_mg
+    apbs_pmgc
+    apbs_fem
+    apbs_routines
+    ${APBS_LIBS}
+)
+if(APPLE)
+    target_link_libraries(mg_para_test "-framework CoreFoundation")
+endif()
+add_test(NAME mg_para_test COMMAND $<TARGET_FILE:mg_para_test>)
+set_tests_properties(mg_para_test PROPERTIES TIMEOUT 60 LABELS unit)
