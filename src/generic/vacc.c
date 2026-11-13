@@ -1525,13 +1525,14 @@ VPUBLIC void Vacc_totalAtomdSAV(Vacc *thee, double dpos, double srad, Vatom *ato
 
 VPUBLIC double Vacc_totalSAV(Vacc *thee, Vclist *clist, APOLparm *apolparm, double radius) {
 
-    int i;
+    int i, ix, nx;
     int npts[3];
 
     double spacs[3], vec[3];
     double w, wx, wy, wz, len, fn, x, y, z, vol;
-    double vol_density,sav;
+    double vol_density, sav, local_sav;
     double *lower_corner, *upper_corner;
+    double *xvals, *slice_sav;
 
     sav = 0.0;
     vol = 1.0;
@@ -1558,7 +1559,29 @@ VPUBLIC double Vacc_totalSAV(Vacc *thee, Vclist *clist, APOLparm *apolparm, doub
         }
     }
 
-    for (x=lower_corner[0]; x<=upper_corner[0]; x=x+spacs[0]) {
+    if (radius > Vclist_maxRadius(thee->clist)) {
+        Vnm_print(2, "Vacc_ivdwAcc: got radius (%g) bigger than max radius (%g)\n",
+                  radius, Vclist_maxRadius(thee->clist));
+        VASSERT(0);
+    }
+
+    nx = 0;
+    for (x=lower_corner[0]; x<=upper_corner[0]; x=x+spacs[0]) nx++;
+    if (nx <= 0) return 0.0;
+
+    xvals = (double *)malloc((size_t)nx * sizeof(double));
+    slice_sav = (double *)malloc((size_t)nx * sizeof(double));
+    VASSERT(xvals != VNULL && slice_sav != VNULL);
+    ix = 0;
+    for (x=lower_corner[0]; x<=upper_corner[0]; x=x+spacs[0]) xvals[ix++] = x;
+
+    /* Each term is 0 or wx*wy*wz in {1/8, 1/4, 1/2, 1}, so slice sums are exact multiples of 1/8. */
+#ifdef _OPENMP
+#pragma omp parallel for private(ix, x, y, z, wx, wy, wz, w, vec, local_sav) schedule(dynamic, 2)
+#endif
+    for (ix=0; ix<nx; ix++) {
+        x = xvals[ix];
+        local_sav = 0.0;
         if ( VABS(x - lower_corner[0]) < VSMALL) {
             wx = 0.5;
         } else if ( VABS(x - upper_corner[0]) < VSMALL) {
@@ -1588,11 +1611,16 @@ VPUBLIC double Vacc_totalSAV(Vacc *thee, Vclist *clist, APOLparm *apolparm, doub
 
                 w = wx*wy*wz;
 
-                sav += (w*(1.0-Vacc_ivdwAcc(thee, vec, radius)));
+                local_sav += (w*(1.0-Vacc_ivdwAcc(thee, vec, radius)));
 
             } /* z loop */
         } /* y loop */
+        slice_sav[ix] = local_sav;
     } /* x loop */
+
+    for (ix=0; ix<nx; ix++) sav += slice_sav[ix];
+    free(xvals);
+    free(slice_sav);
 
     w  = spacs[0]*spacs[1]*spacs[2];
     sav *= w;
@@ -1672,8 +1700,13 @@ int Vacc_wcaEnergyAtom(Vacc *thee, APOLparm *apolparm, Valist *alist,
         spacs[i] = 0.5;
         if (apolparm->setgrid) {
             if (apolparm->grid[i] > spacs[i]) {
-                Vnm_print(2, "Vacc_totalSAV:  Warning, your GRID value (%g) is larger than the recommended value (%g)!\n",
-                    apolparm->grid[i], spacs[i]);
+#ifdef _OPENMP
+#pragma omp critical(apbs_vnm_print)
+#endif
+                {
+                    Vnm_print(2, "Vacc_totalSAV:  Warning, your GRID value (%g) is larger than the recommended value (%g)!\n",
+                        apolparm->grid[i], spacs[i]);
+                }
             }
             spacs[i] = apolparm->grid[i];
         }
