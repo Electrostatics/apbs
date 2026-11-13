@@ -53,6 +53,28 @@
  */
 
 #include "gsd.h"
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
+/* 27-point stencil does ~4x the work per point of 7-point, so lower gate pays. */
+#ifndef PMG_OMP_MIN_N27
+#define PMG_OMP_MIN_N27 8192
+#endif
+
+#if defined(_OPENMP) && (_OPENMP >= 201307)
+#define GSRB27_JBLOCK 4       /* Rows per plane wavefront publication step */
+#define GSRB27_MAX_NZ 1025    /* Max nz for plane progress array (else serial) */
+#ifndef GSRB27_SPIN_LIMIT
+#define GSRB27_SPIN_LIMIT 1000
+#endif
+#if defined(__unix__) || defined(__APPLE__)
+#include <sched.h>
+#define GSRB27_YIELD() ((void)sched_yield())
+#else
+#define GSRB27_YIELD() ((void)0)
+#endif
+#endif
 
 VPUBLIC void Vgsrb(int *nx, int *ny, int *nz,
         int *ipc, double *rpc,
@@ -164,6 +186,46 @@ VPUBLIC void Vgsrb7x(int *nx,int *ny,int *nz,
 
 
 
+VPRIVATE void gsrb27_row(int j, int k, int parity, int nx, int ny,
+        const double *oC, const double *cc, const double *fc,
+        const double *oE, const double *oN, const double *uC,
+        const double *oNE, const double *oNW,
+        const double *uE, const double *uW, const double *uN, const double *uS,
+        const double *uNE, const double *uNW, const double *uSE, const double *uSW,
+        double *x) {
+
+    double tmpO, tmpU, tmpD;
+    size_t sx, sxy, base_jk, idx, idxd;
+    int i, ioff;
+
+    sx = (size_t)nx;
+    sxy = sx * (size_t)ny;
+    base_jk = (size_t)(k - 1) * sxy + (size_t)(j - 1) * sx;
+    ioff = parity ^ ((j + k) & 1);
+
+    for (i = 2 + ioff; i <= nx - 1; i += 2) {
+        idx = base_jk + (size_t)(i - 1);
+        idxd = idx - sxy;
+        tmpO = oN[idx] * x[idx + sx] + oN[idx - sx] * x[idx - sx]
+             + oE[idx] * x[idx + 1]  + oE[idx - 1]  * x[idx - 1]
+             + oNE[idx] * x[idx + sx + 1] + oNW[idx] * x[idx + sx - 1]
+             + oNW[idx - sx + 1] * x[idx - sx + 1] + oNE[idx - sx - 1] * x[idx - sx - 1];
+        tmpU = uC[idx]  * x[idx + sxy]
+             + uN[idx]  * x[idx + sxy + sx]     + uS[idx]  * x[idx + sxy - sx]
+             + uE[idx]  * x[idx + sxy + 1]      + uW[idx]  * x[idx + sxy - 1]
+             + uNE[idx] * x[idx + sxy + sx + 1] + uNW[idx] * x[idx + sxy + sx - 1]
+             + uSE[idx] * x[idx + sxy - sx + 1] + uSW[idx] * x[idx + sxy - sx - 1];
+        tmpD = uC[idxd] * x[idxd]
+             + uS[idxd + sx]      * x[idxd + sx]      + uN[idxd - sx]      * x[idxd - sx]
+             + uW[idxd + 1]       * x[idxd + 1]       + uE[idxd - 1]       * x[idxd - 1]
+             + uSW[idxd + sx + 1] * x[idxd + sx + 1] + uSE[idxd + sx - 1] * x[idxd + sx - 1]
+             + uNW[idxd - sx + 1] * x[idxd - sx + 1] + uNE[idxd - sx - 1] * x[idxd - sx - 1];
+        x[idx] = (fc[idx] + (tmpO + tmpU + tmpD)) / (oC[idx] + cc[idx]);
+    }
+}
+
+
+
 VPUBLIC void Vgsrb27x(int *nx,int *ny,int *nz,
         int *ipc, double *rpc,
         double  *oC, double  *cc, double  *fc,
@@ -175,154 +237,90 @@ VPUBLIC void Vgsrb27x(int *nx,int *ny,int *nz,
         double *errtol, double *omega,
         int *iresid, int *iadjoint) {
 
-    int  i,  j,  k;
-    int i1, j1, k1;
-    int i2, j2, k2;
-    int ioff;
-    int istep;
+    int pass_idx, npasses, cur_p, j, k, nx_v, ny_v, nz_v, p1, p2;
+#if defined(_OPENMP) && (_OPENMP >= 201307)
+    int done_plane[GSRB27_MAX_NZ], *dp = done_plane;
+    int tid, nthreads, tag_base, j0, j_end, req_val, done_prev, spins;
+#endif
 
-    double tmpO, tmpU, tmpD;
+    nx_v = *nx;
+    ny_v = *ny;
+    nz_v = *nz;
+    p1 = (*iadjoint != 0) ? 1 : 0;
+    p2 = 1 - p1;
 
-    MAT3( cc, *nx, *ny, *nz);
-    MAT3(fc, *nx, *ny, *nz);
-    MAT3( x, *nx, *ny, *nz);
-    MAT3(w1, *nx, *ny, *nz);
-    MAT3(w2, *nx, *ny, *nz);
-    MAT3( r, *nx, *ny, *nz);
+    if (*itmax <= 0) {
+        *iters = 1;
+        if (*iresid == 1)
+            Vmresid27_1s(nx, ny, nz, ipc, rpc, oC, cc, fc, oE, oN, uC,
+                         oNE, oNW, uE, uW, uN, uS, uNE, uNW, uSE, uSW, x, r);
+        return;
+    }
 
-    MAT3(oE, *nx, *ny, *nz);
-    MAT3(oN, *nx, *ny, *nz);
-    MAT3(uC, *nx, *ny, *nz);
-    MAT3(oC, *nx, *ny, *nz);
+    *iters = *itmax + 1;
+    npasses = 2 * (*itmax);
 
-    MAT3(oNE, *nx, *ny, *nz);
-    MAT3(oNW, *nx, *ny, *nz);
+    if (nx_v > 2 && ny_v > 2 && nz_v > 2) {
+#if defined(_OPENMP) && (_OPENMP >= 201307)
+        /*
+         * Exact serial-order plane pipeline: thread tid owns k = 2 + tid + m*T
+         * and starts rows j0..j_end once plane k - 1 finishes min(j_end + 1,
+         * ny_v - 1). Monotonic tag_base = pass_idx * ny_v guarantees progress;
+         * set OMP_NUM_THREADS <= allocated cores under container CPU quotas.
+         */
+        if ((size_t)nx_v * (size_t)ny_v * (size_t)nz_v >= PMG_OMP_MIN_N27
+                && nz_v <= GSRB27_MAX_NZ
+                && !omp_in_parallel()
+                && omp_get_max_threads() > 1
+                && omp_get_max_threads() <= omp_get_num_procs()) {
+            #pragma omp parallel private(tid, nthreads, pass_idx, cur_p, tag_base, k, j0, j, j_end, req_val, done_prev, spins)
+            {
+                tid = omp_get_thread_num();
+                nthreads = omp_get_num_threads();
 
-    MAT3( uE, *nx, *ny, *nz);
-    MAT3( uW, *nx, *ny, *nz);
-    MAT3( uN, *nx, *ny, *nz);
-    MAT3( uS, *nx, *ny, *nz);
-    MAT3(uNE, *nx, *ny, *nz);
-    MAT3(uNW, *nx, *ny, *nz);
-    MAT3(uSE, *nx, *ny, *nz);
-    MAT3(uSW, *nx, *ny, *nz);
+                #pragma omp for schedule(static)
+                for (k = 2; k <= nz_v - 1; k++)
+                    dp[k] = 0;
 
-    // Do the gauss-seidel iteration itmax times
+                for (pass_idx = 0; pass_idx < npasses; pass_idx++) {
+                    cur_p = ((pass_idx & 1) == 0) ? p1 : p2;
+                    tag_base = pass_idx * ny_v;
 
-    /*
-    i1    = (1 - *iadjoint) *   2  + (    *iadjoint) * (*nx - 1);
-    i2    = (    *iadjoint) *   2  + (1 - *iadjoint) * (*nx - 1);
-    j1    = (1 - *iadjoint) *   2  + (    *iadjoint) * (*ny - 1);
-    j2    = (    *iadjoint) *   2  + (1 - *iadjoint) * (*ny - 1);
-    k1    = (1 - *iadjoint) *   2  + (    *iadjoint) * (*nz - 1);
-    k2    = (    *iadjoint) *   2  + (1 - *iadjoint) * (*nz - 1);
-    istep = (    *iadjoint) * (-1) + (1 - *iadjoint) * (1);
-    */
-
-    i1 = (1-*iadjoint) * 2 + *iadjoint     * (*nx-1);
-    i2 = *iadjoint     * 2 + (1-*iadjoint) * (*nx-1);
-    j1 = (1-*iadjoint) * 2 + *iadjoint     * (*ny-1);
-    j2 = *iadjoint     * 2 + (1-*iadjoint) * (*ny-1);
-    k1 = (1-*iadjoint) * 2 + *iadjoint     * (*nz-1);
-    k2 = *iadjoint     * 2 + (1-*iadjoint) * (*nz-1);
-    istep = *iadjoint*(-1) + (1-*iadjoint)*(1);
-
-    for (*iters=1; *iters<=*itmax; (*iters)++) {
-
-        //#pragma omp parallel for private(i, j, k, ioff, tmpO, tmpU, tmpD)
-        for (k=2; k<=*nz-1; k++) {
-
-            for (j=2; j<=*ny-1; j++) {
-
-                ioff = (1 - *iadjoint) * (    (j + k + 2) % 2)
-                     + (    *iadjoint) * (1 - (j + k + 2) % 2);
-
-                for (i=2+ioff; i<=*nx-1; i+=2) {
-
-                    tmpO =
-                         + VAT3(  oN,   i,   j,   k) * VAT3(x,   i, j+1,   k)
-                         + VAT3(  oN,   i, j-1,   k) * VAT3(x,   i, j-1,   k)
-                         + VAT3(  oE,   i,   j,   k) * VAT3(x, i+1,   j,   k)
-                         + VAT3(  oE, i-1,   j,   k) * VAT3(x, i-1,   j,   k)
-                         + VAT3( oNE,   i,   j,   k) * VAT3(x, i+1, j+1,   k)
-                         + VAT3( oNW,   i,   j,   k) * VAT3(x, i-1, j+1,   k)
-                         + VAT3( oNW, i+1, j-1,   k) * VAT3(x, i+1, j-1,   k)
-                         + VAT3( oNE, i-1, j-1,   k) * VAT3(x, i-1, j-1,   k);
-
-                   tmpU =
-                         + VAT3(  uC,   i,   j,   k) * VAT3(x,   i,   j, k+1)
-                         + VAT3(  uN,   i,   j,   k) * VAT3(x,   i, j+1, k+1)
-                         + VAT3(  uS,   i,   j,   k) * VAT3(x,   i, j-1, k+1)
-                         + VAT3(  uE,   i,   j,   k) * VAT3(x, i+1,   j, k+1)
-                         + VAT3(  uW,   i,   j,   k) * VAT3(x, i-1,   j, k+1)
-                         + VAT3( uNE,   i,   j,   k) * VAT3(x, i+1, j+1, k+1)
-                         + VAT3( uNW,   i,   j,   k) * VAT3(x, i-1, j+1, k+1)
-                         + VAT3( uSE,   i,   j,   k) * VAT3(x, i+1, j-1, k+1)
-                         + VAT3( uSW,   i,   j,   k) * VAT3(x, i-1, j-1, k+1);
-
-                   tmpD =
-                         + VAT3(  uC,   i,   j, k-1) * VAT3(x,   i,   j, k-1)
-                         + VAT3(  uS,   i, j+1, k-1) * VAT3(x,   i, j+1, k-1)
-                         + VAT3(  uN,   i, j-1, k-1) * VAT3(x,   i, j-1, k-1)
-                         + VAT3(  uW, i+1,   j, k-1) * VAT3(x, i+1,   j, k-1)
-                         + VAT3(  uE, i-1,   j, k-1) * VAT3(x, i-1,   j, k-1)
-                         + VAT3( uSW, i+1, j+1, k-1) * VAT3(x, i+1, j+1, k-1)
-                         + VAT3( uSE, i-1, j+1, k-1) * VAT3(x, i-1, j+1, k-1)
-                         + VAT3( uNW, i+1, j-1, k-1) * VAT3(x, i+1, j-1, k-1)
-                         + VAT3( uNE, i-1, j-1, k-1) * VAT3(x, i-1, j-1, k-1);
-
-                       VAT3(x, i,j,k) = (VAT3(fc, i, j, k) + (tmpO + tmpU + tmpD))
-                                / (VAT3(oC, i, j, k) + VAT3(cc, i, j, k));
-
+                    for (k = 2 + tid; k <= nz_v - 1; k += nthreads) {
+                        for (j0 = 2; j0 <= ny_v - 1; j0 += GSRB27_JBLOCK) {
+                            j_end = (j0 + (GSRB27_JBLOCK - 1) < ny_v - 1) ? (j0 + (GSRB27_JBLOCK - 1)) : (ny_v - 1);
+                            if (k > 2) {
+                                req_val = tag_base + ((j_end + 1 < ny_v - 1) ? (j_end + 1) : (ny_v - 1));
+                                spins = 0;
+                                for (;;) {
+                                    #pragma omp atomic read seq_cst
+                                    done_prev = dp[k - 1];
+                                    if (done_prev >= req_val) break;
+                                    if (spins < GSRB27_SPIN_LIMIT) spins++;
+                                    else GSRB27_YIELD();
+                                }
+                            }
+                            for (j = j0; j <= j_end; j++)
+                                gsrb27_row(j, k, cur_p, nx_v, ny_v, oC, cc, fc, oE, oN, uC,
+                                           oNE, oNW, uE, uW, uN, uS, uNE, uNW, uSE, uSW, x);
+                            #pragma omp atomic write seq_cst
+                            dp[k] = tag_base + j_end;
+                        }
+                    }
+                    if (pass_idx + 1 < npasses) {
+                        #pragma omp barrier
+                    }
                 }
             }
-        }
-
-        //#pragma omp parallel for private(i, j, k, ioff, tmpO, tmpU, tmpD)
-        for (k=2; k<=*nz-1; k++) {
-
-            for (j=2; j<=*ny-1; j++) {
-
-                ioff = (    *iadjoint) * (    (j + k + 2) % 2)
-                     + (1 - *iadjoint) * (1 - (j + k + 2) % 2);
-
-                for (i=2+ioff; i<=*nx-1; i+=2) {
-
-                    tmpO =
-                         + VAT3(  oN,   i,   j,   k) * VAT3(x,   i, j+1,   k)
-                         + VAT3(  oN,   i, j-1,   k) * VAT3(x,   i, j-1,   k)
-                         + VAT3(  oE,   i,   j,   k) * VAT3(x, i+1,   j,   k)
-                         + VAT3(  oE, i-1,   j,   k) * VAT3(x, i-1,   j,   k)
-                         + VAT3( oNE,   i,   j,   k) * VAT3(x, i+1, j+1,   k)
-                         + VAT3( oNW,   i,   j,   k) * VAT3(x, i-1, j+1,   k)
-                         + VAT3( oNW, i+1, j-1,   k) * VAT3(x, i+1, j-1,   k)
-                         + VAT3( oNE, i-1, j-1,   k) * VAT3(x, i-1, j-1,   k);
-
-                    tmpU =
-                         + VAT3(  uC,   i,   j,   k) * VAT3(x,   i,   j, k+1)
-                         + VAT3(  uN,   i,   j,   k) * VAT3(x,   i, j+1, k+1)
-                         + VAT3(  uS,   i,   j,   k) * VAT3(x,   i, j-1, k+1)
-                         + VAT3(  uE,   i,   j,   k) * VAT3(x, i+1,   j, k+1)
-                         + VAT3(  uW,   i,   j,   k) * VAT3(x, i-1,   j, k+1)
-                         + VAT3( uNE,   i,   j,   k) * VAT3(x, i+1, j+1, k+1)
-                         + VAT3( uNW,   i,   j,   k) * VAT3(x, i-1, j+1, k+1)
-                         + VAT3( uSE,   i,   j,   k) * VAT3(x, i+1, j-1, k+1)
-                         + VAT3( uSW,   i,   j,   k) * VAT3(x, i-1, j-1, k+1);
-
-                   tmpD =
-                         + VAT3(  uC,   i,   j, k-1) * VAT3(x,   i,   j, k-1)
-                         + VAT3(  uS,   i, j+1, k-1) * VAT3(x,   i, j+1, k-1)
-                         + VAT3(  uN,   i, j-1, k-1) * VAT3(x,   i, j-1, k-1)
-                         + VAT3(  uW, i+1,   j, k-1) * VAT3(x, i+1,   j, k-1)
-                         + VAT3(  uE, i-1,   j, k-1) * VAT3(x, i-1,   j, k-1)
-                         + VAT3( uSW, i+1, j+1, k-1) * VAT3(x, i+1, j+1, k-1)
-                         + VAT3( uSE, i-1, j+1, k-1) * VAT3(x, i-1, j+1, k-1)
-                         + VAT3( uNW, i+1, j-1, k-1) * VAT3(x, i+1, j-1, k-1)
-                         + VAT3( uNE, i-1, j-1, k-1) * VAT3(x, i-1, j-1, k-1);
-
-                   VAT3(x, i,j,k) = (VAT3(fc, i, j, k) + (tmpO + tmpU + tmpD))
-                            / (VAT3(oC, i, j, k) + VAT3(cc, i, j, k));
-                }
+        } else
+#endif
+        {
+            for (pass_idx = 0; pass_idx < npasses; pass_idx++) {
+                cur_p = ((pass_idx & 1) == 0) ? p1 : p2;
+                for (k = 2; k <= nz_v - 1; k++)
+                    for (j = 2; j <= ny_v - 1; j++)
+                        gsrb27_row(j, k, cur_p, nx_v, ny_v, oC, cc, fc, oE, oN, uC,
+                                   oNE, oNW, uE, uW, uN, uS, uNE, uNW, uSE, uSW, x);
             }
         }
     }
