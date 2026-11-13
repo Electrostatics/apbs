@@ -165,6 +165,9 @@ VEXTERNC void VbuildPb_trilin(int *nxf, int *nyf, int *nzf,
     /* Boundary slot oPC(1,1,1) is unread by interior stencils; tag trilinear pc. */
     oPC[0] = -1.0;
 
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k) schedule(static) if (PMG_OMP_BIG(*nxf, *nyf, *nzf))
+#endif
 for(k=2; k<=*nzc-1; k++) {
     for(j=2; j<=*nyc-1; j++) {
             for(i=2; i<=*nxc-1; i++) {

@@ -57,6 +57,21 @@
 
 #include "stdio.h"
 
+/* >= 32^3 points to amortize OpenMP fork/barrier cost */
+#ifndef PMG_OMP_MIN_N
+#define PMG_OMP_MIN_N 32768
+#endif
+
+#ifndef PMG_OMP_BIG
+#define PMG_OMP_BIG(nx, ny, nz) \
+    (((size_t)(nx) * (size_t)(ny) * (size_t)(nz)) >= (size_t)PMG_OMP_MIN_N)
+#endif
+
+/* Lower gate for loops that evaluate exp() per grid point */
+#ifndef PMG_OMP_MIN_N_EXP
+#define PMG_OMP_MIN_N_EXP 4096
+#endif
+
 /**
  *    @ingroup Vhal
  *    @author     David Gohara

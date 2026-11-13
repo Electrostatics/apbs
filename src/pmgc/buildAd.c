@@ -192,6 +192,9 @@ VPUBLIC void VbuildA_fv(int *nx, int *ny, int *nz,
 
     // build the operator
     //fprintf(data, "%s\n", PRINT_FUNC);
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k, ike, jke, kke, hx, hy, hz, hxm1, hym1, hzm1, coef_fc, bc_cond_e, bc_cond_w, bc_cond_n, bc_cond_s, bc_cond_u, bc_cond_d, coef_oE, coef_oN, coef_uC, coef_oEm1, coef_oNm1, coef_uCm1) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for(k=2; k<=*nz-1; k++) {
 
         hzm1 = VAT(zf, k)   - VAT(zf, k-1);
