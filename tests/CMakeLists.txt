@@ -118,3 +118,18 @@ if(APPLE)
 endif()
 add_test(NAME vgrid_dx_test COMMAND $<TARGET_FILE:vgrid_dx_test>)
 set_tests_properties(vgrid_dx_test PROPERTIES TIMEOUT 60 LABELS unit)
+
+add_executable(gsrb7_pipeline_test gsrb7_pipeline_test.c)
+target_link_libraries(gsrb7_pipeline_test
+    apbs_generic
+    apbs_mg
+    apbs_pmgc
+    apbs_fem
+    apbs_routines
+    ${APBS_LIBS}
+)
+if(APPLE)
+    target_link_libraries(gsrb7_pipeline_test "-framework CoreFoundation")
+endif()
+add_test(NAME gsrb7_pipeline_test COMMAND $<TARGET_FILE:gsrb7_pipeline_test>)
+set_tests_properties(gsrb7_pipeline_test PROPERTIES TIMEOUT 60 LABELS unit)
