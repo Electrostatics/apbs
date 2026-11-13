@@ -5125,17 +5125,31 @@ VPUBLIC int initAPOL(NOsh *nosh,            /**< Input parameter object */
         if (VABS(apolparm->bconc) > VSMALL)
         {
             double tenergy = 0.0;
-            /* wcaEnergy for each atom */
+            int nfail = 0;
+            /* Buried atoms have fewer accessible solvent points than surface atoms. */
+#ifdef _OPENMP
+#pragma omp parallel for private(i, rc, energy) reduction(+:nfail) schedule(dynamic, 16)
+#endif
             for (i = 0; i < len; i++)
             {
                 rc = Vacc_wcaEnergyAtom(acc, apolparm, alist, clist, i, &energy);
                 if (rc == 0)
                 {
-                    Vnm_print(2, "Error in apolar energy calculation!\n");
-                    return 0;
+                    nfail++;
                 }
-                atomwcaEnergy[i] = energy;
-                tenergy += energy;
+                else
+                {
+                    atomwcaEnergy[i] = energy;
+                }
+            }
+            if (nfail != 0)
+            {
+                Vnm_print(2, "Error in apolar energy calculation!\n");
+                return 0;
+            }
+            for (i = 0; i < len; i++)
+            {
+                tenergy += atomwcaEnergy[i];
             }
             apolparm->wcaEnergy = tenergy;
         }
