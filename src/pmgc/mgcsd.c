@@ -95,6 +95,7 @@ VEXTERNC void Vmvcs(int *nx, int *ny, int *nz,
 
     double alpha;     // A utility variable used to pass a parameter to xaxpy
     int numlev;       // A utility variable used to pass a parameter to mkcors
+    int resid_ready;  // 1 if finest post-smoothing left f - A x in w1
 
     MAT2(iz, 50, 1);
 
@@ -314,6 +315,8 @@ VEXTERNC void Vmvcs(int *nx, int *ny, int *nz,
     *iters = 0;
     do {
 
+        resid_ready = 0;
+
         // Finest level initialization
         level = 1;
         lev   = (*ilev - 1) + level;
@@ -484,17 +487,21 @@ VEXTERNC void Vmvcs(int *nx, int *ny, int *nz,
             Vxaxpy(&nxf, &nyf, &nzf,
                     &xdamp, w1, RAT(x, VAT2(iz, 1,lev)));
 
-            // nu2 post-smoothings for correction (no residual)
+            // nu2 post-smoothings for correction (reuses residual on level 1)
             iresid = 0;
             iadjoint = 1;
             iters_s  = 0;
             errtol_s = 0.0;
             nuuu = Vivariv(nu2, &lev);
             if (level == 1) {
+                if (*iok != 0 && (*istop == 0 || *istop == 1) && *mgsmoo == 1) {
+                    iresid = 1;
+                    resid_ready = 1;
+                }
                 Vsmooth(&nxf, &nyf, &nzf,
                         RAT(ipc, VAT2(iz, 5,lev)), RAT(rpc, VAT2(iz, 6,lev)),
                          RAT(ac, VAT2(iz, 7,lev)), RAT(cc, VAT2(iz, 1,lev)), RAT(fc, VAT2(iz, 1,lev)),
-                          RAT(x, VAT2(iz, 1,lev)),w1,w2,w3,
+                          RAT(x, VAT2(iz, 1,lev)), w2, w3, w1,
                          &nuuu, &iters_s, &errtol_s, omega,
                          &iresid, &iadjoint, mgsmoo);
             } else {
@@ -518,16 +525,18 @@ VEXTERNC void Vmvcs(int *nx, int *ny, int *nz,
         if (iok != 0) {
             orsnrm = rsnrm;
             if (*istop == 0) {
-                Vmresid(&nxf, &nyf, &nzf,
-                        RAT(ipc, VAT2(iz, 5,lev)), RAT(rpc, VAT2(iz, 6,lev)),
-                         RAT(ac, VAT2(iz, 7,lev)), RAT(cc, VAT2(iz, 1,lev)), RAT(fc, VAT2(iz, 1,lev)),
-                          RAT(x, VAT2(iz, 1,lev)), w1);
+                if (!resid_ready)
+                    Vmresid(&nxf, &nyf, &nzf,
+                            RAT(ipc, VAT2(iz, 5,lev)), RAT(rpc, VAT2(iz, 6,lev)),
+                             RAT(ac, VAT2(iz, 7,lev)), RAT(cc, VAT2(iz, 1,lev)), RAT(fc, VAT2(iz, 1,lev)),
+                              RAT(x, VAT2(iz, 1,lev)), w1);
                 rsnrm = Vxnrm1(&nxf, &nyf, &nzf, w1);
             } else if(*istop == 1) {
-                Vmresid(&nxf, &nyf, &nzf,
-                        RAT(ipc, VAT2(iz, 5,lev)), RAT(rpc, VAT2(iz, 6,lev)),
-                         RAT(ac, VAT2(iz, 7,lev)),  RAT(cc, VAT2(iz, 1,lev)), RAT(fc, VAT2(iz, 1,lev)),
-                          RAT(x, VAT2(iz, 1,lev)), w1);
+                if (!resid_ready)
+                    Vmresid(&nxf, &nyf, &nzf,
+                            RAT(ipc, VAT2(iz, 5,lev)), RAT(rpc, VAT2(iz, 6,lev)),
+                             RAT(ac, VAT2(iz, 7,lev)),  RAT(cc, VAT2(iz, 1,lev)), RAT(fc, VAT2(iz, 1,lev)),
+                              RAT(x, VAT2(iz, 1,lev)), w1);
                 rsnrm = Vxnrm1(&nxf, &nyf, &nzf, w1);
             } else if (*istop == 2) {
                 Vxcopy(&nxf, &nyf, &nzf, RAT(tru, VAT2(iz, 1,lev)), w1);
