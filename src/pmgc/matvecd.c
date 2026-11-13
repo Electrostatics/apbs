@@ -112,7 +112,9 @@ VEXTERNC void Vmatvec7_1s(int *nx, int *ny, int *nz,
     MAT3(y, *nx, *ny, *nz);
 
     // Do it
-    #pragma omp parallel for private(i, j, k)
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for (k=2; k<=*nz-1; k++) {
         for (j=2; j<=*ny-1; j++) {
             for(i=2; i<=*nx-1; i++) {
@@ -184,7 +186,9 @@ VPUBLIC void Vmatvec27_1s(int *nx, int *ny, int *nz,
     MAT3(uSW, *nx, *ny, *nz);
 
     // Do it
-    #pragma omp parallel for private(i, j, k, tmpO, tmpU, tmpD)
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k, tmpO, tmpU, tmpD) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for (k=2; k<=*nz-1; k++) {
         for (j=2; j<=*ny-1; j++) {
             for(i=2; i<=*nx-1; i++) {
@@ -298,7 +302,9 @@ VPUBLIC void Vnmatvecd7_1s(int *nx, int *ny, int *nz,
     Vc_vec(cc, x, w1, nx, ny, nz, &ipkey);
 
     // The operator
-    #pragma omp parallel for private(i, j, k)
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for (k=2; k<=*nz-1; k++)
         for (j=2; j<=*ny-1; j++)
             for(i=2; i<=*nx-1; i++)
@@ -376,7 +382,9 @@ VPUBLIC void Vnmatvecd27_1s(int *nx, int *ny, int *nz,
     Vc_vec(cc, x, w1, nx, ny, nz, &ipkey);
 
     // The operator
-    #pragma omp parallel for private(i, j, k, tmpO, tmpU, tmpD)
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k, tmpO, tmpU, tmpD) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for (k=2; k<=*nz-1; k++) {
         for (j=2; j<=*ny-1; j++) {
             for(i=2; i<=*nx-1; i++) {
@@ -476,7 +484,9 @@ VPUBLIC void Vmresid7_1s(int *nx, int *ny, int *nz,
     MAT3(r, *nx, *ny, *nz);
 
     // Do it
-    #pragma omp parallel for private(i, j, k)
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for (k=2; k<=*nz-1; k++) {
         for (j=2; j<=*ny-1; j++) {
             for(i=2; i<=*nx-1; i++) {
@@ -549,7 +559,9 @@ VPUBLIC void Vmresid27_1s(int *nx, int *ny, int *nz,
     MAT3(uSE, *nx, *ny, *nz);
     MAT3(uSW, *nx, *ny, *nz);
 
-    #pragma omp parallel for private(i, j, k, tmpO, tmpU, tmpD)
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k, tmpO, tmpU, tmpD) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for (k=2; k<=*nz-1; k++) {
         for (j=2; j<=*ny-1; j++) {
             for(i=2; i<=*nx-1; i++) {
@@ -646,6 +658,9 @@ VPRIVATE void nmresid7_kernel(int *nx, int *ny, int *nz,
     MAT3( r, *nx, *ny, *nz);
     MAT3(w1, *nx, *ny, *nz);
 
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for (k=2; k<=*nz-1; k++) {
         for (j=2; j<=*ny-1; j++) {
             for (i=2; i<=*nx-1; i++) {
@@ -737,6 +752,9 @@ VPUBLIC void Vnmresid27_1s(int *nx, int *ny, int *nz,
     Vc_vec(cc, x, w1, nx, ny, nz, &ipkey);
 
     // The residual
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k, tmpO, tmpU, tmpD) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for (k=2; k<=*nz-1; k++) {
         for (j=2; j<=*ny-1; j++) {
             for (i=2; i<=*nx-1; i++) {
@@ -801,7 +819,7 @@ VPRIVATE void restrc_trilin(int *nxf, int *nyf, int *nzf,
     VfboundPMG00(nxf, nyf, nzf, xin);
 
 #ifdef _OPENMP
-    #pragma omp parallel for private(k, kk, j, jj, i, ii, tmpO, tmpU, tmpD)
+    #pragma omp parallel for private(k, kk, j, jj, i, ii, tmpO, tmpU, tmpD) schedule(static) if (PMG_OMP_BIG(*nxf, *nyf, *nzf))
 #endif
     for (k=2; k<=*nzc-1; k++) {
         kk = (k - 1) * 2 + 1;
@@ -937,7 +955,9 @@ VEXTERNC void Vrestrc2(int *nxf, int *nyf, int *nzf,
     dimfac = VPOW(2.0, idimenshun);
 
     // Handle the interior points as average of 5 finer grid pts ***
-    #pragma omp parallel for private(k, kk, j, jj, i, ii, tmpO, tmpU, tmpD)
+#ifdef _OPENMP
+    #pragma omp parallel for private(k, kk, j, jj, i, ii, tmpO, tmpU, tmpD) schedule(static) if (PMG_OMP_BIG(*nxf, *nyf, *nzf))
+#endif
     for (k=2; k<=*nzc-1; k++) {
         kk = (k - 1) * 2 + 1;
 
@@ -1007,6 +1027,9 @@ VPRIVATE void interp_trilin(int *nxc, int *nyc, int *nzc,
 
     VfboundPMG00(nxc, nyc, nzc, xin);
 
+#ifdef _OPENMP
+    #pragma omp parallel for private(k, kk, j, jj, i, ii, x000, x100, x010, x110, x001, x101, x011, x111) schedule(static) if (PMG_OMP_BIG(*nxf, *nyf, *nzf))
+#endif
     for (k=1; k<=*nzf-2; k+=2) {
         kk = (k - 1) / 2 + 1;
 
@@ -1128,6 +1151,9 @@ VPUBLIC void VinterpPMG2(int *nxc, int *nyc, int *nzc,
     VfboundPMG00(nxc, nyc, nzc, xin);
 
     // Do it
+#ifdef _OPENMP
+    #pragma omp parallel for private(k, kk, j, jj, i, ii) schedule(static) if (PMG_OMP_BIG(*nxf, *nyf, *nzf))
+#endif
     for (k=1; k<=*nzf-2; k+=2) {
         kk = (k - 1) / 2 + 1;
 
@@ -1228,6 +1254,9 @@ VPUBLIC void Vextrac(int *nxf, int *nyf, int *nzf,
     VfboundPMG00(nxf, nyf, nzf, xin);
 
     // Do it
+#ifdef _OPENMP
+    #pragma omp parallel for private(k, kk, j, jj, i, ii) schedule(static) if (PMG_OMP_BIG(*nxf, *nyf, *nzf))
+#endif
     for (k=2; k<=*nzc-1; k++) {
        kk = (k - 1) * 2 + 1;
 

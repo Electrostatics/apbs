@@ -168,10 +168,12 @@ VPRIVATE void eval_boltzmann_vec(double *coef, double *uin, double *uout,
         zu[iion] = -1.0 * VAT(charge, iion);
     }
 
+    /* Interleave chunks so interior solute runs (coef == 0) do not starve threads. */
 #ifdef _OPENMP
     #pragma omp parallel for default(shared) \
         private(i, iion, c, u, acc_c, acc_dc, am_zero, am_zero_dc, am_neg, am_pos, arg, e, ichopped_neg, ichopped_pos) \
-        reduction(+ : ichopped_c, ichopped_dc)
+        reduction(+ : ichopped_c, ichopped_dc) \
+        schedule(static, 2048) if ((size_t)n >= PMG_OMP_MIN_N_EXP)
 #endif
     for (i = 1; i <= n; i++) {
         c = VAT(coef, i);

@@ -539,6 +539,9 @@ VPUBLIC void VbuildG_7(int *nxf, int *nyf, int *nzf,
     //fprintf(data, "%s\n", PRINT_FUNC);
 
     // Build the operator ***
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k, ii, jj, kk, im1, ip1, im2, ip2, jm1, jp1, jm2, jp2, km1, kp1, km2, kp2, iim1, iip1, jjm1, jjp1, kkm1, kkp1, TMP1_XOC, TMP2_XOC, TMP3_XOC, TMP4_XOC, TMP5_XOC, TMP6_XOC, TMP7_XOC, TMP8_XOC, TMP9_XOC, TMP1_XOE, TMP2_XOE, TMP3_XOE, TMP4_XOE, TMP1_XON, TMP2_XON, TMP3_XON, TMP4_XON, TMP1_XUC, TMP2_XUC, TMP3_XUC, TMP4_XUC) schedule(static) if (PMG_OMP_BIG(*nxf, *nyf, *nzf))
+#endif
     for(kk=2; kk<=*nz-1; kk++) {
         k = 2 * kk - 1;
 
@@ -1387,6 +1390,9 @@ VPUBLIC void VbuildG_27(int *nxf, int *nyf, int *nzf,
     //fprintf(data, "%s\n", PRINT_FUNC);
 
     // Build the operator ***
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k, ii, jj, kk, im1, ip1, im2, ip2, jm1, jp1, jm2, jp2, km1, kp1, km2, kp2, iim1, iip1, jjm1, jjp1, kkm1, kkp1, TMP1_XOC, TMP2_XOC, TMP3_XOC, TMP4_XOC, TMP5_XOC, TMP6_XOC, TMP7_XOC, TMP8_XOC, TMP9_XOC, TMP10_XOC, TMP11_XOC, TMP12_XOC, TMP13_XOC, TMP14_XOC, TMP15_XOC, TMP16_XOC, TMP17_XOC, TMP18_XOC, TMP19_XOC, TMP20_XOC, TMP21_XOC, TMP22_XOC, TMP23_XOC, TMP24_XOC, TMP25_XOC, TMP26_XOC, TMP27_XOC, TMP1_XOE, TMP2_XOE, TMP3_XOE, TMP4_XOE, TMP5_XOE, TMP6_XOE, TMP7_XOE, TMP8_XOE, TMP9_XOE, TMP10_XOE, TMP11_XOE, TMP12_XOE, TMP1_XON, TMP2_XON, TMP3_XON, TMP4_XON, TMP5_XON, TMP6_XON, TMP7_XON, TMP8_XON, TMP9_XON, TMP10_XON, TMP11_XON, TMP12_XON, TMP1_XUC, TMP2_XUC, TMP3_XUC, TMP4_XUC, TMP5_XUC, TMP6_XUC, TMP7_XUC, TMP8_XUC, TMP9_XUC, TMP10_XUC, TMP11_XUC, TMP12_XUC, TMP1_XONE, TMP2_XONE, TMP3_XONE, TMP4_XONE, TMP5_XONE, TMP6_XONE, TMP1_XONW, TMP2_XONW, TMP3_XONW, TMP4_XONW, TMP5_XONW, TMP6_XONW, TMP1_XUE, TMP2_XUE, TMP3_XUE, TMP4_XUE, TMP5_XUE, TMP6_XUE, TMP1_XUW, TMP2_XUW, TMP3_XUW, TMP4_XUW, TMP5_XUW, TMP6_XUW, TMP1_XUN, TMP2_XUN, TMP3_XUN, TMP4_XUN, TMP5_XUN, TMP6_XUN, TMP1_XUS, TMP2_XUS, TMP3_XUS, TMP4_XUS, TMP5_XUS, TMP6_XUS, TMP1_XUNE, TMP2_XUNE, TMP1_XUNW, TMP2_XUNW, TMP1_XUSE, TMP2_XUSE, TMP1_XUSW, TMP2_XUSW) schedule(static) if (PMG_OMP_BIG(*nxf, *nyf, *nzf))
+#endif
     for(kk=2; kk<=*nz-1; kk++) {
          k = 2 * kk - 1;
 
