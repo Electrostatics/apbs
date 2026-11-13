@@ -1820,10 +1820,9 @@ VPUBLIC int forceMG(Vmem *mem,
 {
 
     int j,
-        k;
-    double qfForce[3],
-        dbForce[3],
-        ibForce[3];
+        k,
+        natoms;
+    AtomForce *tmpForce;
 
     Vnm_tstart(APBS_TIMER_FORCE, "Force timer");
 
@@ -1842,29 +1841,31 @@ VPUBLIC int forceMG(Vmem *mem,
             (*atomForce)[0].ibForce[j] = 0;
             (*atomForce)[0].dbForce[j] = 0;
         }
-        for (j = 0; j < Valist_getNumberAtoms(alist[pbeparm->molid - 1]); j++)
+        natoms = Valist_getNumberAtoms(alist[pbeparm->molid - 1]);
+        if ((nosh->bogus == 0) && (natoms > 0))
         {
-            if (nosh->bogus == 0)
+            tmpForce = (AtomForce *)Vmem_malloc(mem, (size_t)natoms, sizeof(AtomForce));
+#ifdef _OPENMP
+#pragma omp parallel for private(j) \
+    firstprivate(pmg, mgparm, pbeparm, tmpForce, natoms) \
+    schedule(dynamic, 16)
+#endif
+            for (j = 0; j < natoms; j++)
             {
-                VASSERT(Vpmg_qfForce(pmg, qfForce, j, mgparm->chgm));
-                VASSERT(Vpmg_ibForce(pmg, ibForce, j, pbeparm->srfm));
-                VASSERT(Vpmg_dbForce(pmg, dbForce, j, pbeparm->srfm));
+                VASSERT(Vpmg_qfForce(pmg, tmpForce[j].qfForce, j, mgparm->chgm));
+                VASSERT(Vpmg_ibForce(pmg, tmpForce[j].ibForce, j, pbeparm->srfm));
+                VASSERT(Vpmg_dbForce(pmg, tmpForce[j].dbForce, j, pbeparm->srfm));
             }
-            else
+            for (j = 0; j < natoms; j++)
             {
                 for (k = 0; k < 3; k++)
                 {
-                    qfForce[k] = 0;
-                    ibForce[k] = 0;
-                    dbForce[k] = 0;
+                    (*atomForce)[0].qfForce[k] += tmpForce[j].qfForce[k];
+                    (*atomForce)[0].ibForce[k] += tmpForce[j].ibForce[k];
+                    (*atomForce)[0].dbForce[k] += tmpForce[j].dbForce[k];
                 }
             }
-            for (k = 0; k < 3; k++)
-            {
-                (*atomForce)[0].qfForce[k] += qfForce[k];
-                (*atomForce)[0].ibForce[k] += ibForce[k];
-                (*atomForce)[0].dbForce[k] += dbForce[k];
-            }
+            Vmem_free(mem, (size_t)natoms, sizeof(AtomForce), (void **)&tmpForce);
         }
 #ifndef VAPBSQUIET
         Vnm_tprint(1, "  Printing net forces for molecule %d (kJ/mol/A)\n",
@@ -1901,7 +1902,13 @@ VPUBLIC int forceMG(Vmem *mem,
         Vnm_tprint(1, "    db  n -- dielectric boundary force for atom n\n");
         Vnm_tprint(1, "    ib  n -- ionic boundary force for atom n\n");
 #endif
-        for (j = 0; j < Valist_getNumberAtoms(alist[pbeparm->molid - 1]); j++)
+        natoms = *nforce;
+#ifdef _OPENMP
+#pragma omp parallel for private(j, k) \
+    firstprivate(pmg, mgparm, pbeparm, nosh, atomForce, natoms) \
+    schedule(dynamic, 16)
+#endif
+        for (j = 0; j < natoms; j++)
         {
             if (nosh->bogus == 0)
             {
@@ -1921,7 +1928,10 @@ VPUBLIC int forceMG(Vmem *mem,
                     (*atomForce)[j].dbForce[k] = 0;
                 }
             }
+        }
 #ifndef VAPBSQUIET
+        for (j = 0; j < natoms; j++)
+        {
             Vnm_tprint(1, "mgF  tot %d  %4.3e  %4.3e  %4.3e\n", j,
                        Vunit_kb * pbeparm->temp * (1e-3) * Vunit_Na * ((*atomForce)[j].qfForce[0] + (*atomForce)[j].ibForce[0] + (*atomForce)[j].dbForce[0]),
                        Vunit_kb * pbeparm->temp * (1e-3) * Vunit_Na * ((*atomForce)[j].qfForce[1] + (*atomForce)[j].ibForce[1] + (*atomForce)[j].dbForce[1]),
@@ -1938,8 +1948,8 @@ VPUBLIC int forceMG(Vmem *mem,
                        Vunit_kb * pbeparm->temp * (1e-3) * Vunit_Na * (*atomForce)[j].dbForce[0],
                        Vunit_kb * pbeparm->temp * (1e-3) * Vunit_Na * (*atomForce)[j].dbForce[1],
                        Vunit_kb * pbeparm->temp * (1e-3) * Vunit_Na * (*atomForce)[j].dbForce[2]);
-#endif
         }
+#endif
     }
     else
         *nforce = 0;
