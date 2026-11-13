@@ -418,16 +418,25 @@ VPUBLIC int Vpmg_solve(Vpmg *thee) {
     }
 
     /* Fill the "true solution" array */
+#ifdef _OPENMP
+#pragma omp parallel for private(i) firstprivate(thee, n) schedule(static)
+#endif
     for (i=0; i<n; i++) {
         thee->tcf[i] = 0.0;
     }
 
     /* Fill the RHS array */
+#ifdef _OPENMP
+#pragma omp parallel for private(i) firstprivate(thee, n) schedule(static)
+#endif
     for (i=0; i<n; i++) {
         thee->fcf[i] = thee->charge[i];
     }
 
     /* Fill the operator coefficient array. */
+#ifdef _OPENMP
+#pragma omp parallel for private(i) firstprivate(thee, n) schedule(static)
+#endif
     for (i=0; i<n; i++) {
         thee->a1cf[i] = thee->epsx[i];
         thee->a2cf[i] = thee->epsy[i];
@@ -438,10 +447,16 @@ VPUBLIC int Vpmg_solve(Vpmg *thee) {
      * accessibility array (containing values between 0 and 1) by zkappa2. */
     zkappa2 = Vpbe_getZkappa2(thee->pbe);
     if (zkappa2 > VPMGSMALL) {
+#ifdef _OPENMP
+#pragma omp parallel for private(i) firstprivate(thee, n, zkappa2) schedule(static)
+#endif
         for (i=0; i<n; i++) {
             thee->ccf[i] = zkappa2*thee->kappa[i];
         }
     } else {
+#ifdef _OPENMP
+#pragma omp parallel for private(i) firstprivate(thee, n) schedule(static)
+#endif
         for (i=0; i<n; i++) {
             thee->ccf[i] = 0.0;
         }
@@ -882,7 +897,13 @@ VPUBLIC void Vpmg_unsetPart(Vpmg *thee) {
     nz = thee->pmgp->nz;
     alist = thee->pbe->alist;
 
+#ifdef _OPENMP
+#pragma omp parallel for private(i) firstprivate(thee, nx, ny, nz) schedule(static)
+#endif
     for (i=0; i<(nx*ny*nz); i++) thee->pvec[i] = 1;
+#ifdef _OPENMP
+#pragma omp parallel for private(i, atom) firstprivate(alist) schedule(static)
+#endif
     for (i=0; i<Valist_getNumberAtoms(alist); i++) {
         atom = Valist_getAtom(alist, i);
         atom->partID = 1;
@@ -1411,7 +1432,10 @@ VPRIVATE double Vpmg_qmEnergyNONLIN(Vpmg *thee,
            ionQ[MAXION],
            zkappa2,
            ionstr,
-           zks2;
+           zks2,
+           blk_e,
+           blk_buf[512],
+           *blk_sums;
     int i, /* Loop variable */
         j,
         nx,
@@ -1420,6 +1444,9 @@ VPRIVATE double Vpmg_qmEnergyNONLIN(Vpmg *thee,
         nion,
         ichop,
         nchop,
+        iblk,
+        nblk,
+        i_end,
         len; /* Stores number of iterations for loops to avoid multiple recalculations */
 
     VASSERT(thee != VNULL);
@@ -1455,15 +1482,38 @@ VPRIVATE double Vpmg_qmEnergyNONLIN(Vpmg *thee,
     Vpbe_getIons(thee->pbe, &nion, ionConc, ionRadii, ionQ);
     if (thee->pmgp->nonlin) {
         Vnm_print(0, "Vpmg_qmEnergy:  Calculating nonlinear energy\n");
-        for (i=0, len=nx*ny*nz; i<len; i++) {
-            if (thee->pvec[i]*thee->kappa[i] > VSMALL) {
-                for (j=0; j<nion; j++) {
-                    energy += (thee->pvec[i]*thee->kappa[i]*zks2
-                      * ionConc[j]
-                      * (Vcap_exp(-ionQ[j]*thee->u[i], &ichop)-1.0));
-                    nchop += ichop;
+        len = nx*ny*nz;
+        nblk = (len + 65535) / 65536;
+        blk_sums = blk_buf;
+        if (nblk > 512) {
+            blk_sums = (double *)malloc((size_t)nblk * sizeof(double));
+            VASSERT(blk_sums != VNULL);
+        }
+#ifdef _OPENMP
+#pragma omp parallel for private(iblk, i, i_end, j, ichop, blk_e) \
+    firstprivate(thee, len, nblk, nion, zks2, blk_sums) \
+    reduction(+:nchop) schedule(static)
+#endif
+        for (iblk=0; iblk<nblk; iblk++) {
+            blk_e = 0.0;
+            i_end = (len - iblk*65536 > 65536) ? (iblk*65536 + 65536) : len;
+            for (i=iblk*65536; i<i_end; i++) {
+                if (thee->pvec[i]*thee->kappa[i] > VSMALL) {
+                    for (j=0; j<nion; j++) {
+                        blk_e += (thee->pvec[i]*thee->kappa[i]*zks2
+                          * ionConc[j]
+                          * (Vcap_exp(-ionQ[j]*thee->u[i], &ichop)-1.0));
+                        nchop += ichop;
+                    }
                 }
             }
+            blk_sums[iblk] = blk_e;
+        }
+        for (iblk=0; iblk<nblk; iblk++) {
+            energy += blk_sums[iblk];
+        }
+        if (blk_sums != blk_buf) {
+            free(blk_sums);
         }
         if (nchop > 0){
             Vnm_print(2, "Vpmg_qmEnergy:  Chopped EXP %d times!\n",nchop);
