@@ -70,6 +70,7 @@
  * @endverbatim
  */
 
+#include <stdarg.h>
 #include "vpmg.h"
 
 VEMBED(rcsid="$Id$")
@@ -1890,6 +1891,22 @@ VPRIVATE double Vpmg_qfEnergyVolume(Vpmg *thee, int extFlag) {
     return energy;
 }
 
+/* Serialize diagnostic output when force helpers run concurrently across atoms. */
+VPRIVATE void vpmgPrintTS(int unit, const char *fmt, ...) {
+    char buf[512];
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, ap);
+    va_end(ap);
+#ifdef _OPENMP
+#pragma omp critical(apbs_vnm_print)
+#endif
+    {
+        Vnm_print(unit, "%s", buf);
+        if (unit == 2) fflush(stderr);
+    }
+}
+
 VPRIVATE void Vpmg_splineSelect(int srfm,Vacc *acc,double *gpos,double win,
                                       double infrad,Vatom *atom,double *force){
 
@@ -1904,7 +1921,7 @@ VPRIVATE void Vpmg_splineSelect(int srfm,Vacc *acc,double *gpos,double win,
             Vacc_splineAccGradAtomNorm4(acc, gpos, win, infrad, atom, force);
             break;
         default:
-            Vnm_print(2, "Vpmg_dbnbForce: Unknown surface method.\n");
+            vpmgPrintTS(2, "Vpmg_dbnbForce: Unknown surface method.\n");
             return;
     }
 
@@ -5462,9 +5479,9 @@ VPUBLIC int Vpmg_ibForce(Vpmg *thee, double *force, int atomID,
 
     /* Check surface definition */
     if ((srfm != VSM_SPLINE) && (srfm!=VSM_SPLINE3) && (srfm!=VSM_SPLINE4)) {
-        Vnm_print(2, "Vpmg_ibForce:  Forces *must* be calculated with \
+        vpmgPrintTS(2, "Vpmg_ibForce:  Forces *must* be calculated with \
 spline-based surfaces!\n");
-        Vnm_print(2, "Vpmg_ibForce:  Skipping ionic boundary force \
+        vpmgPrintTS(2, "Vpmg_ibForce:  Skipping ionic boundary force \
 calculation!\n");
         return 0;
     }
@@ -5503,7 +5520,7 @@ calculation!\n");
     /* Sanity check: there is no force if there is zero ionic strength */
     if (zkappa2 < VPMGSMALL) {
 #ifndef VAPBSQUIET
-        Vnm_print(2, "Vpmg_ibForce:  No force for zero ionic strength!\n");
+        vpmgPrintTS(2, "Vpmg_ibForce:  No force for zero ionic strength!\n");
 #endif
         return 1;
     }
@@ -5514,16 +5531,15 @@ calculation!\n");
       (apos[2]<=zmin) || (apos[2]>=zmax)) {
         if ((thee->pmgp->bcfl != BCFL_FOCUS) &&
             (thee->pmgp->bcfl != BCFL_MAP)) {
-            Vnm_print(2, "Vpmg_ibForce:  Atom #%d at (%4.3f, %4.3f, %4.3f) is off the mesh (ignoring):\n",
+            vpmgPrintTS(2, "Vpmg_ibForce:  Atom #%d at (%4.3f, %4.3f, %4.3f) is off the mesh (ignoring):\n",
                   atom, apos[0], apos[1], apos[2]);
-            Vnm_print(2, "Vpmg_ibForce:    xmin = %g, xmax = %g\n",
+            vpmgPrintTS(2, "Vpmg_ibForce:    xmin = %g, xmax = %g\n",
               xmin, xmax);
-            Vnm_print(2, "Vpmg_ibForce:    ymin = %g, ymax = %g\n",
+            vpmgPrintTS(2, "Vpmg_ibForce:    ymin = %g, ymax = %g\n",
               ymin, ymax);
-            Vnm_print(2, "Vpmg_ibForce:    zmin = %g, zmax = %g\n",
+            vpmgPrintTS(2, "Vpmg_ibForce:    zmin = %g, zmax = %g\n",
               zmin, zmax);
         }
-        fflush(stderr);
     } else {
 
         /* Convert the atom position to grid reference frame */
@@ -5612,7 +5628,7 @@ VPUBLIC int Vpmg_dbForce(Vpmg *thee, double *dbForce, int atomID,
 
     VASSERT(thee != VNULL);
     if (!thee->filled) {
-        Vnm_print(2, "Vpmg_dbForce:  Need to callVpmg_fillco!\n");
+        vpmgPrintTS(2, "Vpmg_dbForce:  Need to callVpmg_fillco!\n");
         return 0;
     }
 
@@ -5629,9 +5645,9 @@ VPUBLIC int Vpmg_dbForce(Vpmg *thee, double *dbForce, int atomID,
 
     /* Check surface definition */
     if ((srfm != VSM_SPLINE) && (srfm!=VSM_SPLINE3) && (srfm!=VSM_SPLINE4)) {
-        Vnm_print(2, "Vpmg_dbForce:  Forces *must* be calculated with \
+        vpmgPrintTS(2, "Vpmg_dbForce:  Forces *must* be calculated with \
 spline-based surfaces!\n");
-        Vnm_print(2, "Vpmg_dbForce:  Skipping dielectric/apolar boundary \
+        vpmgPrintTS(2, "Vpmg_dbForce:  Skipping dielectric/apolar boundary \
 force calculation!\n");
         return 0;
     }
@@ -5668,7 +5684,7 @@ force calculation!\n");
 
     /* Sanity check: there is no force if there is zero ionic strength */
     if (VABS(epsp-epsw) < VPMGSMALL) {
-        Vnm_print(0, "Vpmg_dbForce: No force for uniform dielectric!\n");
+        vpmgPrintTS(0, "Vpmg_dbForce: No force for uniform dielectric!\n");
         return 1;
     }
     deps = (epsw - epsp);
@@ -5682,16 +5698,15 @@ force calculation!\n");
         (apos[2]<=zmin + rtot) || (apos[2]>=zmax - rtot)) {
         if ((thee->pmgp->bcfl != BCFL_FOCUS) &&
             (thee->pmgp->bcfl != BCFL_MAP)) {
-            Vnm_print(2, "Vpmg_dbForce:  Atom #%d at (%4.3f, %4.3f, %4.3f) is off the mesh (ignoring):\n",
+            vpmgPrintTS(2, "Vpmg_dbForce:  Atom #%d at (%4.3f, %4.3f, %4.3f) is off the mesh (ignoring):\n",
                       atomID, apos[0], apos[1], apos[2]);
-            Vnm_print(2, "Vpmg_dbForce:    xmin = %g, xmax = %g\n",
+            vpmgPrintTS(2, "Vpmg_dbForce:    xmin = %g, xmax = %g\n",
                       xmin, xmax);
-            Vnm_print(2, "Vpmg_dbForce:    ymin = %g, ymax = %g\n",
+            vpmgPrintTS(2, "Vpmg_dbForce:    ymin = %g, ymax = %g\n",
                       ymin, ymax);
-            Vnm_print(2, "Vpmg_dbForce:    zmin = %g, zmax = %g\n",
+            vpmgPrintTS(2, "Vpmg_dbForce:    zmin = %g, zmax = %g\n",
                       zmin, zmax);
         }
-        fflush(stderr);
     } else {
 
         /* Convert the atom position to grid reference frame */
@@ -5704,32 +5719,32 @@ force calculation!\n");
         dx = rtot/hx;
         imin = (int)floor((position[0]-rtot)/hx);
         if (imin < 1) {
-            Vnm_print(2, "Vpmg_dbForce:  Atom %d off grid!\n", atomID);
+            vpmgPrintTS(2, "Vpmg_dbForce:  Atom %d off grid!\n", atomID);
             return 0;
         }
         imax = (int)ceil((position[0]+rtot)/hx);
         if (imax > (nx-2)) {
-            Vnm_print(2, "Vpmg_dbForce:  Atom %d off grid!\n", atomID);
+            vpmgPrintTS(2, "Vpmg_dbForce:  Atom %d off grid!\n", atomID);
             return 0;
         }
         jmin = (int)floor((position[1]-rtot)/hy);
         if (jmin < 1) {
-            Vnm_print(2, "Vpmg_dbForce:  Atom %d off grid!\n", atomID);
+            vpmgPrintTS(2, "Vpmg_dbForce:  Atom %d off grid!\n", atomID);
             return 0;
         }
         jmax = (int)ceil((position[1]+rtot)/hy);
         if (jmax > (ny-2)) {
-            Vnm_print(2, "Vpmg_dbForce:  Atom %d off grid!\n", atomID);
+            vpmgPrintTS(2, "Vpmg_dbForce:  Atom %d off grid!\n", atomID);
             return 0;
         }
         kmin = (int)floor((position[2]-rtot)/hzed);
         if (kmin < 1) {
-            Vnm_print(2, "Vpmg_dbForce:  Atom %d off grid!\n", atomID);
+            vpmgPrintTS(2, "Vpmg_dbForce:  Atom %d off grid!\n", atomID);
             return 0;
         }
         kmax = (int)ceil((position[2]+rtot)/hzed);
         if (kmax > (nz-2)) {
-            Vnm_print(2, "Vpmg_dbForce:  Atom %d off grid!\n", atomID);
+            vpmgPrintTS(2, "Vpmg_dbForce:  Atom %d off grid!\n", atomID);
             return 0;
         }
         for (i=imin; i<=imax; i++) {
@@ -5864,9 +5879,9 @@ VPUBLIC int Vpmg_qfForce(Vpmg *thee, double *force, int atomID,
 
     /* Check surface definition */
     if (chgm != VCM_BSPL2) {
-        Vnm_print(2, "Vpmg_qfForce:  It is recommended that forces be \
+        vpmgPrintTS(2, "Vpmg_qfForce:  It is recommended that forces be \
 calculated with the\n");
-        Vnm_print(2, "Vpmg_qfForce:  cubic spline charge discretization \
+        vpmgPrintTS(2, "Vpmg_qfForce:  cubic spline charge discretization \
 scheme\n");
     }
 
@@ -5881,9 +5896,9 @@ scheme\n");
             qfForceSpline4(thee, tforce, atomID);
             break;
         default:
-            Vnm_print(2, "Vpmg_qfForce:  Undefined charge discretization \
+            vpmgPrintTS(2, "Vpmg_qfForce:  Undefined charge discretization \
 method (%d)!\n", chgm);
-            Vnm_print(2, "Vpmg_qfForce:  Forces not calculated!\n");
+            vpmgPrintTS(2, "Vpmg_qfForce:  Forces not calculated!\n");
             return 0;
     }
 
@@ -5940,12 +5955,11 @@ VPRIVATE void qfForceSpline1(Vpmg *thee, double *force, int atomID) {
         (apos[1]>=ymax) || (apos[2]<=zmin) || (apos[2]>=zmax)) {
         if ((thee->pmgp->bcfl != BCFL_FOCUS) &&
             (thee->pmgp->bcfl != BCFL_MAP)) {
-            Vnm_print(2, "Vpmg_qfForce:  Atom #%d at (%4.3f, %4.3f, %4.3f) is off the mesh (ignoring):\n", atomID, apos[0], apos[1], apos[2]);
-            Vnm_print(2, "Vpmg_qfForce:    xmin = %g, xmax = %g\n", xmin, xmax);
-            Vnm_print(2, "Vpmg_qfForce:    ymin = %g, ymax = %g\n", ymin, ymax);
-            Vnm_print(2, "Vpmg_qfForce:    zmin = %g, zmax = %g\n", zmin, zmax);
+            vpmgPrintTS(2, "Vpmg_qfForce:  Atom #%d at (%4.3f, %4.3f, %4.3f) is off the mesh (ignoring):\n", atomID, apos[0], apos[1], apos[2]);
+            vpmgPrintTS(2, "Vpmg_qfForce:    xmin = %g, xmax = %g\n", xmin, xmax);
+            vpmgPrintTS(2, "Vpmg_qfForce:    ymin = %g, ymax = %g\n", ymin, ymax);
+            vpmgPrintTS(2, "Vpmg_qfForce:    zmin = %g, zmax = %g\n", zmin, zmax);
         }
-        fflush(stderr);
     } else {
 
         /* Convert the atom position to grid coordinates */
@@ -5997,7 +6011,7 @@ VPRIVATE void qfForceSpline1(Vpmg *thee, double *force, int atomID) {
                      - (1-dy)*(1-dz)*u[IJK(ilo,jlo,klo)])/hx;
         } else {
             force[0] = 0;
-            Vnm_print(0,
+            vpmgPrintTS(0,
               "Vpmg_qfForce:  Atom %d on x gridline; zero x-force\n", atomID);
         }
         if ((dy > VPMGSMALL) && (VABS(1.0-dy) > VPMGSMALL)) {
@@ -6012,7 +6026,7 @@ VPRIVATE void qfForceSpline1(Vpmg *thee, double *force, int atomID) {
                      - (1-dx)*(1-dz)*u[IJK(ilo,jlo,klo)])/hy;
         } else {
             force[1] = 0;
-            Vnm_print(0,
+            vpmgPrintTS(0,
               "Vpmg_qfForce:  Atom %d on y gridline; zero y-force\n", atomID);
         }
         if ((dz > VPMGSMALL) && (VABS(1.0-dz) > VPMGSMALL)) {
@@ -6027,7 +6041,7 @@ VPRIVATE void qfForceSpline1(Vpmg *thee, double *force, int atomID) {
                      - (1-dy)*(1-dx)*u[IJK(ilo,jlo,klo)])/hzed;
         } else {
             force[2] = 0;
-            Vnm_print(0,
+            vpmgPrintTS(0,
               "Vpmg_qfForce:  Atom %d on z gridline; zero z-force\n", atomID);
         }
     }
@@ -6082,10 +6096,9 @@ VPRIVATE void qfForceSpline2(Vpmg *thee, double *force, int atomID) {
      || (apos[2]<=(zmin+hzed)) || (apos[2]>=(zmax-hzed))) {
         if ((thee->pmgp->bcfl != BCFL_FOCUS) &&
             (thee->pmgp->bcfl != BCFL_MAP)) {
-            Vnm_print(2, "qfForceSpline2:  Atom #%d off the mesh \
+            vpmgPrintTS(2, "qfForceSpline2:  Atom #%d off the mesh \
                 (ignoring)\n", atomID);
         }
-        fflush(stderr);
 
     } else {
 
@@ -6200,9 +6213,8 @@ VPRIVATE void qfForceSpline4(Vpmg *thee, double *force, int atomID) {
     if ((apos[0]<=(xmin+2*hx))   || (apos[0]>=(xmax-2*hx)) \
         || (apos[1]<=(ymin+2*hy))   || (apos[1]>=(ymax-2*hy)) \
         || (apos[2]<=(zmin+2*hzed)) || (apos[2]>=(zmax-2*hzed))) {
-        Vnm_print(2, "qfForceSpline4:  Atom off the mesh \
+        vpmgPrintTS(2, "qfForceSpline4:  Atom off the mesh \
             (ignoring) %6.3f %6.3f %6.3f\n", apos[0], apos[1], apos[2]);
-        fflush(stderr);
     } else {
 
         /* Convert the atom position to grid coordinates */
