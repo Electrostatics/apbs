@@ -585,10 +585,12 @@ int main(
                         &(atomForce[i]), alist);
 
                 /* Write out data folks might want */
-                writedataMG(rank, nosh, pbeparm, pmg[i]);
+                writedataMG((mgparm->partRank >= 0) ? mgparm->partRank : rank,
+                            nosh, pbeparm, pmg[i]);
 
                 /* Write matrix */
-                writematMG(rank, nosh, pbeparm, pmg[i]);
+                writematMG((mgparm->partRank >= 0) ? mgparm->partRank : rank,
+                           nosh, pbeparm, pmg[i]);
 
                 /* If needed, cache atom energies */
                 nenergy[i] = 0;
@@ -919,6 +921,9 @@ int main(
             }
 
     }
+
+    foldParaPartitions(nosh, totEnergy, qfEnergy, qmEnergy, dielEnergy,
+                       nenergy, atomEnergy, nforce, atomForce);
 
     //Clear out the parameter file memory
     if(param != VNULL) Vparam_dtor(&param);
