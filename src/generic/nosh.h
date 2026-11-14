@@ -84,7 +84,7 @@
 
 /** @brief Maximum number of calculations in a run
 *  @ingroup NOsh */
-#define NOSH_MAXCALC 20
+#define NOSH_MAXCALC 256
 
 /** @brief Maximum number of PRINT statements in a run
 *  @ingroup NOsh */
