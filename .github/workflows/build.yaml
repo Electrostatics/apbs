@@ -149,6 +149,26 @@ jobs:
             # No static libpython is available on arm64 runners, and the
             # framework fallback makes the binary depend on the runner Python.
             pygbe: OFF
+          - platform: macos-openmp
+            os: macos-15-intel
+            openmp: ON
+            static-build: ON
+            python-version: "3.10"
+            bla-vendor: Apple
+            create-package: false
+            architecture: x64
+            pb-solvers: OFF
+            pygbe: OFF
+          - platform: macos-arm64-openmp
+            os: macos-15
+            openmp: ON
+            static-build: ON
+            python-version: "3.10"
+            bla-vendor: Apple
+            create-package: false
+            architecture: arm64
+            pb-solvers: OFF
+            pygbe: OFF
           - platform: windows
             os: windows-2022
             bla-vendor: OpenBLAS
@@ -212,6 +232,7 @@ jobs:
             eigen \
             gcc \
             lapack \
+            libomp \
             suite-sparse
           git clone https://github.com/Electrostatics/metis-fork.git metis-5.1.0
           cd metis-5.1.0
@@ -277,6 +298,9 @@ jobs:
         env:
           INSTALL_DIR: "./"
         run: |
+          if [ "${ENABLE_OPENMP}" = "ON" ]; then
+            export CMAKE_PREFIX_PATH="$(brew --prefix libomp)${CMAKE_PREFIX_PATH:+;$CMAKE_PREFIX_PATH}"
+          fi
           ./.build.sh
 
       - name: Configure and Build for Linux

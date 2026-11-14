@@ -113,6 +113,14 @@ jobs:
             os: macos-15-intel
             bla-vendor: Apple
             architecture: x64
+          - platform: macos-openmp
+            os: macos-15-intel
+            openmp: ON
+            static-build: ON
+            python-version: "3.10"
+            bla-vendor: Apple
+            architecture: x64
+            pygbe: OFF
           - platform: windows
             os: windows-2022
             bla-vendor: OpenBLAS
@@ -123,6 +131,7 @@ jobs:
       ENABLE_OPENMP: ${{ matrix.openmp }}
       APBS_STATIC_BUILD: ${{matrix.static-build }}
       PYTHON_VERSION: "${{ matrix.python-version }}"
+      ENABLE_PYGBE: ${{ matrix.pygbe || 'ON' }}
 
     steps:
 
@@ -160,6 +169,7 @@ jobs:
             boost \
             eigen \
             lapack \
+            libomp \
             suite-sparse
           git clone https://github.com/Electrostatics/metis-fork.git metis-5.1.0
           cd metis-5.1.0
@@ -225,6 +235,9 @@ jobs:
         env:
           INSTALL_DIR: "./"
         run: |
+          if [ "${ENABLE_OPENMP}" = "ON" ]; then
+            export CMAKE_PREFIX_PATH="$(brew --prefix libomp)${CMAKE_PREFIX_PATH:+;$CMAKE_PREFIX_PATH}"
+          fi
           ./.build.sh
 
       - name: Configure and Build for Linux

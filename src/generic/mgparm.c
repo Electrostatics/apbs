@@ -162,6 +162,7 @@ VPUBLIC Vrc_Codes MGparm_ctor2(MGparm *thee, MGparm_CalcType type) {
     thee->setofrac = 0;
     for (i=0; i<6; i++) thee->partDisjOwnSide[i] = 0;
     thee->setasync = 0;
+    thee->partRank = -1;
 
     thee->useAqua = 0;
     thee->setUseAqua = 0;
@@ -398,6 +399,7 @@ VPUBLIC void MGparm_copy(MGparm *thee, MGparm *parm) {
     thee->setofrac = parm->setofrac;
     thee->setasync = parm->setasync;
     thee->async = parm->async;
+    thee->partRank = parm->partRank;
 
     thee->nonlintype = parm->nonlintype;
     thee->setnonlintype = parm->setnonlintype;

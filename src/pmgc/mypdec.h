@@ -220,4 +220,15 @@ VEXTERNC void Vc_vecsmpbe(
         int *ipkey    ///< @todo: Doc
         );
 
+VEXTERNC void Vc_dc_vecpmg(
+        double *coef,
+        double *uin,
+        double *uout,
+        double *duout,
+        int *nx,
+        int *ny,
+        int *nz,
+        int *ipkey
+        );
+
 #endif /* _MYPDE_H_ */
