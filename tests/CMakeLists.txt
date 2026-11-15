@@ -119,6 +119,53 @@ endif()
 add_test(NAME vgrid_dx_test COMMAND $<TARGET_FILE:vgrid_dx_test>)
 set_tests_properties(vgrid_dx_test PROPERTIES TIMEOUT 60 LABELS unit)
 
+if(ENABLE_OPENMP)
+    add_executable(openmp_parity_test openmp_parity_test.c)
+    target_link_libraries(openmp_parity_test
+        apbs_generic
+        apbs_mg
+        apbs_pmgc
+        apbs_fem
+        apbs_routines
+        ${APBS_LIBS}
+    )
+    if(APPLE)
+        target_link_libraries(openmp_parity_test "-framework CoreFoundation")
+    endif()
+    add_test(NAME openmp_parity_test COMMAND $<TARGET_FILE:openmp_parity_test>)
+    set_tests_properties(openmp_parity_test PROPERTIES TIMEOUT 60 SKIP_RETURN_CODE 77 LABELS unit)
+endif()
+
+add_executable(npbe_boltzmann_test npbe_boltzmann_test.c)
+target_link_libraries(npbe_boltzmann_test
+    apbs_generic
+    apbs_mg
+    apbs_pmgc
+    apbs_fem
+    apbs_routines
+    ${APBS_LIBS}
+)
+if(APPLE)
+    target_link_libraries(npbe_boltzmann_test "-framework CoreFoundation")
+endif()
+add_test(NAME npbe_boltzmann_test COMMAND $<TARGET_FILE:npbe_boltzmann_test>)
+set_tests_properties(npbe_boltzmann_test PROPERTIES TIMEOUT 60 LABELS unit)
+
+add_executable(mg_para_test mg_para_test.c)
+target_link_libraries(mg_para_test
+    apbs_generic
+    apbs_mg
+    apbs_pmgc
+    apbs_fem
+    apbs_routines
+    ${APBS_LIBS}
+)
+if(APPLE)
+    target_link_libraries(mg_para_test "-framework CoreFoundation")
+endif()
+add_test(NAME mg_para_test COMMAND $<TARGET_FILE:mg_para_test>)
+set_tests_properties(mg_para_test PROPERTIES TIMEOUT 60 LABELS unit)
+
 add_executable(gsrb7_pipeline_test gsrb7_pipeline_test.c)
 target_link_libraries(gsrb7_pipeline_test
     apbs_generic
