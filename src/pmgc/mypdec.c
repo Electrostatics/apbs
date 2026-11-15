@@ -142,82 +142,83 @@ VPUBLIC void Vc_vec(double *coef, double *uin, double *uout,
 
 
 
+VPRIVATE void eval_boltzmann_vec(double *coef, double *uin, double *uout,
+        double *duout, int *nx, int *ny, int *nz, int *ipkey, int mode) {
+    /* mode: 0 = c(u) only, 1 = dc(u) only, 2 = both c(u) and dc(u) */
+    double zcf_c[MAXIONS + 1], zcf_dc[MAXIONS + 1], zu[MAXIONS + 1];
+    double c, u, acc_c, acc_dc, am_zero, am_zero_dc, am_neg, am_pos, arg, e;
+    int ichopped_c = 0, ichopped_dc = 0;
+    int ichopped_neg, ichopped_pos, iion, n, i;
+
+    n = (*nx) * (*ny) * (*nz);
+    if (*ipkey != 0) {
+        if ((*ipkey) > 1 && (*ipkey) % 2 == 1 && (*ipkey) <= MAXPOLY) {
+            VABORT_MSG0("eval_boltzmann_vec: Polynomial approximation unavailable\n");
+        }
+        VABORT_MSG0("eval_boltzmann_vec: Linear approximation unavailable\n");
+    }
+    if (nion <= 0) {
+        if (mode != 1) { for (i = 1; i <= n; i++) VAT(uout, i) = 0.0; }
+        if (mode != 0) { for (i = 1; i <= n; i++) VAT(duout, i) = 0.0; }
+        return;
+    }
+    for (iion = 1; iion <= nion; iion++) {
+        zcf_c[iion] = -1.0 * VAT(sconc, iion) * VAT(charge, iion);
+        zcf_dc[iion] = VAT(sconc, iion) * VAT(charge, iion) * VAT(charge, iion);
+        zu[iion] = -1.0 * VAT(charge, iion);
+    }
+
+#ifdef _OPENMP
+    #pragma omp parallel for default(shared) \
+        private(i, iion, c, u, acc_c, acc_dc, am_zero, am_zero_dc, am_neg, am_pos, arg, e, ichopped_neg, ichopped_pos) \
+        reduction(+ : ichopped_c, ichopped_dc)
+#endif
+    for (i = 1; i <= n; i++) {
+        c = VAT(coef, i);
+        if (c == 0.0) {
+            if (mode != 1) VAT(uout, i) = 0.0;
+            if (mode != 0) VAT(duout, i) = 0.0;
+            continue;
+        }
+        u = VAT(uin, i);
+        acc_c = 0.0;
+        acc_dc = 0.0;
+        for (iion = 1; iion <= nion; iion++) {
+            am_neg = VMAX2(VMIN2(zu[iion] * u, 0.0), SINH_MIN);
+            am_pos = VMIN2(VMAX2(zu[iion] * u, 0.0), SINH_MAX);
+            ichopped_neg = (int)(am_neg / SINH_MIN);
+            ichopped_pos = (int)(am_pos / SINH_MAX);
+            if (mode == 0) {
+                am_zero = VMIN2(ZSMALL, VABS(zcf_c[iion] * c)) * ZLARGE;
+                arg = am_zero * (am_neg + am_pos);
+                acc_c = acc_c + zcf_c[iion] * c * exp(arg);
+                ichopped_c += (int)floor(am_zero + 0.5) * (ichopped_neg + ichopped_pos);
+            } else if (mode == 1) {
+                am_zero_dc = VMIN2(ZSMALL, VABS(zcf_dc[iion] * c)) * ZLARGE;
+                arg = am_zero_dc * (am_neg + am_pos);
+                acc_dc += zcf_dc[iion] * c * exp(arg);
+                ichopped_dc += (int)floor(am_zero_dc + 0.5) * (ichopped_neg + ichopped_pos);
+            } else {
+                am_zero = VMIN2(ZSMALL, VABS(zcf_c[iion] * c)) * ZLARGE;
+                am_zero_dc = VMIN2(ZSMALL, VABS(zcf_dc[iion] * c)) * ZLARGE;
+                arg = am_zero * (am_neg + am_pos);
+                e = exp(arg);
+                acc_c = acc_c + zcf_c[iion] * c * e;
+                acc_dc += zcf_dc[iion] * c * ((am_zero_dc == am_zero) ? e : exp(am_zero_dc * (am_neg + am_pos)));
+                ichopped_c += (int)floor(am_zero + 0.5) * (ichopped_neg + ichopped_pos);
+                ichopped_dc += (int)floor(am_zero_dc + 0.5) * (ichopped_neg + ichopped_pos);
+            }
+        }
+        if (mode != 1) VAT(uout, i) = acc_c;
+        if (mode != 0) VAT(duout, i) = acc_dc;
+    }
+    if (ichopped_c > 0) Vnm_print(2, "Vc_vecpmg: trapped exp overflows: %d\n", ichopped_c);
+    if (ichopped_dc > 0) Vnm_print(2, "Vdc_vec: trapped exp overflows: %d\n", ichopped_dc);
+}
+
 VPUBLIC void Vc_vecpmg(double *coef, double *uin, double *uout,
         int *nx, int *ny, int *nz, int *ipkey) {
-
-    double zcf2;      /// @todo  Document this function!
-    double zu2;
-    double am_zero;
-    double am_neg;
-    double am_pos;
-    double argument;
-    int ichopped;
-    int ichopped_neg;
-    int ichopped_pos;
-    int iion;
-
-    int n, i;
-
-    n = *nx * *ny * *nz;
-
-    for (i=1; i<=n; i++) {
-        VAT(uout, i) = 0;
-    }
-
-    for (iion=1; iion<=nion; iion++) {
-
-        // Assemble the ion-specific coefficient
-        zcf2 = -1.0 * VAT(sconc, iion) * VAT(charge, iion);
-
-        // Assemble the ion-specific potential value
-        zu2 = -1.0 * VAT(charge, iion);
-
-        if (*ipkey == 0) {
-            ichopped = 0;
-
-            #pragma omp parallel for \
-             default(shared) \
-             private(i, ichopped_neg, ichopped_pos, am_zero, am_neg, am_pos, argument) \
-             reduction(+ : ichopped)
-            for (i=1; i<=n; i++) {
-
-                // am_zero is 0 if coef zero, and 1 if coef nonzero
-                am_zero = VMIN2(ZSMALL, VABS(zcf2 * VAT(coef, i))) * ZLARGE;
-
-                // am_neg is chopped u if u negative, 0 if u positive
-                am_neg = VMAX2(VMIN2(zu2 * VAT(uin, i), 0.0), SINH_MIN);
-
-                // am_neg is chopped u if u positive, 0 if u negative
-                am_pos = VMIN2(VMAX2(zu2 * VAT(uin, i), 0.0), SINH_MAX);
-
-                // Finally determine the function value
-                argument = am_zero * (am_neg + am_pos);
-
-                VAT(uout, i) = VAT(uout, i) + zcf2 * VAT(coef, i) * exp(argument);
-
-                // Count chopped values
-                ichopped_neg = (int)(am_neg / SINH_MIN);
-                ichopped_pos = (int)(am_pos / SINH_MAX);
-                ichopped += (int)(floor(am_zero+0.5)) * (ichopped_neg + ichopped_pos);
-            }
-
-            // Info
-            if (ichopped > 0) {
-                Vnm_print(2, "Vc_vecpmg: trapped exp overflows: %d\n", ichopped);
-            }
-
-        } else if (*ipkey > 1 && *ipkey % 2 == 1 && *ipkey <= MAXPOLY) {
-
-            // Polynomial requested
-            Vnm_print(2, "Vc_vecpmg: POLYNOMIAL APPROXIMATION UNAVAILABLE\n");
-            abort();
-        } else {
-
-            // Return linear approximation !***
-            Vnm_print(2, "Vc_vecpmg: LINEAR APPROXIMATION UNAVAILABLE\n");
-            abort();
-        }
-    }
+    eval_boltzmann_vec(coef, uin, uout, VNULL, nx, ny, nz, ipkey, 0);
 }
 
 
@@ -365,69 +366,7 @@ VPUBLIC void Vdc_vec(double *coef, double *uin, double *uout,
 
 VPUBLIC void Vdc_vecpmg(double *coef, double *uin, double *uout,
         int *nx, int *ny, int *nz, int *ipkey) {
-
-    int ideg, iion;
-    double  zcf2, zu2;
-    double am_zero, am_neg, am_pos;
-    double argument, poly, fact;
-
-    int ichopped, ichopped_neg, ichopped_pos;
-    int n, i;
-
-    // Find parallel loops (ipara), remainder (ivect)
-    n = *nx * *ny * *nz;
-
-    for (i=1; i<=n; i++) {
-      VAT(uout, i) = 0.0;
-    }
-
-    for (iion=1; iion<=nion; iion++) {
-
-        zcf2 = VAT(sconc, iion) * VAT(charge, iion) * VAT(charge, iion);
-        zu2  = -1.0 * VAT(charge, iion);
-
-        // Check if full exp requested
-        if (*ipkey == 0) {
-
-            // Initialize chopped counter
-            ichopped = 0;
-
-            #pragma omp parallel for \
-             default(shared) \
-             private(i, ichopped_neg, ichopped_pos, \
-                                 am_zero, am_neg, am_pos, argument) \
-             reduction(+:ichopped)
-            for (i=1; i<=n; i++) {
-
-                // am_zero is 0 if coef zero, and 1 if coef nonzero
-                am_zero = VMIN2(ZSMALL, VABS(zcf2 * VAT(coef, i))) * ZLARGE;
-
-                // am_neg is chopped u if u negative, 0 if u positive
-                am_neg = VMAX2(VMIN2(zu2 * VAT(uin, i), 0.0), SINH_MIN);
-
-                // am_neg is chopped u if u positive, 0 if u negative
-                am_pos = VMIN2(VMAX2(zu2 * VAT(uin, i), 0.0), SINH_MAX);
-
-                // Finally determine the function value
-                argument = am_zero * (am_neg + am_pos);
-                VAT(uout, i) += zcf2 * VAT(coef, i) * exp( argument );
-
-                // Count chopped values
-                ichopped_neg = (int)(am_neg / SINH_MIN);
-                ichopped_pos = (int)(am_pos / SINH_MAX);
-                ichopped += (int)floor(am_zero+0.5) * (ichopped_neg + ichopped_pos);
-            }
-
-            // Info
-            if (ichopped > 0)
-                Vnm_print(2, "Vdc_vec: trapped exp overflows: %d\n", ichopped);
-
-        } else if ((*ipkey) > 1 && (*ipkey) % 2 == 1 && (*ipkey) <= MAXPOLY) {
-            VABORT_MSG0("Vdc_vec: Polynomial approximation unavailable\n");
-        } else {
-            VABORT_MSG0("Vdc_vec: Linear approximation unavailable\n");
-        }
-    }
+    eval_boltzmann_vec(coef, uin, VNULL, uout, nx, ny, nz, ipkey, 1);
 }
 
 
@@ -557,4 +496,9 @@ VPUBLIC void Vdc_vecsmpbe(double *coef, double *uin, double *uout,
     // Info
     if (ichopped > 0)
         Vnm_print(2, "Vdc_vecsmpbe: trapped exp overflows: %d\n", ichopped);
+}
+
+VPUBLIC void Vc_dc_vecpmg(double *coef, double *uin, double *uout,
+        double *duout, int *nx, int *ny, int *nz, int *ipkey) {
+    eval_boltzmann_vec(coef, uin, uout, duout, nx, ny, nz, ipkey, 2);
 }

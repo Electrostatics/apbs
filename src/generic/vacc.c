@@ -753,11 +753,16 @@ VPUBLIC double Vacc_SASA(Vacc *thee,
     /* Check to see if we need to build the surface */
     if (thee->surf == VNULL) {
         thee->surf = Vmem_malloc(thee->mem, natom, sizeof(VaccSurf *));
+        if (natom > 0 && radius > Vclist_maxRadius(thee->clist)) {
+            Vnm_print(2,
+                      "Vacc_ivdwAcc: got radius (%g) bigger than max radius (%g)\n",
+                      radius, Vclist_maxRadius(thee->clist));
+            VASSERT(0);
+        }
 
-#if defined(DEBUG_MAC_OSX_OCL) || defined(DEBUG_MAC_OSX_STANDARD)
-#include "mach_chud.h"
-        machm_(&mbeg);
-#pragma omp parallel for private(i,atom)
+        /* Buried atoms exit early via the occluder cache while surface atoms scan full cells. */
+#ifdef _OPENMP
+#pragma omp parallel for private(i,atom) schedule(dynamic, 16)
 #endif
         for (i=0; i<natom; i++) {
             atom = Valist_getAtom(thee->alist, i);
@@ -783,10 +788,6 @@ VPUBLIC double Vacc_SASA(Vacc *thee,
         }
         area += (asurf->area);
     }
-
-#if defined(DEBUG_MAC_OSX_OCL) || defined(DEBUG_MAC_OSX_STANDARD)
-    mets_(&mbeg, "Vacc_SASA - Parallel");
-#endif
 
     Vnm_print(0, "Vacc_SASA: Time elapsed: %f\n", ((double)clock() - ts) / CLOCKS_PER_SEC);
     return area;
@@ -895,6 +896,7 @@ VPUBLIC VaccSurf* Vacc_atomSurf(Vacc *thee, Vatom *atom,
     int atomID;
     double arad, rad, pos[3], *apos;
     Vatom *last_hit = VNULL;
+    unsigned char bflags_buf[2048], *bflags = bflags_buf;
 
     /* Get atom information */
     arad = Vatom_getRadius(atom);
@@ -902,7 +904,18 @@ VPUBLIC VaccSurf* Vacc_atomSurf(Vacc *thee, Vatom *atom,
     atomID = Vatom_getAtomID(atom);
 
     if (arad < VSMALL) {
-        return VaccSurf_ctor(thee->mem, prad, 0);
+#ifdef _OPENMP
+#pragma omp critical(apbs_vmem)
+#endif
+        {
+            surf = VaccSurf_ctor(thee->mem, prad, 0);
+        }
+        return surf;
+    }
+
+    if (ref->npts > (int)sizeof(bflags_buf)) {
+        bflags = (unsigned char *)malloc((size_t)ref->npts);
+        VASSERT(bflags != VNULL);
     }
 
     rad = arad + prad;
@@ -916,27 +929,34 @@ VPUBLIC VaccSurf* Vacc_atomSurf(Vacc *thee, Vatom *atom,
         pos[2] = rad*(ref->zpts[i]) + apos[2];
         if (ivdwAccExclusCache(thee, pos, prad, atomID, &last_hit)) {
             npts++;
-            ref->bpts[i] = (ref->bpts[i] << 1) + 1;
+            bflags[i] = 1;
         } else {
-            ref->bpts[i] <<= 1;
+            bflags[i] = 0;
         }
     }
 
     /* Allocate space for the points */
-    surf = VaccSurf_ctor(thee->mem, prad, npts);
+#ifdef _OPENMP
+#pragma omp critical(apbs_vmem)
+#endif
+    {
+        surf = VaccSurf_ctor(thee->mem, prad, npts);
+    }
 
     /* Assign the points */
     j = 0;
     for (i=0; i<ref->npts; i++) {
-	    char flag = ref->bpts[i] & 1;
-	    ref->bpts[i] >>= 1;
-	    if (flag) {
+        if (bflags[i]) {
             surf->bpts[j] = 1;
             surf->xpts[j] = rad*(ref->xpts[i]) + apos[0];
             surf->ypts[j] = rad*(ref->ypts[i]) + apos[1];
             surf->zpts[j] = rad*(ref->zpts[i]) + apos[2];
             j++;
         }
+    }
+
+    if (bflags != bflags_buf) {
+        free(bflags);
     }
 
     /* Assign the area */
@@ -1525,13 +1545,14 @@ VPUBLIC void Vacc_totalAtomdSAV(Vacc *thee, double dpos, double srad, Vatom *ato
 
 VPUBLIC double Vacc_totalSAV(Vacc *thee, Vclist *clist, APOLparm *apolparm, double radius) {
 
-    int i;
+    int i, ix, nx;
     int npts[3];
 
     double spacs[3], vec[3];
     double w, wx, wy, wz, len, fn, x, y, z, vol;
-    double vol_density,sav;
+    double vol_density, sav, local_sav;
     double *lower_corner, *upper_corner;
+    double *xvals, *slice_sav;
 
     sav = 0.0;
     vol = 1.0;
@@ -1558,7 +1579,29 @@ VPUBLIC double Vacc_totalSAV(Vacc *thee, Vclist *clist, APOLparm *apolparm, doub
         }
     }
 
-    for (x=lower_corner[0]; x<=upper_corner[0]; x=x+spacs[0]) {
+    if (radius > Vclist_maxRadius(thee->clist)) {
+        Vnm_print(2, "Vacc_ivdwAcc: got radius (%g) bigger than max radius (%g)\n",
+                  radius, Vclist_maxRadius(thee->clist));
+        VASSERT(0);
+    }
+
+    nx = 0;
+    for (x=lower_corner[0]; x<=upper_corner[0]; x=x+spacs[0]) nx++;
+    if (nx <= 0) return 0.0;
+
+    xvals = (double *)malloc((size_t)nx * sizeof(double));
+    slice_sav = (double *)malloc((size_t)nx * sizeof(double));
+    VASSERT(xvals != VNULL && slice_sav != VNULL);
+    ix = 0;
+    for (x=lower_corner[0]; x<=upper_corner[0]; x=x+spacs[0]) xvals[ix++] = x;
+
+    /* Each term is 0 or wx*wy*wz in {1/8, 1/4, 1/2, 1}, so slice sums are exact multiples of 1/8. */
+#ifdef _OPENMP
+#pragma omp parallel for private(ix, x, y, z, wx, wy, wz, w, vec, local_sav) schedule(dynamic, 2)
+#endif
+    for (ix=0; ix<nx; ix++) {
+        x = xvals[ix];
+        local_sav = 0.0;
         if ( VABS(x - lower_corner[0]) < VSMALL) {
             wx = 0.5;
         } else if ( VABS(x - upper_corner[0]) < VSMALL) {
@@ -1588,11 +1631,16 @@ VPUBLIC double Vacc_totalSAV(Vacc *thee, Vclist *clist, APOLparm *apolparm, doub
 
                 w = wx*wy*wz;
 
-                sav += (w*(1.0-Vacc_ivdwAcc(thee, vec, radius)));
+                local_sav += (w*(1.0-Vacc_ivdwAcc(thee, vec, radius)));
 
             } /* z loop */
         } /* y loop */
+        slice_sav[ix] = local_sav;
     } /* x loop */
+
+    for (ix=0; ix<nx; ix++) sav += slice_sav[ix];
+    free(xvals);
+    free(slice_sav);
 
     w  = spacs[0]*spacs[1]*spacs[2];
     sav *= w;
@@ -1672,8 +1720,13 @@ int Vacc_wcaEnergyAtom(Vacc *thee, APOLparm *apolparm, Valist *alist,
         spacs[i] = 0.5;
         if (apolparm->setgrid) {
             if (apolparm->grid[i] > spacs[i]) {
-                Vnm_print(2, "Vacc_totalSAV:  Warning, your GRID value (%g) is larger than the recommended value (%g)!\n",
-                    apolparm->grid[i], spacs[i]);
+#ifdef _OPENMP
+#pragma omp critical(apbs_vnm_print)
+#endif
+                {
+                    Vnm_print(2, "Vacc_totalSAV:  Warning, your GRID value (%g) is larger than the recommended value (%g)!\n",
+                        apolparm->grid[i], spacs[i]);
+                }
             }
             spacs[i] = apolparm->grid[i];
         }
