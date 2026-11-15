@@ -545,4 +545,10 @@ VEXTERNC void Vextrac(
         double *xout ///< @todo:  Doc
         );
 
+VEXTERNC int Vnmresid_dc(
+        int *nx, int *ny, int *nz,
+        int *ipc, double *rpc,
+        double *ac, double *cc, double *fc,
+        double *x, double *r, double *w1, double *dc);
+
 #endif /* _MATVECD_H_ */
