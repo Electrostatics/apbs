@@ -63,7 +63,9 @@ VPUBLIC void Vxcopy(int *nx, int *ny, int *nz, double *x, double *y) {
     int i, j, k;
 
     /// @todo:  Once the refactor begins, this will need to be unrolled
-    #pragma omp parallel for private(i,j,k)
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for(k=2; k<=*nz-1; k++)
         for(j=2; j<=*ny-1; j++)
             for(i=2; i<=*nx-1; i++)
@@ -119,7 +121,9 @@ VPUBLIC void Vxaxpy(int *nx, int *ny, int *nz,
     // The indices used to traverse the matrices
     int i, j, k;
 
-    /// @todo parallel optimization
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j, k) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for(k=2; k<=*nz-1; k++)
         for(j=2; j<=*ny-1; j++)
             for(i=2; i<=*nx-1; i++)
@@ -199,7 +203,9 @@ VPUBLIC void Vazeros(int *nx, int *ny, int *nz, double *x) {
 
     n = *nx * *ny * *nz;
 
-    #pragma omp parallel for private(i)
+#ifdef _OPENMP
+    #pragma omp parallel for private(i) schedule(static) if ((size_t)n >= PMG_OMP_MIN_N)
+#endif
     for (i=1; i<=n; i++)
         VAT(x, i) = 0.0;
 }
@@ -262,6 +268,9 @@ VPUBLIC void VfboundPMG00(int *nx, int *ny, int *nz, double *x) {
     MAT3(  x, *nx, *ny, *nz);
 
     // The (i=1) and (i=nx) boundaries
+#ifdef _OPENMP
+    #pragma omp parallel for private(j, k) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for (k=1; k<=*nz; k++) {
         for (j=1; j<=*ny; j++) {
             VAT3(x,   1, j, k) = 0.0;
@@ -270,6 +279,9 @@ VPUBLIC void VfboundPMG00(int *nx, int *ny, int *nz, double *x) {
     }
 
     // The (j=1) and (j=ny) boundaries
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, k) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for (k=1; k<=*nz; k++) {
         for(i=1; i<=*nx; i++) {
             VAT3(x, i,   1, k) = 0.0;
@@ -278,6 +290,9 @@ VPUBLIC void VfboundPMG00(int *nx, int *ny, int *nz, double *x) {
     }
 
     // The (k=1) and (k=nz) boundaries
+#ifdef _OPENMP
+    #pragma omp parallel for private(i, j) schedule(static) if (PMG_OMP_BIG(*nx, *ny, *nz))
+#endif
     for (j=1; j<=*ny; j++) {
         for (i=1; i<=*nx; i++) {
             VAT3(x, i, j,   1) = 0.0;
