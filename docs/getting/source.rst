@@ -63,6 +63,37 @@ To see all the options you can run:
 Additional features can be built using the flags described below.
 
 ^^^^^^^^^^^^^^
+Using OpenMP
+^^^^^^^^^^^^^^
+
+Set :makevar:`ENABLE_OPENMP` to ``ON`` to enable shared-memory parallelism.
+Static APBS builds support OpenMP on Linux and macOS; static MSVC builds
+remain unsupported.
+
+On macOS, Apple's Clang needs a separately installed OpenMP runtime.
+Install Homebrew's ``libomp`` and provide its prefix to CMake so that both
+the headers and the library can be found. In an otherwise configured build
+directory, run:
+
+.. code:: bash
+
+   brew install libomp
+   cd $APBS_BUILD_DIR
+   cmake -DENABLE_OPENMP=ON \
+      -DCMAKE_PREFIX_PATH="$(brew --prefix libomp)" ..
+   cmake --build . --parallel 4
+   export PATH="$APBS_BUILD_DIR/bin:$APBS_BUILD_DIR/src:$PATH"
+   OMP_NUM_THREADS=4 ctest --output-on-failure
+
+The Homebrew prefix works for both Apple Silicon and Intel installations.
+If you already supply :makevar:`CMAKE_PREFIX_PATH`, append the ``libomp``
+prefix to that semicolon-separated list instead of replacing it.
+Use ``OMP_NUM_THREADS`` to select the thread count when running APBS.
+The static-build option prefers static dependencies, but does not guarantee
+a fully static executable; keep Homebrew's ``libomp`` installed if CMake
+selects its dynamic runtime.
+
+^^^^^^^^^^^^^^
 Geometric flow
 ^^^^^^^^^^^^^^
 

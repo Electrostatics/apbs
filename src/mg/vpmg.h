@@ -1354,7 +1354,8 @@ VPRIVATE void markSphere(
         double *tpos,  /** Sphere position */
         int nx,  /** Number of grid points */
         int ny,  /** Number of grid points */
-        int nz,  /** Number of grid points */
+        int k_lo,  /** Inclusive lower z-plane of slab */
+        int k_hi,  /** Exclusive upper z-plane of slab */
         double hx,  /** Grid spacing */
         double hy,  /** Grid spacing */
         double hzed,  /** Grid spacing */
