@@ -5070,6 +5070,7 @@ VPRIVATE void fillcoChargeSpline1(Vpmg *thee) {
     double xlen, ylen, zlen, position[3], ifloat, jfloat, kfloat;
     double charge, dx, dy, dz, zmagic, hx, hy, hzed, *apos;
     int i, nx, ny, nz, iatom, ihi, ilo, jhi, jlo, khi, klo;
+    int k_lo, k_hi, in_khi, in_klo;
 
 
     VASSERT(thee != VNULL);
@@ -5101,10 +5102,20 @@ VPRIVATE void fillcoChargeSpline1(Vpmg *thee) {
     zmax = thee->pmgp->zcent + (zlen/2.0);
 
     /* Reset the charge array */
+#ifdef _OPENMP
+#pragma omp parallel for private(i) firstprivate(thee, nx, ny, nz) schedule(static)
+#endif
     for (i=0; i<(nx*ny*nz); i++) thee->charge[i] = 0.0;
 
     /* Fill in the source term (atomic charges) */
     Vnm_print(0, "Vpmg_fillco:  filling in source term.\n");
+#ifdef _OPENMP
+#pragma omp parallel private(k_lo, k_hi, in_khi, in_klo, iatom, atom, apos, charge, \
+    position, ifloat, jfloat, kfloat, ihi, ilo, jhi, jlo, khi, klo, dx, dy, dz) \
+    firstprivate(thee, alist, nx, ny, nz, hx, hy, hzed, xmin, xmax, ymin, ymax, zmin, zmax, zmagic)
+#endif
+    {
+    zSlabBounds(nz, &k_lo, &k_hi);
     for (iatom=0; iatom<Valist_getNumberAtoms(alist); iatom++) {
 
         atom = Valist_getAtom(alist, iatom);
@@ -5115,7 +5126,8 @@ VPRIVATE void fillcoChargeSpline1(Vpmg *thee) {
         if ((apos[0]<=xmin) || (apos[0]>=xmax)  || \
             (apos[1]<=ymin) || (apos[1]>=ymax)  || \
             (apos[2]<=zmin) || (apos[2]>=zmax)) {
-            if ((thee->pmgp->bcfl != BCFL_FOCUS) &&
+            if ((k_lo == 0) &&
+                (thee->pmgp->bcfl != BCFL_FOCUS) &&
                 (thee->pmgp->bcfl != BCFL_MAP)) {
                 Vnm_print(2, "Vpmg_fillco:  Atom #%d at (%4.3f, %4.3f, \
 %4.3f) is off the mesh (ignoring):\n",
@@ -5127,7 +5139,7 @@ VPRIVATE void fillcoChargeSpline1(Vpmg *thee) {
                 Vnm_print(2, "Vpmg_fillco:    zmin = %g, zmax = %g\n",
                   zmin, zmax);
             }
-            fflush(stderr);
+            if (k_lo == 0) fflush(stderr);
         } else {
 
             /* Convert the atom position to grid reference frame */
@@ -5135,35 +5147,44 @@ VPRIVATE void fillcoChargeSpline1(Vpmg *thee) {
             position[1] = apos[1] - ymin;
             position[2] = apos[2] - zmin;
 
+            kfloat = position[2]/hzed;
+            khi = (int)ceil(kfloat);
+            klo = (int)floor(kfloat);
+            in_khi = (khi >= k_lo) && (khi < k_hi);
+            in_klo = (klo >= k_lo) && (klo < k_hi);
+            if (!in_khi && !in_klo) continue;
+
             /* Scale the charge to be a delta function */
             charge = charge*zmagic/(hx*hy*hzed);
 
             /* Figure out which vertices we're next to */
             ifloat = position[0]/hx;
             jfloat = position[1]/hy;
-            kfloat = position[2]/hzed;
 
             ihi = (int)ceil(ifloat);
             ilo = (int)floor(ifloat);
             jhi = (int)ceil(jfloat);
             jlo = (int)floor(jfloat);
-            khi = (int)ceil(kfloat);
-            klo = (int)floor(kfloat);
 
             /* Now assign fractions of the charge to the nearby verts */
             dx = ifloat - (double)(ilo);
             dy = jfloat - (double)(jlo);
             dz = kfloat - (double)(klo);
-            thee->charge[IJK(ihi,jhi,khi)] += (dx*dy*dz*charge);
-            thee->charge[IJK(ihi,jlo,khi)] += (dx*(1.0-dy)*dz*charge);
-            thee->charge[IJK(ihi,jhi,klo)] += (dx*dy*(1.0-dz)*charge);
-            thee->charge[IJK(ihi,jlo,klo)] += (dx*(1.0-dy)*(1.0-dz)*charge);
-            thee->charge[IJK(ilo,jhi,khi)] += ((1.0-dx)*dy*dz *charge);
-            thee->charge[IJK(ilo,jlo,khi)] += ((1.0-dx)*(1.0-dy)*dz *charge);
-            thee->charge[IJK(ilo,jhi,klo)] += ((1.0-dx)*dy*(1.0-dz)*charge);
-            thee->charge[IJK(ilo,jlo,klo)] += ((1.0-dx)*(1.0-dy)*(1.0-dz)*charge);
+            if (in_khi) {
+                thee->charge[IJK(ihi,jhi,khi)] += (dx*dy*dz*charge);
+                thee->charge[IJK(ihi,jlo,khi)] += (dx*(1.0-dy)*dz*charge);
+                thee->charge[IJK(ilo,jhi,khi)] += ((1.0-dx)*dy*dz *charge);
+                thee->charge[IJK(ilo,jlo,khi)] += ((1.0-dx)*(1.0-dy)*dz *charge);
+            }
+            if (in_klo) {
+                thee->charge[IJK(ihi,jhi,klo)] += (dx*dy*(1.0-dz)*charge);
+                thee->charge[IJK(ihi,jlo,klo)] += (dx*(1.0-dy)*(1.0-dz)*charge);
+                thee->charge[IJK(ilo,jhi,klo)] += ((1.0-dx)*dy*(1.0-dz)*charge);
+                thee->charge[IJK(ilo,jlo,klo)] += ((1.0-dx)*(1.0-dy)*(1.0-dz)*charge);
+            }
         } /* endif (on the mesh) */
     } /* endfor (each atom) */
+    }
 }
 
 VPRIVATE double bspline2(double x) {
@@ -5206,7 +5227,7 @@ VPRIVATE void fillcoChargeSpline2(Vpmg *thee) {
     double xmin, xmax, ymin, ymax, zmin, zmax, zmagic;
     double xlen, ylen, zlen, position[3], ifloat, jfloat, kfloat;
     double charge, hx, hy, hzed, *apos, mx, my, mz;
-    int i, ii, jj, kk, nx, ny, nz, iatom;
+    int i, ii, jj, kk, nx, ny, nz, iatom, k_lo, k_hi, kk_lo, kk_hi;
     int im2, im1, ip1, ip2, jm2, jm1, jp1, jp2, km2, km1, kp1, kp2;
 
 
@@ -5239,10 +5260,21 @@ VPRIVATE void fillcoChargeSpline2(Vpmg *thee) {
     zmax = thee->pmgp->zcent + (zlen/2.0);
 
     /* Reset the charge array */
+#ifdef _OPENMP
+#pragma omp parallel for private(i) firstprivate(thee, nx, ny, nz) schedule(static)
+#endif
     for (i=0; i<(nx*ny*nz); i++) thee->charge[i] = 0.0;
 
     /* Fill in the source term (atomic charges) */
     Vnm_print(0, "Vpmg_fillco:  filling in source term.\n");
+#ifdef _OPENMP
+#pragma omp parallel private(k_lo, k_hi, kk_lo, kk_hi, iatom, atom, apos, charge, \
+    position, ifloat, jfloat, kfloat, im2, im1, ip1, ip2, jm2, jm1, jp1, jp2, \
+    km2, km1, kp1, kp2, ii, jj, kk, mx, my, mz) \
+    firstprivate(thee, alist, nx, ny, nz, hx, hy, hzed, xmin, xmax, ymin, ymax, zmin, zmax, zmagic)
+#endif
+    {
+    zSlabBounds(nz, &k_lo, &k_hi);
     for (iatom=0; iatom<Valist_getNumberAtoms(alist); iatom++) {
 
         atom = Valist_getAtom(alist, iatom);
@@ -5253,7 +5285,8 @@ VPRIVATE void fillcoChargeSpline2(Vpmg *thee) {
         if ((apos[0]<=(xmin-hx)) || (apos[0]>=(xmax+hx))  || \
             (apos[1]<=(ymin-hy)) || (apos[1]>=(ymax+hy))  || \
             (apos[2]<=(zmin-hzed)) || (apos[2]>=(zmax+hzed))) {
-            if ((thee->pmgp->bcfl != BCFL_FOCUS) &&
+            if ((k_lo == 0) &&
+                (thee->pmgp->bcfl != BCFL_FOCUS) &&
                 (thee->pmgp->bcfl != BCFL_MAP)) {
                 Vnm_print(2, "Vpmg_fillco:  Atom #%d at (%4.3f, %4.3f, \
 %4.3f) is off the mesh (for cubic splines!!) (ignoring this atom):\n",
@@ -5265,7 +5298,7 @@ VPRIVATE void fillcoChargeSpline2(Vpmg *thee) {
                 Vnm_print(2, "Vpmg_fillco:    zmin = %g, zmax = %g\n",
                   zmin, zmax);
             }
-            fflush(stderr);
+            if (k_lo == 0) fflush(stderr);
         } else {
 
             /* Convert the atom position to grid reference frame */
@@ -5309,12 +5342,16 @@ VPRIVATE void fillcoChargeSpline2(Vpmg *thee) {
             km1 = VMAX2(km1,0);
             km2 = VMAX2(km2,0);
 
+            kk_lo = VMAX2(km2, k_lo);
+            kk_hi = VMIN2(kp2, k_hi - 1);
+            if (kk_lo > kk_hi) continue;
+
             /* Now assign fractions of the charge to the nearby verts */
             for (ii=im2; ii<=ip2; ii++) {
                 mx = bspline2(VFCHI(ii,ifloat));
                 for (jj=jm2; jj<=jp2; jj++) {
                     my = bspline2(VFCHI(jj,jfloat));
-                    for (kk=km2; kk<=kp2; kk++) {
+                    for (kk=kk_lo; kk<=kk_hi; kk++) {
                         mz = bspline2(VFCHI(kk,kfloat));
                         thee->charge[IJK(ii,jj,kk)] += (charge*mx*my*mz);
                     }
@@ -5323,6 +5360,7 @@ VPRIVATE void fillcoChargeSpline2(Vpmg *thee) {
 
         } /* endif (on the mesh) */
     } /* endfor (each atom) */
+    }
 }
 
 VPUBLIC int Vpmg_fillco(Vpmg *thee,
@@ -6940,7 +6978,7 @@ VPUBLIC void fillcoPermanentMultipole(Vpmg *thee) {
     double mx,my,mz,dmx,dmy,dmz,d2mx,d2my,d2mz;
     double mi,mj,mk;
     /* Loop variables */
-    int i, ii, jj, kk, nx, ny, nz, iatom;
+    int i, ii, jj, kk, nx, ny, nz, iatom, k_lo, k_hi, kk_lo, kk_hi;
     int im2, im1, ip1, ip2, jm2, jm1, jp1, jp2, km2, km1, kp1, kp2;
 
     /* sanity check */
@@ -6980,6 +7018,16 @@ VPUBLIC void fillcoPermanentMultipole(Vpmg *thee) {
 
     /* Fill in the source term (permanent atomic multipoles) */
     Vnm_print(0, "fillcoPermanentMultipole:  filling in source term.\n");
+#ifdef _OPENMP
+#pragma omp parallel private(k_lo, k_hi, kk_lo, kk_hi, iatom, atom, apos, \
+    c, ux, uy, uz, qxx, qyx, qyy, qzx, qzy, qzz, charge, position, \
+    ifloat, jfloat, kfloat, im2, im1, ip1, ip2, jm2, jm1, jp1, jp2, \
+    km2, km1, kp1, kp2, ii, jj, kk, mi, mj, mk, mx, my, mz, dmx, dmy, dmz, \
+    d2mx, d2my, d2mz) \
+    firstprivate(thee, alist, nx, ny, nz, hx, hy, hzed, xmin, xmax, ymin, ymax, zmin, zmax, f)
+#endif
+    {
+    zSlabBounds(nz, &k_lo, &k_hi);
     for (iatom=0; iatom<Valist_getNumberAtoms(alist); iatom++) {
 
         atom = Valist_getAtom(alist, iatom);
@@ -7013,11 +7061,13 @@ VPUBLIC void fillcoPermanentMultipole(Vpmg *thee) {
         if ((apos[0]<=(xmin-2*hx)) || (apos[0]>=(xmax+2*hx))  || \
             (apos[1]<=(ymin-2*hy)) || (apos[1]>=(ymax+2*hy))  || \
             (apos[2]<=(zmin-2*hzed)) || (apos[2]>=(zmax+2*hzed))) {
-            Vnm_print(2, "fillcoPermanentMultipole: Atom #%d at (%4.3f, %4.3f, %4.3f) is off the mesh (ignoring this atom):\n", iatom, apos[0], apos[1], apos[2]);
-            Vnm_print(2, "fillcoPermanentMultipole: xmin = %g, xmax = %g\n", xmin, xmax);
-            Vnm_print(2, "fillcoPermanentMultipole: ymin = %g, ymax = %g\n", ymin, ymax);
-            Vnm_print(2, "fillcoPermanentMultipole: zmin = %g, zmax = %g\n", zmin, zmax);
-            fflush(stderr);
+            if (k_lo == 0) {
+                Vnm_print(2, "fillcoPermanentMultipole: Atom #%d at (%4.3f, %4.3f, %4.3f) is off the mesh (ignoring this atom):\n", iatom, apos[0], apos[1], apos[2]);
+                Vnm_print(2, "fillcoPermanentMultipole: xmin = %g, xmax = %g\n", xmin, xmax);
+                Vnm_print(2, "fillcoPermanentMultipole: ymin = %g, ymax = %g\n", ymin, ymax);
+                Vnm_print(2, "fillcoPermanentMultipole: zmin = %g, zmax = %g\n", zmin, zmax);
+                fflush(stderr);
+            }
         } else {
 
             /* Convert the atom position to grid reference frame */
@@ -7058,6 +7108,10 @@ VPUBLIC void fillcoPermanentMultipole(Vpmg *thee) {
             km1 = VMAX2(km1,0);
             km2 = VMAX2(km2,0);
 
+            kk_lo = VMAX2(km2, k_lo);
+            kk_hi = VMIN2(kp2, k_hi - 1);
+            if (kk_lo > kk_hi) continue;
+
             /* Now assign fractions of the charge to the nearby verts */
             for (ii=im2; ii<=ip2; ii++) {
                 mi = VFCHI4(ii,ifloat);
@@ -7069,7 +7123,7 @@ VPUBLIC void fillcoPermanentMultipole(Vpmg *thee) {
                     my = bspline4(mj);
                     dmy = dbspline4(mj);
                     d2my = d2bspline4(mj);
-                    for (kk=km2; kk<=kp2; kk++) {
+                    for (kk=kk_lo; kk<=kk_hi; kk++) {
                         mk = VFCHI4(kk,kfloat);
                         mz = bspline4(mk);
                         dmz = dbspline4(mk);
@@ -7137,6 +7191,7 @@ VPUBLIC void fillcoPermanentMultipole(Vpmg *thee) {
                 quad[6]*debye,quad[7]*debye,quad[8]*debye);  */
 
     } /* endfor (each atom) */
+    }
 }
 
 VPRIVATE void fillcoCoefSpline4(Vpmg *thee) {
